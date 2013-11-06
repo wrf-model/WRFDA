@@ -1,0 +1,450 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<a name='2'>
+<a name='3'>
+<a name='4'>
+<a name='5'>
+<a name='6'>
+<a name='7'>
+<a name='8'>
+<a name='9'>
+<a name='10'>
+<a name='11'>
+<a name='12'>
+<a name='13'>
+<a name='14'>
+<a name='15'>
+<font color=#447700>!WRF:MODEL_LAYER:PHYSICS<a name='16'></font>
+<font color=#447700>!<a name='17'></font>
+<A NAME='MODULE_RA_SW'><A href='../../html_code/phys/module_ra_sw.F.html#MODULE_RA_SW' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='18'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_ra_sw</font> <A href='../../call_to/MODULE_RA_SW.html' TARGET='index'>2</A><a name='19'>
+<a name='20'>
+CONTAINS<a name='21'>
+<a name='22'>
+<font color=#447700>!------------------------------------------------------------------<a name='23'></font>
+<A NAME='SWRAD'><A href='../../html_code/phys/module_ra_sw.F.html#SWRAD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='24'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>SWRAD</font>(dt,RTHRATEN,GSW,XLAT,XLONG,ALBEDO,            &amp; <A href='../../call_to/SWRAD.html' TARGET='index'>1</A>,<A href='../../call_from/SWRAD.html' TARGET='index'>1</A><a name='25'>
+                    aer_dry,aer_water,                            &amp;<a name='26'>
+   		    rho_phy,T3D,QV3D,QC3D,QR3D,                   &amp;<a name='27'>
+                    QI3D,QS3D,QG3D,P3D,pi3D,dz8w,GMT,             &amp;<a name='28'>
+                    R,CP,G,JULDAY,                                &amp;<a name='29'>
+                    XTIME,DECLIN,SOLCON,                          &amp;<a name='30'>
+                    P_QV,P_QC,P_QR,P_QI,P_QS,P_QG,                &amp;<a name='31'>
+                    P_FIRST_SCALAR,                               &amp;<a name='32'>
+                    RADFRQ,ICLOUD,DEGRAD,warm_rain,               &amp;<a name='33'>
+                    ids,ide, jds,jde, kds,kde,                    &amp; <a name='34'>
+                    ims,ime, jms,jme, kms,kme,                    &amp;<a name='35'>
+                    its,ite, jts,jte, kts,kte                     ) <a name='36'>
+<font color=#447700>!------------------------------------------------------------------<a name='37'></font>
+   IMPLICIT NONE<a name='38'>
+<font color=#447700>!------------------------------------------------------------------<a name='39'></font>
+   INTEGER,    INTENT(IN   ) ::        ids,ide, jds,jde, kds,kde, &amp;<a name='40'>
+                                       ims,ime, jms,jme, kms,kme, &amp;<a name='41'>
+                                       its,ite, jts,jte, kts,kte, &amp;<a name='42'>
+                                       ICLOUD,P_QV,P_QC,P_QR,     &amp;<a name='43'>
+                                       P_QI,P_QS,P_QG,            &amp;<a name='44'>
+                                       P_FIRST_SCALAR<a name='45'>
+   LOGICAL,    INTENT(IN   ) ::        warm_rain<a name='46'>
+<a name='47'>
+   REAL, INTENT(IN    )      ::        RADFRQ,DEGRAD,             &amp;<a name='48'>
+                                       XTIME,DECLIN,SOLCON<a name='49'>
+<font color=#447700>!<a name='50'></font>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &amp;<a name='51'>
+         INTENT(IN    ) ::                                   P3D, &amp;<a name='52'>
+                                               aer_dry,aer_water, &amp;<a name='53'>
+                                                            pi3D, &amp;<a name='54'>
+                                                             T3D, &amp;<a name='55'>
+                                                            QV3D, &amp;<a name='56'>
+                                                            QC3D, &amp;<a name='57'>
+                                                            QR3D, &amp;<a name='58'>
+                                                            QI3D, &amp;<a name='59'>
+                                                            QS3D, &amp;<a name='60'>
+                                                            QG3D, &amp;<a name='61'>
+                                                         rho_phy, &amp;<a name='62'>
+                                                            dz8w<a name='63'>
+<a name='64'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &amp;<a name='65'>
+         INTENT(INOUT)  ::                              RTHRATEN<a name='66'>
+<font color=#447700>!<a name='67'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ),                           &amp;<a name='68'>
+         INTENT(IN   )  ::                                  XLAT, &amp;<a name='69'>
+                                                           XLONG, &amp;<a name='70'>
+                                                          ALBEDO<a name='71'>
+<font color=#447700>!<a name='72'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ),                           &amp;<a name='73'>
+         INTENT(INOUT)  ::                                   GSW<a name='74'>
+<font color=#447700>!<a name='75'></font>
+   REAL, INTENT(IN   )   ::                        GMT,R,CP,G,dt<a name='76'>
+<font color=#447700>!<a name='77'></font>
+   INTEGER, INTENT(IN  ) ::                               JULDAY  <a name='78'>
+ <a name='79'>
+<font color=#447700>! LOCAL VARS<a name='80'></font>
+ <a name='81'>
+   REAL, DIMENSION( kts:kte ) ::                                  &amp;<a name='82'>
+                                                          TTEN1D, &amp;<a name='83'>
+                                                          RHO01D, &amp;<a name='84'>
+                                                             P1D, &amp;<a name='85'>
+                                                              DZ, &amp;<a name='86'>
+                                                             T1D, &amp;<a name='87'>
+                                                            QV1D, &amp;<a name='88'>
+                                                            QC1D, &amp;<a name='89'>
+                                                            QR1D, &amp;<a name='90'>
+                                                            QI1D, &amp;<a name='91'>
+                                                            QS1D, &amp;<a name='92'>
+                                                            QG1D<a name='93'>
+<font color=#447700>!<a name='94'></font>
+   REAL::      XLAT0,XLONG0,ALB0,GSW0<a name='95'>
+<font color=#447700>!<a name='96'></font>
+   INTEGER :: i,j,K,NK<a name='97'>
+   real :: aer_dry1(kts:kte),aer_water1(kts:kte)<a name='98'>
+<a name='99'>
+<font color=#447700>!------------------------------------------------------------------<a name='100'></font>
+   j_loop: DO J=jts,jte<a name='101'>
+   i_loop: DO I=its,ite<a name='102'>
+<a name='103'>
+<font color=#447700>! reverse vars <a name='104'></font>
+         DO K=kts,kte<a name='105'>
+            QV1D(K)=0.<a name='106'>
+            QC1D(K)=0.<a name='107'>
+            QR1D(K)=0.<a name='108'>
+            QI1D(K)=0.<a name='109'>
+            QS1D(K)=0.<a name='110'>
+            QG1D(K)=0.<a name='111'>
+         ENDDO<a name='112'>
+<a name='113'>
+         DO K=kts,kte<a name='114'>
+            NK=kme-1-K+kms<a name='115'>
+            TTEN1D(K)=0.<a name='116'>
+<a name='117'>
+            T1D(K)=T3D(I,NK,J)<a name='118'>
+            P1D(K)=P3D(I,NK,J)<a name='119'>
+            aer_dry1(k)=aer_dry(i,nk,j)<a name='120'>
+            aer_water1(k)=aer_water(i,nk,j)<a name='121'>
+            RHO01D(K)=rho_phy(I,NK,J)<a name='122'>
+            DZ(K)=dz8w(I,NK,J)<a name='123'>
+         ENDDO<a name='124'>
+<a name='125'>
+         IF (P_QV .ge. P_FIRST_SCALAR) THEN<a name='126'>
+            DO K=kts,kte<a name='127'>
+               NK=kme-1-K+kms<a name='128'>
+               QV1D(K)=QV3D(I,NK,J)<a name='129'>
+               QV1D(K)=max(0.,QV1D(K))<a name='130'>
+            ENDDO<a name='131'>
+         ENDIF<a name='132'>
+<a name='133'>
+         IF (P_QC .ge. P_FIRST_SCALAR) THEN<a name='134'>
+            DO K=kts,kte<a name='135'>
+               NK=kme-1-K+kms<a name='136'>
+               QC1D(K)=QC3D(I,NK,J)<a name='137'>
+               QC1D(K)=max(0.,QC1D(K))<a name='138'>
+            ENDDO<a name='139'>
+         ENDIF<a name='140'>
+<a name='141'>
+         IF (P_QR .ge. P_FIRST_SCALAR) THEN<a name='142'>
+            DO K=kts,kte<a name='143'>
+               NK=kme-1-K+kms<a name='144'>
+               QR1D(K)=QR3D(I,NK,J)<a name='145'>
+               QR1D(K)=max(0.,QR1D(K))<a name='146'>
+            ENDDO<a name='147'>
+         ENDIF<a name='148'>
+<a name='149'>
+<font color=#447700>!<a name='150'></font>
+         IF (P_QI .ge. P_FIRST_SCALAR) THEN<a name='151'>
+            DO K=kts,kte          <a name='152'>
+               NK=kme-1-K+kms<a name='153'>
+               QI1D(K)=QI3D(I,NK,J)<a name='154'>
+               QI1D(K)=max(0.,QI1D(K))<a name='155'>
+            ENDDO<a name='156'>
+         ELSE<a name='157'>
+            IF (.not. warm_rain) THEN<a name='158'>
+               DO K=kts,kte          <a name='159'>
+               IF(T1D(K) .lt. 273.15) THEN<a name='160'>
+                  QI1D(K)=QC1D(K)<a name='161'>
+                  QC1D(K)=0.<a name='162'>
+                  QS1D(K)=QR1D(K)<a name='163'>
+                  QR1D(K)=0.<a name='164'>
+               ENDIF<a name='165'>
+               ENDDO<a name='166'>
+            ENDIF<a name='167'>
+         ENDIF<a name='168'>
+<a name='169'>
+         IF (P_QS .ge. P_FIRST_SCALAR) THEN<a name='170'>
+            DO K=kts,kte          <a name='171'>
+               NK=kme-1-K+kms<a name='172'>
+               QS1D(K)=QS3D(I,NK,J)<a name='173'>
+               QS1D(K)=max(0.,QS1D(K))<a name='174'>
+            ENDDO<a name='175'>
+         ENDIF<a name='176'>
+<a name='177'>
+         IF (P_QG .ge. P_FIRST_SCALAR) THEN<a name='178'>
+            DO K=kts,kte          <a name='179'>
+               NK=kme-1-K+kms<a name='180'>
+               QG1D(K)=QG3D(I,NK,J)<a name='181'>
+               QG1D(K)=max(0.,QG1D(K))<a name='182'>
+            ENDDO<a name='183'>
+         ENDIF<a name='184'>
+<a name='185'>
+         XLAT0=XLAT(I,J)<a name='186'>
+         XLONG0=XLONG(I,J)<a name='187'>
+         ALB0=ALBEDO(I,J)<a name='188'>
+<a name='189'>
+         CALL <A href='../../html_code/phys/module_ra_sw.F.html#SWPARA'>SWPARA</A><A href='../../html_code/phys/module_ra_sw.F.html#SWRAD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SWPARA_1">(TTEN1D,GSW0,XLAT0,XLONG0,ALB0,              &amp;<a name='190'>
+                     T1D,QV1D,QC1D,QR1D,QI1D,QS1D,QG1D,P1D,      &amp;<a name='191'>
+                     XTIME,GMT,RHO01D,DZ,                        &amp;<a name='192'>
+                     R,CP,G,DECLIN,SOLCON,                       &amp;<a name='193'>
+                     RADFRQ,ICLOUD,DEGRAD,aer_dry1,aer_water1,   &amp;<a name='194'>
+                     kts,kte                                     )<a name='195'>
+<a name='196'>
+         GSW(I,J)=GSW0<a name='197'>
+         DO K=kts,kte          <a name='198'>
+            NK=kme-1-K+kms<a name='199'>
+            RTHRATEN(I,K,J)=RTHRATEN(I,K,J)+TTEN1D(NK)/pi3D(I,K,J)<a name='200'>
+         ENDDO<a name='201'>
+<font color=#447700>!<a name='202'></font>
+   ENDDO i_loop<a name='203'>
+   ENDDO j_loop                                          <a name='204'>
+<a name='205'>
+   END SUBROUTINE SWRAD<a name='206'>
+<a name='207'>
+<font color=#447700>!------------------------------------------------------------------<a name='208'></font>
+<A NAME='SWPARA'><A href='../../html_code/phys/module_ra_sw.F.html#SWPARA' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='209'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>SWPARA</font>(TTEN,GSW,XLAT,XLONG,ALBEDO,                  &amp; <A href='../../call_to/SWPARA.html' TARGET='index'>1</A><a name='210'>
+                     T,QV,QC,QR,QI,QS,QG,P,            		  &amp;<a name='211'>
+                     XTIME, GMT, RHO0, DZ,             		  &amp;<a name='212'>
+                     R,CP,G,DECLIN,SOLCON,             		  &amp;<a name='213'>
+                     RADFRQ,ICLOUD,DEGRAD,aer_dry1,aer_water1,    &amp;<a name='214'>
+                     kts,kte                            	  )<a name='215'>
+<font color=#447700>!------------------------------------------------------------------<a name='216'></font>
+<font color=#447700>!     TO CALCULATE SHORT-WAVE ABSORPTION AND SCATTERING IN CLEAR<a name='217'></font>
+<font color=#447700>!     AIR AND REFLECTION AND ABSORPTION IN CLOUD LAYERS (STEPHENS,<a name='218'></font>
+<font color=#447700>!     1984)<a name='219'></font>
+<font color=#447700>!     CHANGES:<a name='220'></font>
+<font color=#447700>!       REDUCE EFFECTS OF ICE CLOUDS AND PRECIP ON LIQUID WATER PATH<a name='221'></font>
+<font color=#447700>!       ADD EFFECT OF GRAUPEL<a name='222'></font>
+<font color=#447700>!------------------------------------------------------------------<a name='223'></font>
+<a name='224'>
+  INTEGER, INTENT(IN ) ::                 kts,kte<a name='225'>
+<font color=#447700>!<a name='226'></font>
+  REAL, DIMENSION( kts:kte ), INTENT(IN   )  ::                   &amp;<a name='227'>
+                                                            RHO0, &amp;<a name='228'>
+                                                               T, &amp;<a name='229'>
+                                                               P, &amp;<a name='230'>
+                                                              DZ, &amp;<a name='231'>
+                                                              QV, &amp;<a name='232'>
+                                                              QC, &amp;<a name='233'>
+                                                              QR, &amp;<a name='234'>
+                                                              QI, &amp;<a name='235'>
+                                                              QS, &amp;<a name='236'>
+                                                              QG<a name='237'>
+<a name='238'>
+   REAL, DIMENSION( kts:kte ), INTENT(INOUT)::              TTEN<a name='239'>
+<font color=#447700>!<a name='240'></font>
+   REAL, INTENT(IN  )   ::               XTIME,GMT,R,CP,G,DECLIN, &amp;<a name='241'>
+                                        SOLCON,XLAT,XLONG,ALBEDO, &amp;<a name='242'>
+                                                  RADFRQ, DEGRAD<a name='243'>
+<font color=#447700>!<a name='244'></font>
+   REAL, INTENT(INOUT)  ::                                   GSW<a name='245'>
+<font color=#447700>!<a name='246'></font>
+<font color=#447700>! LOCAL VARS<a name='247'></font>
+<font color=#447700>!<a name='248'></font>
+   REAL, DIMENSION( kts:kte+1 ) ::                         SDOWN<a name='249'>
+<a name='250'>
+   REAL, DIMENSION( kts:kte )   ::                          XLWP, &amp;<a name='251'>
+						            XATP, &amp;<a name='252'>
+						            XWVP, &amp;<a name='253'>
+                                             aer_dry1,aer_water1, &amp;<a name='254'>
+						              RO<a name='255'>
+<font color=#447700>!<a name='256'></font>
+   REAL, DIMENSION( 4, 5 ) ::                             ALBTAB, &amp;<a name='257'>
+                                                          ABSTAB<a name='258'>
+<a name='259'>
+   REAL, DIMENSION( 4    ) ::                             XMUVAL<a name='260'>
+<a name='261'>
+<font color=#447700>!------------------------------------------------------------------<a name='262'></font>
+<a name='263'>
+      DATA ALBTAB/0.,0.,0.,0., &amp;<a name='264'>
+           69.,58.,40.,15.,    &amp;<a name='265'>
+           90.,80.,70.,60.,    &amp;<a name='266'>
+           94.,90.,82.,78.,    &amp;<a name='267'>
+           96.,92.,85.,80./<a name='268'>
+<a name='269'>
+      DATA ABSTAB/0.,0.,0.,0., &amp;<a name='270'>
+           0.,2.5,4.,5.,       &amp;<a name='271'>
+           0.,2.6,7.,10.,      &amp;<a name='272'>
+           0.,3.3,10.,14.,     &amp;<a name='273'>
+           0.,3.7,10.,15./<a name='274'>
+<a name='275'>
+      DATA XMUVAL/0.,0.2,0.5,1.0/<a name='276'>
+<a name='277'>
+      GSW=0.0<a name='278'>
+      bext340=5.E-6<a name='279'>
+      bexth2o=5.E-6<a name='280'>
+      SOLTOP=SOLCON<a name='281'>
+      XT24=DMOD(DBLE(XTIME+RADFRQ*0.5),DBLE(1440.0))<a name='282'>
+      TLOCTM=GMT+XT24/60.+XLONG/15.<a name='283'>
+      HRANG=15.*(TLOCTM-12.)*DEGRAD<a name='284'>
+      XXLAT=XLAT*DEGRAD<a name='285'>
+      CSZA=SIN(XXLAT)*SIN(DECLIN)+COS(XXLAT)*COS(DECLIN)*COS(HRANG)<a name='286'>
+<a name='287'>
+<font color=#447700>!     RETURN IF NIGHT<a name='288'></font>
+      IF(CSZA.LE.1.E-9)GOTO 7<a name='289'>
+<font color=#447700>!<a name='290'></font>
+      DO K=kts, kte<a name='291'>
+<a name='292'>
+<font color=#447700>! P in the unit of 10mb<a name='293'></font>
+         RO(K)=P(K)/(R*T(K))<a name='294'>
+         XWVP(K)=RO(K)*QV(K)*DZ(K)*1000.<a name='295'>
+<font color=#447700>! KG/M**2<a name='296'></font>
+          XATP(K)=RO(K)*DZ(K)<a name='297'>
+      ENDDO<a name='298'>
+<font color=#447700>!<a name='299'></font>
+<font color=#447700>!     G/M**2<a name='300'></font>
+<font color=#447700>!     REDUCE WEIGHT OF LIQUID AND ICE IN SHORT-WAVE SCHEME<a name='301'></font>
+<font color=#447700>!     ADD GRAUPEL EFFECT (ASSUMED SAME AS RAIN)<a name='302'></font>
+<font color=#447700>!<a name='303'></font>
+      IF (ICLOUD.EQ.0)THEN<a name='304'>
+         DO K=kts, kte<a name='305'>
+            XLWP(K)=0.<a name='306'>
+         ENDDO<a name='307'>
+      ELSE<a name='308'>
+         DO K=kts, kte<a name='309'>
+            XLWP(K)=RO(K)*1000.*DZ(K)*(QC(K)+0.1*QI(K)+0.05* &amp;<a name='310'>
+                    QR(K)+0.02*QS(K)+0.05*QG(K))<a name='311'>
+         ENDDO<a name='312'>
+      ENDIF<a name='313'>
+<font color=#447700>!<a name='314'></font>
+      XMU=CSZA<a name='315'>
+      SDOWN(1)=SOLTOP*XMU<a name='316'>
+<font color=#447700>!     SET WW (G/M**2) LIQUID WATER PATH INTEGRATED DOWN<a name='317'></font>
+<font color=#447700>!     SET UV (G/M**2) WATER VAPOR PATH INTEGRATED DOWN<a name='318'></font>
+      WW=0.<a name='319'>
+      UV=0.<a name='320'>
+      OLDALB=0.<a name='321'>
+      OLDABC=0.<a name='322'>
+      TOTABS=0.<a name='323'>
+<font color=#447700>!     CONTRIBUTIONS DUE TO CLEAR AIR AND CLOUD<a name='324'></font>
+      DSCA=0.<a name='325'>
+      DABS=0.<a name='326'>
+      DSCLD=0.<a name='327'>
+<font color=#447700>!<a name='328'></font>
+<font color=#447700>! CONTRIBUTION DUE TO AEROSOLS (FOR CHEMISTRY)<a name='329'></font>
+      DABSA=0.<a name='330'>
+<font color=#447700>!<a name='331'></font>
+      DO 200 K=kts,kte<a name='332'>
+         WW=WW+XLWP(K)<a name='333'>
+         UV=UV+XWVP(K)<a name='334'>
+<font color=#447700>!     WGM IS WW/COS(THETA) (G/M**2)<a name='335'></font>
+<font color=#447700>!     UGCM IS UV/COS(THETA) (G/CM**2)<a name='336'></font>
+         WGM=WW/XMU<a name='337'>
+         UGCM=UV*0.0001/XMU<a name='338'>
+<font color=#447700>!<a name='339'></font>
+         OLDABS=TOTABS<a name='340'>
+<font color=#447700>!     WATER VAPOR ABSORPTION AS IN LACIS AND HANSEN (1974)<a name='341'></font>
+         TOTABS=2.9*UGCM/((1.+141.5*UGCM)**0.635+5.925*UGCM)<a name='342'>
+<font color=#447700>!     APPROXIMATE RAYLEIGH + AEROSOL SCATTERING<a name='343'></font>
+         XSCA=1.E-5*XATP(K)/XMU<a name='344'>
+<font color=#447700>!         XSCA=(1.E-5*XATP(K)+aer_dry1(K)*bext340+aer_water1(K)*bexth2o)/XMU   <a name='345'></font>
+<font color=#447700>!     LAYER VAPOR ABSORPTION DONE FIRST<a name='346'></font>
+         XABS=(TOTABS-OLDABS)*(SDOWN(1)-DSCLD-DSCA-DABSA)/SDOWN(K)<a name='347'>
+<font color=#447700>!rs   AEROSOL ABSORB (would be elemental carbon). So far XABSA = 0.<a name='348'></font>
+         XABSA=0.<a name='349'>
+         IF(XABS.LT.0.)XABS=0.<a name='350'>
+<font color=#447700>!<a name='351'></font>
+         ALW=ALOG10(WGM+1.)<a name='352'>
+         IF(ALW.GT.3.999)ALW=3.999<a name='353'>
+<font color=#447700>!<a name='354'></font>
+         DO II=1,3<a name='355'>
+            IF(XMU.GT.XMUVAL(II))THEN<a name='356'>
+              IIL=II<a name='357'>
+              IU=II+1<a name='358'>
+              XI=(XMU-XMUVAL(II))/(XMUVAL(II+1)-XMUVAL(II))+FLOAT(IIL)<a name='359'>
+            ENDIF<a name='360'>
+         ENDDO<a name='361'>
+<font color=#447700>!<a name='362'></font>
+         JJL=IFIX(ALW)+1<a name='363'>
+         JU=JJL+1<a name='364'>
+         YJ=ALW+1.<a name='365'>
+<font color=#447700>!     CLOUD ALBEDO<a name='366'></font>
+         ALBA=(ALBTAB(IU,JU)*(XI-IIL)*(YJ-JJL)   &amp;<a name='367'>
+              +ALBTAB(IIL,JU)*(IU-XI)*(YJ-JJL)   &amp;<a name='368'>
+              +ALBTAB(IU,JJL)*(XI-IIL)*(JU-YJ)   &amp;<a name='369'>
+              +ALBTAB(IIL,JJL)*(IU-XI)*(JU-YJ))  &amp;<a name='370'>
+             /((IU-IIL)*(JU-JJL))<a name='371'>
+<font color=#447700>!     CLOUD ABSORPTION<a name='372'></font>
+         ABSC=(ABSTAB(IU,JU)*(XI-IIL)*(YJ-JJL)   &amp;<a name='373'>
+              +ABSTAB(IIL,JU)*(IU-XI)*(YJ-JJL)   &amp;<a name='374'>
+              +ABSTAB(IU,JJL)*(XI-IIL)*(JU-YJ)   &amp;<a name='375'>
+              +ABSTAB(IIL,JJL)*(IU-XI)*(JU-YJ))  &amp;<a name='376'>
+             /((IU-IIL)*(JU-JJL))<a name='377'>
+<font color=#447700>!     LAYER ALBEDO AND ABSORPTION<a name='378'></font>
+         XALB=(ALBA-OLDALB)*(SDOWN(1)-DSCA-DABS)/SDOWN(K)<a name='379'>
+         XABSC=(ABSC-OLDABC)*(SDOWN(1)-DSCA-DABS)/SDOWN(K)<a name='380'>
+         IF(XALB.LT.0.)XALB=0.<a name='381'>
+         IF(XABSC.LT.0.)XABSC=0.<a name='382'>
+         DSCLD=DSCLD+(XALB+XABSC)*SDOWN(K)*0.01<a name='383'>
+         DSCA=DSCA+XSCA*SDOWN(K)<a name='384'>
+         DABS=DABS+XABS*SDOWN(K)<a name='385'>
+         DABSA=DABSA+XABSA*SDOWN(K)<a name='386'>
+         OLDALB=ALBA<a name='387'>
+         OLDABC=ABSC<a name='388'>
+<font color=#447700>!     LAYER TRANSMISSIVITY<a name='389'></font>
+         TRANS0=100.-XALB-XABSC-XABS*100.-XSCA*100.<a name='390'>
+         IF(TRANS0.LT.1.)THEN<a name='391'>
+           FF=99./(XALB+XABSC+XABS*100.+XSCA*100.)<a name='392'>
+           XALB=XALB*FF<a name='393'>
+           XABSC=XABSC*FF<a name='394'>
+           XABS=XABS*FF<a name='395'>
+           XSCA=XSCA*FF<a name='396'>
+           TRANS0=1.<a name='397'>
+         ENDIF<a name='398'>
+         SDOWN(K+1)=AMAX1(1.E-9,SDOWN(K)*TRANS0*0.01)<a name='399'>
+         TTEN(K)=SDOWN(K)*(XABSC+XABS*100.+XABSA*100.)*0.01/( &amp;<a name='400'>
+                 RO(K)*CP*DZ(K))<a name='401'>
+  200   CONTINUE<a name='402'>
+<font color=#447700>!<a name='403'></font>
+        GSW=(1.-ALBEDO)*SDOWN(kte+1)<a name='404'>
+<a name='405'>
+    7 CONTINUE<a name='406'>
+<font color=#447700>!<a name='407'></font>
+   END SUBROUTINE SWPARA<a name='408'>
+<a name='409'>
+<font color=#447700>!====================================================================<a name='410'></font>
+<A NAME='SWINIT'><A href='../../html_code/phys/module_ra_sw.F.html#SWINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='411'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>swinit</font>(RTHRATEN,RTHRATENSW,restart,                   &amp; <A href='../../call_to/SWINIT.html' TARGET='index'>1</A><a name='412'>
+                     allowed_to_read ,                              &amp;<a name='413'>
+                     ids, ide, jds, jde, kds, kde,                  &amp;<a name='414'>
+                     ims, ime, jms, jme, kms, kme,                  &amp;<a name='415'>
+                     its, ite, jts, jte, kts, kte                   )<a name='416'>
+<font color=#447700>!--------------------------------------------------------------------<a name='417'></font>
+   IMPLICIT NONE<a name='418'>
+<font color=#447700>!--------------------------------------------------------------------<a name='419'></font>
+   LOGICAL , INTENT(IN)           :: restart<a name='420'>
+   LOGICAL , INTENT(IN)           :: allowed_to_read <a name='421'>
+   INTEGER , INTENT(IN)           :: ids, ide, jds, jde, kds, kde,  &amp;<a name='422'>
+                                     ims, ime, jms, jme, kms, kme,  &amp;<a name='423'>
+                                     its, ite, jts, jte, kts, kte<a name='424'>
+<a name='425'>
+   REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(INOUT) ::        &amp;<a name='426'>
+                                                          RTHRATEN, &amp;<a name='427'>
+                                                        RTHRATENSW<a name='428'>
+   INTEGER :: i, j, k, itf, jtf, ktf<a name='429'>
+<a name='430'>
+   jtf=min0(jte,jde-1)<a name='431'>
+   ktf=min0(kte,kde-1)<a name='432'>
+   itf=min0(ite,ide-1)<a name='433'>
+<a name='434'>
+   IF(.not.restart)THEN<a name='435'>
+     DO j=jts,jtf<a name='436'>
+     DO k=kts,ktf<a name='437'>
+     DO i=its,itf<a name='438'>
+        RTHRATEN(i,k,j)=0.<a name='439'>
+        RTHRATENSW(i,k,j)=0.<a name='440'>
+     ENDDO<a name='441'>
+     ENDDO<a name='442'>
+     ENDDO<a name='443'>
+   ENDIF<a name='444'>
+<a name='445'>
+   END SUBROUTINE swinit<a name='446'>
+<a name='447'>
+<a name='448'>
+END MODULE module_ra_sw<a name='449'>
+</pre></body></html>

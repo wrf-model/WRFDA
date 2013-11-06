@@ -1,0 +1,757 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER: PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<font color=#447700>! note: this module really belongs in the dyn_em directory since it is <a name='4'></font>
+<font color=#447700>!       specific only to the EM core. Leaving here for now, with an <a name='5'></font>
+<font color=#447700>!       #if ( EM_CORE == 1 ) directive. JM 20031201<a name='6'></font>
+<font color=#447700>!<a name='7'></font>
+<a name='8'>
+<font color=#447700>!  This MODULE holds the routines which are used to perform updates of the<a name='9'></font>
+<font color=#447700>!  model C-grid tendencies with physics A-grid tendencies<a name='10'></font>
+<font color=#447700>!  The module consolidates code that was (up to v1.2) duplicated in <a name='11'></font>
+<font color=#447700>!  module_em and module_rk and in<a name='12'></font>
+<font color=#447700>!  module_big_step_utilities.F and module_big_step_utilities_em.F<a name='13'></font>
+<a name='14'>
+<font color=#447700>!  This MODULE CONTAINS the following routines:<a name='15'></font>
+<font color=#447700>!  update_phy_ten, phy_ra_ten, phy_bl_ten, phy_cu_ten, advance_ppt,<a name='16'></font>
+<font color=#447700>!  add_a2a, add_a2c_u, and add_a2c_v<a name='17'></font>
+<a name='18'>
+<a name='19'>
+<A NAME='MODULE_PHYSICS_ADDTENDC'><A href='../../html_code/phys/module_physics_addtendc.F.html#MODULE_PHYSICS_ADDTENDC' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='20'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_physics_addtendc</font> <A href='../../call_to/MODULE_PHYSICS_ADDTENDC.html' TARGET='index'>5</A><a name='21'>
+<a name='22'>
+#if ( EM_CORE == 1 )<a name='23'>
+<a name='24'>
+   USE module_state_description<a name='25'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/phys/module_physics_addtendc.F.html#module_physics_addtendc.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_106"><a name='26'>
+<a name='27'>
+CONTAINS<a name='28'>
+<a name='29'>
+<A NAME='UPDATE_PHY_TEN'><A href='../../html_code/phys/module_physics_addtendc.F.html#UPDATE_PHY_TEN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='30'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>update_phy_ten</font>(rt_tendf,ru_tendf,rv_tendf,moist_tendf,  &amp; <A href='../../call_to/UPDATE_PHY_TEN.html' TARGET='index'>3</A>,<A href='../../call_from/UPDATE_PHY_TEN.html' TARGET='index'>3</A><a name='31'>
+                      RTHRATEN,RTHBLTEN,RTHCUTEN,RUBLTEN,RVBLTEN,  &amp;<a name='32'>
+                      RQVBLTEN,RQCBLTEN,RQIBLTEN,                  &amp;<a name='33'>
+                      RQVCUTEN,RQCCUTEN,RQRCUTEN,RQICUTEN,RQSCUTEN,&amp;<a name='34'>
+                      n_moist,config_flags,rk_step,                &amp;<a name='35'>
+                      ids, ide, jds, jde, kds, kde,                &amp;<a name='36'>
+                      ims, ime, jms, jme, kms, kme,                &amp;<a name='37'>
+                      its, ite, jts, jte, kts, kte                 )<a name='38'>
+<font color=#447700>!-------------------------------------------------------------------<a name='39'></font>
+   IMPLICIT NONE<a name='40'>
+<font color=#447700>!-------------------------------------------------------------------<a name='41'></font>
+<a name='42'>
+   TYPE(grid_config_rec_type   ) ,   INTENT(IN   ) :: config_flags<a name='43'>
+<a name='44'>
+   INTEGER , INTENT(IN)        ::  ids, ide, jds, jde, kds, kde,   &amp;<a name='45'>
+                                   ims, ime, jms, jme, kms, kme,   &amp;<a name='46'>
+                                   its, ite, jts, jte, kts, kte,   &amp;<a name='47'>
+                                   n_moist,rk_step<a name='48'>
+<a name='49'>
+   REAL , DIMENSION(ims:ime , kms:kme, jms:jme),INTENT(INOUT) ::   &amp;<a name='50'>
+                                                         ru_tendf, &amp;<a name='51'>
+                                                         rv_tendf, &amp;<a name='52'>
+                                                         rt_tendf<a name='53'>
+<a name='54'>
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_moist),           &amp;<a name='55'>
+          INTENT(INOUT)     ::                        moist_tendf<a name='56'>
+<a name='57'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN  ) ::   &amp;<a name='58'>
+                                                       RTHRATEN, &amp;<a name='59'>
+                                                       RTHBLTEN, &amp;<a name='60'>
+                                                       RTHCUTEN, &amp;<a name='61'>
+                                                        RUBLTEN, &amp;<a name='62'>
+                                                        RVBLTEN, &amp;<a name='63'>
+                                                       RQVBLTEN, &amp;<a name='64'>
+                                                       RQCBLTEN, &amp;<a name='65'>
+                                                       RQIBLTEN, &amp;<a name='66'>
+                                                       RQVCUTEN, &amp;<a name='67'>
+                                                       RQCCUTEN, &amp;<a name='68'>
+                                                       RQRCUTEN, &amp;<a name='69'>
+                                                       RQICUTEN, &amp;<a name='70'>
+                                                       RQSCUTEN<a name='71'>
+<font color=#447700>!------------------------------------------------------------------<a name='72'></font>
+<a name='73'>
+<font color=#447700>!  set up loop bounds for this grid's boundary conditions<a name='74'></font>
+<a name='75'>
+   if (config_flags%ra_lw_physics .gt. 0 .or.                  &amp;<a name='76'>
+       config_flags%ra_sw_physics .gt. 0)                      &amp;<a name='77'>
+      CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_RA_TEN'>phy_ra_ten</A><A href='../../html_code/phys/module_physics_addtendc.F.html#UPDATE_PHY_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PHY_RA_TEN_1">(config_flags,rt_tendf,RTHRATEN,          &amp;<a name='78'>
+                      ids, ide, jds, jde, kds, kde,            &amp;<a name='79'>
+                      ims, ime, jms, jme, kms, kme,            &amp;<a name='80'>
+                      its, ite, jts, jte, kts, kte             )<a name='81'>
+<a name='82'>
+   if (config_flags%bl_pbl_physics .gt. 0)                     &amp;<a name='83'>
+      CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN'>phy_bl_ten</A><A href='../../html_code/phys/module_physics_addtendc.F.html#UPDATE_PHY_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PHY_BL_TEN_1">(config_flags,rk_step,n_moist,           &amp;<a name='84'>
+                      rt_tendf,ru_tendf,rv_tendf,moist_tendf,  &amp;<a name='85'>
+                      RTHBLTEN,RUBLTEN,RVBLTEN,                &amp;<a name='86'>
+                      RQVBLTEN,RQCBLTEN,RQIBLTEN,              &amp;<a name='87'>
+                      ids, ide, jds, jde, kds, kde,            &amp;<a name='88'>
+                      ims, ime, jms, jme, kms, kme,            &amp;<a name='89'>
+                      its, ite, jts, jte, kts, kte             )<a name='90'>
+<a name='91'>
+   if (config_flags%cu_physics .gt. 0)                         &amp;<a name='92'>
+      CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN'>phy_cu_ten</A><A href='../../html_code/phys/module_physics_addtendc.F.html#UPDATE_PHY_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PHY_CU_TEN_1">(config_flags,rk_step,n_moist,rt_tendf,  &amp;<a name='93'>
+                      RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,     &amp;<a name='94'>
+                      RQICUTEN,RQSCUTEN,moist_tendf,           &amp;<a name='95'>
+                      ids, ide, jds, jde, kds, kde,            &amp;<a name='96'>
+                      ims, ime, jms, jme, kms, kme,            &amp;<a name='97'>
+                      its, ite, jts, jte, kts, kte             )<a name='98'>
+<a name='99'>
+END SUBROUTINE update_phy_ten<a name='100'>
+<a name='101'>
+<font color=#447700>!=================================================================<a name='102'></font>
+<A NAME='PHY_RA_TEN'><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_RA_TEN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='103'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>phy_ra_ten</font>(config_flags,rt_tendf,RTHRATEN,            &amp; <A href='../../call_to/PHY_RA_TEN.html' TARGET='index'>1</A>,<A href='../../call_from/PHY_RA_TEN.html' TARGET='index'>1</A><a name='104'>
+                      ids, ide, jds, jde, kds, kde,              &amp;<a name='105'>
+                      ims, ime, jms, jme, kms, kme,              &amp;<a name='106'>
+                      its, ite, jts, jte, kts, kte               )<a name='107'>
+<font color=#447700>!-----------------------------------------------------------------<a name='108'></font>
+   IMPLICIT NONE<a name='109'>
+<font color=#447700>!-----------------------------------------------------------------<a name='110'></font>
+   TYPE(grid_config_rec_type  ) , INTENT(IN   ) :: config_flags<a name='111'>
+<a name='112'>
+   INTEGER , INTENT(IN)        ::  ids, ide, jds, jde, kds, kde, &amp;<a name='113'>
+                                   ims, ime, jms, jme, kms, kme, &amp;<a name='114'>
+                                   its, ite, jts, jte, kts, kte<a name='115'>
+<a name='116'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN  ) ::   &amp;<a name='117'>
+                                                       RTHRATEN<a name='118'>
+<a name='119'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(INOUT) ::  &amp;<a name='120'>
+                                                       rt_tendf<a name='121'>
+<a name='122'>
+<font color=#447700>! LOCAL VARS<a name='123'></font>
+<a name='124'>
+   INTEGER :: i,j,k<a name='125'>
+<a name='126'>
+   CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_RA_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_1">(rt_tendf,RTHRATEN,config_flags,                  &amp;<a name='127'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='128'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='129'>
+                its, ite, jts, jte, kts, kte                     )<a name='130'>
+<a name='131'>
+END SUBROUTINE phy_ra_ten<a name='132'>
+<a name='133'>
+<font color=#447700>!=================================================================<a name='134'></font>
+<A NAME='PHY_BL_TEN'><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='135'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>phy_bl_ten</font>(config_flags,rk_step,n_moist,             &amp; <A href='../../call_to/PHY_BL_TEN.html' TARGET='index'>1</A>,<A href='../../call_from/PHY_BL_TEN.html' TARGET='index'>16</A><a name='136'>
+                      rt_tendf,ru_tendf,rv_tendf,moist_tendf,    &amp;<a name='137'>
+                      RTHBLTEN,RUBLTEN,RVBLTEN,                  &amp; <a name='138'>
+                      RQVBLTEN,RQCBLTEN,RQIBLTEN,                &amp;<a name='139'>
+                      ids, ide, jds, jde, kds, kde,              &amp;<a name='140'>
+                      ims, ime, jms, jme, kms, kme,              &amp;<a name='141'>
+                      its, ite, jts, jte, kts, kte               )<a name='142'>
+<font color=#447700>!-----------------------------------------------------------------<a name='143'></font>
+   IMPLICIT NONE<a name='144'>
+<font color=#447700>!-----------------------------------------------------------------<a name='145'></font>
+   TYPE(grid_config_rec_type) ,     INTENT(IN   ) :: config_flags<a name='146'>
+<a name='147'>
+   INTEGER , INTENT(IN)        ::  ids, ide, jds, jde, kds, kde, &amp;<a name='148'>
+                                   ims, ime, jms, jme, kms, kme, &amp;<a name='149'>
+                                   its, ite, jts, jte, kts, kte, &amp;<a name='150'>
+                                   n_moist, rk_step<a name='151'>
+<a name='152'>
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_moist),         &amp;<a name='153'>
+          INTENT(INOUT)     ::                      moist_tendf<a name='154'>
+<a name='155'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN  ) ::   &amp; <a name='156'>
+                                                       RTHBLTEN, &amp;<a name='157'>
+                                                        RUBLTEN, &amp;<a name='158'>
+                                                        RVBLTEN, &amp;<a name='159'>
+                                                       RQVBLTEN, &amp;<a name='160'>
+                                                       RQCBLTEN, &amp;<a name='161'>
+                                                       RQIBLTEN<a name='162'>
+<a name='163'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(INOUT)::   &amp;<a name='164'>
+                                                       rt_tendf, &amp;<a name='165'>
+                                                       ru_tendf, &amp;<a name='166'>
+                                                       rv_tendf<a name='167'>
+<font color=#447700>! LOCAL VARS<a name='168'></font>
+<a name='169'>
+   INTEGER :: i,j,k,IBGN,IEND,JBGN,JEND<a name='170'>
+<a name='171'>
+<font color=#447700>!-----------------------------------------------------------------<a name='172'></font>
+<a name='173'>
+   SELECT CASE(config_flags%bl_pbl_physics)<a name='174'>
+<a name='175'>
+      CASE (YSUSCHEME)<a name='176'>
+<a name='177'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_2">(rt_tendf,RTHBLTEN,config_flags,          &amp;<a name='178'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='179'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='180'>
+                its, ite, jts, jte, kts, kte                     )<a name='181'>
+<a name='182'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_U'>add_a2c_u</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2C_U_1">(ru_tendf,RUBLTEN,config_flags,         &amp;<a name='183'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='184'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='185'>
+                its, ite, jts, jte, kts, kte                     )<a name='186'>
+<a name='187'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_V'>add_a2c_v</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2C_V_1">(rv_tendf,RVBLTEN,config_flags,         &amp;<a name='188'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='189'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='190'>
+                its, ite, jts, jte, kts, kte                     )<a name='191'>
+<a name='192'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='193'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_3">(moist_tendf(ims,kms,jms,P_QV),RQVBLTEN,  &amp;<a name='194'>
+                config_flags,                                    &amp;<a name='195'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='196'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='197'>
+                its, ite, jts, jte, kts, kte                     )<a name='198'>
+<a name='199'>
+        if (P_QC .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='200'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_4">(moist_tendf(ims,kms,jms,P_QC),RQCBLTEN,  &amp;<a name='201'>
+                config_flags,                                    &amp;<a name='202'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='203'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='204'>
+                its, ite, jts, jte, kts, kte                     )<a name='205'>
+     <a name='206'>
+        if (P_QI .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='207'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_5">(moist_tendf(ims,kms,jms,P_QI),RQIBLTEN,  &amp;<a name='208'>
+                config_flags,                                    &amp;<a name='209'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='210'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='211'>
+                its, ite, jts, jte, kts, kte                     )<a name='212'>
+<a name='213'>
+      CASE (MRFSCHEME)<a name='214'>
+<a name='215'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_6">(rt_tendf,RTHBLTEN,config_flags,          &amp;<a name='216'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='217'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='218'>
+                its, ite, jts, jte, kts, kte                     )<a name='219'>
+<a name='220'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_U'>add_a2c_u</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2C_U_2">(ru_tendf,RUBLTEN,config_flags,         &amp;<a name='221'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='222'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='223'>
+                its, ite, jts, jte, kts, kte                     )<a name='224'>
+<a name='225'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_V'>add_a2c_v</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2C_V_2">(rv_tendf,RVBLTEN,config_flags,         &amp;<a name='226'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='227'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='228'>
+                its, ite, jts, jte, kts, kte                     )<a name='229'>
+<a name='230'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='231'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_7">(moist_tendf(ims,kms,jms,P_QV),RQVBLTEN,  &amp;<a name='232'>
+                config_flags,                                    &amp;<a name='233'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='234'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='235'>
+                its, ite, jts, jte, kts, kte                     )<a name='236'>
+<a name='237'>
+        if (P_QC .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='238'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_8">(moist_tendf(ims,kms,jms,P_QC),RQCBLTEN,  &amp;<a name='239'>
+                config_flags,                                    &amp;<a name='240'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='241'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='242'>
+                its, ite, jts, jte, kts, kte                     )<a name='243'>
+     <a name='244'>
+        if (P_QI .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='245'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_9">(moist_tendf(ims,kms,jms,P_QI),RQIBLTEN,  &amp;<a name='246'>
+                config_flags,                                    &amp;<a name='247'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='248'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='249'>
+                its, ite, jts, jte, kts, kte                     )<a name='250'>
+<a name='251'>
+      CASE (MYJPBLSCHEME)<a name='252'>
+<a name='253'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_10">(rt_tendf,RTHBLTEN,config_flags,          &amp;<a name='254'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='255'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='256'>
+                its, ite, jts, jte, kts, kte                     )<a name='257'>
+<a name='258'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_U'>add_a2c_u</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2C_U_3">(ru_tendf,RUBLTEN,config_flags,         &amp;<a name='259'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='260'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='261'>
+                its, ite, jts, jte, kts, kte                     )<a name='262'>
+<a name='263'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_V'>add_a2c_v</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2C_V_3">(rv_tendf,RVBLTEN,config_flags,         &amp;<a name='264'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='265'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='266'>
+                its, ite, jts, jte, kts, kte                     )<a name='267'>
+<a name='268'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='269'>
+           CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_BL_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_11">(moist_tendf(ims,kms,jms,P_QV),RQVBLTEN,  &amp;<a name='270'>
+                config_flags,                                    &amp;<a name='271'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='272'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='273'>
+                its, ite, jts, jte, kts, kte                     )<a name='274'>
+<a name='275'>
+      CASE DEFAULT<a name='276'>
+<a name='277'>
+       print*,'phy_bl_ten: The pbl scheme does not exist'<a name='278'>
+<a name='279'>
+   END SELECT<a name='280'>
+<a name='281'>
+END SUBROUTINE phy_bl_ten<a name='282'>
+<a name='283'>
+<font color=#447700>!=================================================================<a name='284'></font>
+<A NAME='PHY_CU_TEN'><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='285'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>phy_cu_ten</font>(config_flags,rk_step,n_moist,rt_tendf,    &amp; <A href='../../call_to/PHY_CU_TEN.html' TARGET='index'>1</A>,<A href='../../call_from/PHY_CU_TEN.html' TARGET='index'>20</A><a name='286'>
+                      RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,       &amp;<a name='287'>
+                      RQICUTEN,RQSCUTEN,moist_tendf,             &amp;<a name='288'>
+                      ids, ide, jds, jde, kds, kde,              &amp;<a name='289'>
+                      ims, ime, jms, jme, kms, kme,              &amp;<a name='290'>
+                      its, ite, jts, jte, kts, kte               )<a name='291'>
+<font color=#447700>!-----------------------------------------------------------------<a name='292'></font>
+   IMPLICIT NONE<a name='293'>
+<font color=#447700>!-----------------------------------------------------------------<a name='294'></font>
+   TYPE(grid_config_rec_type  ) , INTENT(IN   ) :: config_flags<a name='295'>
+<a name='296'>
+   INTEGER , INTENT(IN)        ::  ids, ide, jds, jde, kds, kde, &amp;<a name='297'>
+                                   ims, ime, jms, jme, kms, kme, &amp;<a name='298'>
+                                   its, ite, jts, jte, kts, kte, &amp;<a name='299'>
+                                   n_moist, rk_step<a name='300'>
+<a name='301'>
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_moist),         &amp;<a name='302'>
+          INTENT(INOUT)     ::                      moist_tendf<a name='303'>
+<a name='304'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN  ) ::   &amp;<a name='305'>
+                                                       RTHCUTEN, &amp;<a name='306'>
+                                                       RQVCUTEN, &amp;<a name='307'>
+                                                       RQCCUTEN, &amp;<a name='308'>
+                                                       RQRCUTEN, &amp;<a name='309'>
+                                                       RQICUTEN, &amp;<a name='310'>
+                                                       RQSCUTEN<a name='311'>
+<a name='312'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(INOUT) ::  &amp;<a name='313'>
+                                                       rt_tendf<a name='314'>
+<a name='315'>
+<font color=#447700>! LOCAL VARS<a name='316'></font>
+<a name='317'>
+   INTEGER :: i,j,k<a name='318'>
+<a name='319'>
+   SELECT CASE (config_flags%cu_physics)   <a name='320'>
+<a name='321'>
+   CASE (KFSCHEME)<a name='322'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_12">(rt_tendf,RTHCUTEN,config_flags,             &amp;<a name='323'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='324'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='325'>
+                its, ite, jts, jte, kts, kte                     )<a name='326'>
+<a name='327'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='328'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_13">(moist_tendf(ims,kms,jms,P_QV),RQVCUTEN,     &amp;<a name='329'>
+                config_flags,                                    &amp;<a name='330'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='331'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='332'>
+                its, ite, jts, jte, kts, kte                     )<a name='333'>
+<a name='334'>
+        if (P_QC .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='335'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_14">(moist_tendf(ims,kms,jms,P_QC),RQCCUTEN,     &amp;<a name='336'>
+                config_flags,                                    &amp;<a name='337'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='338'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='339'>
+                its, ite, jts, jte, kts, kte                     )<a name='340'>
+<a name='341'>
+        if (P_QR .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='342'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_15">(moist_tendf(ims,kms,jms,P_QR),RQRCUTEN,     &amp;<a name='343'>
+                config_flags,                                    &amp;<a name='344'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='345'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='346'>
+                its, ite, jts, jte, kts, kte                     )<a name='347'>
+<a name='348'>
+        if (P_QI .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='349'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_16">(moist_tendf(ims,kms,jms,P_QI),RQICUTEN,     &amp;<a name='350'>
+                config_flags,                                    &amp;<a name='351'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='352'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='353'>
+                its, ite, jts, jte, kts, kte                     )<a name='354'>
+<a name='355'>
+        if (P_QS .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='356'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_17">(moist_tendf(ims,kms,jms,P_QS),RQSCUTEN,     &amp;<a name='357'>
+                config_flags,                                    &amp;<a name='358'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='359'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='360'>
+                its, ite, jts, jte, kts, kte                     )<a name='361'>
+<a name='362'>
+   CASE (BMJSCHEME)<a name='363'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_18">(rt_tendf,RTHCUTEN,                          &amp;<a name='364'>
+                config_flags,                                    &amp;<a name='365'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='366'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='367'>
+                its, ite, jts, jte, kts, kte                     )<a name='368'>
+<a name='369'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='370'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_19">(moist_tendf(ims,kms,jms,P_QV),RQVCUTEN,     &amp;<a name='371'>
+                config_flags,                                    &amp;<a name='372'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='373'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='374'>
+                its, ite, jts, jte, kts, kte                     )<a name='375'>
+<a name='376'>
+   CASE (KFETASCHEME)<a name='377'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_20">(rt_tendf,RTHCUTEN,config_flags,             &amp;<a name='378'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='379'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='380'>
+                its, ite, jts, jte, kts, kte                     )<a name='381'>
+<a name='382'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='383'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_21">(moist_tendf(ims,kms,jms,P_QV),RQVCUTEN,     &amp;<a name='384'>
+                config_flags,                                    &amp;<a name='385'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='386'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='387'>
+                its, ite, jts, jte, kts, kte                     )<a name='388'>
+<a name='389'>
+        if (P_QC .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='390'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_22">(moist_tendf(ims,kms,jms,P_QC),RQCCUTEN,     &amp;<a name='391'>
+                config_flags,                                    &amp;<a name='392'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='393'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='394'>
+                its, ite, jts, jte, kts, kte                     )<a name='395'>
+<a name='396'>
+        if (P_QR .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='397'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_23">(moist_tendf(ims,kms,jms,P_QR),RQRCUTEN,     &amp;<a name='398'>
+                config_flags,                                    &amp;<a name='399'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='400'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='401'>
+                its, ite, jts, jte, kts, kte                     )<a name='402'>
+<a name='403'>
+        if (P_QI .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='404'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_24">(moist_tendf(ims,kms,jms,P_QI),RQICUTEN,     &amp;<a name='405'>
+                config_flags,                                    &amp;<a name='406'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='407'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='408'>
+                its, ite, jts, jte, kts, kte                     )<a name='409'>
+<a name='410'>
+        if (P_QS .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='411'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_25">(moist_tendf(ims,kms,jms,P_QS),RQSCUTEN,     &amp;<a name='412'>
+                config_flags,                                    &amp;<a name='413'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='414'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='415'>
+                its, ite, jts, jte, kts, kte                     )<a name='416'>
+<a name='417'>
+   CASE (GDSCHEME)<a name='418'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_26">(rt_tendf,RTHCUTEN,config_flags,             &amp;<a name='419'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='420'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='421'>
+                its, ite, jts, jte, kts, kte                     )<a name='422'>
+<a name='423'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='424'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_27">(moist_tendf(ims,kms,jms,P_QV),RQVCUTEN,     &amp;<a name='425'>
+                config_flags,                                    &amp;<a name='426'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='427'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='428'>
+                its, ite, jts, jte, kts, kte                     )<a name='429'>
+<a name='430'>
+        if (P_QC .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='431'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_28">(moist_tendf(ims,kms,jms,P_QC),RQCCUTEN,     &amp;<a name='432'>
+                config_flags,                                    &amp;<a name='433'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='434'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='435'>
+                its, ite, jts, jte, kts, kte                     )<a name='436'>
+<a name='437'>
+        if (P_QI .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='438'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_29">(moist_tendf(ims,kms,jms,P_QI),RQICUTEN,     &amp;<a name='439'>
+                config_flags,                                    &amp;<a name='440'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='441'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='442'>
+                its, ite, jts, jte, kts, kte                     )<a name='443'>
+   CASE (DUCUSCHEME)<a name='444'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_30">(rt_tendf,RTHCUTEN,config_flags,             &amp;<a name='445'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='446'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='447'>
+                its, ite, jts, jte, kts, kte                     )<a name='448'>
+<a name='449'>
+        if (P_QV .ge. PARAM_FIRST_SCALAR)                                         &amp;<a name='450'>
+        CALL <A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A'>add_a2a</A><A href='../../html_code/phys/module_physics_addtendc.F.html#PHY_CU_TEN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADD_A2A_31">(moist_tendf(ims,kms,jms,P_QV),RQVCUTEN,     &amp;<a name='451'>
+                config_flags,                                    &amp;<a name='452'>
+                ids,ide, jds, jde, kds, kde,                     &amp;<a name='453'>
+                ims, ime, jms, jme, kms, kme,                    &amp;<a name='454'>
+                its, ite, jts, jte, kts, kte                     )<a name='455'>
+<a name='456'>
+   CASE DEFAULT<a name='457'>
+<a name='458'>
+   END SELECT<a name='459'>
+<a name='460'>
+END SUBROUTINE phy_cu_ten<a name='461'>
+<a name='462'>
+<font color=#447700>!----------------------------------------------------------------------<a name='463'></font>
+<A NAME='ADVANCE_PPT'><A href='../../html_code/phys/module_physics_addtendc.F.html#ADVANCE_PPT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='464'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>advance_ppt</font>(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,           &amp; <A href='../../call_to/ADVANCE_PPT.html' TARGET='index'>3</A>,<A href='../../call_from/ADVANCE_PPT.html' TARGET='index'>2</A><a name='465'>
+                     RQICUTEN,RQSCUTEN,RAINC,RAINCV,NCA,              &amp;<a name='466'>
+                     CUPPT, config_flags,                             &amp;<a name='467'>
+                     ids,ide, jds,jde, kds,kde,                       &amp;<a name='468'>
+                     ims,ime, jms,jme, kms,kme,                       &amp;<a name='469'>
+                     its,ite, jts,jte, kts,kte                        )     <a name='470'>
+<font color=#447700>!----------------------------------------------------------------------<a name='471'></font>
+   USE module_state_description<a name='472'>
+   USE <A href='../../html_code/phys/module_cu_kf.F.html#MODULE_CU_KF'>module_cu_kf</A><A href='../../html_code/phys/module_physics_addtendc.F.html#ADVANCE_PPT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_KF_2"><a name='473'>
+   USE <A href='../../html_code/phys/module_cu_kfeta.F.html#MODULE_CU_KFETA'>module_cu_kfeta</A><A href='../../html_code/phys/module_physics_addtendc.F.html#ADVANCE_PPT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_KFETA_2"><a name='474'>
+<font color=#447700>!----------------------------------------------------------------------<a name='475'></font>
+   IMPLICIT NONE<a name='476'>
+<font color=#447700>!----------------------------------------------------------------------<a name='477'></font>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='478'>
+<a name='479'>
+   INTEGER,      INTENT(IN   )    ::                             &amp;<a name='480'>
+                                      ids,ide, jds,jde, kds,kde, &amp;<a name='481'>
+                                      ims,ime, jms,jme, kms,kme, &amp;<a name='482'>
+                                      its,ite, jts,jte, kts,kte<a name='483'>
+<a name='484'>
+<a name='485'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                 &amp;<a name='486'>
+         INTENT(INOUT)  ::                             RTHCUTEN, &amp;<a name='487'>
+                                                       RQVCUTEN, &amp;<a name='488'>
+                                                       RQCCUTEN, &amp;<a name='489'>
+                                                       RQRCUTEN, &amp;<a name='490'>
+                                                       RQICUTEN, &amp;<a name='491'>
+                                                       RQSCUTEN<a name='492'>
+<a name='493'>
+   REAL, DIMENSION( ims:ime , jms:jme ),                         &amp;<a name='494'>
+          INTENT(INOUT) ::                                RAINC, &amp;<a name='495'>
+                                                         RAINCV, &amp;<a name='496'>
+                                                            NCA, &amp;<a name='497'>
+                                                          CUPPT<a name='498'>
+<a name='499'>
+<font color=#447700>! LOCAL  VAR<a name='500'></font>
+<a name='501'>
+   INTEGER :: i,j,k,i_start,i_end,j_start,j_end,k_start,k_end<a name='502'>
+<a name='503'>
+<font color=#447700>!-----------------------------------------------------------------<a name='504'></font>
+<a name='505'>
+   IF (config_flags%cu_physics .eq. 0) return<a name='506'>
+<a name='507'>
+<font color=#447700>! SET START AND END POINTS FOR TILES<a name='508'></font>
+<a name='509'>
+   i_start = its<a name='510'>
+   i_end   = min( ite,ide-1 )<a name='511'>
+   j_start = jts<a name='512'>
+   j_end   = min( jte,jde-1 )<a name='513'>
+<font color=#447700>!<a name='514'></font>
+<font color=#447700>!  IF( config_flags%nested .or. config_flags%specified ) THEN<a name='515'></font>
+<font color=#447700>!    i_start = max( its,ids+1 )<a name='516'></font>
+<font color=#447700>!    i_end   = min( ite,ide-2 )<a name='517'></font>
+<font color=#447700>!    j_start = max( jts,jds+1 )<a name='518'></font>
+<font color=#447700>!    j_end   = min( jte,jde-2 )<a name='519'></font>
+<font color=#447700>!  ENDIF<a name='520'></font>
+<font color=#447700>!<a name='521'></font>
+   k_start = kts<a name='522'>
+   k_end = min( kte, kde-1 )<a name='523'>
+<a name='524'>
+<font color=#447700>! Update total cumulus scheme precipitation<a name='525'></font>
+<a name='526'>
+<font color=#447700>! in mm  <a name='527'></font>
+<a name='528'>
+   DO J = j_start,j_end<a name='529'>
+   DO i = i_start,i_end<a name='530'>
+      RAINC(I,J)=RAINC(I,J)+RAINCV(I,J)<a name='531'>
+      CUPPT(I,J)=CUPPT(I,J)+RAINCV(I,J)/1000.<a name='532'>
+   ENDDO<a name='533'>
+   ENDDO<a name='534'>
+<a name='535'>
+   SELECT CASE (config_flags%cu_physics)<a name='536'>
+<a name='537'>
+   CASE (KFSCHEME)<a name='538'>
+<a name='539'>
+        DO J = j_start,j_end<a name='540'>
+        DO i = i_start,i_end<a name='541'>
+<a name='542'>
+           IF ( NINT(NCA(I,J)).GT. 0 ) THEN<a name='543'>
+<a name='544'>
+              IF ( NINT(NCA(I,J)) .eq. 1 ) THEN<a name='545'>
+<a name='546'>
+              <font color=#447700>! set tendency to zero<a name='547'></font>
+                 RAINCV(I,J)=0.<a name='548'>
+                 DO k = k_start,k_end<a name='549'>
+                    RTHCUTEN(i,k,j)=0.<a name='550'>
+                    RQVCUTEN(i,k,j)=0.<a name='551'>
+                    RQCCUTEN(i,k,j)=0.<a name='552'>
+                    RQRCUTEN(i,k,j)=0.<a name='553'>
+                    if (P_QI .ge. PARAM_FIRST_SCALAR) RQICUTEN(i,k,j)=0.<a name='554'>
+                    if (P_QS .ge. PARAM_FIRST_SCALAR) RQSCUTEN(i,k,j)=0.<a name='555'>
+                 ENDDO<a name='556'>
+              ENDIF<a name='557'>
+<a name='558'>
+              NCA(I,J)=NCA(I,J)-1. <font color=#447700>! Decrease NCA<a name='559'></font>
+<a name='560'>
+           ENDIF<a name='561'>
+<font color=#447700>!<a name='562'></font>
+        ENDDO<a name='563'>
+        ENDDO<a name='564'>
+<a name='565'>
+   CASE (KFETASCHEME)<a name='566'>
+<a name='567'>
+        DO J = j_start,j_end<a name='568'>
+        DO i = i_start,i_end<a name='569'>
+<a name='570'>
+           IF ( NINT(NCA(I,J)).GT. 0 ) THEN<a name='571'>
+<a name='572'>
+              IF ( NINT(NCA(I,J)) .eq. 1 ) THEN<a name='573'>
+<a name='574'>
+              <font color=#447700>! set tendency to zero<a name='575'></font>
+                 RAINCV(I,J)=0.<a name='576'>
+                 DO k = k_start,k_end<a name='577'>
+                    RTHCUTEN(i,k,j)=0.<a name='578'>
+                    RQVCUTEN(i,k,j)=0.<a name='579'>
+                    RQCCUTEN(i,k,j)=0.<a name='580'>
+                    RQRCUTEN(i,k,j)=0.<a name='581'>
+                    if (P_QI .ge. PARAM_FIRST_SCALAR) RQICUTEN(i,k,j)=0.<a name='582'>
+                    if (P_QS .ge. PARAM_FIRST_SCALAR) RQSCUTEN(i,k,j)=0.<a name='583'>
+                 ENDDO<a name='584'>
+              ENDIF<a name='585'>
+<a name='586'>
+              NCA(I,J)=NCA(I,J)-1. <font color=#447700>! Decrease NCA<a name='587'></font>
+<a name='588'>
+           ENDIF<a name='589'>
+<font color=#447700>!<a name='590'></font>
+        ENDDO<a name='591'>
+        ENDDO<a name='592'>
+<a name='593'>
+   CASE DEFAULT<a name='594'>
+<a name='595'>
+   END SELECT<a name='596'>
+<a name='597'>
+END SUBROUTINE advance_ppt<a name='598'>
+<a name='599'>
+<A NAME='ADD_A2A'><A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2A' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='600'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>add_a2a</font>(lvar,rvar,config_flags,                  &amp; <A href='../../call_to/ADD_A2A.html' TARGET='index'>31</A><a name='601'>
+                   ids,ide, jds, jde, kds, kde,             &amp;<a name='602'>
+                   ims, ime, jms, jme, kms, kme,            &amp;<a name='603'>
+                   its, ite, jts, jte, kts, kte             )<a name='604'>
+<font color=#447700>!------------------------------------------------------------<a name='605'></font>
+   IMPLICIT NONE<a name='606'>
+<font color=#447700>!------------------------------------------------------------<a name='607'></font>
+   TYPE(grid_config_rec_type),  INTENT(IN) :: config_flags<a name='608'>
+<a name='609'>
+   INTEGER , INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='610'>
+                              ims, ime, jms, jme, kms, kme, &amp;<a name='611'>
+                              its, ite, jts, jte, kts, kte<a name='612'>
+<a name='613'>
+   REAL, DIMENSION(ims:ime,kms:kme,jms:jme),INTENT(IN   ) ::&amp;<a name='614'>
+                                                      rvar<a name='615'>
+   REAL, DIMENSION(ims:ime,kms:kme,jms:jme),INTENT(INOUT) ::&amp;<a name='616'>
+                                                      lvar<a name='617'>
+<a name='618'>
+<font color=#447700>! LOCAL VARS<a name='619'></font>
+   INTEGER :: i,j,k,i_start,i_end,j_start,j_end,ktf<a name='620'>
+<a name='621'>
+   i_start = its<a name='622'>
+   i_end   = MIN(ite,ide-1)<a name='623'>
+   j_start = jts<a name='624'>
+   j_end   = MIN(jte,jde-1)<a name='625'>
+   ktf = min(kte,kde-1)<a name='626'>
+<a name='627'>
+   IF ( config_flags%specified .or. &amp;<a name='628'>
+        config_flags%nested) i_start = MAX(ids+1,its)<a name='629'>
+   IF ( config_flags%specified .or. &amp;<a name='630'>
+        config_flags%nested) i_end   = MIN(ide-2,ite)<a name='631'>
+   IF ( config_flags%specified .or. &amp;<a name='632'>
+        config_flags%nested) j_start = MAX(jds+1,jts)<a name='633'>
+   IF ( config_flags%specified .or. &amp;<a name='634'>
+        config_flags%nested) j_end   = MIN(jde-2,jte)<a name='635'>
+<a name='636'>
+   DO j = j_start,j_end<a name='637'>
+   DO k = kts,ktf<a name='638'>
+   DO i = i_start,i_end<a name='639'>
+      lvar(i,k,j) = lvar(i,k,j) + rvar(i,k,j)<a name='640'>
+   ENDDO<a name='641'>
+   ENDDO<a name='642'>
+   ENDDO<a name='643'>
+<a name='644'>
+END SUBROUTINE add_a2a<a name='645'>
+<a name='646'>
+<font color=#447700>!------------------------------------------------------------<a name='647'></font>
+<A NAME='ADD_A2C_U'><A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_U' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='648'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>add_a2c_u</font>(lvar,rvar,config_flags,                &amp; <A href='../../call_to/ADD_A2C_U.html' TARGET='index'>3</A><a name='649'>
+                   ids,ide, jds, jde, kds, kde,             &amp;<a name='650'>
+                   ims, ime, jms, jme, kms, kme,            &amp;<a name='651'>
+                   its, ite, jts, jte, kts, kte             )<a name='652'>
+<font color=#447700>!------------------------------------------------------------<a name='653'></font>
+<font color=#447700>!------------------------------------------------------------<a name='654'></font>
+   IMPLICIT NONE<a name='655'>
+<font color=#447700>!------------------------------------------------------------<a name='656'></font>
+<a name='657'>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='658'>
+<a name='659'>
+   INTEGER , INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='660'>
+                              ims, ime, jms, jme, kms, kme, &amp;<a name='661'>
+                              its, ite, jts, jte, kts, kte<a name='662'>
+<a name='663'>
+   REAL, DIMENSION(ims:ime,kms:kme,jms:jme),INTENT(IN   ) ::&amp;<a name='664'>
+                                                      rvar<a name='665'>
+   REAL, DIMENSION(ims:ime,kms:kme,jms:jme),INTENT(INOUT) ::&amp;<a name='666'>
+                                                      lvar<a name='667'>
+<a name='668'>
+<font color=#447700>! LOCAL VARS<a name='669'></font>
+<a name='670'>
+   INTEGER :: i,j,k,i_start,i_end,j_start,j_end,ktf<a name='671'>
+<a name='672'>
+   ktf=min(kte,kde-1)<a name='673'>
+<a name='674'>
+   i_start = its<a name='675'>
+   i_end   = ite<a name='676'>
+   j_start = jts<a name='677'>
+   j_end   = MIN(jte,jde-1)<a name='678'>
+<a name='679'>
+   IF ( config_flags%specified .or. &amp;<a name='680'>
+        config_flags%nested) i_start = MAX(ids+1,its)<a name='681'>
+   IF ( config_flags%specified .or. &amp;<a name='682'>
+        config_flags%nested) i_end   = MIN(ide-1,ite)<a name='683'>
+   IF ( config_flags%specified .or. &amp;<a name='684'>
+        config_flags%nested) j_start = MAX(jds+1,jts)<a name='685'>
+   IF ( config_flags%specified .or. &amp;<a name='686'>
+        config_flags%nested) j_end   = MIN(jde-2,jte)<a name='687'>
+<a name='688'>
+   DO j = j_start,j_end<a name='689'>
+   DO k = kts,ktf<a name='690'>
+   DO i = i_start,i_end<a name='691'>
+      lvar(i,k,j) = lvar(i,k,j) + &amp;<a name='692'>
+                       0.5*(rvar(i,k,j)+rvar(i-1,k,j))<a name='693'>
+   ENDDO<a name='694'>
+   ENDDO<a name='695'>
+   ENDDO<a name='696'>
+<a name='697'>
+END SUBROUTINE add_a2c_u<a name='698'>
+<a name='699'>
+<font color=#447700>!------------------------------------------------------------<a name='700'></font>
+<A NAME='ADD_A2C_V'><A href='../../html_code/phys/module_physics_addtendc.F.html#ADD_A2C_V' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='701'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>add_a2c_v</font>(lvar,rvar,config_flags,                &amp; <A href='../../call_to/ADD_A2C_V.html' TARGET='index'>3</A><a name='702'>
+                   ids,ide, jds, jde, kds, kde,             &amp;<a name='703'>
+                   ims, ime, jms, jme, kms, kme,            &amp;<a name='704'>
+                   its, ite, jts, jte, kts, kte             )<a name='705'>
+<font color=#447700>!------------------------------------------------------------<a name='706'></font>
+<font color=#447700>!------------------------------------------------------------<a name='707'></font>
+   IMPLICIT NONE<a name='708'>
+<font color=#447700>!------------------------------------------------------------<a name='709'></font>
+<a name='710'>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='711'>
+<a name='712'>
+   INTEGER , INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='713'>
+                              ims, ime, jms, jme, kms, kme, &amp;<a name='714'>
+                              its, ite, jts, jte, kts, kte<a name='715'>
+<a name='716'>
+   REAL, DIMENSION(ims:ime,kms:kme,jms:jme),INTENT(IN   ) ::&amp;<a name='717'>
+                                                      rvar<a name='718'>
+   REAL, DIMENSION(ims:ime,kms:kme,jms:jme),INTENT(INOUT) ::&amp;<a name='719'>
+                                                      lvar<a name='720'>
+<a name='721'>
+<font color=#447700>! LOCAL VARS<a name='722'></font>
+<a name='723'>
+   INTEGER :: i,j,k,i_start,i_end,j_start,j_end,ktf<a name='724'>
+<a name='725'>
+   ktf=min(kte,kde-1)<a name='726'>
+<a name='727'>
+   i_start = its<a name='728'>
+   i_end   = MIN(ite,ide-1)<a name='729'>
+   j_start = jts<a name='730'>
+   j_end   = jte<a name='731'>
+<a name='732'>
+   IF ( config_flags%specified .or. &amp;<a name='733'>
+        config_flags%nested) i_start = MAX(ids+1,its)<a name='734'>
+   IF ( config_flags%specified .or. &amp;<a name='735'>
+        config_flags%nested) i_end   = MIN(ide-2,ite)<a name='736'>
+   IF ( config_flags%specified .or. &amp;<a name='737'>
+        config_flags%nested) j_start = MAX(jds+1,jts)<a name='738'>
+   IF ( config_flags%specified .or. &amp;<a name='739'>
+        config_flags%nested) j_end   = MIN(jde-1,jte)<a name='740'>
+<a name='741'>
+   DO j = j_start,j_end<a name='742'>
+   DO k = kts,kte<a name='743'>
+   DO i = i_start,i_end<a name='744'>
+      lvar(i,k,j) = lvar(i,k,j) + &amp;<a name='745'>
+                     0.5*(rvar(i,k,j)+rvar(i,k,j-1))<a name='746'>
+   ENDDO<a name='747'>
+   ENDDO<a name='748'>
+   ENDDO<a name='749'>
+<a name='750'>
+END SUBROUTINE add_a2c_v<a name='751'>
+<a name='752'>
+<font color=#447700>! end of ifdef for EM_CORE == 1 -- this module actually belongs in the dyn_em directory<a name='753'></font>
+#endif<a name='754'>
+<a name='755'>
+END MODULE module_physics_addtendc<a name='756'>
+</pre></body></html>

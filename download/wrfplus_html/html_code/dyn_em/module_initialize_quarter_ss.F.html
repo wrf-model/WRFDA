@@ -1,0 +1,824 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!IDEAL:MODEL_LAYER:INITIALIZATION<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<font color=#447700>!  This MODULE holds the routines which are used to perform various initializations<a name='5'></font>
+<font color=#447700>!  for the individual domains.  <a name='6'></font>
+<a name='7'>
+<font color=#447700>!  This MODULE CONTAINS the following routines:<a name='8'></font>
+<a name='9'>
+<font color=#447700>!  initialize_field_test - 1. Set different fields to different constant<a name='10'></font>
+<font color=#447700>!                             values.  This is only a test.  If the correct<a name='11'></font>
+<font color=#447700>!                             domain is not found (based upon the "id")<a name='12'></font>
+<font color=#447700>!                             then a fatal error is issued.               <a name='13'></font>
+<a name='14'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='15'></font>
+<a name='16'>
+<A NAME='MODULE_INITIALIZE'><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#MODULE_INITIALIZE' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='17'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_initialize</font> <A href='../../call_to/MODULE_INITIALIZE.html' TARGET='index'>7</A><a name='18'>
+<a name='19'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_9"><a name='20'>
+   USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_4"><a name='21'>
+   USE module_state_description<a name='22'>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_16"><a name='23'>
+   USE <A href='../../html_code/share/module_bc.F.html#MODULE_BC'>module_bc</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_16"><a name='24'>
+   USE <A href='../../html_code/frame/module_timing.F.html#MODULE_TIMING'>module_timing</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_TIMING_4"><a name='25'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_17"><a name='26'>
+   USE <A href='../../html_code/dyn_em/module_init_utilities.F.html#MODULE_INIT_UTILITIES'>module_init_utilities</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_INIT_UTILITIES_4"><a name='27'>
+#ifdef DM_PARALLEL<a name='28'>
+   USE <A href='../../html_code/frame/module_dm_stubs.F.html#MODULE_DM'>module_dm</A><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#module_initialize_quarter_ss.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DM_7"><a name='29'>
+#endif<a name='30'>
+<a name='31'>
+<a name='32'>
+CONTAINS<a name='33'>
+<a name='34'>
+<a name='35'>
+<font color=#447700>!-------------------------------------------------------------------<a name='36'></font>
+<font color=#447700>! this is a wrapper for the solver-specific init_domain routines.<a name='37'></font>
+<font color=#447700>! Also dereferences the grid variables and passes them down as arguments.<a name='38'></font>
+<font color=#447700>! This is crucial, since the lower level routines may do message passing<a name='39'></font>
+<font color=#447700>! and this will get fouled up on machines that insist on passing down<a name='40'></font>
+<font color=#447700>! copies of assumed-shape arrays (by passing down as arguments, the <a name='41'></font>
+<font color=#447700>! data are treated as assumed-size -- ie. f77 -- arrays and the copying<a name='42'></font>
+<font color=#447700>! business is avoided).  Fie on the F90 designers.  Fie and a pox.<a name='43'></font>
+<a name='44'>
+<A NAME='INIT_DOMAIN'><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#INIT_DOMAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='45'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_domain</font> ( grid ) <A href='../../call_to/INIT_DOMAIN.html' TARGET='index'>3</A>,<A href='../../call_from/INIT_DOMAIN.html' TARGET='index'>24</A><a name='46'>
+<a name='47'>
+   IMPLICIT NONE<a name='48'>
+<a name='49'>
+   <font color=#447700>!  Input data.<a name='50'></font>
+   TYPE (domain), POINTER :: grid <a name='51'>
+   <font color=#447700>!  Local data.<a name='52'></font>
+   INTEGER                :: dyn_opt <a name='53'>
+   INTEGER :: idum1, idum2<a name='54'>
+<a name='55'>
+#ifdef DEREF_KLUDGE<a name='56'>
+<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='57'></font>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33<a name='58'>
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x<a name='59'>
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y<a name='60'>
+#endif<a name='61'>
+<a name='62'>
+#include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_1"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='63'>
+<a name='64'>
+   CALL nl_get_dyn_opt( 1, dyn_opt )<a name='65'>
+   <a name='66'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG'>set_scalar_indices_from_config</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_SCALAR_INDICES_FROM_CONFIG_4"> ( head_grid%id , idum1, idum2 )<a name='67'>
+<a name='68'>
+   IF (      dyn_opt .eq. 1 &amp;<a name='69'>
+        .or. dyn_opt .eq. 2 &amp;<a name='70'>
+        .or. dyn_opt .eq. 3 &amp;<a name='71'>
+                                       ) THEN<a name='72'>
+     CALL <A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK'>init_domain_rk</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INIT_DOMAIN_RK_4">( grid, &amp;<a name='73'>
+<font color=#447700>!<a name='74'></font>
+#include &lt;<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>&gt;<A NAME="em_actual_args.inc_2"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='75'>
+<font color=#447700>!<a name='76'></font>
+                        )<a name='77'>
+<a name='78'>
+   ELSE<a name='79'>
+     WRITE(0,*)' init_domain: unknown or unimplemented dyn_opt = ',dyn_opt<a name='80'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_24"> ( ' init_domain: unknown or unimplemented dyn_opt ' )<a name='81'>
+   ENDIF<a name='82'>
+<a name='83'>
+   END SUBROUTINE init_domain<a name='84'>
+<a name='85'>
+<font color=#447700>!-------------------------------------------------------------------<a name='86'></font>
+<a name='87'>
+<A NAME='INIT_DOMAIN_RK'><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#INIT_DOMAIN_RK' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='88'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_domain_rk</font> ( grid, &amp; <A href='../../call_to/INIT_DOMAIN_RK.html' TARGET='index'>7</A>,<A href='../../call_from/INIT_DOMAIN_RK.html' TARGET='index'>128</A><a name='89'>
+<font color=#447700>!<a name='90'></font>
+# include &lt;<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>&gt;<A NAME="em_dummy_args.inc_3"><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='91'>
+<font color=#447700>!<a name='92'></font>
+)<a name='93'>
+   IMPLICIT NONE<a name='94'>
+<a name='95'>
+   <font color=#447700>!  Input data.<a name='96'></font>
+   TYPE (domain), POINTER :: grid<a name='97'>
+<a name='98'>
+# include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_4"><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='99'>
+<a name='100'>
+   TYPE (grid_config_rec_type)              :: config_flags<a name='101'>
+<a name='102'>
+   <font color=#447700>!  Local data<a name='103'></font>
+   INTEGER                             ::                       &amp;<a name='104'>
+                                  ids, ide, jds, jde, kds, kde, &amp;<a name='105'>
+                                  ims, ime, jms, jme, kms, kme, &amp;<a name='106'>
+                                  its, ite, jts, jte, kts, kte, &amp;<a name='107'>
+                                  i, j, k<a name='108'>
+<a name='109'>
+   <font color=#447700>! Local data<a name='110'></font>
+<a name='111'>
+   INTEGER, PARAMETER :: nl_max = 1000<a name='112'>
+   REAL, DIMENSION(nl_max) :: zk, p_in, theta, rho, u, v, qv, pd_in<a name='113'>
+   INTEGER :: nl_in<a name='114'>
+<a name='115'>
+<a name='116'>
+   INTEGER :: icm,jcm, ii, im1, jj, jm1, loop, error, fid, nxc, nyc<a name='117'>
+   REAL    :: u_mean,v_mean, f0, p_surf, p_level, qvf, z_at_v, z_at_u<a name='118'>
+   REAL    :: z_scale, xrad, yrad, zrad, rad, delt, cof1, cof2<a name='119'>
+<font color=#447700>!   REAL, EXTERNAL :: interp_0<a name='120'></font>
+   REAL    :: hm<a name='121'>
+   REAL    :: pi<a name='122'>
+<a name='123'>
+<font color=#447700>!  stuff from original initialization that has been dropped from the Registry <a name='124'></font>
+   REAL    :: vnu, xnu, xnus, dinit0, cbh, p0_temp, t0_temp, zd, zt<a name='125'>
+   REAL    :: qvf1, qvf2, pd_surf<a name='126'>
+   INTEGER :: it<a name='127'>
+   real :: thtmp, ptmp, temp(3)<a name='128'>
+<a name='129'>
+   LOGICAL :: moisture_init<a name='130'>
+   LOGICAL :: stretch_grid, dry_sounding<a name='131'>
+<a name='132'>
+#ifdef DEREF_KLUDGE<a name='133'>
+<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='134'></font>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33<a name='135'>
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x<a name='136'>
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y<a name='137'>
+#endif<a name='138'>
+<a name='139'>
+   LOGICAL, EXTERNAL :: wrf_dm_on_monitor<a name='140'>
+<a name='141'>
+#include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_5"><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='142'>
+<a name='143'>
+#define COPY_IN<a name='144'>
+#include &lt;<A href='../../html_code/include/em_scalar_derefs.inc.html'>em_scalar_derefs.inc</A>&gt;<A NAME="em_scalar_derefs.inc_6"><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='145'>
+#ifdef DM_PARALLEL<a name='146'>
+#    include &lt;<A href='../../html_code/include/em_data_calls.inc.html'>em_data_calls.inc</A>&gt;<A NAME="em_data_calls.inc_7"><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='147'>
+#endif<a name='148'>
+<a name='149'>
+<a name='150'>
+   SELECT CASE ( model_data_order )<a name='151'>
+         CASE ( DATA_ORDER_ZXY )<a name='152'>
+   kds = grid%sd31 ; kde = grid%ed31 ;<a name='153'>
+   ids = grid%sd32 ; ide = grid%ed32 ;<a name='154'>
+   jds = grid%sd33 ; jde = grid%ed33 ;<a name='155'>
+<a name='156'>
+   kms = grid%sm31 ; kme = grid%em31 ;<a name='157'>
+   ims = grid%sm32 ; ime = grid%em32 ;<a name='158'>
+   jms = grid%sm33 ; jme = grid%em33 ;<a name='159'>
+<a name='160'>
+   kts = grid%sp31 ; kte = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='161'></font>
+   its = grid%sp32 ; ite = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='162'></font>
+   jts = grid%sp33 ; jte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='163'></font>
+         CASE ( DATA_ORDER_XYZ )<a name='164'>
+   ids = grid%sd31 ; ide = grid%ed31 ;<a name='165'>
+   jds = grid%sd32 ; jde = grid%ed32 ;<a name='166'>
+   kds = grid%sd33 ; kde = grid%ed33 ;<a name='167'>
+<a name='168'>
+   ims = grid%sm31 ; ime = grid%em31 ;<a name='169'>
+   jms = grid%sm32 ; jme = grid%em32 ;<a name='170'>
+   kms = grid%sm33 ; kme = grid%em33 ;<a name='171'>
+<a name='172'>
+   its = grid%sp31 ; ite = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='173'></font>
+   jts = grid%sp32 ; jte = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='174'></font>
+   kts = grid%sp33 ; kte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='175'></font>
+         CASE ( DATA_ORDER_XZY )<a name='176'>
+   ids = grid%sd31 ; ide = grid%ed31 ;<a name='177'>
+   kds = grid%sd32 ; kde = grid%ed32 ;<a name='178'>
+   jds = grid%sd33 ; jde = grid%ed33 ;<a name='179'>
+<a name='180'>
+   ims = grid%sm31 ; ime = grid%em31 ;<a name='181'>
+   kms = grid%sm32 ; kme = grid%em32 ;<a name='182'>
+   jms = grid%sm33 ; jme = grid%em33 ;<a name='183'>
+<a name='184'>
+   its = grid%sp31 ; ite = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='185'></font>
+   kts = grid%sp32 ; kte = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='186'></font>
+   jts = grid%sp33 ; jte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='187'></font>
+<a name='188'>
+   END SELECT<a name='189'>
+<a name='190'>
+<a name='191'>
+   stretch_grid = .true.<a name='192'>
+   delt = 3.<a name='193'>
+<font color=#447700>!   z_scale = .50<a name='194'></font>
+   z_scale = .40<a name='195'>
+   pi = 2.*asin(1.0)<a name='196'>
+   write(6,*) ' pi is ',pi<a name='197'>
+   nxc = (ide-ids)/2<a name='198'>
+   nyc = (jde-jds)/2<a name='199'>
+<a name='200'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_4"> ( grid%id , model_config_rec , config_flags )<a name='201'>
+<a name='202'>
+<font color=#447700>! here we check to see if the boundary conditions are set properly<a name='203'></font>
+<a name='204'>
+   CALL <A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK'>boundary_condition_check</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="BOUNDARY_CONDITION_CHECK_4">( config_flags, bdyzone, error, grid%id )<a name='205'>
+<a name='206'>
+   moisture_init = .true.<a name='207'>
+<a name='208'>
+    grid%itimestep=0<a name='209'>
+<a name='210'>
+#ifdef DM_PARALLEL<a name='211'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_7">( icm , IWORDSIZE )<a name='212'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_8">( jcm , IWORDSIZE )<a name='213'>
+#endif<a name='214'>
+<a name='215'>
+    CALL <A href='../../html_code/frame/module_configure.F.html#NL_SET_MMINLU'>nl_set_mminlu</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NL_SET_MMINLU_4">(1, '    ')<a name='216'>
+    CALL nl_set_iswater(1,0)<a name='217'>
+    CALL nl_set_cen_lat(1,40.)<a name='218'>
+    CALL nl_set_cen_lon(1,-105.)<a name='219'>
+    CALL nl_set_truelat1(1,0.)<a name='220'>
+    CALL nl_set_truelat2(1,0.)<a name='221'>
+    CALL nl_set_moad_cen_lat (1,0.)<a name='222'>
+    CALL nl_set_stand_lon (1,0.)<a name='223'>
+    CALL nl_set_map_proj(1,0)<a name='224'>
+<a name='225'>
+<a name='226'>
+<font color=#447700>!  here we initialize data we currently is not initialized <a name='227'></font>
+<font color=#447700>!  in the input data<a name='228'></font>
+<a name='229'>
+    DO j = jts, jte<a name='230'>
+      DO i = its, ite<a name='231'>
+         msft(i,j)     = 1.<a name='232'>
+         msfu(i,j)     = 1.<a name='233'>
+         msfv(i,j)     = 1.<a name='234'>
+         sina(i,j)     = 0.<a name='235'>
+         cosa(i,j)     = 1.<a name='236'>
+         e(i,j)        = 0.<a name='237'>
+         f(i,j)        = 0.<a name='238'>
+<a name='239'>
+      END DO<a name='240'>
+   END DO<a name='241'>
+<a name='242'>
+    DO j = jts, jte<a name='243'>
+    DO k = kts, kte<a name='244'>
+      DO i = its, ite<a name='245'>
+         ww(i,k,j)     = 0.<a name='246'>
+      END DO<a name='247'>
+   END DO<a name='248'>
+   END DO<a name='249'>
+<a name='250'>
+   step_number = 0<a name='251'>
+<a name='252'>
+<font color=#447700>! set up the grid<a name='253'></font>
+<a name='254'>
+   IF (stretch_grid) THEN <font color=#447700>! exponential stretch for eta (nearly constant dz)<a name='255'></font>
+     DO k=1, kde<a name='256'>
+      znw(k) = (exp(-(k-1)/float(kde-1)/z_scale) - exp(-1./z_scale))/ &amp;<a name='257'>
+                                (1.-exp(-1./z_scale))<a name='258'>
+     ENDDO<a name='259'>
+   ELSE<a name='260'>
+     DO k=1, kde<a name='261'>
+      znw(k) = 1. - float(k-1)/float(kde-1)<a name='262'>
+     ENDDO<a name='263'>
+   ENDIF<a name='264'>
+<a name='265'>
+   DO k=1, kde-1<a name='266'>
+    dnw(k) = znw(k+1) - znw(k)<a name='267'>
+    rdnw(k) = 1./dnw(k)<a name='268'>
+    znu(k) = 0.5*(znw(k+1)+znw(k))<a name='269'>
+   ENDDO<a name='270'>
+   DO k=2, kde-1<a name='271'>
+    dn(k) = 0.5*(dnw(k)+dnw(k-1))<a name='272'>
+    rdn(k) = 1./dn(k)<a name='273'>
+    fnp(k) = .5* dnw(k  )/dn(k)<a name='274'>
+    fnm(k) = .5* dnw(k-1)/dn(k)<a name='275'>
+   ENDDO<a name='276'>
+<a name='277'>
+   cof1 = (2.*dn(2)+dn(3))/(dn(2)+dn(3))*dnw(1)/dn(2) <a name='278'>
+   cof2 =     dn(2)        /(dn(2)+dn(3))*dnw(1)/dn(3) <a name='279'>
+   cf1  = fnp(2) + cof1<a name='280'>
+   cf2  = fnm(2) - cof1 - cof2<a name='281'>
+   cf3  = cof2       <a name='282'>
+<a name='283'>
+   cfn  = (.5*dnw(kde-1)+dn(kde-1))/dn(kde-1)<a name='284'>
+   cfn1 = -.5*dnw(kde-1)/dn(kde-1)<a name='285'>
+   rdx = 1./dx<a name='286'>
+   rdy = 1./dy<a name='287'>
+<a name='288'>
+<font color=#447700>!  get the sounding from the ascii sounding file, first get dry sounding and <a name='289'></font>
+<font color=#447700>!  calculate base state<a name='290'></font>
+<a name='291'>
+  dry_sounding = .true.<a name='292'>
+  IF ( wrf_dm_on_monitor() ) THEN<a name='293'>
+  write(6,*) ' getting dry sounding for base state '<a name='294'>
+<a name='295'>
+  CALL <A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#GET_SOUNDING'>get_sounding</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GET_SOUNDING_8">( zk, p_in, pd_in, theta, rho, u, v, qv, dry_sounding, nl_max, nl_in )<a name='296'>
+  ENDIF<a name='297'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_1">( zk , nl_max )<a name='298'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_2">( p_in , nl_max )<a name='299'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_3">( pd_in , nl_max )<a name='300'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_4">( theta , nl_max )<a name='301'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_5">( rho , nl_max )<a name='302'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_6">( u , nl_max )<a name='303'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_7">( v , nl_max )<a name='304'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_8">( qv , nl_max )<a name='305'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_INTEGER'>wrf_dm_bcast_integer</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_INTEGER_1"> ( nl_in , 1 ) <a name='306'>
+<a name='307'>
+  write(6,*) ' returned from reading sounding, nl_in is ',nl_in<a name='308'>
+<a name='309'>
+<font color=#447700>!  find ptop for the desired ztop (ztop is input from the namelist),<a name='310'></font>
+<font color=#447700>!  and find surface pressure<a name='311'></font>
+<a name='312'>
+  p_top = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_28">( p_in, zk, ztop, nl_in )<a name='313'>
+<a name='314'>
+  DO j=jts,jte<a name='315'>
+  DO i=its,ite  <font color=#447700>! flat surface<a name='316'></font>
+    phb(i,1,j) = 0.<a name='317'>
+    php(i,1,j) = 0.<a name='318'>
+    ph0(i,1,j) = 0.<a name='319'>
+    ht(i,j) = 0.<a name='320'>
+  ENDDO<a name='321'>
+  ENDDO<a name='322'>
+<a name='323'>
+  DO J = jts, jte<a name='324'>
+  DO I = its, ite<a name='325'>
+<a name='326'>
+    p_surf = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_29">( p_in, zk, phb(i,1,j)/g, nl_in )<a name='327'>
+    mub(i,j) = p_surf-p_top<a name='328'>
+<a name='329'>
+<font color=#447700>!  this is dry hydrostatic sounding (base state), so given p (coordinate),<a name='330'></font>
+<font color=#447700>!  interp theta (from interp) and compute 1/rho from eqn. of state<a name='331'></font>
+<a name='332'>
+    DO K = 1, kte-1<a name='333'>
+      p_level = znu(k)*(p_surf - p_top) + p_top<a name='334'>
+      pb(i,k,j) = p_level<a name='335'>
+      t_init(i,k,j) = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_30">( theta, p_in, p_level, nl_in ) - t0<a name='336'>
+      alb(i,k,j) = (r_d/p1000mb)*(t_init(i,k,j)+t0)*(pb(i,k,j)/p1000mb)**cvpm<a name='337'>
+    ENDDO<a name='338'>
+<a name='339'>
+<font color=#447700>!  calc hydrostatic balance (alternatively we could interp the geopotential from the<a name='340'></font>
+<font color=#447700>!  sounding, but this assures that the base state is in exact hydrostatic balance with<a name='341'></font>
+<font color=#447700>!  respect to the model eqns.<a name='342'></font>
+<a name='343'>
+    DO k  = 2,kte<a name='344'>
+      phb(i,k,j) = phb(i,k-1,j) - dnw(k-1)*mub(i,j)*alb(i,k-1,j)<a name='345'>
+    ENDDO<a name='346'>
+<a name='347'>
+  ENDDO<a name='348'>
+  ENDDO<a name='349'>
+<a name='350'>
+  IF ( wrf_dm_on_monitor() ) THEN<a name='351'>
+    write(6,*) ' ptop is ',p_top<a name='352'>
+    write(6,*) ' base state mub(1,1), p_surf is ',mub(1,1),mub(1,1)+p_top<a name='353'>
+  ENDIF<a name='354'>
+<a name='355'>
+<font color=#447700>!  calculate full state for each column - this includes moisture.<a name='356'></font>
+<a name='357'>
+  write(6,*) ' getting moist sounding for full state '<a name='358'>
+  dry_sounding = .false.<a name='359'>
+  CALL <A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#GET_SOUNDING'>get_sounding</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GET_SOUNDING_9">( zk, p_in, pd_in, theta, rho, u, v, qv, dry_sounding, nl_max, nl_in )<a name='360'>
+<a name='361'>
+  DO J = jts, min(jde-1,jte)<a name='362'>
+  DO I = its, min(ide-1,ite)<a name='363'>
+<a name='364'>
+<font color=#447700>!  At this point p_top is already set. find the DRY mass in the column <a name='365'></font>
+<font color=#447700>!  by interpolating the DRY pressure.  <a name='366'></font>
+<a name='367'>
+   pd_surf = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_31">( pd_in, zk, phb(i,1,j)/g, nl_in )<a name='368'>
+<a name='369'>
+<font color=#447700>!  compute the perturbation mass and the full mass<a name='370'></font>
+<a name='371'>
+    mu_1(i,j) = pd_surf-p_top - mub(i,j)<a name='372'>
+    mu_2(i,j) = mu_1(i,j)<a name='373'>
+    mu0(i,j) = mu_1(i,j) + mub(i,j)<a name='374'>
+<a name='375'>
+<font color=#447700>! given the dry pressure and coordinate system, interp the potential<a name='376'></font>
+<font color=#447700>! temperature and qv<a name='377'></font>
+<a name='378'>
+    do k=1,kde-1<a name='379'>
+<a name='380'>
+      p_level = znu(k)*(pd_surf - p_top) + p_top<a name='381'>
+<a name='382'>
+      moist_1(i,k,j,P_QV) = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_32">( qv, pd_in, p_level, nl_in )<a name='383'>
+      moist_2(i,k,j,P_QV) = moist_1(i,k,j,P_QV)<a name='384'>
+      t_1(i,k,j)          = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_33">( theta, pd_in, p_level, nl_in ) - t0<a name='385'>
+      t_2(i,k,j)          = t_1(i,k,j)<a name='386'>
+      <a name='387'>
+<a name='388'>
+    enddo<a name='389'>
+<a name='390'>
+<font color=#447700>!  integrate the hydrostatic equation (from the RHS of the bigstep<a name='391'></font>
+<font color=#447700>!  vertical momentum equation) down from the top to get p.<a name='392'></font>
+<font color=#447700>!  first from the top of the model to the top pressure<a name='393'></font>
+<a name='394'>
+    k = kte-1  <font color=#447700>! top level<a name='395'></font>
+<a name='396'>
+    qvf1 = 0.5*(moist_1(i,k,j,P_QV)+moist_1(i,k,j,P_QV))<a name='397'>
+    qvf2 = 1./(1.+qvf1)<a name='398'>
+    qvf1 = qvf1*qvf2<a name='399'>
+<a name='400'>
+<font color=#447700>!    p(i,k,j) = - 0.5*mu_1(i,j)/rdnw(k)<a name='401'></font>
+    p(i,k,j) = - 0.5*(mu_1(i,j)+qvf1*mub(i,j))/rdnw(k)/qvf2<a name='402'>
+    qvf = 1. + rvovrd*moist_1(i,k,j,P_QV)<a name='403'>
+    alt(i,k,j) = (r_d/p1000mb)*(t_1(i,k,j)+t0)*qvf* &amp;<a name='404'>
+                (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)<a name='405'>
+    al(i,k,j) = alt(i,k,j) - alb(i,k,j)<a name='406'>
+<a name='407'>
+<font color=#447700>!  down the column<a name='408'></font>
+<a name='409'>
+    do k=kte-2,1,-1<a name='410'>
+      qvf1 = 0.5*(moist_1(i,k,j,P_QV)+moist_1(i,k+1,j,P_QV))<a name='411'>
+      qvf2 = 1./(1.+qvf1)<a name='412'>
+      qvf1 = qvf1*qvf2<a name='413'>
+      p(i,k,j) = p(i,k+1,j) - (mu_1(i,j) + qvf1*mub(i,j))/qvf2/rdn(k+1)<a name='414'>
+      qvf = 1. + rvovrd*moist_1(i,k,j,P_QV)<a name='415'>
+      alt(i,k,j) = (r_d/p1000mb)*(t_1(i,k,j)+t0)*qvf* &amp;<a name='416'>
+                  (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)<a name='417'>
+      al(i,k,j) = alt(i,k,j) - alb(i,k,j)<a name='418'>
+    enddo<a name='419'>
+<a name='420'>
+<font color=#447700>!  this is the hydrostatic equation used in the model after the<a name='421'></font>
+<font color=#447700>!  small timesteps.  In the model, al (inverse density)<a name='422'></font>
+<font color=#447700>!  is computed from the geopotential.<a name='423'></font>
+<a name='424'>
+<a name='425'>
+    ph_1(i,1,j) = 0.<a name='426'>
+    DO k  = 2,kte<a name='427'>
+      ph_1(i,k,j) = ph_1(i,k-1,j) - (1./rdnw(k-1))*(       &amp;<a name='428'>
+                   (mub(i,j)+mu_1(i,j))*al(i,k-1,j)+ &amp;<a name='429'>
+                    mu_1(i,j)*alb(i,k-1,j)  )<a name='430'>
+                                                   <a name='431'>
+      ph_2(i,k,j) = ph_1(i,k,j) <a name='432'>
+      ph0(i,k,j) = ph_1(i,k,j) + phb(i,k,j)<a name='433'>
+    ENDDO<a name='434'>
+<a name='435'>
+    IF ( wrf_dm_on_monitor() ) THEN<a name='436'>
+    if((i==2) .and. (j==2)) then<a name='437'>
+     write(6,*) ' ph_1 calc ',ph_1(2,1,2),ph_1(2,2,2),mu_1(2,2)+mub(2,2),mu_1(2,2), &amp;<a name='438'>
+                              alb(2,1,2),al(1,2,1),rdnw(1)<a name='439'>
+    endif<a name='440'>
+    ENDIF<a name='441'>
+<a name='442'>
+  ENDDO<a name='443'>
+  ENDDO<a name='444'>
+<a name='445'>
+<font color=#447700>!#if 0<a name='446'></font>
+<a name='447'>
+<font color=#447700>!  thermal perturbation to kick off convection<a name='448'></font>
+<a name='449'>
+  write(6,*) ' nxc, nyc for perturbation ',nxc,nyc<a name='450'>
+  write(6,*) ' delt for perturbation ',delt<a name='451'>
+<a name='452'>
+  DO J = jts, min(jde-1,jte)<a name='453'>
+    yrad = dy*float(j-nyc)/10000.<a name='454'>
+<font color=#447700>!   yrad = 0.<a name='455'></font>
+    DO I = its, min(ide-1,ite)<a name='456'>
+      xrad = dx*float(i-nxc)/10000.<a name='457'>
+<font color=#447700>!     xrad = 0.<a name='458'></font>
+      DO K = 1, kte-1<a name='459'>
+<a name='460'>
+<font color=#447700>!  put in preturbation theta (bubble) and recalc density.  note,<a name='461'></font>
+<font color=#447700>!  the mass in the column is not changing, so when theta changes,<a name='462'></font>
+<font color=#447700>!  we recompute density and geopotential<a name='463'></font>
+<a name='464'>
+        zrad = 0.5*(ph_1(i,k,j)+ph_1(i,k+1,j)  &amp;<a name='465'>
+                   +phb(i,k,j)+phb(i,k+1,j))/g<a name='466'>
+        zrad = (zrad-1500.)/1500.<a name='467'>
+        RAD=SQRT(xrad*xrad+yrad*yrad+zrad*zrad)<a name='468'>
+        IF(RAD &lt;= 1.) THEN<a name='469'>
+           T_1(i,k,j)=T_1(i,k,j)+delt*COS(.5*PI*RAD)**2<a name='470'>
+           T_2(i,k,j)=T_1(i,k,j)<a name='471'>
+           qvf = 1. + rvovrd*moist_1(i,k,j,P_QV)<a name='472'>
+           alt(i,k,j) = (r_d/p1000mb)*(t_1(i,k,j)+t0)*qvf* &amp;<a name='473'>
+                        (((p(i,k,j)+pb(i,k,j))/p1000mb)**cvpm)<a name='474'>
+           al(i,k,j) = alt(i,k,j) - alb(i,k,j)<a name='475'>
+        ENDIF<a name='476'>
+      ENDDO<a name='477'>
+<a name='478'>
+<font color=#447700>!  rebalance hydrostatically<a name='479'></font>
+<a name='480'>
+      DO k  = 2,kte<a name='481'>
+        ph_1(i,k,j) = ph_1(i,k-1,j) - (1./rdnw(k-1))*(       &amp;<a name='482'>
+                     (mub(i,j)+mu_1(i,j))*al(i,k-1,j)+ &amp;<a name='483'>
+                      mu_1(i,j)*alb(i,k-1,j)  )<a name='484'>
+                                                   <a name='485'>
+        ph_2(i,k,j) = ph_1(i,k,j) <a name='486'>
+        ph0(i,k,j) = ph_1(i,k,j) + phb(i,k,j)<a name='487'>
+      ENDDO<a name='488'>
+<a name='489'>
+    ENDDO<a name='490'>
+  ENDDO<a name='491'>
+<a name='492'>
+<font color=#447700>!#endif<a name='493'></font>
+<a name='494'>
+   IF ( wrf_dm_on_monitor() ) THEN<a name='495'>
+   write(6,*) ' mu_1 from comp ', mu_1(1,1)<a name='496'>
+   write(6,*) ' full state sounding from comp, ph, p, al, t_1, qv '<a name='497'>
+   do k=1,kde-1<a name='498'>
+     write(6,'(i3,1x,5(1x,1pe10.3))') k, ph_1(1,k,1)+phb(1,k,1), &amp;<a name='499'>
+                                      p(1,k,1)+pb(1,k,1), alt(1,k,1), &amp;<a name='500'>
+                                      t_1(1,k,1)+t0, moist_1(1,k,1,P_QV)<a name='501'>
+   enddo<a name='502'>
+<a name='503'>
+   write(6,*) ' pert state sounding from comp, ph_1, pp, alp, t_1, qv '<a name='504'>
+   do k=1,kde-1<a name='505'>
+     write(6,'(i3,1x,5(1x,1pe10.3))') k, ph_1(1,k,1), &amp;<a name='506'>
+                                      p(1,k,1), al(1,k,1), &amp;<a name='507'>
+                                      t_1(1,k,1), moist_1(1,k,1,P_QV)<a name='508'>
+   enddo<a name='509'>
+   ENDIF<a name='510'>
+<a name='511'>
+<font color=#447700>! interp v<a name='512'></font>
+<a name='513'>
+  DO J = jts, jte<a name='514'>
+  DO I = its, min(ide-1,ite)<a name='515'>
+<a name='516'>
+    IF (j == jds) THEN<a name='517'>
+      z_at_v = phb(i,1,j)/g<a name='518'>
+    ELSE IF (j == jde) THEN<a name='519'>
+      z_at_v = phb(i,1,j-1)/g<a name='520'>
+    ELSE<a name='521'>
+      z_at_v = 0.5*(phb(i,1,j)+phb(i,1,j-1))/g<a name='522'>
+    END IF<a name='523'>
+    p_surf = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_34">( p_in, zk, z_at_v, nl_in )<a name='524'>
+<a name='525'>
+    DO K = 1, kte-1<a name='526'>
+      p_level = znu(k)*(p_surf - p_top) + p_top<a name='527'>
+      v_1(i,k,j) = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_35">( v, p_in, p_level, nl_in )<a name='528'>
+      v_2(i,k,j) = v_1(i,k,j)<a name='529'>
+    ENDDO<a name='530'>
+<a name='531'>
+  ENDDO<a name='532'>
+  ENDDO<a name='533'>
+<a name='534'>
+<font color=#447700>! interp u<a name='535'></font>
+<a name='536'>
+  DO J = jts, min(jde-1,jte)<a name='537'>
+  DO I = its, ite<a name='538'>
+<a name='539'>
+    IF (i == ids) THEN<a name='540'>
+      z_at_u = phb(i,1,j)/g<a name='541'>
+    ELSE IF (i == ide) THEN<a name='542'>
+      z_at_u = phb(i-1,1,j)/g<a name='543'>
+    ELSE<a name='544'>
+      z_at_u = 0.5*(phb(i,1,j)+phb(i-1,1,j))/g<a name='545'>
+    END IF<a name='546'>
+<a name='547'>
+    p_surf = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_36">( p_in, zk, z_at_u, nl_in )<a name='548'>
+<a name='549'>
+    DO K = 1, kte-1<a name='550'>
+      p_level = znu(k)*(p_surf - p_top) + p_top<a name='551'>
+      u_1(i,k,j) = <A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0'>interp_0</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_0_37">( u, p_in, p_level, nl_in )<a name='552'>
+      u_2(i,k,j) = u_1(i,k,j)<a name='553'>
+    ENDDO<a name='554'>
+<a name='555'>
+  ENDDO<a name='556'>
+  ENDDO<a name='557'>
+<a name='558'>
+<font color=#447700>!  set w<a name='559'></font>
+<a name='560'>
+  DO J = jts, min(jde-1,jte)<a name='561'>
+  DO K = kts, kte<a name='562'>
+  DO I = its, min(ide-1,ite)<a name='563'>
+    w_1(i,k,j) = 0.<a name='564'>
+    w_2(i,k,j) = 0.<a name='565'>
+  ENDDO<a name='566'>
+  ENDDO<a name='567'>
+  ENDDO<a name='568'>
+<a name='569'>
+<font color=#447700>!  set a few more things<a name='570'></font>
+<a name='571'>
+  DO J = jts, min(jde-1,jte)<a name='572'>
+  DO K = kts, kte-1<a name='573'>
+  DO I = its, min(ide-1,ite)<a name='574'>
+    h_diabatic(i,k,j) = 0.<a name='575'>
+  ENDDO<a name='576'>
+  ENDDO<a name='577'>
+  ENDDO<a name='578'>
+<a name='579'>
+  IF ( wrf_dm_on_monitor() ) THEN<a name='580'>
+  DO k=1,kte-1<a name='581'>
+    t_base(k) = t_1(1,k,1)<a name='582'>
+    qv_base(k) = moist_1(1,k,1,P_QV)<a name='583'>
+    u_base(k) = u_1(1,k,1)<a name='584'>
+    v_base(k) = v_1(1,k,1)<a name='585'>
+    z_base(k) = 0.5*(phb(1,k,1)+phb(1,k+1,1)+ph_1(1,k,1)+ph_1(1,k+1,1))/g<a name='586'>
+  ENDDO<a name='587'>
+  ENDIF<a name='588'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_9">( t_base , kte )<a name='589'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_10">( qv_base , kte )<a name='590'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_11">( u_base , kte )<a name='591'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_12">( v_base , kte )<a name='592'>
+  CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_REAL'>wrf_dm_bcast_real</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_REAL_13">( z_base , kte )<a name='593'>
+<a name='594'>
+  DO J = jts, min(jde-1,jte)<a name='595'>
+  DO I = its, min(ide-1,ite)<a name='596'>
+     thtmp   = t_2(i,1,j)+t0<a name='597'>
+     ptmp    = p(i,1,j)+pb(i,1,j)<a name='598'>
+     temp(1) = thtmp * (ptmp/p1000mb)**rcp<a name='599'>
+     thtmp   = t_2(i,2,j)+t0<a name='600'>
+     ptmp    = p(i,2,j)+pb(i,2,j)<a name='601'>
+     temp(2) = thtmp * (ptmp/p1000mb)**rcp<a name='602'>
+     thtmp   = t_2(i,3,j)+t0<a name='603'>
+     ptmp    = p(i,3,j)+pb(i,3,j)<a name='604'>
+     temp(3) = thtmp * (ptmp/p1000mb)**rcp<a name='605'>
+<a name='606'>
+     TSK(I,J)=cf1*temp(1)+cf2*temp(2)+cf3*temp(3)<a name='607'>
+     TMN(I,J)=TSK(I,J)-0.5<a name='608'>
+  ENDDO<a name='609'>
+  ENDDO<a name='610'>
+<a name='611'>
+#define COPY_OUT<a name='612'>
+#include &lt;<A href='../../html_code/include/em_scalar_derefs.inc.html'>em_scalar_derefs.inc</A>&gt;<A NAME="em_scalar_derefs.inc_8"><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#INIT_DOMAIN_RK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='613'>
+  RETURN<a name='614'>
+<a name='615'>
+ END SUBROUTINE init_domain_rk<a name='616'>
+<a name='617'>
+<A NAME='INIT_MODULE_INITIALIZE'><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#INIT_MODULE_INITIALIZE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='618'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_initialize</font>,<A href='../../call_from/INIT_MODULE_INITIALIZE.html' TARGET='index'>8</A><a name='619'>
+   END SUBROUTINE init_module_initialize<a name='620'>
+<a name='621'>
+<font color=#447700>!---------------------------------------------------------------------<a name='622'></font>
+<a name='623'>
+<font color=#447700>!  test driver for get_sounding<a name='624'></font>
+<font color=#447700>!<a name='625'></font>
+<font color=#447700>!      implicit none<a name='626'></font>
+<font color=#447700>!      integer n<a name='627'></font>
+<font color=#447700>!      parameter(n = 1000)<a name='628'></font>
+<font color=#447700>!      real zk(n),p(n),theta(n),rho(n),u(n),v(n),qv(n),pd(n)<a name='629'></font>
+<font color=#447700>!      logical dry<a name='630'></font>
+<font color=#447700>!      integer nl,k<a name='631'></font>
+<font color=#447700>!<a name='632'></font>
+<font color=#447700>!      dry = .false.<a name='633'></font>
+<font color=#447700>!      dry = .true.<a name='634'></font>
+<font color=#447700>!      call get_sounding( zk, p, pd, theta, rho, u, v, qv, dry, n, nl )<a name='635'></font>
+<font color=#447700>!      write(6,*) ' input levels ',nl<a name='636'></font>
+<font color=#447700>!      write(6,*) ' sounding '<a name='637'></font>
+<font color=#447700>!      write(6,*) '  k  height(m)  press (Pa) pd(Pa) theta (K) den(kg/m^3)  u(m/s)     v(m/s)    qv(g/g) '<a name='638'></font>
+<font color=#447700>!      do k=1,nl<a name='639'></font>
+<font color=#447700>!        write(6,'(1x,i3,8(1x,1pe10.3))') k, zk(k), p(k), pd(k), theta(k), rho(k), u(k), v(k), qv(k)<a name='640'></font>
+<font color=#447700>!      enddo<a name='641'></font>
+<font color=#447700>!      end<a name='642'></font>
+<font color=#447700>!<a name='643'></font>
+<font color=#447700>!---------------------------------------------------------------------------<a name='644'></font>
+<a name='645'>
+<A NAME='GET_SOUNDING'><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#GET_SOUNDING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='646'>
+      <font color=#993300>subroutine </font><font color=#cc0000>get_sounding</font>( zk, p, p_dry, theta, rho, &amp; <A href='../../call_to/GET_SOUNDING.html' TARGET='index'>13</A>,<A href='../../call_from/GET_SOUNDING.html' TARGET='index'>12</A><a name='647'>
+                               u, v, qv, dry, nl_max, nl_in )<a name='648'>
+      implicit none<a name='649'>
+<a name='650'>
+      integer nl_max, nl_in<a name='651'>
+      real zk(nl_max), p(nl_max), theta(nl_max), rho(nl_max), &amp;<a name='652'>
+           u(nl_max), v(nl_max), qv(nl_max), p_dry(nl_max)<a name='653'>
+      logical dry<a name='654'>
+<a name='655'>
+      integer n<a name='656'>
+      parameter(n=1000)<a name='657'>
+      logical debug<a name='658'>
+      parameter( debug = .true.)<a name='659'>
+<a name='660'>
+<font color=#447700>! input sounding data<a name='661'></font>
+<a name='662'>
+      real p_surf, th_surf, qv_surf<a name='663'>
+      real pi_surf, pi(n)<a name='664'>
+      real h_input(n), th_input(n), qv_input(n), u_input(n), v_input(n)<a name='665'>
+<a name='666'>
+<font color=#447700>! diagnostics<a name='667'></font>
+<a name='668'>
+      real rho_surf, p_input(n), rho_input(n)<a name='669'>
+      real pm_input(n)  <font color=#447700>!  this are for full moist sounding<a name='670'></font>
+<a name='671'>
+<font color=#447700>! local data<a name='672'></font>
+<a name='673'>
+      real p1000mb,cv,cp,r,cvpm,g<a name='674'>
+      parameter (p1000mb = 1.e+05, r = 287, cp = 1003., cv = cp-r, cvpm = -cv/cp, g=9.81 )<a name='675'>
+      integer k, it, nl<a name='676'>
+      real qvf, qvf1, dz<a name='677'>
+<a name='678'>
+<font color=#447700>!  first, read the sounding<a name='679'></font>
+<a name='680'>
+      call <A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#READ_SOUNDING'>read_sounding</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#GET_SOUNDING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="READ_SOUNDING_3">( p_surf, th_surf, qv_surf, &amp;<a name='681'>
+                          h_input, th_input, qv_input, u_input, v_input,n, nl, debug )<a name='682'>
+<a name='683'>
+      if(dry) then<a name='684'>
+       do k=1,nl<a name='685'>
+         qv_input(k) = 0.<a name='686'>
+       enddo<a name='687'>
+      endif<a name='688'>
+<a name='689'>
+      if(debug) write(6,*) ' number of input levels = ',nl<a name='690'>
+<a name='691'>
+        nl_in = nl<a name='692'>
+        if(nl_in .gt. nl_max ) then<a name='693'>
+          write(6,*) ' too many levels for input arrays ',nl_in,nl_max<a name='694'>
+          call <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/dyn_em/module_initialize_squall2d_y.F.html#GET_SOUNDING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_25"> ( ' too many levels for input arrays ' )<a name='695'>
+        end if<a name='696'>
+<a name='697'>
+<font color=#447700>!  compute diagnostics,<a name='698'></font>
+<font color=#447700>!  first, convert qv(g/kg) to qv(g/g)<a name='699'></font>
+<a name='700'>
+      do k=1,nl<a name='701'>
+        qv_input(k) = 0.001*qv_input(k)<a name='702'>
+      enddo<a name='703'>
+<a name='704'>
+      p_surf = 100.*p_surf  <font color=#447700>! convert to pascals<a name='705'></font>
+      qvf = 1. + rvovrd*qv_input(1) <a name='706'>
+      rho_surf = 1./((r/p1000mb)*th_surf*qvf*((p_surf/p1000mb)**cvpm))<a name='707'>
+      pi_surf = (p_surf/p1000mb)**(r/cp)<a name='708'>
+<a name='709'>
+      if(debug) then<a name='710'>
+        write(6,*) ' surface density is ',rho_surf<a name='711'>
+        write(6,*) ' surface pi is      ',pi_surf<a name='712'>
+      end if<a name='713'>
+<a name='714'>
+<a name='715'>
+<font color=#447700>!  integrate moist sounding hydrostatically, starting from the<a name='716'></font>
+<font color=#447700>!  specified surface pressure<a name='717'></font>
+<font color=#447700>!  -&gt; first, integrate from surface to lowest level<a name='718'></font>
+<a name='719'>
+          qvf = 1. + rvovrd*qv_input(1) <a name='720'>
+          qvf1 = 1. + qv_input(1)<a name='721'>
+          rho_input(1) = rho_surf<a name='722'>
+          dz = h_input(1)<a name='723'>
+          do it=1,10<a name='724'>
+            pm_input(1) = p_surf &amp;<a name='725'>
+                    - 0.5*dz*(rho_surf+rho_input(1))*g*qvf1<a name='726'>
+            rho_input(1) = 1./((r/p1000mb)*th_input(1)*qvf*((pm_input(1)/p1000mb)**cvpm))<a name='727'>
+          enddo<a name='728'>
+<a name='729'>
+<font color=#447700>! integrate up the column<a name='730'></font>
+<a name='731'>
+          do k=2,nl<a name='732'>
+            rho_input(k) = rho_input(k-1)<a name='733'>
+            dz = h_input(k)-h_input(k-1)<a name='734'>
+            qvf1 = 0.5*(2.+(qv_input(k-1)+qv_input(k)))<a name='735'>
+            qvf = 1. + rvovrd*qv_input(k)   <font color=#447700>! qv is in g/kg here<a name='736'></font>
+ <a name='737'>
+            do it=1,10<a name='738'>
+              pm_input(k) = pm_input(k-1) &amp;<a name='739'>
+                      - 0.5*dz*(rho_input(k)+rho_input(k-1))*g*qvf1<a name='740'>
+              rho_input(k) = 1./((r/p1000mb)*th_input(k)*qvf*((pm_input(k)/p1000mb)**cvpm))<a name='741'>
+            enddo<a name='742'>
+          enddo<a name='743'>
+<a name='744'>
+<font color=#447700>!  we have the moist sounding<a name='745'></font>
+<a name='746'>
+<font color=#447700>!  next, compute the dry sounding using p at the highest level from the<a name='747'></font>
+<font color=#447700>!  moist sounding and integrating down.<a name='748'></font>
+<a name='749'>
+        p_input(nl) = pm_input(nl)<a name='750'>
+<a name='751'>
+          do k=nl-1,1,-1<a name='752'>
+            dz = h_input(k+1)-h_input(k)<a name='753'>
+            p_input(k) = p_input(k+1) + 0.5*dz*(rho_input(k)+rho_input(k+1))*g<a name='754'>
+          enddo<a name='755'>
+<a name='756'>
+<a name='757'>
+        do k=1,nl<a name='758'>
+<a name='759'>
+          zk(k) = h_input(k)<a name='760'>
+          p(k) = pm_input(k)<a name='761'>
+          p_dry(k) = p_input(k)<a name='762'>
+          theta(k) = th_input(k)<a name='763'>
+          rho(k) = rho_input(k)<a name='764'>
+          u(k) = u_input(k)<a name='765'>
+          v(k) = v_input(k)<a name='766'>
+          qv(k) = qv_input(k)<a name='767'>
+<a name='768'>
+        enddo<a name='769'>
+<a name='770'>
+     if(debug) then<a name='771'>
+      write(6,*) ' sounding '<a name='772'>
+      write(6,*) '  k  height(m)  press (Pa) pd(Pa) theta (K) den(kg/m^3)  u(m/s)     v(m/s)    qv(g/g) '<a name='773'>
+      do k=1,nl<a name='774'>
+        write(6,'(1x,i3,8(1x,1pe10.3))') k, zk(k), p(k), p_dry(k), theta(k), rho(k), u(k), v(k), qv(k)<a name='775'>
+      enddo<a name='776'>
+<a name='777'>
+     end if<a name='778'>
+<a name='779'>
+      end subroutine get_sounding<a name='780'>
+<a name='781'>
+<font color=#447700>!-------------------------------------------------------<a name='782'></font>
+<a name='783'>
+<A NAME='READ_SOUNDING'><A href='../../html_code/dyn_em/module_initialize_quarter_ss.F.html#READ_SOUNDING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='784'>
+      <font color=#993300>subroutine </font><font color=#cc0000>read_sounding</font>( ps,ts,qvs,h,th,qv,u,v,n,nl,debug ) <A href='../../call_to/READ_SOUNDING.html' TARGET='index'>5</A><a name='785'>
+      implicit none<a name='786'>
+      integer n,nl<a name='787'>
+      real ps,ts,qvs,h(n),th(n),qv(n),u(n),v(n)<a name='788'>
+      logical end_of_file<a name='789'>
+      logical debug<a name='790'>
+<a name='791'>
+      integer k<a name='792'>
+<a name='793'>
+      open(unit=10,file='input_sounding',form='formatted',status='old')<a name='794'>
+      rewind(10)<a name='795'>
+      read(10,*) ps, ts, qvs<a name='796'>
+      if(debug) then<a name='797'>
+        write(6,*) ' input sounding surface parameters '<a name='798'>
+        write(6,*) ' surface pressure (mb) ',ps<a name='799'>
+        write(6,*) ' surface pot. temp (K) ',ts<a name='800'>
+        write(6,*) ' surface mixing ratio (g/kg) ',qvs<a name='801'>
+      end if<a name='802'>
+<a name='803'>
+      end_of_file = .false.<a name='804'>
+      k = 0<a name='805'>
+<a name='806'>
+      do while (.not. end_of_file)<a name='807'>
+<a name='808'>
+        read(10,*,end=100) h(k+1), th(k+1), qv(k+1), u(k+1), v(k+1)<a name='809'>
+        k = k+1<a name='810'>
+        if(debug) write(6,'(1x,i3,5(1x,e10.3))') k, h(k), th(k), qv(k), u(k), v(k)<a name='811'>
+        go to 110<a name='812'>
+ 100    end_of_file = .true.<a name='813'>
+ 110    continue<a name='814'>
+      enddo<a name='815'>
+<a name='816'>
+      nl = k<a name='817'>
+<a name='818'>
+      close(unit=10,status = 'keep')<a name='819'>
+<a name='820'>
+      end subroutine read_sounding<a name='821'>
+<a name='822'>
+END MODULE module_initialize<a name='823'>
+</pre></body></html>

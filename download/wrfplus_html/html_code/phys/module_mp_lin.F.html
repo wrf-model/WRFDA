@@ -1,0 +1,2551 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_MP_LIN'><A href='../../html_code/phys/module_mp_lin.F.html#MODULE_MP_LIN' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_mp_lin</font> <A href='../../call_to/MODULE_MP_LIN.html' TARGET='index'>1</A><a name='6'>
+<a name='7'>
+   USE     <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/phys/module_mp_lin.F.html#module_mp_lin.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_36"><a name='8'>
+<font color=#447700>!<a name='9'></font>
+   REAL    , PARAMETER, PRIVATE ::       RH = 1.0<a name='10'>
+<font color=#447700>!  REAL    , PARAMETER, PRIVATE ::   episp0 = 0.622*611.21<a name='11'></font>
+   REAL    , PARAMETER, PRIVATE ::     xnor = 8.0e6<a name='12'>
+   REAL    , PARAMETER, PRIVATE ::     xnos = 3.0e6<a name='13'>
+<a name='14'>
+<font color=#447700>!  Lin<a name='15'></font>
+<font color=#447700>!  REAL    , PARAMETER, PRIVATE ::     xnog = 4.0e4<a name='16'></font>
+<font color=#447700>!  REAL    , PARAMETER, PRIVATE ::     rhograul = 917.<a name='17'></font>
+<a name='18'>
+<font color=#447700>! Hobbs<a name='19'></font>
+  REAL     , PARAMETER, PRIVATE ::     xnog = 4.0e6<a name='20'>
+  REAL     , PARAMETER, PRIVATE ::     rhograul = 400.<a name='21'>
+<a name='22'>
+<font color=#447700>!<a name='23'></font>
+  REAL     , PARAMETER, PRIVATE ::                              &amp;<a name='24'>
+             qi0 = 1.0e-3, ql0 = 7.0e-4, qs0 = 6.0E-4,          &amp;<a name='25'>
+             xmi50 = 4.8e-10, xmi40 = 2.46e-10,                 &amp;<a name='26'>
+             constb = 0.8, constd = 0.25,                       &amp;<a name='27'>
+             o6 = 1./6.,  cdrag = 0.6,                          &amp;<a name='28'>
+             avisc = 1.49628e-6, adiffwv = 8.7602e-5,           &amp;<a name='29'>
+             axka = 1.4132e3, di50 = 1.0e-4, xmi = 4.19e-13,    &amp;<a name='30'>
+             cw = 4.187e3, vf1s = 0.78, vf2s = 0.31,            &amp;<a name='31'>
+             xni0 = 1.0e-2, xmnin = 1.05e-18, bni = 0.5,        &amp;<a name='32'>
+             ci = 2.093e3<a name='33'>
+CONTAINS<a name='34'>
+<a name='35'>
+<font color=#447700>!-------------------------------------------------------------------<a name='36'></font>
+<font color=#447700>!  Lin et al., 1983, JAM, 1065-1092, and<a name='37'></font>
+<font color=#447700>!  Rutledge and Hobbs, 1984, JAS, 2949-2972<a name='38'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='39'></font>
+<A NAME='LIN_ET_AL'><A href='../../html_code/phys/module_mp_lin.F.html#LIN_ET_AL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='40'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>lin_et_al</font>(th, qv, ql, qr, qi, qs, qg,                 &amp; <A href='../../call_to/LIN_ET_AL.html' TARGET='index'>1</A>,<A href='../../call_from/LIN_ET_AL.html' TARGET='index'>2</A><a name='41'>
+                       qrold, qsold, qgold,                        &amp;<a name='42'>
+                       rho, pii, p, RAINNC, RAINNCV,               &amp;<a name='43'>
+                       dt_in, z, ht, dz8w,                         &amp;<a name='44'>
+                       grav, cp, Rair, rvapor,                     &amp;<a name='45'>
+                       XLS, XLV, XLF, rhowater, rhosnow,           &amp;<a name='46'>
+                       EP2,SVP1,SVP2,SVP3,SVPT0,                   &amp;<a name='47'>
+                       P_QI,P_QS,P_QG,                             &amp;<a name='48'>
+                       P_FIRST_SCALAR,                             &amp;<a name='49'>
+                       ids,ide, jds,jde, kds,kde,                  &amp; <font color=#447700>! domain dims<a name='50'></font>
+                       ims,ime, jms,jme, kms,kme,                  &amp; <font color=#447700>! memory dims<a name='51'></font>
+                       its,ite, jts,jte, kts,kte                   ) <font color=#447700>! tile   dims<a name='52'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='53'></font>
+  IMPLICIT NONE<a name='54'>
+<font color=#447700>!-------------------------------------------------------------------<a name='55'></font>
+<font color=#447700>!<a name='56'></font>
+<font color=#447700>! Shuhua 12/17/99<a name='57'></font>
+<font color=#447700>!<a name='58'></font>
+  INTEGER,      INTENT(IN   )    ::   ids,ide, jds,jde, kds,kde , &amp;<a name='59'>
+                                      ims,ime, jms,jme, kms,kme , &amp;<a name='60'>
+                                      its,ite, jts,jte, kts,kte , &amp;<a name='61'>
+                                      P_QI,P_QS,P_QG,             &amp;<a name='62'>
+                                      P_FIRST_SCALAR<a name='63'>
+<a name='64'>
+  REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &amp;<a name='65'>
+        INTENT(INOUT) ::                                          &amp;<a name='66'>
+                                                              th, &amp;<a name='67'>
+                                                              qv, &amp;<a name='68'>
+                                                              ql, &amp;<a name='69'>
+                                                              qr, &amp;<a name='70'>
+                                                              qi, &amp;<a name='71'>
+                                                              qs, &amp;<a name='72'>
+                                                              qg<a name='73'>
+<font color=#447700>!<a name='74'></font>
+  REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &amp;<a name='75'>
+        INTENT(IN   ) ::                                          &amp;<a name='76'>
+                                                           qrold, &amp;<a name='77'>
+                                                           qsold, &amp;<a name='78'>
+                                                           qgold, &amp;<a name='79'>
+                                                             rho, &amp;<a name='80'>
+                                                             pii, &amp;<a name='81'>
+                                                               p, &amp;<a name='82'>
+                                                            dz8w<a name='83'>
+<a name='84'>
+  REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                 &amp;<a name='85'>
+        INTENT(IN   ) ::                                       z<a name='86'>
+<a name='87'>
+  REAL, DIMENSION( ims:ime , jms:jme ),                           &amp;<a name='88'>
+        INTENT(INOUT) ::                                  RAINNC, &amp;<a name='89'>
+                                                         RAINNCV<a name='90'>
+<a name='91'>
+<a name='92'>
+  REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(IN) ::       ht<a name='93'>
+<a name='94'>
+  REAL, INTENT(IN   ) ::                                   dt_in, &amp;<a name='95'>
+                                                            grav, &amp;<a name='96'>
+                                                            Rair, &amp;<a name='97'>
+                                                          rvapor, &amp;<a name='98'>
+                                                              cp, &amp;<a name='99'>
+                                                             XLS, &amp;<a name='100'>
+                                                             XLV, &amp;<a name='101'>
+                                                             XLF, &amp;<a name='102'>
+                                                        rhowater, &amp;<a name='103'>
+                                                         rhosnow<a name='104'>
+<a name='105'>
+  REAL, INTENT(IN   ) :: EP2,SVP1,SVP2,SVP3,SVPT0<a name='106'>
+<a name='107'>
+<font color=#447700>! LOCAL VAR<a name='108'></font>
+<a name='109'>
+  INTEGER             ::                            min_q, max_q<a name='110'>
+<a name='111'>
+  REAL, DIMENSION( its:ite , jts:jte )                            &amp;<a name='112'>
+                               ::        rain, snow, graupel,ice<a name='113'>
+<a name='114'>
+  REAL, DIMENSION( kts:kte )   ::                  qvz, qlz, qrz, &amp;<a name='115'>
+                                                   qiz, qsz, qgz, &amp;<a name='116'>
+                                                  qrzold, qszold, &amp;<a name='117'>
+                                                     qgzold, thz, &amp;<a name='118'>
+                                                     tothz, rhoz, &amp;<a name='119'>
+                                                   orhoz, sqrhoz, &amp;<a name='120'>
+                                                        prez, zz, &amp;<a name='121'>
+                                                        dzw<a name='122'>
+<font color=#447700>!<a name='123'></font>
+  REAL    ::         dt, pptrain, pptsnow, pptgraul, rhoe_s,      &amp;<a name='124'>
+                     gindex, pptice<a name='125'>
+<a name='126'>
+  INTEGER ::               i,j,k<a name='127'>
+<font color=#447700>!<a name='128'></font>
+   dt=dt_in<a name='129'>
+   rhoe_s=1.29<a name='130'>
+<font color=#447700>!<a name='131'></font>
+   IF (P_QI .lt. P_FIRST_SCALAR .or. P_QS .lt. P_FIRST_SCALAR) THEN<a name='132'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_mp_lin.F.html#LIN_ET_AL' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_151"> ( 'module_mp_lin: Improper use of Lin et al scheme; no ice phase. Please chose another one.')<a name='133'>
+   ENDIF<a name='134'>
+<a name='135'>
+   gindex=1.0<a name='136'>
+<a name='137'>
+   IF (P_QG .lt. P_FIRST_SCALAR) gindex=0.<a name='138'>
+<a name='139'>
+   j_loop:  DO j = jts, jte<a name='140'>
+   i_loop:  DO i = its, ite<a name='141'>
+<font color=#447700>!<a name='142'></font>
+<font color=#447700>!- write data from 3-D to 1-D<a name='143'></font>
+<font color=#447700>!<a name='144'></font>
+   DO k = kts, kte<a name='145'>
+      qvz(k)=qv(i,k,j)<a name='146'>
+      qlz(k)=ql(i,k,j)<a name='147'>
+      qrz(k)=qr(i,k,j)<a name='148'>
+      qrzold(k)=qrold(i,k,j)<a name='149'>
+      thz(k)=th(i,k,j)<a name='150'>
+<font color=#447700>!<a name='151'></font>
+      rhoz(k)=rho(i,k,j)<a name='152'>
+      orhoz(k)=1./rhoz(k)<a name='153'>
+      prez(k)=p(i,k,j)<a name='154'>
+      sqrhoz(k)=sqrt(rhoe_s*orhoz(k))<a name='155'>
+      tothz(k)=pii(i,k,j)<a name='156'>
+      zz(k)=z(i,k,j)<a name='157'>
+      dzw(k)=dz8w(i,k,j)<a name='158'>
+   END DO<a name='159'>
+<a name='160'>
+   IF (P_QI .ge. P_FIRST_SCALAR) THEN<a name='161'>
+      DO k = kts, kte<a name='162'>
+         qiz(k)=qi(i,k,j)<a name='163'>
+      ENDDO<a name='164'>
+   ELSE<a name='165'>
+      DO k = kts, kte<a name='166'>
+         qiz(k)=0.<a name='167'>
+      ENDDO<a name='168'>
+   ENDIF<a name='169'>
+<a name='170'>
+   IF (P_QS .ge. P_FIRST_SCALAR) THEN<a name='171'>
+      DO k = kts, kte<a name='172'>
+         qsz(k)=qs(i,k,j)<a name='173'>
+         qszold(k)=qsold(i,k,j)<a name='174'>
+      ENDDO<a name='175'>
+   ELSE<a name='176'>
+      DO k = kts, kte<a name='177'>
+         qsz(k)=0.<a name='178'>
+         qszold(k)=0.<a name='179'>
+      ENDDO<a name='180'>
+   ENDIF<a name='181'>
+<a name='182'>
+   IF (P_QG .ge. P_FIRST_SCALAR) THEN<a name='183'>
+      DO k = kts, kte<a name='184'>
+         qgz(k)=qg(i,k,j)<a name='185'>
+         qgzold(k)=qgold(i,k,j)<a name='186'>
+      ENDDO<a name='187'>
+   ELSE<a name='188'>
+      DO k = kts, kte<a name='189'>
+         qgz(k)=0.<a name='190'>
+         qgzold(k)=0.<a name='191'>
+      ENDDO<a name='192'>
+   ENDIF<a name='193'>
+<font color=#447700>!<a name='194'></font>
+   pptrain=0.<a name='195'>
+   pptsnow=0.<a name='196'>
+   pptgraul=0.<a name='197'>
+   pptice=0.<a name='198'>
+   CALL <A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D'>clphy1d</A><A href='../../html_code/phys/module_mp_lin.F.html#LIN_ET_AL' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLPHY1D_1">(    dt, qvz, qlz, qrz, qiz, qsz, qgz,         &amp;<a name='199'>
+                    qrzold, qszold, qgzold,                   &amp;<a name='200'>
+                    thz, tothz, rhoz, orhoz, sqrhoz,          &amp;<a name='201'>
+                    prez, zz, dzw, ht(I,J),                   &amp;<a name='202'>
+                    pptrain, pptsnow, pptgraul, pptice,       &amp;<a name='203'>
+                    grav, cp, Rair, rvapor, gindex,           &amp;<a name='204'>
+                    XLS, XLV, XLF, rhowater, rhosnow,         &amp;<a name='205'>
+                    EP2,SVP1,SVP2,SVP3,SVPT0,                 &amp;<a name='206'>
+                    kts, kte, i, j                            )<a name='207'>
+<a name='208'>
+<font color=#447700>!<a name='209'></font>
+<font color=#447700>! Precipitation from cloud microphysics -- only for one time step<a name='210'></font>
+<font color=#447700>!<a name='211'></font>
+<font color=#447700>! unit is transferred from m to mm<a name='212'></font>
+<a name='213'>
+<font color=#447700>!<a name='214'></font>
+   rain(i,j)=pptrain<a name='215'>
+   snow(i,j)=pptsnow<a name='216'>
+   graupel(i,j)=pptgraul<a name='217'>
+   ice(i,j)=pptice<a name='218'>
+<font color=#447700>!<a name='219'></font>
+   RAINNCV(i,j)= pptrain + pptsnow + pptgraul + pptice<a name='220'>
+   RAINNC(i,j)=RAINNC(i,j) + pptrain + pptsnow + pptgraul + pptice<a name='221'>
+<a name='222'>
+<font color=#447700>!<a name='223'></font>
+<font color=#447700>!- update data from 1-D back to 3-D<a name='224'></font>
+<font color=#447700>!<a name='225'></font>
+<font color=#447700>!<a name='226'></font>
+   DO k = kts, kte<a name='227'>
+      qv(i,k,j)=qvz(k)<a name='228'>
+      ql(i,k,j)=qlz(k)<a name='229'>
+      qr(i,k,j)=qrz(k)<a name='230'>
+      th(i,k,j)=thz(k)<a name='231'>
+   END DO<a name='232'>
+<font color=#447700>!<a name='233'></font>
+   IF (P_QI .ge. P_FIRST_SCALAR) THEN<a name='234'>
+      DO k = kts, kte<a name='235'>
+         qi(i,k,j)=qiz(k)<a name='236'>
+      ENDDO<a name='237'>
+   ENDIF<a name='238'>
+<a name='239'>
+   IF (P_QS .ge. P_FIRST_SCALAR) THEN<a name='240'>
+      DO k = kts, kte<a name='241'>
+         qs(i,k,j)=qsz(k)<a name='242'>
+      ENDDO<a name='243'>
+   ENDIF<a name='244'>
+<a name='245'>
+   IF (P_QG .ge. P_FIRST_SCALAR) THEN<a name='246'>
+      DO k = kts, kte<a name='247'>
+         qg(i,k,j)=qgz(k)<a name='248'>
+      ENDDO<a name='249'>
+   ENDIF<a name='250'>
+<font color=#447700>!<a name='251'></font>
+   ENDDO i_loop<a name='252'>
+   ENDDO j_loop<a name='253'>
+<a name='254'>
+   END SUBROUTINE lin_et_al<a name='255'>
+<a name='256'>
+<a name='257'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='258'></font>
+<A NAME='CLPHY1D'><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='259'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>clphy1d</font>(dt, qvz, qlz, qrz, qiz, qsz, qgz,                &amp; <A href='../../call_to/CLPHY1D.html' TARGET='index'>1</A>,<A href='../../call_from/CLPHY1D.html' TARGET='index'>16</A><a name='260'>
+                      qrzold, qszold, qgzold,                          &amp;<a name='261'>
+                      thz, tothz, rho, orho, sqrho,                    &amp;<a name='262'>
+                      prez, zz, dzw, zsfc, pptrain, pptsnow, pptgraul, &amp;<a name='263'>
+                      pptice, grav, cp, Rair, rvapor, gindex,          &amp;<a name='264'>
+                      XLS, XLV, XLF, rhowater, rhosnow,                &amp;<a name='265'>
+                      EP2,SVP1,SVP2,SVP3,SVPT0,                        &amp;<a name='266'>
+                      kts, kte, i, j                                   )<a name='267'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='268'></font>
+    IMPLICIT NONE<a name='269'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='270'></font>
+<font color=#447700>!  This program handles the vertical 1-D cloud micphysics<a name='271'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='272'></font>
+<font color=#447700>! avisc: constant in empirical formular for dynamic viscosity of air<a name='273'></font>
+<font color=#447700>!         =1.49628e-6 [kg/m/s] = 1.49628e-5 [g/cm/s]<a name='274'></font>
+<font color=#447700>! adiffwv: constant in empirical formular for diffusivity of water<a name='275'></font>
+<font color=#447700>!          vapor in air<a name='276'></font>
+<font color=#447700>!          = 8.7602e-5 [kgm/s3] = 8.7602 [gcm/s3]<a name='277'></font>
+<font color=#447700>! axka: constant in empirical formular for thermal conductivity of air<a name='278'></font>
+<font color=#447700>!       = 1.4132e3 [m2/s2/K] = 1.4132e7 [cm2/s2/K]<a name='279'></font>
+<font color=#447700>! qi0: mixing ratio threshold for cloud ice aggregation [kg/kg]<a name='280'></font>
+<font color=#447700>! xmi50: mass of a 50 micron ice crystal<a name='281'></font>
+<font color=#447700>!        = 4.8e-10 [kg] =4.8e-7 [g]<a name='282'></font>
+<font color=#447700>! xmi40: mass of a 40 micron ice crystal<a name='283'></font>
+<font color=#447700>!        = 2.46e-10 [kg] = 2.46e-7 [g]<a name='284'></font>
+<font color=#447700>! di50: diameter of a 50 micro (radius) ice crystal<a name='285'></font>
+<font color=#447700>!       =1.0e-4 [m]<a name='286'></font>
+<font color=#447700>! xmi: mass of one cloud ice crystal<a name='287'></font>
+<font color=#447700>!      =4.19e-13 [kg] = 4.19e-10 [g]<a name='288'></font>
+<font color=#447700>! oxmi=1.0/xmi<a name='289'></font>
+<font color=#447700>!<a name='290'></font>
+<font color=#447700>! xni0=1.0e-2 [m-3] The value given in Lin et al. is wrong.(see<a name='291'></font>
+<font color=#447700>!                   Hsie et al.(1980) and Rutledge and Hobbs(1983) )<a name='292'></font>
+<font color=#447700>! bni=0.5 [K-1]<a name='293'></font>
+<font color=#447700>! xmnin: mass of a natural ice nucleus<a name='294'></font>
+<font color=#447700>!    = 1.05e-18 [kg] = 1.05e-15 [g] This values is suggested by<a name='295'></font>
+<font color=#447700>!                    Hsie et al. (1980)<a name='296'></font>
+<font color=#447700>!    = 1.0e-12 [kg] suggested by Rutlegde and Hobbs (1983)<a name='297'></font>
+<font color=#447700>! rhowater: density of water=1.0 g/cm3=1000.0 kg/m3<a name='298'></font>
+<font color=#447700>! consta: constant in empirical formular for terminal<a name='299'></font>
+<font color=#447700>!         velocity of raindrop<a name='300'></font>
+<font color=#447700>!         =2115.0 [cm**(1-b)/s] = 2115.0*0.01**(1-b) [m**(1-b)/s]<a name='301'></font>
+<font color=#447700>! constb: constant in empirical formular for terminal<a name='302'></font>
+<font color=#447700>!         velocity of raindrop<a name='303'></font>
+<font color=#447700>!         =0.8<a name='304'></font>
+<font color=#447700>! xnor: intercept parameter of the raindrop size distribution<a name='305'></font>
+<font color=#447700>!       = 0.08 cm-4 = 8.0e6 m-4<a name='306'></font>
+<font color=#447700>! araut: time sacle for autoconversion of cloud water to raindrops<a name='307'></font>
+<font color=#447700>!       =1.0e-3 [s-1]<a name='308'></font>
+<font color=#447700>! ql0: mixing ratio threshold for cloud watercoalescence [kg/kg]<a name='309'></font>
+<font color=#447700>! vf1r: ventilation factors for rain =0.78<a name='310'></font>
+<font color=#447700>! vf2r: ventilation factors for rain =0.31<a name='311'></font>
+<font color=#447700>! rhosnow: density of snow=0.1 g/cm3=100.0 kg/m3<a name='312'></font>
+<font color=#447700>! constc: constant in empirical formular for terminal<a name='313'></font>
+<font color=#447700>!         velocity of snow<a name='314'></font>
+<font color=#447700>!         =152.93 [cm**(1-d)/s] = 152.93*0.01**(1-d) [m**(1-d)/s]<a name='315'></font>
+<font color=#447700>! constd: constant in empirical formular for terminal<a name='316'></font>
+<font color=#447700>!         velocity of snow<a name='317'></font>
+<font color=#447700>!         =0.25<a name='318'></font>
+<font color=#447700>! xnos: intercept parameter of the snowflake size distribution<a name='319'></font>
+<font color=#447700>! vf1s: ventilation factors for snow =0.78<a name='320'></font>
+<font color=#447700>! vf2s: ventilation factors for snow =0.31<a name='321'></font>
+<font color=#447700>!<a name='322'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='323'></font>
+<a name='324'>
+  INTEGER, INTENT(IN   )               :: kts, kte, i, j<a name='325'>
+<a name='326'>
+  REAL,    DIMENSION( kts:kte ),                                      &amp;<a name='327'>
+           INTENT(INOUT)               :: qvz, qlz, qrz, qiz, qsz,    &amp;<a name='328'>
+                                          qgz, thz<a name='329'>
+<a name='330'>
+  REAL,    DIMENSION( kts:kte ),                                      &amp;<a name='331'>
+           INTENT(IN   )               :: tothz, rho, orho, sqrho,    &amp;<a name='332'>
+                                          prez, zz, qrzold, qszold,   &amp;<a name='333'>
+                                          qgzold, dzw<a name='334'>
+<a name='335'>
+  REAL,    INTENT(IN   )               :: dt, grav, cp, Rair, rvapor, &amp;<a name='336'>
+                                          XLS, XLV, XLF, rhowater,    &amp;<a name='337'>
+                                          rhosnow,EP2,SVP1,SVP2,SVP3,SVPT0<a name='338'>
+<a name='339'>
+  REAL,    INTENT(INOUT)               :: pptrain, pptsnow, pptgraul, pptice<a name='340'>
+<a name='341'>
+  REAL,    INTENT(IN   )               :: zsfc<a name='342'>
+<a name='343'>
+<font color=#447700>! local vars<a name='344'></font>
+<a name='345'>
+   REAL                                :: obp4, bp3, bp5, bp6, odp4,  &amp;<a name='346'>
+                                          dp3, dp5, dp5o2<a name='347'>
+<a name='348'>
+<a name='349'>
+<font color=#447700>! temperary vars<a name='350'></font>
+<a name='351'>
+   REAL                                :: tmp, tmp0, tmp1, tmp2,tmp3,  &amp;<a name='352'>
+                                          tmp4,delta2,delta3, delta4,  &amp;<a name='353'>
+                                          tmpa,tmpb,tmpc,tmpd,alpha1,  &amp;<a name='354'>
+                                          qic, abi,abr, abg, odtberg,  &amp;<a name='355'>
+                                          vti50,eiw,eri,esi,esr, esw,  &amp;<a name='356'>
+                                          erw,delrs,term0,term1,araut, &amp;<a name='357'>
+                                          constg2, vf1r, vf2r,alpha2,  &amp;<a name='358'>
+                                          Ap, Bp, egw, egi, egs, egr,  &amp;<a name='359'>
+                                          constg, gdelta4, g1sdelt4,   &amp;<a name='360'>
+                                          factor, tmp_r, tmp_s,tmp_g,  &amp;<a name='361'>
+                                          qlpqi, rsat, a1, a2, xnin<a name='362'>
+<a name='363'>
+  INTEGER                              :: k<a name='364'>
+<font color=#447700>!<a name='365'></font>
+  REAL, DIMENSION( kts:kte )    ::  oprez, tem, temcc, theiz, qswz,    &amp;<a name='366'>
+                                    qsiz, qvoqswz, qvoqsiz, qvzodt,    &amp;<a name='367'>
+                                    qlzodt, qizodt, qszodt, qrzodt,    &amp;<a name='368'>
+                                    qgzodt<a name='369'>
+<a name='370'>
+  REAL, DIMENSION( kts:kte )    :: psnow, psaut, psfw,  psfi,  praci,  &amp;<a name='371'>
+                                   piacr, psaci, psacw, psdep, pssub,  &amp;<a name='372'>
+                                   pracs, psacr, psmlt, psmltevp,      &amp;<a name='373'>
+                                   prain, praut, pracw, prevp, pvapor, &amp;<a name='374'>
+                                   pclw,  pladj, pcli,  pimlt, pihom,  &amp;<a name='375'>
+                                   pidw,  piadj, pgraupel, pgaut,      &amp;<a name='376'>
+                                   pgfr,  pgacw, pgaci, pgacr, pgacs,  &amp;<a name='377'>
+                                   pgacip,pgacrp,pgacsp,pgwet, pdry,   &amp;<a name='378'>
+                                   pgsub, pgdep, pgmlt, pgmltevp,      &amp;<a name='379'>
+                                   qschg, qgchg<a name='380'>
+<font color=#447700>!<a name='381'></font>
+<a name='382'>
+  REAL, DIMENSION( kts:kte )    :: qvsbar, rs0, viscmu, visc, diffwv,  &amp;<a name='383'>
+                                   schmidt, xka<a name='384'>
+<a name='385'>
+  REAL, DIMENSION( kts:kte )    :: vtr, vts, vtg,                      &amp;<a name='386'>
+                                   vtrold, vtsold, vtgold, vtiold,     &amp;<a name='387'>
+                                   xlambdar, xlambdas, xlambdag,       &amp;<a name='388'>
+                                   olambdar, olambdas, olambdag<a name='389'>
+<a name='390'>
+  REAL                          :: episp0k, dtb, odtb, pi, pio4,       &amp;<a name='391'>
+                                   pio6, oxLf, xLvocp, xLfocp, consta, &amp;<a name='392'>
+                                   constc, ocdrag, gambp4, gamdp4,     &amp;<a name='393'>
+                                   gam4pt5, Cpor, oxmi, gambp3, gamdp3,&amp;<a name='394'>
+                                   gambp6, gam3pt5, gam2pt75, gambp5o2,&amp;<a name='395'>
+                                   gamdp5o2, cwoxlf, ocp, xni50, es<a name='396'>
+<font color=#447700>!<a name='397'></font>
+  REAL                          :: qvmin=1.e-20<a name='398'>
+  REAL                          :: gindex<a name='399'>
+  REAL                          :: temc1,save1,save2,xni50mx<a name='400'>
+<a name='401'>
+<font color=#447700>! for terminal velocity flux<a name='402'></font>
+<a name='403'>
+  INTEGER                       :: min_q, max_q<a name='404'>
+  REAL                          :: t_del_tv, del_tv, flux, fluxin, fluxout ,tmpqrz<a name='405'>
+  LOGICAL                       :: notlast<a name='406'>
+<font color=#447700>!<a name='407'></font>
+<a name='408'>
+   dtb=dt<a name='409'>
+   odtb=1./dtb<a name='410'>
+   pi=acos(-1.)<a name='411'>
+   pio4=acos(-1.)/4.<a name='412'>
+   pio6=acos(-1.)/6.<a name='413'>
+   ocp=1./cp<a name='414'>
+   oxLf=1./xLf<a name='415'>
+   xLvocp=xLv/cp<a name='416'>
+   xLfocp=xLf/cp<a name='417'>
+   consta=2115.0*0.01**(1-constb)<a name='418'>
+   constc=152.93*0.01**(1-constd)<a name='419'>
+   ocdrag=1./Cdrag<a name='420'>
+<font color=#447700>!  episp0k=RH*episp0<a name='421'></font>
+   episp0k=RH*ep2*1000.*svp1<a name='422'>
+<font color=#447700>!<a name='423'></font>
+   gambp4=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_1">(constb+4.)<a name='424'>
+   gamdp4=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_2">(constd+4.)<a name='425'>
+   gam4pt5=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_3">(4.5)<a name='426'>
+   Cpor=cp/Rair<a name='427'>
+   oxmi=1.0/xmi<a name='428'>
+   gambp3=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_4">(constb+3.)<a name='429'>
+   gamdp3=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_5">(constd+3.)<a name='430'>
+   gambp6=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_6">(constb+6)<a name='431'>
+   gam3pt5=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_7">(3.5)<a name='432'>
+   gam2pt75=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_8">(2.75)<a name='433'>
+   gambp5o2=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_9">((constb+5.)/2.)<a name='434'>
+   gamdp5o2=<A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA'>ggamma</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GGAMMA_10">((constd+5.)/2.)<a name='435'>
+   cwoxlf=cw/xlf<a name='436'>
+   delta2=0.<a name='437'>
+   delta3=0.<a name='438'>
+   delta4=0.<a name='439'>
+<font color=#447700>!<a name='440'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='441'></font>
+<font color=#447700>!     oprez       1./prez ( prez : pressure)<a name='442'></font>
+<font color=#447700>!     qsw         saturated mixing ratio on water surface<a name='443'></font>
+<font color=#447700>!     qsi         saturated mixing ratio on ice surface<a name='444'></font>
+<font color=#447700>!     episp0k     RH*e*saturated pressure at 273.15 K<a name='445'></font>
+<font color=#447700>!     qvoqsw      qv/qsw<a name='446'></font>
+<font color=#447700>!     qvoqsi      qv/qsi<a name='447'></font>
+<font color=#447700>!     qvzodt      qv/dt<a name='448'></font>
+<font color=#447700>!     qlzodt      ql/dt<a name='449'></font>
+<font color=#447700>!     qizodt      qi/dt<a name='450'></font>
+<font color=#447700>!     qszodt      qs/dt<a name='451'></font>
+<font color=#447700>!     qrzodt      qr/dt<a name='452'></font>
+<font color=#447700>!     qgzodt      qg/dt<a name='453'></font>
+<font color=#447700>!<a name='454'></font>
+<font color=#447700>!     temcc       temperature in dregee C<a name='455'></font>
+<font color=#447700>!<a name='456'></font>
+<a name='457'>
+      obp4=1.0/(constb+4.0)<a name='458'>
+      bp3=constb+3.0<a name='459'>
+      bp5=constb+5.0<a name='460'>
+      bp6=constb+6.0<a name='461'>
+      odp4=1.0/(constd+4.0)<a name='462'>
+      dp3=constd+3.0<a name='463'>
+      dp5=constd+5.0<a name='464'>
+      dp5o2=0.5*(constd+5.0)<a name='465'>
+<font color=#447700>!<a name='466'></font>
+      do k=kts,kte<a name='467'>
+         oprez(k)=1./prez(k)<a name='468'>
+      enddo<a name='469'>
+<a name='470'>
+      do k=kts,kte<a name='471'>
+         qlz(k)=amax1( 0.0,qlz(k) )<a name='472'>
+         qiz(k)=amax1( 0.0,qiz(k) )<a name='473'>
+         qvz(k)=amax1( qvmin,qvz(k) )<a name='474'>
+         qsz(k)=amax1( 0.0,qsz(k) )<a name='475'>
+         qrz(k)=amax1( 0.0,qrz(k) )<a name='476'>
+         qgz(k)=amax1( 0.0,qgz(k) )<a name='477'>
+<font color=#447700>!<a name='478'></font>
+         tem(k)=thz(k)*tothz(k)<a name='479'>
+         temcc(k)=tem(k)-273.15<a name='480'>
+<font color=#447700>!<a name='481'></font>
+<font color=#447700>!        qswz(k)=episp0k*oprez(k)* &amp;<a name='482'></font>
+<font color=#447700>!               exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='483'></font>
+         es=1000.*svp1*exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='484'>
+         qswz(k)=ep2*es/(prez(k)-es)<a name='485'>
+         if (tem(k) .lt. 273.15 ) then<a name='486'>
+<font color=#447700>!           qsiz(k)=episp0k*oprez(k)* &amp;<a name='487'></font>
+<font color=#447700>!                  exp( 21.8745584*(tem(k)-273.16)/(tem(k)-7.66) )<a name='488'></font>
+            es=1000.*svp1*exp( 21.8745584*(tem(k)-273.16)/(tem(k)-7.66) )<a name='489'>
+            qsiz(k)=ep2*es/(prez(k)-es)<a name='490'>
+            if (temcc(k) .lt. -40.0) qswz(k)=qsiz(k)<a name='491'>
+         else<a name='492'>
+            qsiz(k)=qswz(k)<a name='493'>
+         endif<a name='494'>
+<font color=#447700>!<a name='495'></font>
+         qvoqswz(k)=qvz(k)/qswz(k)<a name='496'>
+         qvoqsiz(k)=qvz(k)/qsiz(k)<a name='497'>
+         qvzodt(k)=amax1( 0.0,odtb*qvz(k) )<a name='498'>
+         qlzodt(k)=amax1( 0.0,odtb*qlz(k) )<a name='499'>
+         qizodt(k)=amax1( 0.0,odtb*qiz(k) )<a name='500'>
+         qszodt(k)=amax1( 0.0,odtb*qsz(k) )<a name='501'>
+         qrzodt(k)=amax1( 0.0,odtb*qrz(k) )<a name='502'>
+         qgzodt(k)=amax1( 0.0,odtb*qgz(k) )<a name='503'>
+<a name='504'>
+         theiz(k)=thz(k)+(xlvocp*qvz(k)-xlfocp*qiz(k))/tothz(k)<a name='505'>
+      enddo<a name='506'>
+<a name='507'>
+<a name='508'>
+<font color=#447700>!<a name='509'></font>
+<font color=#447700>!<a name='510'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='511'></font>
+<font color=#447700>! In this simple stable cloud parameterization scheme, only five<a name='512'></font>
+<font color=#447700>! forms of water substance (water vapor, cloud water, cloud ice,<a name='513'></font>
+<font color=#447700>! rain and snow are considered. The prognostic variables are total<a name='514'></font>
+<font color=#447700>! water (qp),cloud water (ql), and cloud ice (qi). Rain and snow are<a name='515'></font>
+<font color=#447700>! diagnosed following Nagata and Ogura, 1991, MWR, 1309-1337. Eq (A7).<a name='516'></font>
+<font color=#447700>! the micro physics are based on (1) Hsie et al.,1980, JAM, 950-977 ;<a name='517'></font>
+<font color=#447700>! (2) Lin et al., 1983, JAM, 1065-1092 ; (3) Rutledge and Hobbs, 1983,<a name='518'></font>
+<font color=#447700>! JAS, 1185-1206 ; (4) Rutledge and Hobbs, 1984, JAS, 2949-2972.<a name='519'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='520'></font>
+<font color=#447700>!<a name='521'></font>
+<font color=#447700>! rhowater: density of water=1.0 g/cm3=1000.0 kg/m3<a name='522'></font>
+<font color=#447700>! rhosnow: density of snow=0.1 g/cm3=100.0 kg/m3<a name='523'></font>
+<font color=#447700>! xnor: intercept parameter of the raindrop size distribution<a name='524'></font>
+<font color=#447700>!       = 0.08 cm-4 = 8.0e6 m-4<a name='525'></font>
+<font color=#447700>! xnos: intercept parameter of the snowflake size distribution<a name='526'></font>
+<font color=#447700>!       = 0.03 cm-4 = 3.0e6 m-4<a name='527'></font>
+<font color=#447700>! xnog: intercept parameter of the graupel size distribution<a name='528'></font>
+<font color=#447700>!       = 4.0e-4 cm-4 = 4.0e4 m-4<a name='529'></font>
+<font color=#447700>! consta: constant in empirical formular for terminal<a name='530'></font>
+<font color=#447700>!         velocity of raindrop<a name='531'></font>
+<font color=#447700>!         =2115.0 [cm**(1-b)/s] = 2115.0*0.01**(1-b) [m**(1-b)/s]<a name='532'></font>
+<font color=#447700>! constb: constant in empirical formular for terminal<a name='533'></font>
+<font color=#447700>!         velocity of raindrop<a name='534'></font>
+<font color=#447700>!         =0.8<a name='535'></font>
+<font color=#447700>! constc: constant in empirical formular for terminal<a name='536'></font>
+<font color=#447700>!         velocity of snow<a name='537'></font>
+<font color=#447700>!         =152.93 [cm**(1-d)/s] = 152.93*0.01**(1-d) [m**(1-d)/s]<a name='538'></font>
+<font color=#447700>! constd: constant in empirical formular for terminal<a name='539'></font>
+<font color=#447700>!         velocity of snow<a name='540'></font>
+<font color=#447700>!         =0.25<a name='541'></font>
+<font color=#447700>! avisc: constant in empirical formular for dynamic viscosity of air<a name='542'></font>
+<font color=#447700>!         =1.49628e-6 [kg/m/s] = 1.49628e-5 [g/cm/s]<a name='543'></font>
+<font color=#447700>! adiffwv: constant in empirical formular for diffusivity of water<a name='544'></font>
+<font color=#447700>!          vapor in air<a name='545'></font>
+<font color=#447700>!          = 8.7602e-5 [kgm/s3] = 8.7602 [gcm/s3]<a name='546'></font>
+<font color=#447700>! axka: constant in empirical formular for thermal conductivity of air<a name='547'></font>
+<font color=#447700>!       = 1.4132e3 [m2/s2/K] = 1.4132e7 [cm2/s2/K]<a name='548'></font>
+<font color=#447700>! qi0: mixing ratio threshold for cloud ice aggregation [kg/kg]<a name='549'></font>
+<font color=#447700>!      = 1.0e-3 g/g = 1.0e-3 kg/gk<a name='550'></font>
+<font color=#447700>! ql0: mixing ratio threshold for cloud watercoalescence [kg/kg]<a name='551'></font>
+<font color=#447700>!      = 2.0e-3 g/g = 2.0e-3 kg/gk<a name='552'></font>
+<font color=#447700>! qs0: mixing ratio threshold for snow aggregation<a name='553'></font>
+<font color=#447700>!      = 6.0e-4 g/g = 6.0e-4 kg/gk<a name='554'></font>
+<font color=#447700>! xmi50: mass of a 50 micron ice crystal<a name='555'></font>
+<font color=#447700>!        = 4.8e-10 [kg] =4.8e-7 [g]<a name='556'></font>
+<font color=#447700>! xmi40: mass of a 40 micron ice crystal<a name='557'></font>
+<font color=#447700>!        = 2.46e-10 [kg] = 2.46e-7 [g]<a name='558'></font>
+<font color=#447700>! di50: diameter of a 50 micro (radius) ice crystal<a name='559'></font>
+<font color=#447700>!       =1.0e-4 [m]<a name='560'></font>
+<font color=#447700>! xmi: mass of one cloud ice crystal<a name='561'></font>
+<font color=#447700>!      =4.19e-13 [kg] = 4.19e-10 [g]<a name='562'></font>
+<font color=#447700>! oxmi=1.0/xmi<a name='563'></font>
+<font color=#447700>!<a name='564'></font>
+<a name='565'>
+<a name='566'>
+<font color=#447700>! if gindex=1.0 include graupel<a name='567'></font>
+<font color=#447700>! if gindex=0. no graupel<a name='568'></font>
+<font color=#447700>!<a name='569'></font>
+<font color=#447700>!<a name='570'></font>
+      do k=kts,kte<a name='571'>
+         psnow(k)=0.0<a name='572'>
+         psaut(k)=0.0<a name='573'>
+         psfw(k)=0.0<a name='574'>
+         psfi(k)=0.0<a name='575'>
+         praci(k)=0.0<a name='576'>
+         piacr(k)=0.0<a name='577'>
+         psaci(k)=0.0<a name='578'>
+         psacw(k)=0.0<a name='579'>
+         psdep(k)=0.0<a name='580'>
+         pssub(k)=0.0<a name='581'>
+         pracs(k)=0.0<a name='582'>
+         psacr(k)=0.0<a name='583'>
+         psmlt(k)=0.0<a name='584'>
+         psmltevp(k)=0.0<a name='585'>
+<font color=#447700>!<a name='586'></font>
+         prain(k)=0.0<a name='587'>
+         praut(k)=0.0<a name='588'>
+         pracw(k)=0.0<a name='589'>
+         prevp(k)=0.0<a name='590'>
+<font color=#447700>!<a name='591'></font>
+         pvapor(k)=0.0<a name='592'>
+<font color=#447700>!<a name='593'></font>
+         pclw(k)=0.0<a name='594'>
+         pladj(k)=0.0<a name='595'>
+<font color=#447700>!<a name='596'></font>
+         pcli(k)=0.0<a name='597'>
+         pimlt(k)=0.0<a name='598'>
+         pihom(k)=0.0<a name='599'>
+         pidw(k)=0.0<a name='600'>
+         piadj(k)=0.0<a name='601'>
+      enddo<a name='602'>
+<a name='603'>
+<font color=#447700>!<a name='604'></font>
+<font color=#447700>!!! graupel<a name='605'></font>
+<font color=#447700>!<a name='606'></font>
+      do k=kts,kte<a name='607'>
+         pgraupel(k)=0.0<a name='608'>
+         pgaut(k)=0.0<a name='609'>
+         pgfr(k)=0.0<a name='610'>
+         pgacw(k)=0.0<a name='611'>
+         pgaci(k)=0.0<a name='612'>
+         pgacr(k)=0.0<a name='613'>
+         pgacs(k)=0.0<a name='614'>
+         pgacip(k)=0.0<a name='615'>
+         pgacrP(k)=0.0<a name='616'>
+         pgacsp(k)=0.0<a name='617'>
+         pgwet(k)=0.0<a name='618'>
+         pdry(k)=0.0<a name='619'>
+         pgsub(k)=0.0<a name='620'>
+         pgdep(k)=0.0<a name='621'>
+         pgmlt(k)=0.0<a name='622'>
+         pgmltevp(k)=0.0<a name='623'>
+         qschg(k)=0.<a name='624'>
+         qgchg(k)=0.<a name='625'>
+      enddo<a name='626'>
+<font color=#447700>!<a name='627'></font>
+<font color=#447700>!<a name='628'></font>
+<font color=#447700>! Set rs0=episp0*oprez(k)<a name='629'></font>
+<font color=#447700>! episp0=e*saturated pressure at 273.15 K<a name='630'></font>
+<font color=#447700>! e     = 0.622<a name='631'></font>
+<font color=#447700>!<a name='632'></font>
+      DO k=kts,kte<a name='633'>
+         rs0(k)=ep2*1000.*svp1/(prez(k)-1000.*svp1)<a name='634'>
+      END DO<a name='635'>
+<font color=#447700>!<a name='636'></font>
+<font color=#447700>!***********************************************************************<a name='637'></font>
+<font color=#447700>! Calculate precipitation fluxes due to terminal velocities.<a name='638'></font>
+<font color=#447700>!***********************************************************************<a name='639'></font>
+<font color=#447700>!<a name='640'></font>
+<font color=#447700>!- Calculate termianl velocity (vt?)  of precipitation q?z<a name='641'></font>
+<font color=#447700>!- Find maximum vt? to determine the small delta t<a name='642'></font>
+<font color=#447700>!<a name='643'></font>
+<font color=#447700>!-- rain<a name='644'></font>
+<font color=#447700>!<a name='645'></font>
+    t_del_tv=0.<a name='646'>
+    del_tv=dtb<a name='647'>
+    notlast=.true.<a name='648'>
+    DO while (notlast)<a name='649'>
+<font color=#447700>!<a name='650'></font>
+      min_q=kte<a name='651'>
+      max_q=kts-1<a name='652'>
+<font color=#447700>!<a name='653'></font>
+      do k=kts,kte-1<a name='654'>
+<font color=#447700>!        if (qrzold(k) .gt. 1.0e-12) then<a name='655'></font>
+<font color=#447700>!!       if (qrzold(k) .gt. 1.0e-8) then<a name='656'></font>
+         if (qrz(k) .gt. 1.0e-8) then<a name='657'>
+            min_q=min0(min_q,k)<a name='658'>
+            max_q=max0(max_q,k)<a name='659'>
+<font color=#447700>!!          tmp1=sqrt(pi*rhowater*xnor/rho(k)/qrzold(k))<a name='660'></font>
+            tmp1=sqrt(pi*rhowater*xnor/rho(k)/qrz(k))<a name='661'>
+            tmp1=sqrt(tmp1)<a name='662'>
+            vtrold(k)=o6*consta*gambp4*sqrho(k)/tmp1**constb<a name='663'>
+            if (k .eq. 1) then<a name='664'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zsfc)/vtrold(k))<a name='665'>
+            else<a name='666'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zz(k-1))/vtrold(k))<a name='667'>
+            endif<a name='668'>
+         else<a name='669'>
+            vtrold(k)=0.<a name='670'>
+         endif<a name='671'>
+      enddo<a name='672'>
+<a name='673'>
+      if (max_q .ge. min_q) then<a name='674'>
+<font color=#447700>!<a name='675'></font>
+<font color=#447700>!- Check if the summation of the small delta t &gt;=  big delta t<a name='676'></font>
+<font color=#447700>!             (t_del_tv)          (del_tv)             (dtb)<a name='677'></font>
+<a name='678'>
+         t_del_tv=t_del_tv+del_tv<a name='679'>
+<font color=#447700>!<a name='680'></font>
+         if ( t_del_tv .ge. dtb ) then<a name='681'>
+              notlast=.false.<a name='682'>
+              del_tv=dtb+del_tv-t_del_tv<a name='683'>
+         endif<a name='684'>
+<a name='685'>
+<font color=#447700>! use small delta t to calculate the q?z flux<a name='686'></font>
+<font color=#447700>! termi is the qrzold flux pass in the grid box through the upper boundary<a name='687'></font>
+<font color=#447700>! termo is the qrzold flux pass out the grid box through the lower boundary<a name='688'></font>
+<font color=#447700>!<a name='689'></font>
+         fluxin=0.<a name='690'>
+         do k=max_q,min_q,-1<a name='691'>
+<font color=#447700>!           fluxout=rho(k)*vtrold(k)*qrzold(k)<a name='692'></font>
+            fluxout=rho(k)*vtrold(k)*qrz(k)<a name='693'>
+            flux=(fluxin-fluxout)/rho(k)/dzw(k)<a name='694'>
+            tmpqrz=qrz(k)<a name='695'>
+            qrz(k)=qrz(k)+del_tv*flux<a name='696'>
+            fluxin=fluxout<a name='697'>
+         enddo<a name='698'>
+         if (min_q .eq. 1) then<a name='699'>
+            pptrain=pptrain+fluxin*del_tv<a name='700'>
+         else<a name='701'>
+            qrz(min_q-1)=qrz(min_q-1)+del_tv*  &amp;<a name='702'>
+                          fluxin/rho(min_q-1)/dzw(min_q-1)<a name='703'>
+         endif<a name='704'>
+<font color=#447700>!<a name='705'></font>
+      else<a name='706'>
+         notlast=.false.<a name='707'>
+      endif<a name='708'>
+    ENDDO<a name='709'>
+<a name='710'>
+<font color=#447700>!<a name='711'></font>
+<font color=#447700>!-- snow<a name='712'></font>
+<font color=#447700>!<a name='713'></font>
+    t_del_tv=0.<a name='714'>
+    del_tv=dtb<a name='715'>
+    notlast=.true.<a name='716'>
+<a name='717'>
+    DO while (notlast)<a name='718'>
+<font color=#447700>!<a name='719'></font>
+      min_q=kte<a name='720'>
+      max_q=kts-1<a name='721'>
+<font color=#447700>!<a name='722'></font>
+      do k=kts,kte-1<a name='723'>
+<font color=#447700>!        if (qszold(k) .gt. 1.0e-12) then<a name='724'></font>
+<font color=#447700>!!       if (qszold(k) .gt. 1.0e-8) then<a name='725'></font>
+         if (qsz(k) .gt. 1.0e-8) then<a name='726'>
+            min_q=min0(min_q,k)<a name='727'>
+            max_q=max0(max_q,k)<a name='728'>
+<font color=#447700>!!          tmp1=sqrt(pi*rhosnow*xnos/rho(k)/qszold(k))<a name='729'></font>
+            tmp1=sqrt(pi*rhosnow*xnos/rho(k)/qsz(k))<a name='730'>
+            tmp1=sqrt(tmp1)<a name='731'>
+            vtsold(k)=o6*constc*gamdp4*sqrho(k)/tmp1**constd<a name='732'>
+            if (k .eq. 1) then<a name='733'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zsfc)/vtsold(k))<a name='734'>
+            else<a name='735'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zz(k-1))/vtsold(k))<a name='736'>
+            endif<a name='737'>
+         else<a name='738'>
+            vtsold(k)=0.<a name='739'>
+         endif<a name='740'>
+      enddo<a name='741'>
+<a name='742'>
+      if (max_q .ge. min_q) then<a name='743'>
+<font color=#447700>!<a name='744'></font>
+<font color=#447700>!<a name='745'></font>
+<font color=#447700>!- Check if the summation of the small delta t &gt;=  big delta t<a name='746'></font>
+<font color=#447700>!             (t_del_tv)          (del_tv)             (dtb)<a name='747'></font>
+<a name='748'>
+         t_del_tv=t_del_tv+del_tv<a name='749'>
+<a name='750'>
+         if ( t_del_tv .ge. dtb ) then<a name='751'>
+              notlast=.false.<a name='752'>
+              del_tv=dtb+del_tv-t_del_tv<a name='753'>
+         endif<a name='754'>
+<a name='755'>
+<font color=#447700>! use small delta t to calculate the qszold flux<a name='756'></font>
+<font color=#447700>! termi is the qszold flux pass in the grid box through the upper boundary<a name='757'></font>
+<font color=#447700>! termo is the qszold flux pass out the grid box through the lower boundary<a name='758'></font>
+<font color=#447700>!<a name='759'></font>
+         fluxin=0.<a name='760'>
+         do k=max_q,min_q,-1<a name='761'>
+<font color=#447700>!!          fluxout=rho(k)*vtsold(k)*qszold(k)<a name='762'></font>
+            fluxout=rho(k)*vtsold(k)*qsz(k)<a name='763'>
+            flux=(fluxin-fluxout)/rho(k)/dzw(k)<a name='764'>
+            qsz(k)=qsz(k)+del_tv*flux<a name='765'>
+            qsz(k)=amax1(0.,qsz(k))<a name='766'>
+            fluxin=fluxout<a name='767'>
+         enddo<a name='768'>
+         if (min_q .eq. 1) then<a name='769'>
+            pptsnow=pptsnow+fluxin*del_tv<a name='770'>
+         else<a name='771'>
+            qsz(min_q-1)=qsz(min_q-1)+del_tv*  &amp;<a name='772'>
+                         fluxin/rho(min_q-1)/dzw(min_q-1)<a name='773'>
+         endif<a name='774'>
+<font color=#447700>!<a name='775'></font>
+      else<a name='776'>
+         notlast=.false.<a name='777'>
+      endif<a name='778'>
+<a name='779'>
+    ENDDO<a name='780'>
+<font color=#447700>!<a name='781'></font>
+<font color=#447700>!-- grauupel<a name='782'></font>
+<font color=#447700>!<a name='783'></font>
+    t_del_tv=0.<a name='784'>
+    del_tv=dtb<a name='785'>
+    notlast=.true.<a name='786'>
+<font color=#447700>!<a name='787'></font>
+    DO while (notlast)<a name='788'>
+<font color=#447700>!<a name='789'></font>
+      min_q=kte<a name='790'>
+      max_q=kts-1<a name='791'>
+<font color=#447700>!<a name='792'></font>
+      do k=kts,kte-1<a name='793'>
+<font color=#447700>!        if (qgzold(k) .gt. 1.0e-12) then<a name='794'></font>
+<font color=#447700>!!       if (qgzold(k) .gt. 1.0e-8) then<a name='795'></font>
+         if (qgz(k) .gt. 1.0e-8) then<a name='796'>
+            min_q=min0(min_q,k)<a name='797'>
+            max_q=max0(max_q,k)<a name='798'>
+<font color=#447700>!!          tmp1=sqrt(pi*rhograul*xnog/rho(k)/qgzold(k))<a name='799'></font>
+            tmp1=sqrt(pi*rhograul*xnog/rho(k)/qgz(k))<a name='800'>
+            tmp1=sqrt(tmp1)<a name='801'>
+            term0=sqrt(4.*grav*rhograul*0.33334/rho(k)/cdrag)<a name='802'>
+            vtgold(k)=o6*gam4pt5*term0*sqrt(1./tmp1)<a name='803'>
+            if (k .eq. 1) then<a name='804'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zsfc)/vtgold(k))<a name='805'>
+            else<a name='806'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zz(k-1))/vtgold(k))<a name='807'>
+            endif<a name='808'>
+         else<a name='809'>
+            vtgold(k)=0.<a name='810'>
+         endif<a name='811'>
+      enddo<a name='812'>
+<a name='813'>
+      if (max_q .ge. min_q) then<a name='814'>
+<font color=#447700>!<a name='815'></font>
+<font color=#447700>!<a name='816'></font>
+<font color=#447700>!- Check if the summation of the small delta t &gt;=  big delta t<a name='817'></font>
+<font color=#447700>!             (t_del_tv)          (del_tv)             (dtb)<a name='818'></font>
+<a name='819'>
+         t_del_tv=t_del_tv+del_tv<a name='820'>
+<a name='821'>
+         if ( t_del_tv .ge. dtb ) then<a name='822'>
+              notlast=.false.<a name='823'>
+              del_tv=dtb+del_tv-t_del_tv<a name='824'>
+         endif<a name='825'>
+<a name='826'>
+<font color=#447700>! use small delta t to calculate the qgzold flux<a name='827'></font>
+<font color=#447700>! termi is the qgzold flux pass in the grid box through the upper boundary<a name='828'></font>
+<font color=#447700>! termo is the qgzold flux pass out the grid box through the lower boundary<a name='829'></font>
+<font color=#447700>!<a name='830'></font>
+         fluxin=0.<a name='831'>
+         do k=max_q,min_q,-1<a name='832'>
+<font color=#447700>!!          fluxout=rho(k)*vtgold(k)*qgzold(k)<a name='833'></font>
+            fluxout=rho(k)*vtgold(k)*qgz(k)<a name='834'>
+            flux=(fluxin-fluxout)/rho(k)/dzw(k)<a name='835'>
+            qgz(k)=qgz(k)+del_tv*flux<a name='836'>
+            qgz(k)=amax1(0.,qgz(k))<a name='837'>
+            fluxin=fluxout<a name='838'>
+         enddo<a name='839'>
+         if (min_q .eq. 1) then<a name='840'>
+            pptgraul=pptgraul+fluxin*del_tv<a name='841'>
+         else<a name='842'>
+            qgz(min_q-1)=qgz(min_q-1)+del_tv*  &amp;<a name='843'>
+                         fluxin/rho(min_q-1)/dzw(min_q-1)<a name='844'>
+         endif<a name='845'>
+<font color=#447700>!<a name='846'></font>
+      else<a name='847'>
+         notlast=.false.<a name='848'>
+      endif<a name='849'>
+<font color=#447700>!<a name='850'></font>
+   ENDDO<a name='851'>
+<a name='852'>
+<font color=#447700>!<a name='853'></font>
+<font color=#447700>!-- cloud ice  (03/21/02) follow Vaughan T.J. Phillips at GFDL<a name='854'></font>
+<font color=#447700>!<a name='855'></font>
+    t_del_tv=0.<a name='856'>
+    del_tv=dtb<a name='857'>
+    notlast=.true.<a name='858'>
+<font color=#447700>!<a name='859'></font>
+    DO while (notlast)<a name='860'>
+<font color=#447700>!<a name='861'></font>
+      min_q=kte<a name='862'>
+      max_q=kts-1<a name='863'>
+<font color=#447700>!<a name='864'></font>
+      do k=kts,kte-1<a name='865'>
+         if (qiz(k) .gt. 1.0e-8) then<a name='866'>
+            min_q=min0(min_q,k)<a name='867'>
+            max_q=max0(max_q,k)<a name='868'>
+            vtiold(k)= 3.29 * (rho(k)* qiz(k))** 0.16  <font color=#447700>! Heymsfield and Donner<a name='869'></font>
+            if (k .eq. 1) then<a name='870'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zsfc)/vtiold(k))<a name='871'>
+            else<a name='872'>
+               del_tv=amin1(del_tv,0.9*(zz(k)-zz(k-1))/vtiold(k))<a name='873'>
+            endif<a name='874'>
+         else<a name='875'>
+            vtiold(k)=0.<a name='876'>
+         endif<a name='877'>
+      enddo<a name='878'>
+<a name='879'>
+      if (max_q .ge. min_q) then<a name='880'>
+<font color=#447700>!<a name='881'></font>
+<font color=#447700>!<a name='882'></font>
+<font color=#447700>!- Check if the summation of the small delta t &gt;=  big delta t<a name='883'></font>
+<font color=#447700>!             (t_del_tv)          (del_tv)             (dtb)<a name='884'></font>
+<a name='885'>
+         t_del_tv=t_del_tv+del_tv<a name='886'>
+<a name='887'>
+         if ( t_del_tv .ge. dtb ) then<a name='888'>
+              notlast=.false.<a name='889'>
+              del_tv=dtb+del_tv-t_del_tv<a name='890'>
+         endif<a name='891'>
+<a name='892'>
+<font color=#447700>! use small delta t to calculate the qgzold flux<a name='893'></font>
+<font color=#447700>! termi is the qgzold flux pass in the grid box through the upper boundary<a name='894'></font>
+<font color=#447700>! termo is the qgzold flux pass out the grid box through the lower boundary<a name='895'></font>
+<font color=#447700>!<a name='896'></font>
+<a name='897'>
+         fluxin=0.<a name='898'>
+         do k=max_q,min_q,-1<a name='899'>
+            fluxout=rho(k)*vtiold(k)*qiz(k)<a name='900'>
+            flux=(fluxin-fluxout)/rho(k)/dzw(k)<a name='901'>
+            qiz(k)=qiz(k)+del_tv*flux<a name='902'>
+            qiz(k)=amax1(0.,qiz(k))<a name='903'>
+            fluxin=fluxout<a name='904'>
+         enddo<a name='905'>
+         if (min_q .eq. 1) then<a name='906'>
+            pptice=pptice+fluxin*del_tv<a name='907'>
+         else<a name='908'>
+            qiz(min_q-1)=qiz(min_q-1)+del_tv*  &amp;<a name='909'>
+                         fluxin/rho(min_q-1)/dzw(min_q-1)<a name='910'>
+         endif<a name='911'>
+<font color=#447700>!<a name='912'></font>
+      else<a name='913'>
+         notlast=.false.<a name='914'>
+      endif<a name='915'>
+<font color=#447700>!<a name='916'></font>
+   ENDDO<a name='917'>
+<a name='918'>
+<font color=#447700>! Microphpysics processes<a name='919'></font>
+<font color=#447700>!<a name='920'></font>
+      DO 2000 k=kts,kte<a name='921'>
+<font color=#447700>!<a name='922'></font>
+<font color=#447700>!***********************************************************************<a name='923'></font>
+<font color=#447700>!*****   diagnose mixing ratios (qrz,qsz), terminal                *****<a name='924'></font>
+<font color=#447700>!*****   velocities (vtr,vts), and slope parameters in size        *****<a name='925'></font>
+<font color=#447700>!*****   distribution(xlambdar,xlambdas) of rain and snow          *****<a name='926'></font>
+<font color=#447700>!*****   follows Nagata and Ogura, 1991, MWR, 1309-1337. Eq (A7)   *****<a name='927'></font>
+<font color=#447700>!***********************************************************************<a name='928'></font>
+<font color=#447700>!<a name='929'></font>
+<font color=#447700>!**** assuming no cloud water can exist in the top two levels due to<a name='930'></font>
+<font color=#447700>!**** radiation consideration<a name='931'></font>
+<font color=#447700>!<a name='932'></font>
+<font color=#447700>!!  if<a name='933'></font>
+<font color=#447700>!!     unsaturated,<a name='934'></font>
+<font color=#447700>!!     no cloud water, rain, ice, snow and graupel<a name='935'></font>
+<font color=#447700>!!  then<a name='936'></font>
+<font color=#447700>!!     skip these processes and jump to line 2000<a name='937'></font>
+<font color=#447700>!<a name='938'></font>
+<font color=#447700>!<a name='939'></font>
+        tmp=qiz(k)+qlz(k)+qsz(k)+qrz(k)+qgz(k)*gindex<a name='940'>
+        if( qvz(k)+qlz(k)+qiz(k) .lt. qsiz(k)  &amp;<a name='941'>
+            .and. tmp .eq. 0.0 ) go to 2000<a name='942'>
+<a name='943'>
+<font color=#447700>!! calculate terminal velocity of rain<a name='944'></font>
+<font color=#447700>!<a name='945'></font>
+<font color=#447700>!       if (qrzold(k) .gt. 1.0e-12) then<a name='946'></font>
+<font color=#447700>!!      if (qrzold(k) .gt. 1.0e-8) then<a name='947'></font>
+        if (qrz(k) .gt. 1.0e-8) then<a name='948'>
+<font color=#447700>!!          tmp1=sqrt(pi*rhowater*xnor*orho(k)/qrzold(k))<a name='949'></font>
+            tmp1=sqrt(pi*rhowater*xnor*orho(k)/qrz(k))<a name='950'>
+            xlambdar(k)=sqrt(tmp1)<a name='951'>
+            olambdar(k)=1.0/xlambdar(k)<a name='952'>
+            vtrold(k)=o6*consta*gambp4*sqrho(k)*olambdar(k)**constb<a name='953'>
+        else<a name='954'>
+            vtrold(k)=0.<a name='955'>
+            olambdar(k)=0.<a name='956'>
+        endif<a name='957'>
+<font color=#447700>!<a name='958'></font>
+<font color=#447700>!       if (qrz(k) .gt. 1.0e-12) then<a name='959'></font>
+        if (qrz(k) .gt. 1.0e-8) then<a name='960'>
+            tmp1=sqrt(pi*rhowater*xnor*orho(k)/qrz(k))<a name='961'>
+            xlambdar(k)=sqrt(tmp1)<a name='962'>
+            olambdar(k)=1.0/xlambdar(k)<a name='963'>
+            vtr(k)=o6*consta*gambp4*sqrho(k)*olambdar(k)**constb<a name='964'>
+        else<a name='965'>
+            vtr(k)=0.<a name='966'>
+            olambdar(k)=0.<a name='967'>
+        endif<a name='968'>
+<font color=#447700>!<a name='969'></font>
+<font color=#447700>!! calculate terminal velocity of snow<a name='970'></font>
+<font color=#447700>!<a name='971'></font>
+<font color=#447700>!       if (qszold(k) .gt. 1.0e-12) then<a name='972'></font>
+<font color=#447700>!!      if (qszold(k) .gt. 1.0e-8) then<a name='973'></font>
+        if (qsz(k) .gt. 1.0e-8) then<a name='974'>
+<font color=#447700>!!          tmp1=sqrt(pi*rhosnow*xnos*orho(k)/qszold(k))<a name='975'></font>
+            tmp1=sqrt(pi*rhosnow*xnos*orho(k)/qsz(k))<a name='976'>
+            xlambdas(k)=sqrt(tmp1)<a name='977'>
+            olambdas(k)=1.0/xlambdas(k)<a name='978'>
+            vtsold(k)=o6*constc*gamdp4*sqrho(k)*olambdas(k)**constd<a name='979'>
+        else<a name='980'>
+            vtsold(k)=0.<a name='981'>
+            olambdas(k)=0.<a name='982'>
+        endif<a name='983'>
+<font color=#447700>!<a name='984'></font>
+<font color=#447700>!       if (qsz(k) .gt. 1.0e-12) then<a name='985'></font>
+        if (qsz(k) .gt. 1.0e-8) then<a name='986'>
+            tmp1=sqrt(pi*rhosnow*xnos*orho(k)/qsz(k))<a name='987'>
+            xlambdas(k)=sqrt(tmp1)<a name='988'>
+            olambdas(k)=1.0/xlambdas(k)<a name='989'>
+            vts(k)=o6*constc*gamdp4*sqrho(k)*olambdas(k)**constd<a name='990'>
+        else<a name='991'>
+            vts(k)=0.<a name='992'>
+            olambdas(k)=0.<a name='993'>
+        endif<a name='994'>
+<font color=#447700>!<a name='995'></font>
+<font color=#447700>!! calculate terminal velocity of graupel<a name='996'></font>
+<font color=#447700>!<a name='997'></font>
+<font color=#447700>!       if (qgzold(k) .gt. 1.0e-12) then<a name='998'></font>
+<font color=#447700>!!      if (qgzold(k) .gt. 1.0e-8) then<a name='999'></font>
+        if (qgz(k) .gt. 1.0e-8) then<a name='1000'>
+<font color=#447700>!!          tmp1=sqrt( pi*rhograul*xnog*orho(k)/qgzold(k))<a name='1001'></font>
+            tmp1=sqrt( pi*rhograul*xnog*orho(k)/qgz(k))<a name='1002'>
+            xlambdag(k)=sqrt(tmp1)<a name='1003'>
+            olambdag(k)=1.0/xlambdag(k)<a name='1004'>
+            term0=sqrt(4.*grav*rhograul*0.33334*orho(k)*ocdrag)<a name='1005'>
+            vtgold(k)=o6*gam4pt5*term0*sqrt(olambdag(k))<a name='1006'>
+        else<a name='1007'>
+            vtgold(k)=0.<a name='1008'>
+            olambdag(k)=0.<a name='1009'>
+        endif<a name='1010'>
+<font color=#447700>!<a name='1011'></font>
+<font color=#447700>!       if (qgz(k) .gt. 1.0e-12) then<a name='1012'></font>
+        if (qgz(k) .gt. 1.0e-8) then<a name='1013'>
+            tmp1=sqrt( pi*rhograul*xnog*orho(k)/qgz(k))<a name='1014'>
+            xlambdag(k)=sqrt(tmp1)<a name='1015'>
+            olambdag(k)=1.0/xlambdag(k)<a name='1016'>
+            term0=sqrt(4.*grav*rhograul*0.33334*orho(k)*ocdrag)<a name='1017'>
+            vtg(k)=o6*gam4pt5*term0*sqrt(olambdag(k))<a name='1018'>
+        else<a name='1019'>
+            vtg(k)=0.<a name='1020'>
+            olambdag(k)=0.<a name='1021'>
+        endif<a name='1022'>
+<font color=#447700>!<a name='1023'></font>
+<font color=#447700>!***********************************************************************<a name='1024'></font>
+<font color=#447700>!*****  compute viscosity,difusivity,thermal conductivity, and    ******<a name='1025'></font>
+<font color=#447700>!*****  Schmidt number                                            ******<a name='1026'></font>
+<font color=#447700>!***********************************************************************<a name='1027'></font>
+<font color=#447700>!c------------------------------------------------------------------<a name='1028'></font>
+<font color=#447700>!c      viscmu: dynamic viscosity of air kg/m/s<a name='1029'></font>
+<font color=#447700>!c      visc: kinematic viscosity of air = viscmu/rho (m2/s)<a name='1030'></font>
+<font color=#447700>!c      avisc=1.49628e-6 kg/m/s=1.49628e-5 g/cm/s<a name='1031'></font>
+<font color=#447700>!c      viscmu=1.718e-5 kg/m/s in RH<a name='1032'></font>
+<font color=#447700>!c      diffwv: Diffusivity of water vapor in air<a name='1033'></font>
+<font color=#447700>!c      adiffwv = 8.7602e-5 (8.794e-5 in MM5) kgm/s3<a name='1034'></font>
+<font color=#447700>!c              = 8.7602 (8.794 in MM5) gcm/s3<a name='1035'></font>
+<font color=#447700>!c      diffwv(k)=2.26e-5 m2/s<a name='1036'></font>
+<font color=#447700>!c      schmidt: Schmidt number=visc/diffwv<a name='1037'></font>
+<font color=#447700>!c      xka: thermal conductivity of air J/m/s/K (Kgm/s3/K)<a name='1038'></font>
+<font color=#447700>!c      xka(k)=2.43e-2 J/m/s/K in RH<a name='1039'></font>
+<font color=#447700>!c      axka=1.4132e3 (1.414e3 in MM5) m2/s2/k = 1.4132e7 cm2/s2/k<a name='1040'></font>
+<font color=#447700>!c------------------------------------------------------------------<a name='1041'></font>
+<a name='1042'>
+        viscmu(k)=avisc*tem(k)**1.5/(tem(k)+120.0)<a name='1043'>
+        visc(k)=viscmu(k)*orho(k)<a name='1044'>
+        diffwv(k)=adiffwv*tem(k)**1.81*oprez(k)<a name='1045'>
+        schmidt(k)=visc(k)/diffwv(k)<a name='1046'>
+        xka(k)=axka*viscmu(k)<a name='1047'>
+<a name='1048'>
+        if (tem(k) .lt. 273.15) then<a name='1049'>
+<a name='1050'>
+<font color=#447700>!<a name='1051'></font>
+<font color=#447700>!***********************************************************************<a name='1052'></font>
+<font color=#447700>!*********        snow production processes for T &lt; 0 C       **********<a name='1053'></font>
+<font color=#447700>!***********************************************************************<a name='1054'></font>
+<font color=#447700>!c<a name='1055'></font>
+<font color=#447700>!c (1) ICE CRYSTAL AGGREGATION TO SNOW (Psaut): Lin (21)<a name='1056'></font>
+<font color=#447700>!c!    psaut=alpha1*(qi-qi0)<a name='1057'></font>
+<font color=#447700>!c!    alpha1=1.0e-3*exp(0.025*(T-T0))<a name='1058'></font>
+<font color=#447700>!c<a name='1059'></font>
+<font color=#447700>!          alpha1=1.0e-3*exp( 0.025*temcc(k) )<a name='1060'></font>
+<a name='1061'>
+           alpha1=1.0e-3*exp( 0.025*temcc(k) )<a name='1062'>
+<font color=#447700>!<a name='1063'></font>
+           if(temcc(k) .lt. -20.0) then<a name='1064'>
+             tmp1=-7.6+4.0*exp( -0.2443e-3*(abs(temcc(k))-20)**2.455 )<a name='1065'>
+             qic=1.0e-3*exp(tmp1)*orho(k)<a name='1066'>
+           else<a name='1067'>
+             qic=qi0<a name='1068'>
+           end if<a name='1069'>
+<font color=#447700>!testing<a name='1070'></font>
+<font color=#447700>!          tmp1=amax1( 0.0,alpha1*(qiz(k)-qic) )<a name='1071'></font>
+<font color=#447700>!          psaut(k)=amin1( tmp1,qizodt(k) )<a name='1072'></font>
+<a name='1073'>
+           tmp1=odtb*(qiz(k)-qic)*(1.0-exp(-alpha1*dtb))<a name='1074'>
+           psaut(k)=amax1( 0.0,tmp1 )<a name='1075'>
+<a name='1076'>
+<font color=#447700>!c<a name='1077'></font>
+<font color=#447700>!c (2) BERGERON PROCESS TRANSFER OF CLOUD WATER TO SNOW (Psfw)<a name='1078'></font>
+<font color=#447700>!c     this process only considered when -31 C &lt; T &lt; 0 C<a name='1079'></font>
+<font color=#447700>!c     Lin (33) and Hsie (17)<a name='1080'></font>
+<font color=#447700>!c<a name='1081'></font>
+<font color=#447700>!c!<a name='1082'></font>
+<font color=#447700>!c!    parama1 and parama2 functions must be user supplied<a name='1083'></font>
+<font color=#447700>!c!<a name='1084'></font>
+<a name='1085'>
+<font color=#447700>! testing<a name='1086'></font>
+          if( qlz(k) .gt. 1.0e-10 ) then<a name='1087'>
+            temc1=amax1(-30.99,temcc(k))<a name='1088'>
+<font color=#447700>!           print*,'temc1',temc1,qlz(k)<a name='1089'></font>
+            a1=<A href='../../html_code/phys/module_mp_lin.F.html#PARAMA1'>parama1</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PARAMA1_1">( temc1 )<a name='1090'>
+            a2=<A href='../../html_code/phys/module_mp_lin.F.html#PARAMA2'>parama2</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PARAMA2_1">( temc1 )<a name='1091'>
+            tmp1=1.0-a2<a name='1092'>
+<font color=#447700>!! change unit from cgs to mks<a name='1093'></font>
+            a1=a1*0.001**tmp1<a name='1094'>
+<font color=#447700>!c!   dtberg is the time needed for a crystal to grow from 40 to 50 um<a name='1095'></font>
+<font color=#447700>!c !  odtberg=1.0/dtberg<a name='1096'></font>
+            odtberg=(a1*tmp1)/(xmi50**tmp1-xmi40**tmp1)<a name='1097'>
+<font color=#447700>!<a name='1098'></font>
+<font color=#447700>!c!   compute terminal velocity of a 50 micron ice cystal<a name='1099'></font>
+<font color=#447700>!<a name='1100'></font>
+            vti50=constc*di50**constd*sqrho(k)<a name='1101'>
+<font color=#447700>!<a name='1102'></font>
+            eiw=1.0<a name='1103'>
+            save1=a1*xmi50**a2<a name='1104'>
+            save2=0.25*pi*eiw*rho(k)*di50*di50*vti50<a name='1105'>
+<font color=#447700>!<a name='1106'></font>
+            tmp2=( save1 + save2*qlz(k) )<a name='1107'>
+<font color=#447700>!<a name='1108'></font>
+<font color=#447700>!! maximum number of 50 micron crystals limited by the amount<a name='1109'></font>
+<font color=#447700>!!  of supercool water<a name='1110'></font>
+<font color=#447700>!<a name='1111'></font>
+            xni50mx=qlzodt(k)/tmp2<a name='1112'>
+<font color=#447700>!<a name='1113'></font>
+<font color=#447700>!!   number of 50 micron crystals produced<a name='1114'></font>
+<font color=#447700>!<a name='1115'></font>
+<font color=#447700>!<a name='1116'></font>
+            xni50=qiz(k)*( 1.0-exp(-dtb*odtberg) )/xmi50<a name='1117'>
+            xni50=amin1(xni50,xni50mx)<a name='1118'>
+<font color=#447700>!<a name='1119'></font>
+            tmp3=odtb*tmp2/save2*( 1.0-exp(-save2*xni50*dtb) )<a name='1120'>
+            psfw(k)=amin1( tmp3,qlzodt(k) )<a name='1121'>
+<font color=#447700>!testing<a name='1122'></font>
+<font color=#447700>!           psfw(k)=0.<a name='1123'></font>
+<a name='1124'>
+<font color=#447700>!0915     if( temcc(k).gt.-30.99 ) then<a name='1125'></font>
+<font color=#447700>!0915        a1=parama1( temcc(k) )<a name='1126'></font>
+<font color=#447700>!0915        a2=parama2( temcc(k) )<a name='1127'></font>
+<font color=#447700>!0915        tmp1=1.0-a2<a name='1128'></font>
+<font color=#447700>!!     change unit from cgs to mks<a name='1129'></font>
+<font color=#447700>!0915        a1=a1*0.001**tmp1<a name='1130'></font>
+<a name='1131'>
+<font color=#447700>!c!    dtberg is the time needed for a crystal to grow from 40 to 50 um<a name='1132'></font>
+<font color=#447700>!c!    odtberg=1.0/dtberg<a name='1133'></font>
+<font color=#447700>!0915        odtberg=(a1*tmp1)/(xmi50**tmp1-xmi40**tmp1)<a name='1134'></font>
+<a name='1135'>
+<font color=#447700>!c!    number of 50 micron crystals produced<a name='1136'></font>
+<font color=#447700>!0915        xni50=qiz(k)*dtb*odtberg/xmi50<a name='1137'></font>
+<a name='1138'>
+<font color=#447700>!c!    need to calculate the terminal velocity of a 50 micron<a name='1139'></font>
+<font color=#447700>!c!    ice cystal<a name='1140'></font>
+<font color=#447700>!0915        vti50=constc*di50**constd*sqrho(k)<a name='1141'></font>
+<font color=#447700>!0915        eiw=1.0<a name='1142'></font>
+<font color=#447700>!0915        tmp2=xni50*( a1*xmi50**a2 + &amp;<a name='1143'></font>
+<font color=#447700>!0915             0.25*qlz(k)*pi*eiw*rho(k)*di50*di50*vti50 )<a name='1144'></font>
+<font color=#447700>!0915        psfw(k)=amin1( tmp2,qlzodt(k) )<a name='1145'></font>
+<font color=#447700>!0915        psfw(k)=0.<a name='1146'></font>
+<font color=#447700>!c<a name='1147'></font>
+<font color=#447700>!c (3) REDUCTION OF CLOUD ICE BY BERGERON PROCESS (Psfi): Lin (34)<a name='1148'></font>
+<font color=#447700>!c     this process only considered when -31 C &lt; T &lt; 0 C<a name='1149'></font>
+<font color=#447700>!c<a name='1150'></font>
+            tmp1=xni50*xmi50-psfw(k)<a name='1151'>
+            psfi(k)=amin1(tmp1,qizodt(k))<a name='1152'>
+<font color=#447700>! testing<a name='1153'></font>
+<font color=#447700>!           psfi(k)=0.<a name='1154'></font>
+          end if<a name='1155'>
+<font color=#447700>!<a name='1156'></font>
+<a name='1157'>
+<font color=#447700>!0915        tmp1=qiz(k)*odtberg<a name='1158'></font>
+<font color=#447700>!0915        psfi(k)=amin1(tmp1,qizodt(k))<a name='1159'></font>
+<font color=#447700>! testing<a name='1160'></font>
+<font color=#447700>!0915        psfi(k)=0.<a name='1161'></font>
+<font color=#447700>!0915     end if<a name='1162'></font>
+<font color=#447700>!<a name='1163'></font>
+          if(qrz(k) .le. 0.0) go to 1000<a name='1164'>
+<font color=#447700>!<a name='1165'></font>
+<font color=#447700>! Processes (4) and (5) only need when qrz &gt; 0.0<a name='1166'></font>
+<font color=#447700>!<a name='1167'></font>
+<font color=#447700>!c<a name='1168'></font>
+<font color=#447700>!c (4) CLOUD ICE ACCRETION BY RAIN (Praci): Lin (25)<a name='1169'></font>
+<font color=#447700>!c     may produce snow or graupel<a name='1170'></font>
+<font color=#447700>!c<a name='1171'></font>
+          eri=1.0<a name='1172'>
+<font color=#447700>!0915     tmp1=qiz(k)*pio4*eri*xnor*consta*sqrho(k)<a name='1173'></font>
+<font color=#447700>!0915     tmp2=tmp1*gambp3*olambdar(k)**bp3<a name='1174'></font>
+<font color=#447700>!0915     praci(k)=amin1( tmp2,qizodt(k) )<a name='1175'></font>
+<a name='1176'>
+          save1=pio4*eri*xnor*consta*sqrho(k)<a name='1177'>
+          tmp1=save1*gambp3*olambdar(k)**bp3<a name='1178'>
+          praci(k)=qizodt(k)*( 1.0-exp(-tmp1*dtb) )<a name='1179'>
+<a name='1180'>
+<font color=#447700>!c<a name='1181'></font>
+<font color=#447700>!c (5) RAIN ACCRETION BY CLOUD ICE (Piacr): Lin (26)<a name='1182'></font>
+<font color=#447700>!c<a name='1183'></font>
+<font color=#447700>!0915     tmp2=tmp1*rho(k)*pio6*rhowater*gambp6*oxmi* &amp;<a name='1184'></font>
+<font color=#447700>!0915              olambdar(k)**bp6<a name='1185'></font>
+<font color=#447700>!0915     piacr(k)=amin1( tmp2,qrzodt(k) )<a name='1186'></font>
+<a name='1187'>
+          tmp2=qiz(k)*save1*rho(k)*pio6*rhowater*gambp6*oxmi* &amp;<a name='1188'>
+                   olambdar(k)**bp6<a name='1189'>
+          piacr(k)=amin1( tmp2,qrzodt(k) )<a name='1190'>
+<a name='1191'>
+<font color=#447700>!<a name='1192'></font>
+1000      continue<a name='1193'>
+<font color=#447700>!<a name='1194'></font>
+          if(qsz(k) .le. 0.0) go to 1200<a name='1195'>
+<font color=#447700>!<a name='1196'></font>
+<font color=#447700>! Compute the following processes only when qsz &gt; 0.0<a name='1197'></font>
+<font color=#447700>!<a name='1198'></font>
+<font color=#447700>!c<a name='1199'></font>
+<font color=#447700>!c (6) ICE CRYSTAL ACCRETION BY SNOW (Psaci): Lin (22)<a name='1200'></font>
+<font color=#447700>!c<a name='1201'></font>
+          esi=exp( 0.025*temcc(k) )<a name='1202'>
+          save1=pio4*xnos*constc*gamdp3*sqrho(k)* &amp;<a name='1203'>
+               olambdas(k)**dp3<a name='1204'>
+          tmp1=esi*save1<a name='1205'>
+          psaci(k)=qizodt(k)*( 1.0-exp(-tmp1*dtb) )<a name='1206'>
+<a name='1207'>
+<font color=#447700>!0915     tmp1=pio4*xnos*constc*gamdp3*sqrho(k)* &amp;<a name='1208'></font>
+<font color=#447700>!0915          olambdas(k)**dp3<a name='1209'></font>
+<font color=#447700>!0915     tmp2=qiz(k)*esi*tmp1<a name='1210'></font>
+<font color=#447700>!0915     psaci(k)=amin1( tmp2,qizodt(k) )<a name='1211'></font>
+<font color=#447700>!c<a name='1212'></font>
+<font color=#447700>!c (7) CLOUD WATER ACCRETION BY SNOW (Psacw): Lin (24)<a name='1213'></font>
+<font color=#447700>!c<a name='1214'></font>
+          esw=1.0<a name='1215'>
+          tmp1=esw*save1<a name='1216'>
+          psacw(k)=qlzodt(K)*( 1.0-exp(-tmp1*dtb) )<a name='1217'>
+<a name='1218'>
+<font color=#447700>!0915     tmp2=qlz(k)*esw*tmp1<a name='1219'></font>
+<font color=#447700>!0915     psacw(k)=amin1( tmp2,qlzodt(k) )<a name='1220'></font>
+<font color=#447700>!c<a name='1221'></font>
+<font color=#447700>!c (8) DEPOSITION/SUBLIMATION OF SNOW (Psdep/Pssub): Lin (31)<a name='1222'></font>
+<font color=#447700>!c     includes consideration of ventilation effect<a name='1223'></font>
+<font color=#447700>!c<a name='1224'></font>
+<font color=#447700>!c     abi=2*pi*(Si-1)/rho/(A"+B")<a name='1225'></font>
+<font color=#447700>!c<a name='1226'></font>
+          tmpa=rvapor*xka(k)*tem(k)*tem(k)<a name='1227'>
+          tmpb=xls*xls*rho(k)*qsiz(k)*diffwv(k)<a name='1228'>
+          tmpc=tmpa*qsiz(k)*diffwv(k)<a name='1229'>
+          abi=2.0*pi*(qvoqsiz(k)-1.0)*tmpc/(tmpa+tmpb)<a name='1230'>
+<font color=#447700>!<a name='1231'></font>
+<font color=#447700>!c     vf1s,vf2s=ventilation factors for snow<a name='1232'></font>
+<font color=#447700>!c     vf1s=0.78,vf2s=0.31 in LIN<a name='1233'></font>
+<font color=#447700>!<a name='1234'></font>
+          tmp1=constc*sqrho(k)*olambdas(k)**dp5/visc(k)<a name='1235'>
+          tmp2=abi*xnos*( vf1s*olambdas(k)*olambdas(k)+ &amp;<a name='1236'>
+                    vf2s*schmidt(k)**0.33334*gamdp5o2*sqrt(tmp1) )<a name='1237'>
+          tmp3=odtb*( qvz(k)-qsiz(k) )<a name='1238'>
+<font color=#447700>!<a name='1239'></font>
+          if( tmp2 .le. 0.0) then<a name='1240'>
+            tmp2=amax1( tmp2,tmp3)<a name='1241'>
+            pssub(k)=amax1( tmp2,-qszodt(k) )<a name='1242'>
+            psdep(k)=0.0<a name='1243'>
+          else<a name='1244'>
+            psdep(k)=amin1( tmp2,tmp3 )<a name='1245'>
+            pssub(k)=0.0<a name='1246'>
+          end if<a name='1247'>
+<a name='1248'>
+<font color=#447700>!0915     psdep(k)=amax1(0.0,tmp2)<a name='1249'></font>
+<font color=#447700>!0915     pssub(k)=amin1(0.0,tmp2)<a name='1250'></font>
+<font color=#447700>!0915     pssub(k)=amax1( pssub(k),-qszodt(k) )<a name='1251'></font>
+<font color=#447700>!<a name='1252'></font>
+          if(qrz(k) .le. 0.0) go to 1200<a name='1253'>
+<font color=#447700>!<a name='1254'></font>
+<font color=#447700>! Compute processes (9) and (10) only when qsz &gt; 0.0 and qrz &gt; 0.0<a name='1255'></font>
+<font color=#447700>!<a name='1256'></font>
+<font color=#447700>!c<a name='1257'></font>
+<font color=#447700>!c (9) ACCRETION OF SNOW BY RAIN (Pracs): Lin (27)<a name='1258'></font>
+<font color=#447700>!c<a name='1259'></font>
+          esr=1.0<a name='1260'>
+          tmpa=olambdar(k)*olambdar(k)<a name='1261'>
+          tmpb=olambdas(k)*olambdas(k)<a name='1262'>
+          tmpc=olambdar(k)*olambdas(k)<a name='1263'>
+          tmp1=pi*pi*esr*xnor*xnos*abs( vtr(k)-vts(k) )*orho(k)<a name='1264'>
+          tmp2=tmpb*tmpb*olambdar(k)*(5.0*tmpb+2.0*tmpc+0.5*tmpa)<a name='1265'>
+          tmp3=tmp1*rhosnow*tmp2<a name='1266'>
+          pracs(k)=amin1( tmp3,qszodt(k) )<a name='1267'>
+<font color=#447700>!c<a name='1268'></font>
+<font color=#447700>!c (10)  ACCRETION OF RAIN BY SNOW (Psacr): Lin (28)<a name='1269'></font>
+<font color=#447700>!c<a name='1270'></font>
+          tmp3=tmpa*tmpa*olambdas(k)*(5.0*tmpa+2.0*tmpc+0.5*tmpb)<a name='1271'>
+          tmp4=tmp1*rhowater*tmp3<a name='1272'>
+          psacr(k)=amin1( tmp4,qrzodt(k) )<a name='1273'>
+<font color=#447700>!<a name='1274'></font>
+1200      continue<a name='1275'>
+<font color=#447700>!<a name='1276'></font>
+        else<a name='1277'>
+<font color=#447700>!<a name='1278'></font>
+<font color=#447700>!***********************************************************************<a name='1279'></font>
+<font color=#447700>!*********        snow production processes for T &gt; 0 C       **********<a name='1280'></font>
+<font color=#447700>!***********************************************************************<a name='1281'></font>
+<font color=#447700>!<a name='1282'></font>
+         if (qsz(k) .le. 0.0) go to 1400<a name='1283'>
+<font color=#447700>!c<a name='1284'></font>
+<font color=#447700>!c (1) CLOUD WATER ACCRETION BY SNOW (Psacw): Lin (24)<a name='1285'></font>
+<font color=#447700>!c<a name='1286'></font>
+            esw=1.0<a name='1287'>
+<a name='1288'>
+            tmp1=esw*pio4*xnos*constc*gamdp3*sqrho(k)* &amp;<a name='1289'>
+                 olambdas(k)**dp3<a name='1290'>
+            psacw(k)=qlzodt(k)*( 1.0-exp(-tmp1*dtb) )<a name='1291'>
+<a name='1292'>
+<font color=#447700>!0915       tmp1=pio4*xnos*constc*gamdp3*sqrho(k)* &amp;<a name='1293'></font>
+<font color=#447700>!0915            olambdas(k)**dp3<a name='1294'></font>
+<font color=#447700>!0915       tmp2=qlz(k)*esw*tmp1<a name='1295'></font>
+<font color=#447700>!0915       psacw(k)=amin1( tmp2,qlzodt(k) )<a name='1296'></font>
+<font color=#447700>!c<a name='1297'></font>
+<font color=#447700>!c (2) ACCRETION OF RAIN BY SNOW (Psacr): Lin (28)<a name='1298'></font>
+<font color=#447700>!c<a name='1299'></font>
+            esr=1.0<a name='1300'>
+            tmpa=olambdar(k)*olambdar(k)<a name='1301'>
+            tmpb=olambdas(k)*olambdas(k)<a name='1302'>
+            tmpc=olambdar(k)*olambdas(k)<a name='1303'>
+            tmp1=pi*pi*esr*xnor*xnos*abs( vtr(k)-vts(k) )*orho(k)<a name='1304'>
+            tmp2=tmpa*tmpa*olambdas(k)*(5.0*tmpa+2.0*tmpc+0.5*tmpb)<a name='1305'>
+            tmp3=tmp1*rhowater*tmp2<a name='1306'>
+            psacr(k)=amin1( tmp3,qrzodt(k) )<a name='1307'>
+<font color=#447700>!c<a name='1308'></font>
+<font color=#447700>!c (3) MELTING OF SNOW (Psmlt): Lin (32)<a name='1309'></font>
+<font color=#447700>!c     Psmlt is negative value<a name='1310'></font>
+<font color=#447700>!<a name='1311'></font>
+            delrs=rs0(k)-qvz(k)<a name='1312'>
+            term1=2.0*pi*orho(k)*( xlv*diffwv(k)*rho(k)*delrs- &amp;<a name='1313'>
+                  xka(k)*temcc(k) )<a name='1314'>
+            tmp1=constc*sqrho(k)*olambdas(k)**dp5/visc(k)<a name='1315'>
+            tmp2=xnos*( vf1s*olambdas(k)*olambdas(k)+  &amp;<a name='1316'>
+                 vf2s*schmidt(k)**0.33334*gamdp5o2*sqrt(tmp1) )<a name='1317'>
+            tmp3=term1*oxlf*tmp2-cwoxlf*temcc(k)*( psacw(k)+psacr(k) )<a name='1318'>
+            tmp4=amin1(0.0,tmp3)<a name='1319'>
+            psmlt(k)=amax1( tmp4,-qszodt(k) )<a name='1320'>
+<font color=#447700>!c<a name='1321'></font>
+<font color=#447700>!c (4) EVAPORATION OF MELTING SNOW (Psmltevp): HR (A27)<a name='1322'></font>
+<font color=#447700>!c     but use Lin et al. coefficience<a name='1323'></font>
+<font color=#447700>!c     Psmltevp is a negative value<a name='1324'></font>
+<font color=#447700>!c<a name='1325'></font>
+            tmpa=rvapor*xka(k)*tem(k)*tem(k)<a name='1326'>
+            tmpb=xlv*xlv*rho(k)*qswz(k)*diffwv(k)<a name='1327'>
+            tmpc=tmpa*qswz(k)*diffwv(k)<a name='1328'>
+            tmpd=amin1( 0.0,(qvoqswz(k)-0.90)*qswz(k)*odtb )<a name='1329'>
+<a name='1330'>
+<font color=#447700>!      abr=2.0*pi*(qvoqswz(k)-1.0)*tmpc/(tmpa+tmpb)<a name='1331'></font>
+<a name='1332'>
+            abr=2.0*pi*(qvoqswz(k)-0.90)*tmpc/(tmpa+tmpb)<a name='1333'>
+<font color=#447700>!<a name='1334'></font>
+<font color=#447700>!**** allow evaporation to occur when RH less than 90%<a name='1335'></font>
+<font color=#447700>!**** here not using 100% because the evaporation cooling<a name='1336'></font>
+<font color=#447700>!**** of temperature is not taking into account yet; hence,<a name='1337'></font>
+<font color=#447700>!**** the qsw value is a little bit larger. This will avoid<a name='1338'></font>
+<font color=#447700>!**** evaporation can generate cloud.<a name='1339'></font>
+<font color=#447700>!<a name='1340'></font>
+<font color=#447700>!c    vf1s,vf2s=ventilation factors for snow<a name='1341'></font>
+<font color=#447700>!c    vf1s=0.78,vf2s=0.31 in LIN<a name='1342'></font>
+<font color=#447700>!<a name='1343'></font>
+            tmp1=constc*sqrho(k)*olambdas(k)**dp5/visc(k)<a name='1344'>
+            tmp2=abr*xnos*( vf1s*olambdas(k)*olambdas(k)+  &amp;<a name='1345'>
+                 vf2s*schmidt(k)**0.33334*gamdp5o2*sqrt(tmp1) )<a name='1346'>
+            tmp3=amin1(0.0,tmp2)<a name='1347'>
+            tmp3=amax1( tmp3,tmpd )<a name='1348'>
+            psmltevp(k)=amax1( tmp3,-qszodt(k) )<a name='1349'>
+1400     continue<a name='1350'>
+<font color=#447700>!<a name='1351'></font>
+        end if<a name='1352'>
+<a name='1353'>
+<font color=#447700>!***********************************************************************<a name='1354'></font>
+<font color=#447700>!*********           rain production processes                **********<a name='1355'></font>
+<font color=#447700>!***********************************************************************<a name='1356'></font>
+<font color=#447700>!<a name='1357'></font>
+<font color=#447700>!c<a name='1358'></font>
+<font color=#447700>!c (1) AUTOCONVERSION OF RAIN (Praut): RH<a name='1359'></font>
+<font color=#447700>!c     araut=afa*rho<a name='1360'></font>
+<font color=#447700>!c     afa=0.001 Rate coefficient for autoconvergence<a name='1361'></font>
+<font color=#447700>!c<a name='1362'></font>
+<font color=#447700>!c     araut=1.0e-3<a name='1363'></font>
+<font color=#447700>!c<a name='1364'></font>
+         araut=0.001<a name='1365'>
+<font color=#447700>!testing<a name='1366'></font>
+<font color=#447700>!        tmp1=amax1( 0.0,araut*(qlz(k)-ql0) )<a name='1367'></font>
+<font color=#447700>!        praut(k)=amin1( tmp1,qlzodt(k) )<a name='1368'></font>
+         tmp1=odtb*(qlz(k)-ql0)*( 1.0-exp(-araut*dtb) )<a name='1369'>
+         praut(k)=amax1( 0.0,tmp1 )<a name='1370'>
+<a name='1371'>
+<font color=#447700>!c<a name='1372'></font>
+<font color=#447700>!c (2) ACCRETION OF CLOUD WATER BY RAIN (Pracw): Lin (51)<a name='1373'></font>
+<font color=#447700>!c<a name='1374'></font>
+         erw=1.0<a name='1375'>
+<font color=#447700>!        tmp1=qlz(k)*pio4*erw*xnor*consta*sqrho(k)<a name='1376'></font>
+<font color=#447700>!        tmp2=tmp1*gambp3*olambdar(k)**bp3<a name='1377'></font>
+<font color=#447700>!        pracw(k)=amin1( tmp2,qlzodt(k) )<a name='1378'></font>
+<a name='1379'>
+        tmp1=pio4*erw*xnor*consta*sqrho(k)* &amp;<a name='1380'>
+             gambp3*olambdar(k)**bp3<a name='1381'>
+        pracw(k)=qlzodt(k)*( 1.0-exp(-tmp1*dtb) )<a name='1382'>
+<a name='1383'>
+<font color=#447700>!c<a name='1384'></font>
+<font color=#447700>!c (3) EVAPORATION OF RAIN (Prevp): Lin (52)<a name='1385'></font>
+<font color=#447700>!c     Prevp is negative value<a name='1386'></font>
+<font color=#447700>!c<a name='1387'></font>
+<font color=#447700>!c     Sw=qvoqsw : saturation ratio<a name='1388'></font>
+<font color=#447700>!c<a name='1389'></font>
+         tmpa=rvapor*xka(k)*tem(k)*tem(k)<a name='1390'>
+         tmpb=xlv*xlv*rho(k)*qswz(k)*diffwv(k)<a name='1391'>
+         tmpc=tmpa*qswz(k)*diffwv(k)<a name='1392'>
+         tmpd=amin1(0.0,(qvoqswz(k)-0.90)*qswz(k)*odtb)<a name='1393'>
+<font color=#447700>!<a name='1394'></font>
+<font color=#447700>!      abr=2.0*pi*(qvoqswz(k)-1.0)*tmpc/(tmpa+tmpb)<a name='1395'></font>
+<a name='1396'>
+         abr=2.0*pi*(qvoqswz(k)-0.90)*tmpc/(tmpa+tmpb)<a name='1397'>
+<font color=#447700>!<a name='1398'></font>
+<font color=#447700>!c     vf1r,vf2r=ventilation factors for rain<a name='1399'></font>
+<font color=#447700>!c     vf1r=0.78,vf2r=0.31 in RH, LIN  and MM5<a name='1400'></font>
+<font color=#447700>!<a name='1401'></font>
+         vf1r=0.78<a name='1402'>
+         vf2r=0.31<a name='1403'>
+         tmp1=consta*sqrho(k)*olambdar(k)**bp5/visc(k)<a name='1404'>
+         tmp2=abr*xnor*( vf1r*olambdar(k)*olambdar(k)+  &amp;<a name='1405'>
+              vf2r*schmidt(k)**0.33334*gambp5o2*sqrt(tmp1) )<a name='1406'>
+         tmp3=amin1( 0.0,tmp2 )<a name='1407'>
+         tmp3=amax1( tmp3,tmpd )<a name='1408'>
+         prevp(k)=amax1( tmp3,-qrzodt(k) )<a name='1409'>
+<a name='1410'>
+<font color=#447700>!<a name='1411'></font>
+<font color=#447700>!      if(iout .gt. 0) write(20,*)'tmp1,tmp2,tmp3=',tmp1,tmp2,tmp3<a name='1412'></font>
+<font color=#447700>!      if(iout .gt. 0) write(20,*)'qlz,qiz,qrz=',qlz(k),qiz(k),qrz(k)<a name='1413'></font>
+<font color=#447700>!      if(iout .gt. 0) write(20,*)'tem,qsz,qvz=',tem(k),qsz(k),qvz(k)<a name='1414'></font>
+<a name='1415'>
+<a name='1416'>
+<a name='1417'>
+<font color=#447700>!     if (gindex .eq. 0.) goto 900<a name='1418'></font>
+<font color=#447700>!<a name='1419'></font>
+      if (tem(k) .lt. 273.15) then<a name='1420'>
+<font color=#447700>!<a name='1421'></font>
+<font color=#447700>!<a name='1422'></font>
+<font color=#447700>!-- graupel<a name='1423'></font>
+<font color=#447700>!***********************************************************************<a name='1424'></font>
+<font color=#447700>!*********        graupel production processes for T &lt; 0 C    **********<a name='1425'></font>
+<font color=#447700>!***********************************************************************<a name='1426'></font>
+<font color=#447700>!c<a name='1427'></font>
+<font color=#447700>!c (1) AUTOCONVERSION OF SNOW TO FORM GRAUPEL (Pgaut): Lin (37)<a name='1428'></font>
+<font color=#447700>!c     pgaut=alpha2*(qsz-qs0)<a name='1429'></font>
+<font color=#447700>!c     qs0=6.0E-4<a name='1430'></font>
+<font color=#447700>!c     alpha2=1.0e-3*exp(0.09*temcc(k))      Lin (38)<a name='1431'></font>
+<font color=#447700>!<a name='1432'></font>
+            alpha2=1.0e-3*exp(0.09*temcc(k))<a name='1433'>
+<font color=#447700>!<a name='1434'></font>
+<a name='1435'>
+<font color=#447700>! testing<a name='1436'></font>
+<font color=#447700>!           tmp1=alpha2*(qsz(k)-qs0)<a name='1437'></font>
+<font color=#447700>!           tmp1=amax1(0.0,tmp1)<a name='1438'></font>
+<font color=#447700>!           pgaut(k)=amin1( tmp1,qszodt(k) )<a name='1439'></font>
+<a name='1440'>
+            tmp1=odtb*(qsz(k)-qs0)*(1.0-exp(-alpha2*dtb))<a name='1441'>
+            pgaut(k)=amax1( 0.0,tmp1 )<a name='1442'>
+<a name='1443'>
+<font color=#447700>!c<a name='1444'></font>
+<font color=#447700>!c (2) FREEZING OF RAIN TO FORM GRAUPEL  (Pgfr): Lin (45)<a name='1445'></font>
+<font color=#447700>!c     positive value<a name='1446'></font>
+<font color=#447700>!c     Constant in Bigg freezing Aplume=Ap=0.66 /k<a name='1447'></font>
+<font color=#447700>!c     Constant in raindrop freezing equ. Bplume=Bp=100./m/m/m/s<a name='1448'></font>
+<font color=#447700>!<a name='1449'></font>
+<a name='1450'>
+            if (qrz(k) .gt. 1.e-8 ) then<a name='1451'>
+               Bp=100.<a name='1452'>
+               Ap=0.66<a name='1453'>
+               tmp1=olambdar(k)*olambdar(k)*olambdar(k)<a name='1454'>
+               tmp2=20.*pi*pi*Bp*xnor*rhowater*orho(k)*  &amp;<a name='1455'>
+                    (exp(-Ap*temcc(k))-1.0)*tmp1*tmp1*olambdar(k)<a name='1456'>
+               Pgfr(k)=amin1( tmp2,qrzodt(k) )<a name='1457'>
+            else<a name='1458'>
+               Pgfr(k)=0<a name='1459'>
+            endif<a name='1460'>
+<a name='1461'>
+<font color=#447700>!c<a name='1462'></font>
+<font color=#447700>!c       if (qgz(k) = 0.0) skip the other step below about graupel<a name='1463'></font>
+<font color=#447700>!c<a name='1464'></font>
+         if (qgz(k) .eq. 0.0) goto 4000<a name='1465'>
+<a name='1466'>
+<font color=#447700>!c<a name='1467'></font>
+<font color=#447700>!c       Comparing Pgwet(wet process) and Pdry(dry process),<a name='1468'></font>
+<font color=#447700>!c       we will pick up the small one.<a name='1469'></font>
+<font color=#447700>!c<a name='1470'></font>
+<a name='1471'>
+<font color=#447700>!c       ---------------<a name='1472'></font>
+<font color=#447700>!c      | dry processes |<a name='1473'></font>
+<font color=#447700>!c       ---------------<a name='1474'></font>
+<font color=#447700>!c<a name='1475'></font>
+<font color=#447700>!c (3)   ACCRETION OF CLOUD WATER BY GRAUPEL  (Pgacw): Lin (40)<a name='1476'></font>
+<font color=#447700>!c       egw=1.0<a name='1477'></font>
+<font color=#447700>!c       Cdrag=0.6 drag coefficients for hairstone<a name='1478'></font>
+<font color=#447700>!c       constg=sqrt(4.*grav*rhograul*0.33334*orho(k)/Cdrag)<a name='1479'></font>
+<font color=#447700>!c<a name='1480'></font>
+         egw=1.0<a name='1481'>
+         constg=sqrt(4.*grav*rhograul*0.33334*orho(k)*oCdrag)<a name='1482'>
+         tmp1=pio4*xnog*gam3pt5*constg*olambdag(k)**3.5<a name='1483'>
+         tmp2=qlz(k)*egw*tmp1<a name='1484'>
+         Pgacw(k)=amin1( tmp2,qlzodt(k) )<a name='1485'>
+<font color=#447700>!c<a name='1486'></font>
+<font color=#447700>!c (4)   ACCRETION OF ICE CRYSTAL BY GRAUPEL  (Pgaci): Lin (41)<a name='1487'></font>
+<font color=#447700>!c       egi=1.   for wet growth<a name='1488'></font>
+<font color=#447700>!c       egi=0.1  for dry growth<a name='1489'></font>
+<font color=#447700>!c<a name='1490'></font>
+         egi=0.1<a name='1491'>
+         tmp2=qiz(k)*egi*tmp1<a name='1492'>
+         pgaci(k)=amin1( tmp2,qizodt(k) )<a name='1493'>
+<a name='1494'>
+<a name='1495'>
+<font color=#447700>!c<a name='1496'></font>
+<font color=#447700>!c (5)   ACCRETION OF SNOW BY GRAUPEL  (Pgacs) : Lin (29)<a name='1497'></font>
+<font color=#447700>!c       Compute processes (6) only when qsz &gt; 0.0 and qgz &gt; 0.0<a name='1498'></font>
+<font color=#447700>!c<a name='1499'></font>
+         egs=exp(0.09*temcc(k))<a name='1500'>
+         tmpa=olambdas(k)*olambdas(k)<a name='1501'>
+         tmpb=olambdag(k)*olambdag(k)<a name='1502'>
+         tmpc=olambdas(k)*olambdag(k)<a name='1503'>
+         tmp1=pi*pi*xnos*xnog*abs( vts(k)-vtg(k) )*orho(k)<a name='1504'>
+         tmp2=tmpa*tmpa*olambdag(k)*(5.0*tmpa+2.0*tmpc+0.5*tmpb)<a name='1505'>
+         tmp3=tmp1*egs*rhosnow*tmp2<a name='1506'>
+         Pgacs(k)=amin1( tmp3,qszodt(k) )<a name='1507'>
+<a name='1508'>
+<a name='1509'>
+<font color=#447700>!c<a name='1510'></font>
+<font color=#447700>!c (6)   ACCRETION OF RAIN BY GRAUPEL (Pgacr): Lin (42)<a name='1511'></font>
+<font color=#447700>!c       Compute processes (6) only when qrz &gt; 0.0 and qgz &gt; 0.0<a name='1512'></font>
+<font color=#447700>!c       egr=1.<a name='1513'></font>
+<font color=#447700>!c<a name='1514'></font>
+         egr=1.<a name='1515'>
+         tmpa=olambdar(k)*olambdar(k)<a name='1516'>
+         tmpb=olambdag(k)*olambdag(k)<a name='1517'>
+         tmpc=olambdar(k)*olambdag(k)<a name='1518'>
+         tmp1=pi*pi*xnor*xnog*abs( vtr(k)-vtg(k) )*orho(k)<a name='1519'>
+         tmp2=tmpa*tmpa*olambdag(k)*(5.0*tmpa+2.0*tmpc+0.5*tmpb)<a name='1520'>
+         tmp3=tmp1*egr*rhowater*tmp2<a name='1521'>
+         pgacr(k)=amin1( tmp3,qrzodt(k) )<a name='1522'>
+<a name='1523'>
+<font color=#447700>!c<a name='1524'></font>
+<font color=#447700>!c (7)   Calculate total dry process effect Pdry(k)<a name='1525'></font>
+<font color=#447700>!c<a name='1526'></font>
+         Pdry(k)=Pgacw(k)+pgaci(k)+Pgacs(k)+pgacr(k)<a name='1527'>
+<a name='1528'>
+<font color=#447700>!c       ---------------<a name='1529'></font>
+<font color=#447700>!c      | wet processes |<a name='1530'></font>
+<font color=#447700>!c       ---------------<a name='1531'></font>
+<font color=#447700>!c<a name='1532'></font>
+<font color=#447700>!c (3)   ACCRETION OF ICE CRYSTAL BY GRAUPEL  (Pgacip): Lin (41)<a name='1533'></font>
+<font color=#447700>!c       egi=1.   for wet growth<a name='1534'></font>
+<font color=#447700>!c       egi=0.1  for dry growth<a name='1535'></font>
+<font color=#447700>!c<a name='1536'></font>
+         tmp2=10.*pgaci(k)<a name='1537'>
+         pgacip(k)=amin1( tmp2,qizodt(k) )<a name='1538'>
+<a name='1539'>
+<font color=#447700>!c<a name='1540'></font>
+<font color=#447700>!c (4)   ACCRETION OF SNOW BY GRAUPEL  ((Pgacsp) : Lin (29)<a name='1541'></font>
+<font color=#447700>!c       Compute processes (6) only when qsz &gt; 0.0 and qgz &gt; 0.0<a name='1542'></font>
+<font color=#447700>!c       egs=exp(0.09*(tem(k)-273.15))  when T &lt; 273.15 k<a name='1543'></font>
+<font color=#447700>!c<a name='1544'></font>
+         tmp3=Pgacs(k)*1.0/egs<a name='1545'>
+         Pgacsp(k)=amin1( tmp3,qszodt(k) )<a name='1546'>
+<a name='1547'>
+<font color=#447700>!c<a name='1548'></font>
+<font color=#447700>!c (5)   WET GROWTH OF GRAUPEL (Pgwet) : Lin (43)<a name='1549'></font>
+<font color=#447700>!c       may involve Pgacs or Pgaci and<a name='1550'></font>
+<font color=#447700>!c       must include PPgacw or Pgacr, or both.<a name='1551'></font>
+<font color=#447700>!c       ( The amount of Pgacw which is not able<a name='1552'></font>
+<font color=#447700>!c       to freeze is shed to rain. )<a name='1553'></font>
+         IF(temcc(k).gt.-40.)THEN<a name='1554'>
+<a name='1555'>
+             term0=constg*olambdag(k)**5.5/visc(k)<a name='1556'>
+<a name='1557'>
+<font color=#447700>!c<a name='1558'></font>
+<font color=#447700>!c    vf1s,vf2s=ventilation factors for graupel<a name='1559'></font>
+<font color=#447700>!c    vf1s=0.78,vf2s=0.31 in LIN<a name='1560'></font>
+<font color=#447700>!c    Cdrag=0.6  drag coefficient for hairstone<a name='1561'></font>
+<font color=#447700>!c    constg2=vf1s*olambdag(k)*olambdag(k)+<a name='1562'></font>
+<font color=#447700>!c            vf2s*schmidt(k)**0.33334*gam2pt75*sqrt(term0)<a name='1563'></font>
+<a name='1564'>
+             delrs=rs0(k)-qvz(k)<a name='1565'>
+             tmp0=1./(xlf+cw*temcc(k))<a name='1566'>
+             tmp1=2.*pi*xnog*(rho(k)*xlv*diffwv(k)*delrs-xka(k)*  &amp;<a name='1567'>
+                  temcc(k))*orho(k)*tmp0<a name='1568'>
+             constg2=vf1s*olambdag(k)*olambdag(k)+  &amp;<a name='1569'>
+                     vf2s*schmidt(k)**0.33334*gam2pt75*sqrt(term0)<a name='1570'>
+             tmp3=tmp1*constg2+(Pgacip(k)+Pgacsp(k))*  &amp;<a name='1571'>
+                  (1-Ci*temcc(k)*tmp0)<a name='1572'>
+             tmp3=amax1(0.0,tmp3)<a name='1573'>
+             Pgwet(k)=amax1(tmp3,qlzodt(k)+qszodt(k)+qizodt(k) )<a name='1574'>
+<a name='1575'>
+<font color=#447700>!c<a name='1576'></font>
+<font color=#447700>!c     Comparing Pgwet(wet process) and Pdry(dry process),<a name='1577'></font>
+<font color=#447700>!c     we will apply the small one.<a name='1578'></font>
+<font color=#447700>!c     if dry processes then delta4=1.0<a name='1579'></font>
+<font color=#447700>!c     if wet processes then delta4=0.0<a name='1580'></font>
+<font color=#447700>!<a name='1581'></font>
+         if ( Pdry(k) .lt. Pgwet(k) ) then<a name='1582'>
+            delta4=1.0<a name='1583'>
+         else<a name='1584'>
+            delta4=0.0<a name='1585'>
+         endif<a name='1586'>
+         ELSE<a name='1587'>
+            delta4=1.0<a name='1588'>
+         ENDIF<a name='1589'>
+<a name='1590'>
+<font color=#447700>!c<a name='1591'></font>
+<font color=#447700>!c<a name='1592'></font>
+<font color=#447700>!c (6)   Pgacrp(k)=Pgwet(k)-Pgacw(k)-Pgacip(k)-Pgacsp(k)<a name='1593'></font>
+<font color=#447700>!c       if Pgacrp(k) &gt; 0. then some of the rain is frozen to hail<a name='1594'></font>
+<font color=#447700>!c       if Pgacrp(k) &lt; 0. then some of the cloud water collected<a name='1595'></font>
+<font color=#447700>!c                            by the hail is unable to freeze and is<a name='1596'></font>
+<font color=#447700>!c                            shed as rain.<a name='1597'></font>
+<font color=#447700>!c<a name='1598'></font>
+            Pgacrp(k)=Pgwet(k)-Pgacw(k)-Pgacip(k)-Pgacsp(k)<a name='1599'>
+<a name='1600'>
+<font color=#447700>!c<a name='1601'></font>
+<font color=#447700>!c (8)   DEPOSITION/SUBLIMATION OF GRAUPEL  (Pgdep/Pgsub): Lin (46)<a name='1602'></font>
+<font color=#447700>!c       includes ventilation effect<a name='1603'></font>
+<font color=#447700>!c       constg=sqrt(4.*grav*rhograul*0.33334*orho(k)/Cdrag)<a name='1604'></font>
+<font color=#447700>!c       constg2=vf1s*olambdag(k)*olambdag(k)+<a name='1605'></font>
+<font color=#447700>!c             vf2s*schmidt(k)**0.33334*gam2pt75*constg<a name='1606'></font>
+<font color=#447700>!c<a name='1607'></font>
+<font color=#447700>!c       abg=2*pi*(Si-1)/rho/(A"+B")<a name='1608'></font>
+<font color=#447700>!c<a name='1609'></font>
+            tmpa=rvapor*xka(k)*tem(k)*tem(k)<a name='1610'>
+            tmpb=xls*xls*rho(k)*qsiz(k)*diffwv(k)<a name='1611'>
+            tmpc=tmpa*qsiz(k)*diffwv(k)<a name='1612'>
+            abg=2.0*pi*(qvoqsiz(k)-1.0)*tmpc/(tmpa+tmpb)<a name='1613'>
+<font color=#447700>!c<a name='1614'></font>
+<font color=#447700>!c     vf1s,vf2s=ventilation factors for graupel<a name='1615'></font>
+<font color=#447700>!c     vf1s=0.78,vf2s=0.31 in LIN<a name='1616'></font>
+<font color=#447700>!c     Cdrag=0.6  drag coefficient for hairstone<a name='1617'></font>
+<font color=#447700>!c<a name='1618'></font>
+            tmp2=abg*xnog*constg2<a name='1619'>
+            pgdep(k)=amax1(0.0,tmp2)<a name='1620'>
+            pgsub(k)=amin1(0.0,tmp2)<a name='1621'>
+            pgsub(k)=amax1( pgsub(k),-qgzodt(k) )<a name='1622'>
+<a name='1623'>
+ 4000    continue<a name='1624'>
+        else<a name='1625'>
+<font color=#447700>!<a name='1626'></font>
+<font color=#447700>!***********************************************************************<a name='1627'></font>
+<font color=#447700>!*********      graupel production processes for T &gt; 0 C      **********<a name='1628'></font>
+<font color=#447700>!***********************************************************************<a name='1629'></font>
+<font color=#447700>!<a name='1630'></font>
+<font color=#447700>!c<a name='1631'></font>
+<font color=#447700>!c (1) ACCRETION OF CLOUD WATER BY GRAUPEL (Pgacw): Lin (40)<a name='1632'></font>
+<font color=#447700>!c     egw=1.0<a name='1633'></font>
+<font color=#447700>!c     Cdrag=0.6 drag coefficients for hairstone<a name='1634'></font>
+<font color=#447700>!c     constg=sqrt(4.*grav*rhograul*0.33334*orho(k)/Cdrag)<a name='1635'></font>
+<a name='1636'>
+            egw=1.0<a name='1637'>
+            constg=sqrt(4.*grav*rhograul*0.33334*orho(k)*oCdrag)<a name='1638'>
+            tmp1=pio4*xnog*gam3pt5*constg*olambdag(k)**3.5<a name='1639'>
+            tmp2=qlz(k)*egw*tmp1<a name='1640'>
+            Pgacw(k)=amin1( tmp2,qlzodt(k) )<a name='1641'>
+<a name='1642'>
+<font color=#447700>!c<a name='1643'></font>
+<font color=#447700>!c (2) ACCRETION OF RAIN BY GRAUPEL (Pgacr): Lin (42)<a name='1644'></font>
+<font color=#447700>!c     Compute processes (5) only when qrz &gt; 0.0 and qgz &gt; 0.0<a name='1645'></font>
+<font color=#447700>!c     egr=1.<a name='1646'></font>
+<font color=#447700>!c<a name='1647'></font>
+            egr=1.<a name='1648'>
+            tmpa=olambdar(k)*olambdar(k)<a name='1649'>
+            tmpb=olambdag(k)*olambdag(k)<a name='1650'>
+            tmpc=olambdar(k)*olambdag(k)<a name='1651'>
+            tmp1=pi*pi*xnor*xnog*abs( vtr(k)-vtg(k) )*orho(k)<a name='1652'>
+            tmp2=tmpa*tmpa*olambdag(k)*(5.0*tmpa+2.0*tmpc+0.5*tmpb)<a name='1653'>
+            tmp3=tmp1*egr*rhowater*tmp2<a name='1654'>
+            pgacr(k)=amin1( tmp3,qrzodt(k) )<a name='1655'>
+<a name='1656'>
+<a name='1657'>
+<font color=#447700>!c<a name='1658'></font>
+<font color=#447700>!c (3) GRAUPEL MELTING TO FORM RAIN (Pgmlt): Lin (47)<a name='1659'></font>
+<font color=#447700>!c     Pgmlt is negative value<a name='1660'></font>
+<font color=#447700>!c     constg=sqrt(4.*grav*rhograul*0.33334*orho(k)/Cdrag)<a name='1661'></font>
+<font color=#447700>!c     constg2=vf1s*olambdag(k)*olambdag(k)+<a name='1662'></font>
+<font color=#447700>!c             vf2s*schmidt(k)**0.33334*gam2pt75*constg<a name='1663'></font>
+<font color=#447700>!c     Cdrag=0.6  drag coefficients for hairstone<a name='1664'></font>
+<font color=#447700>!<a name='1665'></font>
+            delrs=rs0(k)-qvz(k)<a name='1666'>
+            term1=2.0*pi*orho(k)*( xlv*diffwv(k)*rho(k)*delrs- &amp;<a name='1667'>
+                  xka(k)*temcc(k) )<a name='1668'>
+            term0=sqrt(4.*grav*rhograul*0.33334*orho(k)*ocdrag) &amp;<a name='1669'>
+                  *olambdag(k)**5.5/visc(k)<a name='1670'>
+<a name='1671'>
+            constg2=vf1s*olambdag(k)*olambdag(k)+ &amp;<a name='1672'>
+                    vf2s*schmidt(k)**0.33334*gam2pt75*sqrt(term0)<a name='1673'>
+            tmp2=xnog*constg2<a name='1674'>
+            tmp3=term1*oxlf*tmp2-cwoxlf*temcc(k)*( pgacw(k)+pgacr(k) )<a name='1675'>
+            tmp4=amin1(0.0,tmp3)<a name='1676'>
+            pgmlt(k)=amax1( tmp4,-qgzodt(k) )<a name='1677'>
+<a name='1678'>
+<a name='1679'>
+<font color=#447700>!c<a name='1680'></font>
+<font color=#447700>!c (4) EVAPORATION OF MELTING GRAUPEL (Pgmltevp) : HR (A19)<a name='1681'></font>
+<font color=#447700>!c     but use Lin et al. coefficience<a name='1682'></font>
+<font color=#447700>!c     Pgmltevp is a negative value<a name='1683'></font>
+<font color=#447700>!c     abg=2.0*pi*(qvoqsiz(k)-1.0)*tmpc/(tmpa+tmpb)<a name='1684'></font>
+<font color=#447700>!c<a name='1685'></font>
+            tmpa=rvapor*xka(k)*tem(k)*tem(k)<a name='1686'>
+            tmpb=xlv*xlv*rho(k)*qswz(k)*diffwv(k)<a name='1687'>
+            tmpc=tmpa*qswz(k)*diffwv(k)<a name='1688'>
+            tmpd=amin1( 0.0,(qvoqswz(k)-0.90)*qswz(k)*odtb )<a name='1689'>
+<a name='1690'>
+<font color=#447700>!c<a name='1691'></font>
+<font color=#447700>!c     abg=2*pi*(Si-1)/rho/(A"+B")<a name='1692'></font>
+<font color=#447700>!c<a name='1693'></font>
+            abg=2.0*pi*(qvoqswz(k)-0.90)*tmpc/(tmpa+tmpb)<a name='1694'>
+<font color=#447700>!<a name='1695'></font>
+<font color=#447700>!**** allow evaporation to occur when RH less than 90%<a name='1696'></font>
+<font color=#447700>!**** here not using 100% because the evaporation cooling<a name='1697'></font>
+<font color=#447700>!**** of temperature is not taking into account yet; hence,<a name='1698'></font>
+<font color=#447700>!**** the qgw value is a little bit larger. This will avoid<a name='1699'></font>
+<font color=#447700>!**** evaporation can generate cloud.<a name='1700'></font>
+<font color=#447700>!<a name='1701'></font>
+<font color=#447700>!c    vf1s,vf2s=ventilation factors for snow<a name='1702'></font>
+<font color=#447700>!c    vf1s=0.78,vf2s=0.31 in LIN<a name='1703'></font>
+<font color=#447700>!c    constg=sqrt(4.*grav*rhograul*0.33334*orho(k)/Cdrag)<a name='1704'></font>
+<font color=#447700>!c    constg2=vf1s*olambdag(k)*olambdag(k)+<a name='1705'></font>
+<font color=#447700>!c            vf2s*schmidt(k)**0.33334*gam2pt75*constg<a name='1706'></font>
+<font color=#447700>!<a name='1707'></font>
+            tmp2=abg*xnog*constg2<a name='1708'>
+            tmp3=amin1(0.0,tmp2)<a name='1709'>
+            tmp3=amax1( tmp3,tmpd )<a name='1710'>
+            pgmltevp(k)=amax1( tmp3,-qgzodt(k) )<a name='1711'>
+<a name='1712'>
+<font color=#447700>!c<a name='1713'></font>
+<font color=#447700>!c (5) ACCRETION OF SNOW BY GRAUPEL (Pgacs) : Lin (29)<a name='1714'></font>
+<font color=#447700>!c     Compute processes (3) only when qsz &gt; 0.0 and qgz &gt; 0.0<a name='1715'></font>
+<font color=#447700>!c     egs=1.0<a name='1716'></font>
+<font color=#447700>!c<a name='1717'></font>
+           egs=1.<a name='1718'>
+           tmpa=olambdas(k)*olambdas(k)<a name='1719'>
+           tmpb=olambdag(k)*olambdag(k)<a name='1720'>
+           tmpc=olambdas(k)*olambdag(k)<a name='1721'>
+           tmp1=pi*pi*xnos*xnog*abs( vts(k)-vtg(k) )*orho(k)<a name='1722'>
+           tmp2=tmpa*tmpa*olambdag(k)*(5.0*tmpa+2.0*tmpc+0.5*tmpb)<a name='1723'>
+           tmp3=tmp1*egs*rhosnow*tmp2<a name='1724'>
+           Pgacs(k)=amin1( tmp3,qszodt(k) )<a name='1725'>
+<a name='1726'>
+        endif<a name='1727'>
+<a name='1728'>
+<a name='1729'>
+<font color=#447700>!<a name='1730'></font>
+  900   continue<a name='1731'>
+<a name='1732'>
+<font color=#447700>!cc<a name='1733'></font>
+<font color=#447700>!c<a name='1734'></font>
+<font color=#447700>!c**********************************************************************<a name='1735'></font>
+<font color=#447700>!c*****     combine all processes together and avoid negative      *****<a name='1736'></font>
+<font color=#447700>!c*****     water substances<a name='1737'></font>
+<font color=#447700>!***********************************************************************<a name='1738'></font>
+<font color=#447700>!c<a name='1739'></font>
+      if ( temcc(k) .lt. 0.0) then<a name='1740'>
+<font color=#447700>!,delta4,1.-delta4<a name='1741'></font>
+<font color=#447700>!c<a name='1742'></font>
+<font color=#447700>!c  gdelta4=gindex*delta4<a name='1743'></font>
+<font color=#447700>!c  g1sdelt4=gindex*(1.-delta4)<a name='1744'></font>
+<font color=#447700>!c<a name='1745'></font>
+           gdelta4=gindex*delta4<a name='1746'>
+           g1sdelt4=gindex*(1.-delta4)<a name='1747'>
+<font color=#447700>!c<a name='1748'></font>
+<font color=#447700>!c  combined water vapor depletions<a name='1749'></font>
+<font color=#447700>!c<a name='1750'></font>
+<font color=#447700>!cc graupel<a name='1751'></font>
+           tmp=psdep(k)+pgdep(k)*gindex<a name='1752'>
+           if ( tmp .gt. qvzodt(k) ) then<a name='1753'>
+              factor=qvzodt(k)/tmp<a name='1754'>
+              psdep(k)=psdep(k)*factor<a name='1755'>
+              pgdep(k)=pgdep(k)*factor*gindex<a name='1756'>
+           end if<a name='1757'>
+<font color=#447700>!c<a name='1758'></font>
+<font color=#447700>!c  combined cloud water depletions<a name='1759'></font>
+<font color=#447700>!c<a name='1760'></font>
+           tmp=praut(k)+psacw(k)+psfw(k)+pracw(k)+gindex*Pgacw(k)<a name='1761'>
+           if ( tmp .gt. qlzodt(k) ) then<a name='1762'>
+              factor=qlzodt(k)/tmp<a name='1763'>
+              praut(k)=praut(k)*factor<a name='1764'>
+              psacw(k)=psacw(k)*factor<a name='1765'>
+              psfw(k)=psfw(k)*factor<a name='1766'>
+              pracw(k)=pracw(k)*factor<a name='1767'>
+<font color=#447700>!cc graupel<a name='1768'></font>
+              Pgacw(k)=Pgacw(k)*factor*gindex<a name='1769'>
+           end if<a name='1770'>
+<font color=#447700>!c<a name='1771'></font>
+<font color=#447700>!c  combined cloud ice depletions<a name='1772'></font>
+<font color=#447700>!c<a name='1773'></font>
+           tmp=psaut(k)+psaci(k)+praci(k)+psfi(k)+Pgaci(k)*gdelta4 &amp;<a name='1774'>
+               +Pgacip(k)*g1sdelt4<a name='1775'>
+           if (tmp .gt. qizodt(k) ) then<a name='1776'>
+              factor=qizodt(k)/tmp<a name='1777'>
+              psaut(k)=psaut(k)*factor<a name='1778'>
+              psaci(k)=psaci(k)*factor<a name='1779'>
+              praci(k)=praci(k)*factor<a name='1780'>
+              psfi(k)=psfi(k)*factor<a name='1781'>
+<font color=#447700>!cc graupel<a name='1782'></font>
+              Pgaci(k)=Pgaci(k)*factor*gdelta4<a name='1783'>
+              Pgacip(k)=Pgacip(k)*factor*g1sdelt4<a name='1784'>
+           endif<a name='1785'>
+<font color=#447700>!c<a name='1786'></font>
+<font color=#447700>!c  combined all rain processes<a name='1787'></font>
+<font color=#447700>!c<a name='1788'></font>
+          tmp_r=piacr(k)+psacr(k)-prevp(k)-praut(k)-pracw(k) &amp;<a name='1789'>
+                +Pgfr(k)*gindex+Pgacr(k)*gdelta4 &amp;<a name='1790'>
+                +Pgacrp(k)*g1sdelt4<a name='1791'>
+          if (tmp_r .gt. qrzodt(k) ) then<a name='1792'>
+             factor=qrzodt(k)/tmp_r<a name='1793'>
+             piacr(k)=piacr(k)*factor<a name='1794'>
+             psacr(k)=psacr(k)*factor<a name='1795'>
+             prevp(k)=prevp(k)*factor<a name='1796'>
+<font color=#447700>!cc graupel<a name='1797'></font>
+             Pgfr(k)=Pgfr(k)*factor*gindex<a name='1798'>
+             Pgacr(k)=Pgacr(k)*factor*gdelta4<a name='1799'>
+             Pgacrp(k)=Pgacrp(k)*factor*g1sdelt4<a name='1800'>
+          endif<a name='1801'>
+<a name='1802'>
+<font color=#447700>!c<a name='1803'></font>
+<font color=#447700>!c     if qrz &lt; 1.0E-4 and qsz &lt; 1.0E-4  then delta2=1.<a name='1804'></font>
+<font color=#447700>!c                  (all Pracs and Psacr become to snow)<a name='1805'></font>
+<font color=#447700>!c     if qrz &gt;= 1.0E-4 or qsz &gt;= 1.0E-4 then delta2=0.<a name='1806'></font>
+<font color=#447700>!c                 (all Pracs and Psacr become to graupel)<a name='1807'></font>
+<font color=#447700>!c<a name='1808'></font>
+          if (qrz(k) .lt. 1.0E-4 .and. qsz(k) .lt. 1.0E-4) then<a name='1809'>
+             delta2=1.0<a name='1810'>
+          else<a name='1811'>
+             delta2=0.0<a name='1812'>
+          endif<a name='1813'>
+<font color=#447700>!<a name='1814'></font>
+<font color=#447700>!cc graupel<a name='1815'></font>
+<a name='1816'>
+<font color=#447700>!c<a name='1817'></font>
+<font color=#447700>!c  if qrz(k) &lt; 1.0e-4 then delta3=1. means praci(k) --&gt;  qs<a name='1818'></font>
+<font color=#447700>!c                                          piacr(k) --&gt;  qs<a name='1819'></font>
+<font color=#447700>!c  if qrz(k) &gt; 1.0e-4 then delta3=0. means praci(k) --&gt;  qg<a name='1820'></font>
+<font color=#447700>!c                                          piacr(k) --&gt;  qg : Lin (20)<a name='1821'></font>
+<a name='1822'>
+          if (qrz(k) .lt. 1.0e-4) then<a name='1823'>
+             delta3=1.0<a name='1824'>
+          else<a name='1825'>
+             delta3=0.0<a name='1826'>
+          endif<a name='1827'>
+<font color=#447700>!<a name='1828'></font>
+<font color=#447700>!c<a name='1829'></font>
+<font color=#447700>!c     if gindex = 0.(no graupel) then delta2=1.0<a name='1830'></font>
+<font color=#447700>!c                                     delta3=1.0<a name='1831'></font>
+<font color=#447700>!c<a name='1832'></font>
+          if (gindex .eq. 0.) then<a name='1833'>
+              delta2=1.0<a name='1834'>
+              delta3=1.0<a name='1835'>
+         endif<a name='1836'>
+<font color=#447700>!<a name='1837'></font>
+<font color=#447700>!c<a name='1838'></font>
+<font color=#447700>!c   combined all snow processes<a name='1839'></font>
+<font color=#447700>!c<a name='1840'></font>
+          tmp_s=-pssub(k)-(psaut(k)+psaci(k)+psacw(k)+psfw(k)+ &amp;<a name='1841'>
+                 psfi(k)+praci(k)*delta3+piacr(k)*delta3+ &amp;<a name='1842'>
+                 psdep(k))+Pgaut(k)*gindex+Pgacs(k)*gdelta4+ &amp;<a name='1843'>
+                 Pgacsp(k)*g1sdelt4+Pracs(k)*(1.-delta2)- &amp;<a name='1844'>
+                 Psacr(k)*delta2<a name='1845'>
+          if ( tmp_s .gt. qszodt(k) ) then<a name='1846'>
+             factor=qszodt(k)/tmp_s<a name='1847'>
+             pssub(k)=pssub(k)*factor<a name='1848'>
+             Pracs(k)=Pracs(k)*factor<a name='1849'>
+<font color=#447700>!cc graupel<a name='1850'></font>
+             Pgaut(k)=Pgaut(k)*factor*gindex<a name='1851'>
+             Pgacs(k)=Pgacs(k)*factor*gdelta4<a name='1852'>
+             Pgacsp(k)=Pgacsp(k)*factor*g1sdelt4<a name='1853'>
+          endif<a name='1854'>
+<a name='1855'>
+<font color=#447700>!cc graupel<a name='1856'></font>
+<font color=#447700>!<a name='1857'></font>
+<a name='1858'>
+<font color=#447700>!          if (gindex .eq. 0.) goto 998<a name='1859'></font>
+<font color=#447700>!c<a name='1860'></font>
+<font color=#447700>!c  combined all graupel processes<a name='1861'></font>
+<font color=#447700>!c<a name='1862'></font>
+           tmp_g=-pgaut(k)-pgfr(k)-Pgacw(k)*delta4-Pgaci(k)*delta4  &amp;<a name='1863'>
+                 -Pgacr(k)*delta4-Pgacs(k)*delta4  &amp;<a name='1864'>
+                 -pgwet(k)*(1.-delta4)-pgsub(k)-pgdep(k)  &amp;<a name='1865'>
+                 -psacr(k)*(1-delta2)-Pracs(k)*(1-delta2)  &amp;<a name='1866'>
+                 -praci(k)*(1-delta3)-piacr(k)*(1-delta3)<a name='1867'>
+           if (tmp_g .gt. qgzodt(k)) then<a name='1868'>
+               factor=qgzodt(k)/tmp_g<a name='1869'>
+               pgsub(k)=pgsub(k)*factor<a name='1870'>
+           endif<a name='1871'>
+<a name='1872'>
+  998      continue<a name='1873'>
+<font color=#447700>!c<a name='1874'></font>
+<font color=#447700>!c  calculate new water substances, thetae, tem, and qvsbar<a name='1875'></font>
+<font color=#447700>!c<a name='1876'></font>
+<a name='1877'>
+<font color=#447700>!cc graupel<a name='1878'></font>
+         pvapor(k)=-pssub(k)-psdep(k)-prevp(k)-pgsub(k)*gindex &amp;<a name='1879'>
+                   -pgdep(k)*gindex<a name='1880'>
+         qvz(k)=amax1( qvmin,qvz(k)+dtb*pvapor(k) )<a name='1881'>
+         pclw(k)=-praut(k)-pracw(k)-psacw(k)-psfw(k)-pgacw(k)*gindex<a name='1882'>
+         qlz(k)=amax1( 0.0,qlz(k)+dtb*pclw(k) )<a name='1883'>
+         pcli(k)=-psaut(k)-psfi(k)-psaci(k)-praci(k)-pgaci(k)*gdelta4 &amp;<a name='1884'>
+                 -Pgacip(k)*g1sdelt4<a name='1885'>
+         qiz(k)=amax1( 0.0,qiz(k)+dtb*pcli(k) )<a name='1886'>
+         tmp_r=piacr(k)+psacr(k)-prevp(k)-praut(k)-pracw(k) &amp;<a name='1887'>
+                +Pgfr(k)*gindex+Pgacr(k)*gdelta4 &amp;<a name='1888'>
+                +Pgacrp(k)*g1sdelt4<a name='1889'>
+ 232     format(i2,1x,6(f9.3,1x))<a name='1890'>
+         prain(k)=-tmp_r<a name='1891'>
+         qrz(k)=amax1( 0.0,qrz(k)+dtb*prain(k) )<a name='1892'>
+         tmp_s=-pssub(k)-(psaut(k)+psaci(k)+psacw(k)+psfw(k)+  &amp;<a name='1893'>
+                psfi(k)+praci(k)*delta3+piacr(k)*delta3+  &amp;<a name='1894'>
+                psdep(k))+Pgaut(k)*gindex+Pgacs(k)*gdelta4+  &amp;<a name='1895'>
+                Pgacsp(k)*g1sdelt4+Pracs(k)*(1.-delta2)-  &amp;<a name='1896'>
+                Psacr(k)*delta2<a name='1897'>
+         psnow(k)=-tmp_s<a name='1898'>
+         qsz(k)=amax1( 0.0,qsz(k)+dtb*psnow(k) )<a name='1899'>
+         qschg(k)=qschg(k)+psnow(k)<a name='1900'>
+         qschg(k)=psnow(k)<a name='1901'>
+<font color=#447700>!cc graupel<a name='1902'></font>
+         tmp_g=-pgaut(k)-pgfr(k)-Pgacw(k)*delta4-Pgaci(k)*delta4 &amp;<a name='1903'>
+               -Pgacr(k)*delta4-Pgacs(k)*delta4 &amp;<a name='1904'>
+               -pgwet(k)*(1.-delta4)-pgsub(k)-pgdep(k) &amp;<a name='1905'>
+               -psacr(k)*(1-delta2)-Pracs(k)*(1-delta2) &amp;<a name='1906'>
+               -praci(k)*(1-delta3)-piacr(k)*(1-delta3)<a name='1907'>
+ 252     format(i2,1x,6(f12.9,1x))<a name='1908'>
+ 262     format(i2,1x,7(f12.9,1x))<a name='1909'>
+         pgraupel(k)=-tmp_g<a name='1910'>
+         pgraupel(k)=pgraupel(k)*gindex<a name='1911'>
+         qgz(k)=amax1( 0.0,qgz(k)+dtb*pgraupel(k))<a name='1912'>
+<font color=#447700>!        qgchg(k)=qgchg(k)+pgraupel(k)<a name='1913'></font>
+         qgchg(k)=pgraupel(k)<a name='1914'>
+         qgz(k)=qgz(k)*gindex<a name='1915'>
+<a name='1916'>
+         tmp=ocp/tothz(k)*xLf*(qschg(k)+qgchg(k))<a name='1917'>
+         theiz(k)=theiz(k)+dtb*tmp<a name='1918'>
+         thz(k)=theiz(k)-(xLvocp*qvz(k)-xLfocp*qiz(k))/tothz(k)<a name='1919'>
+         tem(k)=thz(k)*tothz(k)<a name='1920'>
+<a name='1921'>
+         temcc(k)=tem(k)-273.15<a name='1922'>
+<a name='1923'>
+         if( temcc(k) .lt. -40.0 ) qswz(k)=qsiz(k)<a name='1924'>
+         qlpqi=qlz(k)+qiz(k)<a name='1925'>
+         if ( qlpqi .eq. 0.0 ) then<a name='1926'>
+            qvsbar(k)=qsiz(k)<a name='1927'>
+         else<a name='1928'>
+            qvsbar(k)=( qiz(k)*qsiz(k)+qlz(k)*qswz(k) )/qlpqi<a name='1929'>
+         endif<a name='1930'>
+<a name='1931'>
+<font color=#447700>!<a name='1932'></font>
+      else<a name='1933'>
+<font color=#447700>!c<a name='1934'></font>
+<font color=#447700>!c  combined cloud water depletions<a name='1935'></font>
+<font color=#447700>!c<a name='1936'></font>
+          tmp=praut(k)+psacw(k)+pracw(k)+pgacw(k)*gindex<a name='1937'>
+          if ( tmp .gt. qlzodt(k) ) then<a name='1938'>
+             factor=qlzodt(k)/tmp<a name='1939'>
+             praut(k)=praut(k)*factor<a name='1940'>
+             psacw(k)=psacw(k)*factor<a name='1941'>
+             pracw(k)=pracw(k)*factor<a name='1942'>
+<font color=#447700>!cc graupel<a name='1943'></font>
+             pgacw(k)=pgacw(k)*factor*gindex<a name='1944'>
+          end if<a name='1945'>
+<font color=#447700>!c<a name='1946'></font>
+<font color=#447700>!c  combined all snow processes<a name='1947'></font>
+<font color=#447700>!c<a name='1948'></font>
+          tmp_s=-(psmlt(k)+psmltevp(k))+Pgacs(k)*gindex<a name='1949'>
+          if (tmp_s .gt. qszodt(k) ) then<a name='1950'>
+             factor=qszodt(k)/tmp_s<a name='1951'>
+             psmlt(k)=psmlt(k)*factor<a name='1952'>
+             psmltevp(k)=psmltevp(k)*factor<a name='1953'>
+<font color=#447700>!cc graupel<a name='1954'></font>
+             Pgacs(k)=Pgacs(k)*factor*gindex<a name='1955'>
+          endif<a name='1956'>
+<a name='1957'>
+<font color=#447700>!c<a name='1958'></font>
+<font color=#447700>!c<a name='1959'></font>
+<font color=#447700>!cc graupel<a name='1960'></font>
+<font color=#447700>!c<a name='1961'></font>
+<font color=#447700>!         if (gindex .eq. 0.) goto 997<a name='1962'></font>
+<a name='1963'>
+<font color=#447700>!c<a name='1964'></font>
+<font color=#447700>!c  combined all graupel processes<a name='1965'></font>
+<font color=#447700>!c<a name='1966'></font>
+            tmp_g=-pgmlt(k)-pgacs(k)-pgmltevp(k)<a name='1967'>
+            if (tmp_g .gt. qgzodt(k)) then<a name='1968'>
+              factor=qgzodt(k)/tmp_g<a name='1969'>
+              pgmltevp(k)=pgmltevp(k)*factor<a name='1970'>
+              pgmlt(k)=pgmlt(k)*factor<a name='1971'>
+            endif<a name='1972'>
+<font color=#447700>!c<a name='1973'></font>
+  997     continue<a name='1974'>
+<a name='1975'>
+<font color=#447700>!c<a name='1976'></font>
+<font color=#447700>!c  combined all rain processes<a name='1977'></font>
+<font color=#447700>!c<a name='1978'></font>
+          tmp_r=-prevp(k)-(praut(k)+pracw(k)+psacw(k)-psmlt(k)) &amp;<a name='1979'>
+                +pgmlt(k)*gindex-pgacw(k)*gindex<a name='1980'>
+          if (tmp_r .gt. qrzodt(k) ) then<a name='1981'>
+             factor=qrzodt(k)/tmp_r<a name='1982'>
+             prevp(k)=prevp(k)*factor<a name='1983'>
+          endif<a name='1984'>
+<font color=#447700>!c<a name='1985'></font>
+<font color=#447700>!c<a name='1986'></font>
+<font color=#447700>!c  calculate new water substances and thetae<a name='1987'></font>
+<font color=#447700>!c<a name='1988'></font>
+<a name='1989'>
+<a name='1990'>
+          pvapor(k)=-psmltevp(k)-prevp(k)-pgmltevp(k)<a name='1991'>
+          qvz(k)=amax1( qvmin,qvz(k)+dtb*pvapor(k))<a name='1992'>
+          pclw(k)=-praut(k)-pracw(k)-psacw(k)-pgacw(k)*gindex<a name='1993'>
+          qlz(k)=amax1( 0.0,qlz(k)+dtb*pclw(k) )<a name='1994'>
+          pcli(k)=0.0<a name='1995'>
+          qiz(k)=amax1( 0.0,qiz(k)+dtb*pcli(k) )<a name='1996'>
+          tmp_r=-prevp(k)-(praut(k)+pracw(k)+psacw(k)-psmlt(k)) &amp;<a name='1997'>
+                +pgmlt(k)*gindex-pgacw(k)*gindex<a name='1998'>
+ 242      format(i2,1x,7(f9.6,1x))<a name='1999'>
+          prain(k)=-tmp_r<a name='2000'>
+          tmpqrz=qrz(k)<a name='2001'>
+          qrz(k)=amax1( 0.0,qrz(k)+dtb*prain(k) )<a name='2002'>
+          tmp_s=-(psmlt(k)+psmltevp(k))+Pgacs(k)*gindex<a name='2003'>
+          psnow(k)=-tmp_s<a name='2004'>
+          qsz(k)=amax1( 0.0,qsz(k)+dtb*psnow(k) )<a name='2005'>
+<font color=#447700>!         qschg(k)=qschg(k)+psnow(k)<a name='2006'></font>
+          qschg(k)=psnow(k)<a name='2007'>
+<font color=#447700>!cc graupel<a name='2008'></font>
+<a name='2009'>
+          tmp_g=-pgmlt(k)-pgacs(k)-pgmltevp(k)<a name='2010'>
+<font color=#447700>!         write(*,272)k,pgmlt(k),pgacs(k),pgmltevp(k),<a name='2011'></font>
+ 272      format(i2,1x,3(f12.9,1x))<a name='2012'>
+          pgraupel(k)=-tmp_g*gindex<a name='2013'>
+          qgz(k)=amax1( 0.0,qgz(k)+dtb*pgraupel(k))<a name='2014'>
+<font color=#447700>!         qgchg(k)=qgchg(k)+pgraupel(k)<a name='2015'></font>
+          qgchg(k)=pgraupel(k)<a name='2016'>
+          qgz(k)=qgz(k)*gindex<a name='2017'>
+<font color=#447700>!<a name='2018'></font>
+          tmp=ocp/tothz(k)*xLf*(qschg(k)+qgchg(k))<a name='2019'>
+          theiz(k)=theiz(k)+dtb*tmp<a name='2020'>
+          thz(k)=theiz(k)-(xLvocp*qvz(k)-xLfocp*qiz(k))/tothz(k)<a name='2021'>
+<a name='2022'>
+          tem(k)=thz(k)*tothz(k)<a name='2023'>
+          temcc(k)=tem(k)-273.15<a name='2024'>
+<font color=#447700>!         qswz(k)=episp0k*oprez(k)*  &amp;<a name='2025'></font>
+<font color=#447700>!                exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='2026'></font>
+          es=1000.*svp1*exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='2027'>
+          qswz(k)=ep2*es/(prez(k)-es)<a name='2028'>
+          qsiz(k)=qswz(k)<a name='2029'>
+          qvsbar(k)=qswz(k)<a name='2030'>
+<font color=#447700>!<a name='2031'></font>
+      end if<a name='2032'>
+<a name='2033'>
+<font color=#447700>!<a name='2034'></font>
+<font color=#447700>!***********************************************************************<a name='2035'></font>
+<font color=#447700>!**********              saturation adjustment                **********<a name='2036'></font>
+<font color=#447700>!***********************************************************************<a name='2037'></font>
+<font color=#447700>!<a name='2038'></font>
+<font color=#447700>!    allow supersaturation exits linearly from 0% at 500 mb to 50%<a name='2039'></font>
+<font color=#447700>!    above 300 mb<a name='2040'></font>
+<font color=#447700>!    5.0e-5=1.0/(500mb-300mb)<a name='2041'></font>
+<font color=#447700>!<a name='2042'></font>
+         rsat=1.0+0.5*(50000.0-prez(k))*5.0e-5<a name='2043'>
+         rsat=amax1(1.0,rsat)<a name='2044'>
+         rsat=amin1(1.5,rsat)<a name='2045'>
+         rsat=1.0<a name='2046'>
+         if( qvz(k)+qlz(k)+qiz(k) .lt. rsat*qvsbar(k) ) then<a name='2047'>
+<a name='2048'>
+<font color=#447700>!c<a name='2049'></font>
+<font color=#447700>!c   unsaturated<a name='2050'></font>
+<font color=#447700>!c<a name='2051'></font>
+          qvz(k)=qvz(k)+qlz(k)+qiz(k)<a name='2052'>
+          qlz(k)=0.0<a name='2053'>
+          qiz(k)=0.0<a name='2054'>
+<a name='2055'>
+          thz(k)=theiz(k)-(xLvocp*qvz(k)-xLfocp*qiz(k))/tothz(k)<a name='2056'>
+          tem(k)=thz(k)*tothz(k)<a name='2057'>
+          temcc(k)=tem(k)-273.15<a name='2058'>
+<a name='2059'>
+          go to 1800<a name='2060'>
+<font color=#447700>!<a name='2061'></font>
+        else<a name='2062'>
+<font color=#447700>!c<a name='2063'></font>
+<font color=#447700>!c   saturated<a name='2064'></font>
+<font color=#447700>!c<a name='2065'></font>
+<font color=#447700>!<a name='2066'></font>
+          pladj(k)=qlz(k)<a name='2067'>
+          piadj(k)=qiz(k)<a name='2068'>
+<font color=#447700>!<a name='2069'></font>
+<a name='2070'>
+          CALL <A href='../../html_code/phys/module_mp_lin.F.html#SATADJ'>satadj</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SATADJ_1">(qvz, qlz, qiz, prez, theiz, thz, tothz, kts, kte, &amp;<a name='2071'>
+                      k, xLvocp, xLfocp, episp0k, EP2,SVP1,SVP2,SVP3,SVPT0 )<a name='2072'>
+<a name='2073'>
+<font color=#447700>!<a name='2074'></font>
+          pladj(k)=odtb*(qlz(k)-pladj(k))<a name='2075'>
+          piadj(k)=odtb*(qiz(k)-piadj(k))<a name='2076'>
+<font color=#447700>!<a name='2077'></font>
+          pclw(k)=pclw(k)+pladj(k)<a name='2078'>
+          pcli(k)=pcli(k)+piadj(k)<a name='2079'>
+          pvapor(k)=pvapor(k)-( pladj(k)+piadj(k) )<a name='2080'>
+<font color=#447700>!<a name='2081'></font>
+          thz(k)=theiz(k)-(xLvocp*qvz(k)-xLfocp*qiz(k))/tothz(k)<a name='2082'>
+          tem(k)=thz(k)*tothz(k)<a name='2083'>
+<a name='2084'>
+          temcc(k)=tem(k)-273.15<a name='2085'>
+<a name='2086'>
+<font color=#447700>!         qswz(k)=episp0k*oprez(k)*  &amp;<a name='2087'></font>
+<font color=#447700>!                 exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='2088'></font>
+          es=1000.*svp1*exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='2089'>
+          qswz(k)=ep2*es/(prez(k)-es)<a name='2090'>
+          if (tem(k) .lt. 273.15 ) then<a name='2091'>
+<font color=#447700>!            qsiz(k)=episp0k*oprez(k)* &amp;<a name='2092'></font>
+<font color=#447700>!                   exp( 21.8745584*(tem(k)-273.16)/(tem(k)-7.66) )<a name='2093'></font>
+             es=1000.*svp1*exp( 21.8745584*(tem(k)-273.16)/(tem(k)-7.66) )<a name='2094'>
+             qsiz(k)=ep2*es/(prez(k)-es)<a name='2095'>
+             if (temcc(k) .lt. -40.0) qswz(k)=qsiz(k)<a name='2096'>
+          else<a name='2097'>
+             qsiz(k)=qswz(k)<a name='2098'>
+          endif<a name='2099'>
+          qlpqi=qlz(k)+qiz(k)<a name='2100'>
+          if ( qlpqi .eq. 0.0 ) then<a name='2101'>
+             qvsbar(k)=qsiz(k)<a name='2102'>
+          else<a name='2103'>
+             qvsbar(k)=( qiz(k)*qsiz(k)+qlz(k)*qswz(k) )/qlpqi<a name='2104'>
+          endif<a name='2105'>
+<a name='2106'>
+        end if<a name='2107'>
+<a name='2108'>
+<font color=#447700>!<a name='2109'></font>
+<font color=#447700>!***********************************************************************<a name='2110'></font>
+<font color=#447700>!*****     melting and freezing of cloud ice and cloud water       *****<a name='2111'></font>
+<font color=#447700>!***********************************************************************<a name='2112'></font>
+        qlpqi=qlz(k)+qiz(k)<a name='2113'>
+        if(qlpqi .le. 0.0) go to 1800<a name='2114'>
+<font color=#447700>!<a name='2115'></font>
+<font color=#447700>!c<a name='2116'></font>
+<font color=#447700>!c (1)  HOMOGENEOUS NUCLEATION WHEN T&lt; -40 C (Pihom)<a name='2117'></font>
+<font color=#447700>!c<a name='2118'></font>
+        if(temcc(k) .lt. -40.0) pihom(k)=qlz(k)*odtb<a name='2119'>
+<font color=#447700>!c<a name='2120'></font>
+<font color=#447700>!c (2)  MELTING OF ICE CRYSTAL WHEN T&gt; 0 C (Pimlt)<a name='2121'></font>
+<font color=#447700>!c<a name='2122'></font>
+        if(temcc(k) .gt. 0.0) pimlt(k)=qiz(k)*odtb<a name='2123'>
+<font color=#447700>!c<a name='2124'></font>
+<font color=#447700>!c (3) PRODUCTION OF CLOUD ICE BY BERGERON PROCESS (Pidw): Hsie (p957)<a name='2125'></font>
+<font color=#447700>!c     this process only considered when -31 C &lt; T &lt; 0 C<a name='2126'></font>
+<font color=#447700>!c<a name='2127'></font>
+        if(temcc(k) .lt. 0.0 .and. temcc(k) .gt. -31.0) then<a name='2128'>
+<font color=#447700>!c!<a name='2129'></font>
+<font color=#447700>!c!   parama1 and parama2 functions must be user supplied<a name='2130'></font>
+<font color=#447700>!c!<a name='2131'></font>
+          a1=<A href='../../html_code/phys/module_mp_lin.F.html#PARAMA1'>parama1</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PARAMA1_2">( temcc(k) )<a name='2132'>
+          a2=<A href='../../html_code/phys/module_mp_lin.F.html#PARAMA2'>parama2</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PARAMA2_2">( temcc(k) )<a name='2133'>
+<font color=#447700>!! change unit from cgs to mks<a name='2134'></font>
+          a1=a1*0.001**(1.0-a2)<a name='2135'>
+          xnin=xni0*exp(-bni*temcc(k))<a name='2136'>
+          pidw(k)=xnin*orho(k)*(a1*xmnin**a2)<a name='2137'>
+        end if<a name='2138'>
+<font color=#447700>!<a name='2139'></font>
+        pcli(k)=pcli(k)+pihom(k)-pimlt(k)+pidw(k)<a name='2140'>
+        pclw(k)=pclw(k)-pihom(k)+pimlt(k)-pidw(k)<a name='2141'>
+        qlz(k)=amax1( 0.0,qlz(k)+dtb*(-pihom(k)+pimlt(k)-pidw(k)) )<a name='2142'>
+        qiz(k)=amax1( 0.0,qiz(k)+dtb*(pihom(k)-pimlt(k)+pidw(k)) )<a name='2143'>
+<a name='2144'>
+<font color=#447700>!<a name='2145'></font>
+        CALL <A href='../../html_code/phys/module_mp_lin.F.html#SATADJ'>satadj</A><A href='../../html_code/phys/module_mp_lin.F.html#CLPHY1D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SATADJ_2">(qvz, qlz, qiz, prez, theiz, thz, tothz, kts, kte, &amp;<a name='2146'>
+                    k, xLvocp, xLfocp, episp0k ,EP2,SVP1,SVP2,SVP3,SVPT0)<a name='2147'>
+<a name='2148'>
+        thz(k)=theiz(k)-(xLvocp*qvz(k)-xLfocp*qiz(k))/tothz(k)<a name='2149'>
+        tem(k)=thz(k)*tothz(k)<a name='2150'>
+<a name='2151'>
+        temcc(k)=tem(k)-273.15<a name='2152'>
+<a name='2153'>
+<font color=#447700>!       qswz(k)=episp0k*oprez(k)* &amp;<a name='2154'></font>
+<font color=#447700>!              exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='2155'></font>
+        es=1000.*svp1*exp( svp2*temcc(k)/(tem(k)-svp3) )<a name='2156'>
+        qswz(k)=ep2*es/(prez(k)-es)<a name='2157'>
+<a name='2158'>
+        if (tem(k) .lt. 273.15 ) then<a name='2159'>
+<font color=#447700>!          qsiz(k)=episp0k*oprez(k)* &amp;<a name='2160'></font>
+<font color=#447700>!                 exp( 21.8745584*(tem(k)-273.16)/(tem(k)-7.66) )<a name='2161'></font>
+           es=1000.*svp1*exp( 21.8745584*(tem(k)-273.16)/(tem(k)-7.66) )<a name='2162'>
+           qsiz(k)=ep2*es/(prez(k)-es)<a name='2163'>
+           if (temcc(k) .lt. -40.0) qswz(k)=qsiz(k)<a name='2164'>
+        else<a name='2165'>
+           qsiz(k)=qswz(k)<a name='2166'>
+        endif<a name='2167'>
+        qlpqi=qlz(k)+qiz(k)<a name='2168'>
+        if ( qlpqi .eq. 0.0 ) then<a name='2169'>
+           qvsbar(k)=qsiz(k)<a name='2170'>
+        else<a name='2171'>
+           qvsbar(k)=( qiz(k)*qsiz(k)+qlz(k)*qswz(k) )/qlpqi<a name='2172'>
+        endif<a name='2173'>
+<a name='2174'>
+1800  continue<a name='2175'>
+<font color=#447700>!<a name='2176'></font>
+<font color=#447700>!***********************************************************************<a name='2177'></font>
+<font color=#447700>!**********    integrate the productions of rain and snow     **********<a name='2178'></font>
+<font color=#447700>!***********************************************************************<a name='2179'></font>
+<font color=#447700>!c<a name='2180'></font>
+<a name='2181'>
+2000  continue<a name='2182'>
+<a name='2183'>
+<a name='2184'>
+<font color=#447700>!---------------------------------------------------------------------<a name='2185'></font>
+<a name='2186'>
+<font color=#447700>!<a name='2187'></font>
+<font color=#447700>!***********************************************************************<a name='2188'></font>
+<font color=#447700>!******      Write terms in cloud physics to time series dataset   *****<a name='2189'></font>
+<font color=#447700>!***********************************************************************<a name='2190'></font>
+<font color=#447700>!<a name='2191'></font>
+<font color=#447700>!     open(unit=24,form='formatted',status='new',<a name='2192'></font>
+<font color=#447700>!    &amp;     file='cloud.dat')<a name='2193'></font>
+<a name='2194'>
+<font color=#447700>!9030  format(10e12.6)<a name='2195'></font>
+<a name='2196'>
+<font color=#447700>!      write(24,*)'tmp'<a name='2197'></font>
+<font color=#447700>!      write(24,9030) (tem(k),k=kts+1,kte)<a name='2198'></font>
+<font color=#447700>!      write(24,*)'qiz'<a name='2199'></font>
+<font color=#447700>!      write(24,9030) (qiz(k),k=kts+1,kte)<a name='2200'></font>
+<font color=#447700>!      write(24,*)'qsz'<a name='2201'></font>
+<font color=#447700>!      write(24,9030) (qsz(k),k=kts+1,kte)<a name='2202'></font>
+<font color=#447700>!      write(24,*)'qrz'<a name='2203'></font>
+<font color=#447700>!      write(24,9030) (qrz(k),k=kts+1,kte)<a name='2204'></font>
+<font color=#447700>!      write(24,*)'qgz'<a name='2205'></font>
+<font color=#447700>!      write(24,9030) (qgz(k),k=kts+1,kte)<a name='2206'></font>
+<font color=#447700>!      write(24,*)'qvoqsw'<a name='2207'></font>
+<font color=#447700>!      write(24,9030) (qvoqswz(k),k=kts+1,kte)<a name='2208'></font>
+<font color=#447700>!      write(24,*)'qvoqsi'<a name='2209'></font>
+<font color=#447700>!      write(24,9030) (qvoqsiz(k),k=kts+1,kte)<a name='2210'></font>
+<font color=#447700>!      write(24,*)'vtr'<a name='2211'></font>
+<font color=#447700>!      write(24,9030) (vtr(k),k=kts+1,kte)<a name='2212'></font>
+<font color=#447700>!      write(24,*)'vts'<a name='2213'></font>
+<font color=#447700>!      write(24,9030) (vts(k),k=kts+1,kte)<a name='2214'></font>
+<font color=#447700>!      write(24,*)'vtg'<a name='2215'></font>
+<font color=#447700>!      write(24,9030) (vtg(k),k=kts+1,kte)<a name='2216'></font>
+<font color=#447700>!      write(24,*)'pclw'<a name='2217'></font>
+<font color=#447700>!      write(24,9030) (pclw(k),k=kts+1,kte)<a name='2218'></font>
+<font color=#447700>!      write(24,*)'pvapor'<a name='2219'></font>
+<font color=#447700>!      write(24,9030) (pvapor(k),k=kts+1,kte)<a name='2220'></font>
+<font color=#447700>!      write(24,*)'pcli'<a name='2221'></font>
+<font color=#447700>!      write(24,9030) (pcli(k),k=kts+1,kte)<a name='2222'></font>
+<font color=#447700>!      write(24,*)'pimlt'<a name='2223'></font>
+<font color=#447700>!      write(24,9030) (pimlt(k),k=kts+1,kte)<a name='2224'></font>
+<font color=#447700>!      write(24,*)'pihom'<a name='2225'></font>
+<font color=#447700>!      write(24,9030) (pihom(k),k=kts+1,kte)<a name='2226'></font>
+<font color=#447700>!      write(24,*)'pidw'<a name='2227'></font>
+<font color=#447700>!      write(24,9030) (pidw(k),k=kts+1,kte)<a name='2228'></font>
+<font color=#447700>!      write(24,*)'prain'<a name='2229'></font>
+<font color=#447700>!      write(24,9030) (prain(k),k=kts+1,kte)<a name='2230'></font>
+<font color=#447700>!      write(24,*)'praut'<a name='2231'></font>
+<font color=#447700>!      write(24,9030) (praut(k),k=kts+1,kte)<a name='2232'></font>
+<font color=#447700>!      write(24,*)'pracw'<a name='2233'></font>
+<font color=#447700>!      write(24,9030) (pracw(k),k=kts+1,kte)<a name='2234'></font>
+<font color=#447700>!      write(24,*)'prevp'<a name='2235'></font>
+<font color=#447700>!      write(24,9030) (prevp(k),k=kts+1,kte)<a name='2236'></font>
+<font color=#447700>!      write(24,*)'psnow'<a name='2237'></font>
+<font color=#447700>!      write(24,9030) (psnow(k),k=kts+1,kte)<a name='2238'></font>
+<font color=#447700>!      write(24,*)'psaut'<a name='2239'></font>
+<font color=#447700>!      write(24,9030) (psaut(k),k=kts+1,kte)<a name='2240'></font>
+<font color=#447700>!      write(24,*)'psfw'<a name='2241'></font>
+<font color=#447700>!      write(24,9030) (psfw(k),k=kts+1,kte)<a name='2242'></font>
+<font color=#447700>!      write(24,*)'psfi'<a name='2243'></font>
+<font color=#447700>!      write(24,9030) (psfi(k),k=kts+1,kte)<a name='2244'></font>
+<font color=#447700>!      write(24,*)'praci'<a name='2245'></font>
+<font color=#447700>!      write(24,9030) (praci(k),k=kts+1,kte)<a name='2246'></font>
+<font color=#447700>!      write(24,*)'piacr'<a name='2247'></font>
+<font color=#447700>!      write(24,9030) (piacr(k),k=kts+1,kte)<a name='2248'></font>
+<font color=#447700>!      write(24,*)'psaci'<a name='2249'></font>
+<font color=#447700>!      write(24,9030) (psaci(k),k=kts+1,kte)<a name='2250'></font>
+<font color=#447700>!      write(24,*)'psacw'<a name='2251'></font>
+<font color=#447700>!      write(24,9030) (psacw(k),k=kts+1,kte)<a name='2252'></font>
+<font color=#447700>!      write(24,*)'psdep'<a name='2253'></font>
+<font color=#447700>!      write(24,9030) (psdep(k),k=kts+1,kte)<a name='2254'></font>
+<font color=#447700>!      write(24,*)'pssub'<a name='2255'></font>
+<font color=#447700>!      write(24,9030) (pssub(k),k=kts+1,kte)<a name='2256'></font>
+<font color=#447700>!      write(24,*)'pracs'<a name='2257'></font>
+<font color=#447700>!      write(24,9030) (pracs(k),k=kts+1,kte)<a name='2258'></font>
+<font color=#447700>!      write(24,*)'psacr'<a name='2259'></font>
+<font color=#447700>!      write(24,9030) (psacr(k),k=kts+1,kte)<a name='2260'></font>
+<font color=#447700>!      write(24,*)'psmlt'<a name='2261'></font>
+<font color=#447700>!      write(24,9030) (psmlt(k),k=kts+1,kte)<a name='2262'></font>
+<font color=#447700>!      write(24,*)'psmltevp'<a name='2263'></font>
+<font color=#447700>!      write(24,9030) (psmltevp(k),k=kts+1,kte)<a name='2264'></font>
+<font color=#447700>!      write(24,*)'pladj'<a name='2265'></font>
+<font color=#447700>!      write(24,9030) (pladj(k),k=kts+1,kte)<a name='2266'></font>
+<font color=#447700>!      write(24,*)'piadj'<a name='2267'></font>
+<font color=#447700>!      write(24,9030) (piadj(k),k=kts+1,kte)<a name='2268'></font>
+<font color=#447700>!      write(24,*)'pgraupel'<a name='2269'></font>
+<font color=#447700>!      write(24,9030) (pgraupel(k),k=kts+1,kte)<a name='2270'></font>
+<font color=#447700>!      write(24,*)'pgaut'<a name='2271'></font>
+<font color=#447700>!      write(24,9030) (pgaut(k),k=kts+1,kte)<a name='2272'></font>
+<font color=#447700>!      write(24,*)'pgfr'<a name='2273'></font>
+<font color=#447700>!      write(24,9030) (pgfr(k),k=kts+1,kte)<a name='2274'></font>
+<font color=#447700>!      write(24,*)'pgacw'<a name='2275'></font>
+<font color=#447700>!      write(24,9030) (pgacw(k),k=kts+1,kte)<a name='2276'></font>
+<font color=#447700>!      write(24,*)'pgaci'<a name='2277'></font>
+<font color=#447700>!      write(24,9030) (pgaci(k),k=kts+1,kte)<a name='2278'></font>
+<font color=#447700>!      write(24,*)'pgacr'<a name='2279'></font>
+<font color=#447700>!      write(24,9030) (pgacr(k),k=kts+1,kte)<a name='2280'></font>
+<font color=#447700>!      write(24,*)'pgacs'<a name='2281'></font>
+<font color=#447700>!      write(24,9030) (pgacs(k),k=kts+1,kte)<a name='2282'></font>
+<font color=#447700>!      write(24,*)'pgacip'<a name='2283'></font>
+<font color=#447700>!      write(24,9030) (pgacip(k),k=kts+1,kte)<a name='2284'></font>
+<font color=#447700>!      write(24,*)'pgacrP'<a name='2285'></font>
+<font color=#447700>!      write(24,9030) (pgacrP(k),k=kts+1,kte)<a name='2286'></font>
+<font color=#447700>!      write(24,*)'pgacsp'<a name='2287'></font>
+<font color=#447700>!      write(24,9030) (pgacsp(k),k=kts+1,kte)<a name='2288'></font>
+<font color=#447700>!      write(24,*)'pgwet'<a name='2289'></font>
+<font color=#447700>!      write(24,9030) (pgwet(k),k=kts+1,kte)<a name='2290'></font>
+<font color=#447700>!      write(24,*)'pdry'<a name='2291'></font>
+<font color=#447700>!      write(24,9030) (pdry(k),k=kts+1,kte)<a name='2292'></font>
+<font color=#447700>!      write(24,*)'pgsub'<a name='2293'></font>
+<font color=#447700>!      write(24,9030) (pgsub(k),k=kts+1,kte)<a name='2294'></font>
+<font color=#447700>!      write(24,*)'pgdep'<a name='2295'></font>
+<font color=#447700>!      write(24,9030) (pgdep(k),k=kts+1,kte)<a name='2296'></font>
+<font color=#447700>!      write(24,*)'pgmlt'<a name='2297'></font>
+<font color=#447700>!      write(24,9030) (pgmlt(k),k=kts+1,kte)<a name='2298'></font>
+<font color=#447700>!      write(24,*)'pgmltevp'<a name='2299'></font>
+<font color=#447700>!      write(24,9030) (pgmltevp(k),k=kts+1,kte)<a name='2300'></font>
+<a name='2301'>
+<a name='2302'>
+<a name='2303'>
+<font color=#447700>!**** below if qv &lt; qvmin then qv=qvmin, ql=0.0, and qi=0.0<a name='2304'></font>
+<font color=#447700>!<a name='2305'></font>
+      do k=kts+1,kte<a name='2306'>
+         if ( qvz(k) .lt. qvmin ) then<a name='2307'>
+            qlz(k)=0.0<a name='2308'>
+            qiz(k)=0.0<a name='2309'>
+            qvz(k)=amax1( qvmin,qvz(k)+qlz(k)+qiz(k) )<a name='2310'>
+         end if<a name='2311'>
+      enddo<a name='2312'>
+<font color=#447700>!<a name='2313'></font>
+  END SUBROUTINE clphy1d<a name='2314'>
+<a name='2315'>
+<a name='2316'>
+<font color=#447700>!---------------------------------------------------------------------<a name='2317'></font>
+<font color=#447700>!                         SATURATED ADJUSTMENT<a name='2318'></font>
+<font color=#447700>!---------------------------------------------------------------------<a name='2319'></font>
+<A NAME='SATADJ'><A href='../../html_code/phys/module_mp_lin.F.html#SATADJ' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2320'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>satadj</font>(qvz, qlz, qiz, prez, theiz, thz, tothz,      &amp; <A href='../../call_to/SATADJ.html' TARGET='index'>2</A><a name='2321'>
+                        kts, kte, k, xLvocp, xLfocp, episp0k, EP2,SVP1,SVP2,SVP3,SVPT0)<a name='2322'>
+<font color=#447700>!---------------------------------------------------------------------<a name='2323'></font>
+   IMPLICIT NONE<a name='2324'>
+<font color=#447700>!---------------------------------------------------------------------<a name='2325'></font>
+<font color=#447700>!  This program use Newton's method for finding saturated temperature<a name='2326'></font>
+<font color=#447700>!  and saturation mixing ratio.<a name='2327'></font>
+<font color=#447700>!<a name='2328'></font>
+<font color=#447700>! In this saturation adjustment scheme we assume<a name='2329'></font>
+<font color=#447700>! (1)  the saturation mixing ratio is the mass weighted average of<a name='2330'></font>
+<font color=#447700>!      saturation values over liquid water (qsw), and ice (qsi)<a name='2331'></font>
+<font color=#447700>!      following Lord et al., 1984 and Tao, 1989<a name='2332'></font>
+<font color=#447700>!<a name='2333'></font>
+<font color=#447700>! (2) the percentage of cloud liquid and cloud ice will<a name='2334'></font>
+<font color=#447700>!      be fixed during the saturation calculation<a name='2335'></font>
+<font color=#447700>!---------------------------------------------------------------------<a name='2336'></font>
+<font color=#447700>!<a name='2337'></font>
+<a name='2338'>
+  INTEGER, INTENT(IN   )             :: kts, kte, k<a name='2339'>
+<a name='2340'>
+  REAL,      DIMENSION( kts:kte ),                                   &amp;<a name='2341'>
+                       INTENT(INOUT) :: qvz, qlz, qiz<a name='2342'>
+<font color=#447700>!<a name='2343'></font>
+  REAL,      DIMENSION( kts:kte ),                                   &amp;<a name='2344'>
+                       INTENT(IN   ) :: prez, theiz, tothz<a name='2345'>
+<a name='2346'>
+  REAL,     INTENT(IN   )            :: xLvocp, xLfocp, episp0k<a name='2347'>
+  REAL,     INTENT(IN   )            :: EP2,SVP1,SVP2,SVP3,SVPT0<a name='2348'>
+<a name='2349'>
+<font color=#447700>! LOCAL VARS<a name='2350'></font>
+<a name='2351'>
+  INTEGER                            :: n<a name='2352'>
+<a name='2353'>
+  REAL, DIMENSION( kts:kte )         :: thz, tem, temcc, qsiz,       &amp;<a name='2354'>
+                                        qswz, qvsbar<a name='2355'>
+<a name='2356'>
+  REAL ::   qsat, qlpqi, ratql, t0, t1, tmp1, ratqi, tsat, absft,    &amp;<a name='2357'>
+            denom1, denom2, dqvsbar, ftsat, dftsat, qpz, qvold,      &amp;<a name='2358'>
+            gindex, es<a name='2359'>
+<font color=#447700>!<a name='2360'></font>
+<font color=#447700>!---------------------------------------------------------------------<a name='2361'></font>
+<a name='2362'>
+      thz(k)=theiz(k)-(xLvocp*qvz(k)-xLfocp*qiz(k))/tothz(k)<a name='2363'>
+<a name='2364'>
+      tem(k)=tothz(k)*thz(k)<a name='2365'>
+      if (tem(k) .gt. 273.15) then<a name='2366'>
+<font color=#447700>!        qsat=episp0k/prez(k)*  &amp;<a name='2367'></font>
+<font color=#447700>!            exp( svp2*(tem(k)-273.15)/(tem(k)-svp3) )<a name='2368'></font>
+         es=1000.*svp1*exp( svp2*(tem(k)-svpt0)/(tem(k)-svp3) )<a name='2369'>
+         qsat=ep2*es/(prez(k)-es)<a name='2370'>
+      else<a name='2371'>
+        qsat=episp0k/prez(k)*  &amp;<a name='2372'>
+             exp( 21.8745584*(tem(k)-273.15)/(tem(k)-7.66) )<a name='2373'>
+      end if<a name='2374'>
+      qpz=qvz(k)+qlz(k)+qiz(k)<a name='2375'>
+      qvold=qvz(k)<a name='2376'>
+      if (qpz .lt. qsat) then<a name='2377'>
+         qvz(k)=qpz<a name='2378'>
+         qiz(k)=0.0<a name='2379'>
+         qlz(k)=0.0<a name='2380'>
+         go to 400<a name='2381'>
+      end if<a name='2382'>
+      qlpqi=qlz(k)+qiz(k)<a name='2383'>
+      if( qlpqi .ge. 1.0e-5) then<a name='2384'>
+        ratql=qlz(k)/qlpqi<a name='2385'>
+        ratqi=qiz(k)/qlpqi<a name='2386'>
+      else<a name='2387'>
+        t0=273.15<a name='2388'>
+<font color=#447700>!       t1=233.15<a name='2389'></font>
+        t1=248.15<a name='2390'>
+        tmp1=( t0-tem(k) )/(t0-t1)<a name='2391'>
+        tmp1=amin1(1.0,tmp1)<a name='2392'>
+        tmp1=amax1(0.0,tmp1)<a name='2393'>
+        ratqi=tmp1<a name='2394'>
+        ratql=1.0-tmp1<a name='2395'>
+      end if<a name='2396'>
+<font color=#447700>!<a name='2397'></font>
+<font color=#447700>!<a name='2398'></font>
+<font color=#447700>!--  saturation mixing ratios over water and ice<a name='2399'></font>
+<font color=#447700>!--  at the outset we will follow Bolton 1980 MWR for<a name='2400'></font>
+<font color=#447700>!--  the water and Murray JAS 1967 for the ice<a name='2401'></font>
+<font color=#447700>!<a name='2402'></font>
+<font color=#447700>!-- dqvsbar=d(qvsbar)/dT<a name='2403'></font>
+<font color=#447700>!-- ftsat=F(Tsat)<a name='2404'></font>
+<font color=#447700>!-- dftsat=d(F(T))/dT<a name='2405'></font>
+<font color=#447700>!<a name='2406'></font>
+<font color=#447700>!  First guess of tsat<a name='2407'></font>
+<a name='2408'>
+      tsat=tem(k)<a name='2409'>
+      absft=1.0<a name='2410'>
+<font color=#447700>!<a name='2411'></font>
+      do 200 n=1,20<a name='2412'>
+         denom1=1.0/(tsat-svp3)<a name='2413'>
+         denom2=1.0/(tsat-7.66)<a name='2414'>
+<font color=#447700>!        qswz(k)=episp0k/prez(k)*  &amp;<a name='2415'></font>
+<font color=#447700>!                exp( svp2*denom1*(tsat-273.15) )<a name='2416'></font>
+         es=1000.*svp1*exp( svp2*denom1*(tsat-svpt0) )<a name='2417'>
+         qswz(k)=ep2*es/(prez(k)-es)<a name='2418'>
+         if (tem(k) .lt. 273.15) then<a name='2419'>
+<font color=#447700>!           qsiz(k)=episp0k/prez(k)*  &amp;<a name='2420'></font>
+<font color=#447700>!                   exp( 21.8745584*denom2*(tsat-273.15) )<a name='2421'></font>
+            es=1000.*svp1*exp( 21.8745584*denom2*(tsat-273.15) )<a name='2422'>
+            qsiz(k)=ep2*es/(prez(k)-es)<a name='2423'>
+            if (tem(k) .lt. 233.15) qswz(k)=qsiz(k)<a name='2424'>
+         else<a name='2425'>
+            qsiz(k)=qswz(k)<a name='2426'>
+         endif<a name='2427'>
+         qvsbar(k)=ratql*qswz(k)+ratqi*qsiz(k)<a name='2428'>
+<font color=#447700>!<a name='2429'></font>
+<font color=#447700>!        if( absft .lt. 0.01 .and. n .gt. 3 ) go to 300<a name='2430'></font>
+         if( absft .lt. 0.01 ) go to 300<a name='2431'>
+<font color=#447700>!<a name='2432'></font>
+         dqvsbar=ratql*qswz(k)*svp2*243.5*denom1*denom1+  &amp;<a name='2433'>
+                 ratqi*qsiz(k)*21.8745584*265.5*denom2*denom2<a name='2434'>
+         ftsat=tsat+(xlvocp+ratqi*xlfocp)*qvsbar(k)-  &amp;<a name='2435'>
+               tothz(k)*theiz(k)-xlfocp*ratqi*(qvz(k)+qlz(k)+qiz(k))<a name='2436'>
+         dftsat=1.0+(xlvocp+ratqi*xlfocp)*dqvsbar<a name='2437'>
+         tsat=tsat-ftsat/dftsat<a name='2438'>
+         absft=abs(ftsat)<a name='2439'>
+<a name='2440'>
+200   continue<a name='2441'>
+9020  format(1x,'point can not converge, absft,n=',e12.5,i5)<a name='2442'>
+<font color=#447700>!<a name='2443'></font>
+300   continue<a name='2444'>
+      if( qpz .gt. qvsbar(k) ) then<a name='2445'>
+        qvz(k)=qvsbar(k)<a name='2446'>
+        qiz(k)=ratqi*( qpz-qvz(k) )<a name='2447'>
+        qlz(k)=ratql*( qpz-qvz(k) )<a name='2448'>
+      else<a name='2449'>
+        qvz(k)=qpz<a name='2450'>
+        qiz(k)=0.0<a name='2451'>
+        qlz(k)=0.0<a name='2452'>
+      end if<a name='2453'>
+ 400  continue<a name='2454'>
+<a name='2455'>
+   END SUBROUTINE satadj<a name='2456'>
+<a name='2457'>
+<a name='2458'>
+<font color=#447700>!----------------------------------------------------------------<a name='2459'></font>
+<A NAME='PARAMA1'><A href='../../html_code/phys/module_mp_lin.F.html#PARAMA1' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2460'>
+   REAL <font color=#993300>FUNCTION </font><font color=#cc0000>parama1</font>(temp) <A href='../../call_to/PARAMA1.html' TARGET='index'>2</A><a name='2461'>
+<font color=#447700>!----------------------------------------------------------------<a name='2462'></font>
+   IMPLICIT NONE<a name='2463'>
+<font color=#447700>!----------------------------------------------------------------<a name='2464'></font>
+<font color=#447700>!  This program calculate the parameter for crystal growth rate<a name='2465'></font>
+<font color=#447700>!  in Bergeron process<a name='2466'></font>
+<font color=#447700>!----------------------------------------------------------------<a name='2467'></font>
+<a name='2468'>
+      REAL, INTENT (IN   )   :: temp<a name='2469'>
+      REAL, DIMENSION(32)    :: a1<a name='2470'>
+      INTEGER                :: i1, i1p1<a name='2471'>
+      REAL                   :: ratio<a name='2472'>
+<a name='2473'>
+      data a1/0.100e-10,0.7939e-7,0.7841e-6,0.3369e-5,0.4336e-5, &amp;<a name='2474'>
+              0.5285e-5,0.3728e-5,0.1852e-5,0.2991e-6,0.4248e-6, &amp;<a name='2475'>
+              0.7434e-6,0.1812e-5,0.4394e-5,0.9145e-5,0.1725e-4, &amp;<a name='2476'>
+              0.3348e-4,0.1725e-4,0.9175e-5,0.4412e-5,0.2252e-5, &amp;<a name='2477'>
+              0.9115e-6,0.4876e-6,0.3473e-6,0.4758e-6,0.6306e-6, &amp;<a name='2478'>
+              0.8573e-6,0.7868e-6,0.7192e-6,0.6513e-6,0.5956e-6, &amp;<a name='2479'>
+              0.5333e-6,0.4834e-6/<a name='2480'>
+<a name='2481'>
+      i1=int(-temp)+1<a name='2482'>
+      i1p1=i1+1<a name='2483'>
+      ratio=-(temp)-float(i1-1)<a name='2484'>
+      parama1=a1(i1)+ratio*( a1(i1p1)-a1(i1) )<a name='2485'>
+<a name='2486'>
+   END FUNCTION parama1<a name='2487'>
+<a name='2488'>
+<font color=#447700>!----------------------------------------------------------------<a name='2489'></font>
+<A NAME='PARAMA2'><A href='../../html_code/phys/module_mp_lin.F.html#PARAMA2' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2490'>
+   REAL <font color=#993300>FUNCTION </font><font color=#cc0000>parama2</font>(temp) <A href='../../call_to/PARAMA2.html' TARGET='index'>2</A><a name='2491'>
+<font color=#447700>!----------------------------------------------------------------<a name='2492'></font>
+   IMPLICIT NONE<a name='2493'>
+<font color=#447700>!----------------------------------------------------------------<a name='2494'></font>
+<font color=#447700>!  This program calculate the parameter for crystal growth rate<a name='2495'></font>
+<font color=#447700>!  in Bergeron process<a name='2496'></font>
+<font color=#447700>!----------------------------------------------------------------<a name='2497'></font>
+<a name='2498'>
+      REAL, INTENT (IN   )   :: temp<a name='2499'>
+      REAL, DIMENSION(32)    :: a2<a name='2500'>
+      INTEGER                :: i1, i1p1<a name='2501'>
+      REAL                   :: ratio<a name='2502'>
+<a name='2503'>
+      data a2/0.0100,0.4006,0.4831,0.5320,0.5307,0.5319,0.5249, &amp;<a name='2504'>
+              0.4888,0.3849,0.4047,0.4318,0.4771,0.5183,0.5463, &amp;<a name='2505'>
+              0.5651,0.5813,0.5655,0.5478,0.5203,0.4906,0.4447, &amp;<a name='2506'>
+              0.4126,0.3960,0.4149,0.4320,0.4506,0.4483,0.4460, &amp;<a name='2507'>
+              0.4433,0.4413,0.4382,0.4361/<a name='2508'>
+      i1=int(-temp)+1<a name='2509'>
+      i1p1=i1+1<a name='2510'>
+      ratio=-(temp)-float(i1-1)<a name='2511'>
+      parama2=a2(i1)+ratio*( a2(i1p1)-a2(i1) )<a name='2512'>
+<a name='2513'>
+   END FUNCTION parama2<a name='2514'>
+<a name='2515'>
+<font color=#447700>!----------------------------------------------------------------<a name='2516'></font>
+<A NAME='GGAMMA'><A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2517'>
+   REAL <font color=#993300>FUNCTION </font><font color=#cc0000>ggamma</font>(X) <A href='../../call_to/GGAMMA.html' TARGET='index'>10</A>,<A href='../../call_from/GGAMMA.html' TARGET='index'>1</A><a name='2518'>
+<font color=#447700>!----------------------------------------------------------------<a name='2519'></font>
+   IMPLICIT NONE<a name='2520'>
+<font color=#447700>!----------------------------------------------------------------<a name='2521'></font>
+      REAL, INTENT(IN   ) :: x<a name='2522'>
+      REAL, DIMENSION(8)  :: B<a name='2523'>
+      INTEGER             ::j, K1<a name='2524'>
+      REAL                ::PF, G1TO2 ,TEMP<a name='2525'>
+<a name='2526'>
+      DATA B/-.577191652,.988205891,-.897056937,.918206857,  &amp;<a name='2527'>
+             -.756704078,.482199394,-.193527818,.035868343/<a name='2528'>
+<a name='2529'>
+      PF=1.<a name='2530'>
+      TEMP=X<a name='2531'>
+      DO 10 J=1,200<a name='2532'>
+      IF (TEMP .LE. 2) GO TO 20<a name='2533'>
+      TEMP=TEMP-1.<a name='2534'>
+   10 PF=PF*TEMP<a name='2535'>
+  100 FORMAT(//,5X,'module_mp_lin: INPUT TO GAMMA FUNCTION TOO LARGE, X=',E12.5)<a name='2536'>
+      WRITE(wrf_err_message,100)X<a name='2537'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_mp_lin.F.html#GGAMMA' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_152">(wrf_err_message)<a name='2538'>
+   20 G1TO2=1.<a name='2539'>
+      TEMP=TEMP - 1.<a name='2540'>
+      DO 30 K1=1,8<a name='2541'>
+   30 G1TO2=G1TO2 + B(K1)*TEMP**K1<a name='2542'>
+      ggamma=PF*G1TO2<a name='2543'>
+<a name='2544'>
+      END FUNCTION ggamma<a name='2545'>
+<a name='2546'>
+<font color=#447700>!----------------------------------------------------------------<a name='2547'></font>
+<a name='2548'>
+END MODULE module_mp_lin<a name='2549'>
+<a name='2550'>
+</pre></body></html>

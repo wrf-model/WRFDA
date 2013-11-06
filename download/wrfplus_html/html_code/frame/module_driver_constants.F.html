@@ -1,0 +1,67 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:DRIVER_LAYER:CONSTANTS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<font color=#447700>!  This MODULE contains all of the constants used in the model.  These<a name='4'></font>
+<font color=#447700>!  are separated by uage within the code.<a name='5'></font>
+<a name='6'>
+<A NAME='MODULE_DRIVER_CONSTANTS'><A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='7'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_driver_constants</font> <A href='../../call_to/MODULE_DRIVER_CONSTANTS.html' TARGET='index'>41</A><a name='8'>
+<a name='9'>
+   <font color=#447700>!  0. The following tells the rest of the model what data ordering we are<a name='10'></font>
+   <font color=#447700>!     using<a name='11'></font>
+<a name='12'>
+   INTEGER , PARAMETER :: DATA_ORDER_XYZ = 1<a name='13'>
+   INTEGER , PARAMETER :: DATA_ORDER_YXZ = 2<a name='14'>
+   INTEGER , PARAMETER :: DATA_ORDER_ZXY = 3<a name='15'>
+   INTEGER , PARAMETER :: DATA_ORDER_ZYX = 4<a name='16'>
+   INTEGER , PARAMETER :: DATA_ORDER_XZY = 5<a name='17'>
+   INTEGER , PARAMETER :: DATA_ORDER_YZX = 6<a name='18'>
+<a name='19'>
+#include &lt;<A href='../../html_code/include/model_data_order.inc.html'>model_data_order.inc</A>&gt;<A NAME="model_data_order.inc_1"><A href='../../html_code/frame/module_driver_constants.F.html#module_driver_constants.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='20'>
+<a name='21'>
+   <font color=#447700>!  1. Following are constants for use in defining maximal values for array<a name='22'></font>
+   <font color=#447700>!     definitions.  <a name='23'></font>
+   <font color=#447700>!<a name='24'></font>
+<a name='25'>
+   <font color=#447700>!  The maximum number of levels in the model is how deeply the domains may<a name='26'></font>
+   <font color=#447700>!  be nested.<a name='27'></font>
+<a name='28'>
+   INTEGER , PARAMETER :: max_levels      =  20<a name='29'>
+<a name='30'>
+   <font color=#447700>!  The maximum number of nests that can depend on a single parent and other way round<a name='31'></font>
+<a name='32'>
+   INTEGER , PARAMETER :: max_nests        =  20<a name='33'>
+<a name='34'>
+   <font color=#447700>!  The maximum number of parents that a nest can have (simplified assumption -&gt; one only)<a name='35'></font>
+<a name='36'>
+   INTEGER , PARAMETER :: max_parents      =  1<a name='37'>
+<a name='38'>
+   <font color=#447700>!  The maximum number of domains is how many grids the model will be running.<a name='39'></font>
+<a name='40'>
+   INTEGER , PARAMETER :: max_domains     =   ( MAX_DOMAINS_F - 1 ) / 2 + 1<a name='41'>
+<a name='42'>
+   <font color=#447700>!  The maximum number of nest move specifications allowed in a namelist<a name='43'></font>
+<a name='44'>
+   INTEGER , PARAMETER :: max_moves       =   50<a name='45'>
+<a name='46'>
+   <font color=#447700>!  2. Following related to driver leve data structures for DM_PARALLEL communications<a name='47'></font>
+<a name='48'>
+#ifdef DM_PARALLEL<a name='49'>
+   INTEGER , PARAMETER :: max_comms       =   1024<a name='50'>
+#else<a name='51'>
+   INTEGER , PARAMETER :: max_comms       =   1<a name='52'>
+#endif<a name='53'>
+<a name='54'>
+   <font color=#447700>!  3. Following is information related to the file I/O.<a name='55'></font>
+<a name='56'>
+   <font color=#447700>!  These are the bounds of the available FORTRAN logical unit numbers for the file I/O.<a name='57'></font>
+   <font color=#447700>!  Only logical unti numbers within these bounds will be chosen for I/O unit numbers.<a name='58'></font>
+<a name='59'>
+   INTEGER , PARAMETER :: min_file_unit = 10<a name='60'>
+   INTEGER , PARAMETER :: max_file_unit = 99<a name='61'>
+ CONTAINS<a name='62'>
+<A NAME='INIT_MODULE_DRIVER_CONSTANTS'><A href='../../html_code/frame/module_driver_constants.F.html#INIT_MODULE_DRIVER_CONSTANTS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='63'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_driver_constants</font> <A href='../../call_to/INIT_MODULE_DRIVER_CONSTANTS.html' TARGET='index'>2</A><a name='64'>
+   END SUBROUTINE init_module_driver_constants<a name='65'>
+ END MODULE module_driver_constants<a name='66'>
+</pre></body></html>

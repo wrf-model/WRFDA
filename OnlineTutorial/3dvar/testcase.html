@@ -1,0 +1,366 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Courier, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+
+      <p class="headingtext" id="Font14">3DVAR: Compilation</p>
+
+      <p class="bodytext"><strong id="Font14">Step 7: Download test data</strong> </p>
+      <p class="bodytext">If you've made it to this point, WRFDA should be fully compiled on your system. If you haven't already, you should make an environment variable pointing to the directory where you unpacked WRFDA (this should be the directory that you downloaded the <span class="style6" id="Font12">WRFDA_V3.5.tar.gz</span> file in).</p>
+      <p class="bodytext">A test data set is available on the WRFDA website: </p>
+      <blockquote>
+        <p class="bodytext"><a href="http://www.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html">http://www.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html</a></p>
+      </blockquote>
+      <p class="bodytext">This test case is a continental US domain case at 12Z on February 5, 2008. This was the morning of the so-called <a href="http://en.wikipedia.org/wiki/2008_Super_Tuesday_tornado_outbreak">Super Tuesday Tornado Outbreak</a>, which resulted in more than 50 deaths and over $1 billion in damage across the central and southeastern United States.</p>
+      <p class="bodytext">Download the test data package to the same folder you downloaded the WRFDA package to, then unpack it in the same way you unpacked the WRFDA package.</p>
+      <p class="code"> > cd $WRFDA_DIR</br>
+      > tar -xvf WRFDAV3.5-testdata.tar.gz</br>
+      <p class="bodytext">You should now see two .tar.gz files and four directories:</p>
+      <p class="code"> > ls -al</br>
+      total 234892</br>
+      drwxr-xr-x  &nbsp;6 user &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4096 Oct 29 14:39 .</br>
+      drwxr-xr-x 19 user &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4096 Oct 29 11:57 ..</br>
+      drwxr-xr-x  &nbsp;2 user &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4096 Mar 18 &nbsp;2012 be</br>
+      drwxr-xr-x  &nbsp;9 user &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4096 Mar 12 &nbsp;2012 ob</br>
+      drwxr-xr-x  &nbsp;4 user &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4096 Mar &nbsp;9 &nbsp;2012 rc</br>
+      drwxr-xr-x 17 user &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;4096 Oct 29 12:25 WRFDA</br>
+      -rw-r--r--  &nbsp;1 user &nbsp;47726138 Oct 29 11:58 WRFDA_V3.5.tar.gz</br>
+      -rw-r--r--  &nbsp;1 user 192531933 Oct 29 14:31 WRFDAV3.5-testdata.tar.gz</p>
+      <p class="bodytext">The "WRFDA" directory is the directory where we just compiled the WRFDA system. The other three directories contain the sample data for our test case:</p>
+      <blockquote>
+        <ul><li class="bodybullet">"<span class="style6" id="Font12">be</span>" contains our background error data in a binary file named "be.dat". This file must be generated on a case-by-case basis. The utility used to generate background error data is known as "gen_be"; instructions on how to use this will be covered in the advanced tutorial.</li> 
+        <li class="bodybullet">"<span class="style6" id="Font12">ob</span>" contains our observation data. This folder contains many different types of data, but the file we will be using for this basic tutorial is named "ob.ascii". This is an ASCII text file, and contains a number of different observation types (including balloon soundings, surface METAR, ships, and buoy observations.</li>
+        <li class="bodybullet">"<span class="style6" id="Font12">rc</span>" contains the first guess and boundary files. These files are generated by WPS and WRF; you can find more information in the <a href="http://www.mmm.ucar.edu/wrf/users/docs/user_guide_V3/contents.html">User's Guide</a> and the <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/index.htm">WRF/WPS Online Tutorial</a>.</li></ul>
+      </blockquote>
+      <p class="bodytext">In order to avoid confusion and possibly overwriting important files, you should run every experiment in a separate working directory. Create a directory named "3dvar" and enter it; we will run the test case in this directory:</p>
+      <p class="code"> > mkdir 3dvar</br>
+      > cd 3dvar</p>
+
+      <p class="bodytext"><strong id="Font14">Step 8: Run the test case</strong> </p>
+      <p class="bodytext">The first and most important file for running WRFDA is the <span class="style6" id="Font12">namelist.input</span> file. A sample namelist is included in the WRFDA distribution; copy it into your working directory:</p>
+      <p class="code"> > cp ../WRFDA/var/test/tutorial/namelist.input .</p>
+      <p class="bodytext">You will also need to link several other files to your working directory. This can be done using the <span class="style6" id="Font12">ln</span> command:</p>
+      <p class="code"> > ln -sf $WRFDA_DIR/WRFDA/run/LANDUSE.TBL</br>
+       > ln -sf $WRFDA_DIR/be/be.dat .</br>
+       > ln -sf $WRFDA_DIR/ob/2008020512/ob.ascii .</br>
+       > ln -sf $WRFDA_DIR/rc/2008020512/wrfinput_d01 ./fg</br>
+       > ln -sf $WRFDA_DIR/WRFDA/var/build/da_wrfvar.exe .</p>
+      <p class="bodytext">The <span class="style6" id="Font12">-sf</span> option specifies that this should be a symbolic link (analogous to a "shortcut" in the Windows operating system) and that the command should overwrite any link by the same name which might already exist (in this case, not a problem, but it is a good habit to develop).  These files are all important for running WRFDA:</p>
+      <blockquote>
+        <ul><li class="bodybullet">"<span class="style6" id="Font12">wrfinput_d01</span>" is a netCDF file which was created by WPS and WRF. This is our "first guess" file (and so is linked as "fg"); the meteorological analysis that we start with before adding observations.</li>
+          <li class="bodybullet">"<span class="style6" id="Font12">LANDUSE.TBL</span>" is a tabular file that describes the physical properties of the different land use categories which are specified in the first-guess file.</li>
+          <li class="bodybullet">"<span class="style6" id="Font12">be.dat</span>" is the aforementioned background error file.</li>
+          <li class="bodybullet">"<span class="style6" id="Font12">ob.ascii</span>" is the aforementioned observation file.</li>
+          <li class="bodybullet">And finally, "<span class="style6" id="Font12">da_wrfvar.exe</span>" is our WRFDA executable file. This is the program that runs the WRFDA system.</li></ul>
+     </blockquote>
+      <p class="bodytext">Let's take a closer look at the namelist file. You can open it using the text editor of your choice (<span class="style6" id="Font12">vi</span>, <span class="style6" id="Font12">emacs</span>, etc.). You will see a large number of namelist sections, but only the ones listed below are important:</p>
+      <p class="code">&wrfvar18<br/>
+        analysis_date="2008-02-05_12:00:00.0000", &nbsp; &nbsp; <span style=color:#993333>This option sets the full date of the analysis</span><br/>
+        /<br/>
+        ...<br/>
+        &wrfvar21<br/>
+        time_window_min="2008-02-05_11:00:00.0000", &nbsp; <span style=color:#993333>Beginning time for the assimilation window</span><br/>
+        /<br/>
+        &wrfvar22<br/>
+        time_window_max="2008-02-05_13:00:00.0000", &nbsp; <span style=color:#993333>Ending time for the assimilation window</span><br/> 
+        /<br/>
+        ...<br/>
+        &time_control<br/>
+        start_year=2008, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>The start parameters should be the same as the analysis time</span><br/>
+        start_month=02,<br/>
+        start_day=05,<br/>
+        start_hour=12,<br/>
+        end_year=2008, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>The end parameters are ignored by WRFDA, so they can be set to anything</span><br/>
+        end_month=02,<br/>
+        end_day=05,<br/>
+        end_hour=12,<br/>
+        /<br/>
+        ...<br/>
+        &domains<br/>
+        e_we=90, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>The number of horizontal east-west grid spaces in the domain</span><br/>
+        e_sn=60, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>The number of horizontal north-south grid spaces in the domain</span><br/>
+        e_vert=41, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>The number of vertical levels in the domain</span><br/>
+        dx=60000, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style=color:#993333>The east-west grid spacing in meters</span><br/>
+        dy=60000, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; <span style=color:#993333>The north-south grid spacing in meters</span><br/>
+        hypsometric_opt=2, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>Vertical integration method. This value must match the first guess file!</span><br/>
+        /<br/>
+        ...<br/>
+        &physics &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>Starting with version 3.5, it is not necessary to set these options;</span><br/>
+        mp_physics=3, &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;<span style=color:#993333>the necessary fields are read directly from the first guess file.</span><br/>
+        ra_lw_physics=1,<br/>
+        ra_sw_physics=1,<br/>
+        radt=60,<br/>
+        sf_sfclay_physics=1,<br/>
+        sf_surface_physics=1,<br/>
+        bl_pbl_physics=1,<br/>
+        cu_physics=1,<br/>
+        cudt=5,<br/>
+        num_soil_layers=5,<br/>
+        ...</p>
+      <p class="bodytext">The analysis date option specifies the analysis date and time, which should be the same date and time as the first guess file. The time_window_min and time_window_max options specify the beginning and end times of the so-called "assimilation window"; WRFDA will only assimilate observations in the observation file that fall within this window. Starting with version 3.5, the span class="style6" id="Font12">&domains</span> and <span class="style6" id="Font12">&physics</span> namelists can be ignored, as the information necessary to run WRFDA is now read directly from the first guess file.</p>
+
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="5%" valign="top"><img src="../images/exclamation.svg" alt="Tip" width="50" height="50"></td>
+          <td width="95%" bgcolor="#DDAA55" class="bodytext">
+            <em>Prior to version 3.5, the parameters in the <span class="style6" id="Font12">&domains</span> and <span class="style6" id="Font12">&physics</span> namelists should match those in the first guess file. You can check the values of these parameters in the first guess file by issuing the command <span class="style6" id="Font12">ncdump -h fg</span>.</em>
+          </td>
+        </tr>
+      </table>
+
+      <p class="bodytext">When all these files are linked properly, you can run WRFDA by issuing the command:</p>
+      <p class="code"> > ./da_wrfvar.exe >& wrfda.out</p>
+      <p class="bodytext">This command runs the WRFDA executable (<span class="style6" id="Font12">da_wrfvar.exe</span>) and records the output to a log file (<span class="style6" id="Font12">wrfda.out</span>, though again, you can name this file whatever you wish). This tutorial case should take less than a minute to run, though depending on your system setup it may take up to five minutes.</p>
+      <p class="bodytext">Once the executable is done running, let's take a look at what our working directory looks like:</p>
+      <p class="code"> > ls -al<br/>
+total 34688<br/>
+drwxr-xr-x 2 user &nbsp; &nbsp; 4096 Nov &nbsp;1 14:48 .<br/>
+drwxr-xr-x 7 user &nbsp; &nbsp; 4096 Oct 30 19:12 ..<br/>	
+lrwxrwxrwx 1 user &nbsp; &nbsp; &nbsp; 38 Oct 29 21:26 be.dat -> /home/USER/WRFDA341/be/be.dat<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; &nbsp; &nbsp;0 Nov &nbsp;1 14:46 buddy_check<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; &nbsp; &nbsp;0 Nov &nbsp;1 14:46 check_max_iv<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; &nbsp;378 Nov &nbsp;1 14:46 cost_fn<br/>
+lrwxrwxrwx 1 user &nbsp; &nbsp; &nbsp; 58 Oct 29 21:40 da_wrfvar.exe -> /home/USER/WRFDA341/WRFDA/var/build/da_wrfvar.exe<br/>
+lrwxrwxrwx 1 user &nbsp; &nbsp; &nbsp; 55 Oct 29 21:39 fg -> /home/USER/WRFDA341/rc/2008020512/wrfinput_d01<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; &nbsp;349 Nov &nbsp;1 14:46 grad_fn<br/>
+-rw-r--r-- 1 user &nbsp;6084853 Nov &nbsp;1 14:46 gts_omb_oma_01<br/>
+-rw-r--r-- 1 user &nbsp;6084853 Nov &nbsp;1 14:46 gts_omb_oma_01.0000<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; 2758 Nov &nbsp;1 14:46 jo<br/>
+lrwxrwxrwx 1 user &nbsp; &nbsp; &nbsp; 50 Oct 29 21:25 LANDUSE.TBL -> /home/USER/WRFDA341/WRFDA/run/LANDUSE.TBL<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; 1075 Oct 29 16:08 namelist.input<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp;92879 Nov &nbsp;1 14:46 namelist.output.da<br/>
+lrwxrwxrwx 1 user &nbsp; &nbsp; &nbsp; 51 Oct 29 21:38 ob.ascii -> /home/USER/WRFDA341/ob/2008020512/ob.ascii<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp;10205 Nov &nbsp;1 14:46 qcstat_conv_01<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp;28690 Nov &nbsp;1 14:46 rej_obs_conv_01.000<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp;29280 Nov &nbsp;1 14:46 statistics<br/>
+-rw-r--r-- 1 user &nbsp;2725792 Nov &nbsp;1 14:46 unpert_obs<br/>
+-rw-r--r-- 1 user &nbsp;2725792 Nov &nbsp;1 14:46 unpert_obs.0000<br/>
+-rw-r--r-- 1 user &nbsp; &nbsp; 7489 Nov &nbsp;1 14:46 wrfda.out<br/>
+-rw-r--r-- 1 user 17624520 Nov &nbsp;1 14:46 wrfvar_output</p>
+      <p class="bodytext">Many of these files can be safely ignored for now. The details of the important files are listed below:</p>
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">cost_fn</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Details the various components of the cost function for each outer iteration</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">grad_fn</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Details the various components of the gradient function for each outer iteration</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">gts_omb_oma_01</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Detailed statistics about all observations.</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">gts_omb_oma_01.0000</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Detailed statistics about the observations used on each processor. For parallel runs, there will be one of these files for each processor used.</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">jo</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Cost function statistics for each observation type.</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">namelist.output.da</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Those namelist options not specified in the "namelist.input" file will be assigned default values. This file lists <em>ALL</em> namelist options selected for your run, including all default options.</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">qcstat_conv_01</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Details quality control information for each individual variable for each observation type.</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">rej_obs_conv_01.000</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Lists each rejected observation</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">statistics</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Lists useful statistics for each observation type</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">wrfda.out</p></td>
+          <td width="80%" colspan=2><p class="bodytext">This is the file where you sent WRFDA's standard output. This should contain run-time information, as well as any errors which may have occurred.</p>
+          </td>
+        </tr>
+        <tr>
+          <td width="10%"></td>
+          <td width="10%" valign="top"><p class="style6" id="Font12">wrfvar_output</p></td>
+          <td width="80%" colspan=2><p class="bodytext">Finally, the most important file! This is the analysis produced by WRFDA in netCDF format.</p>
+          </td>
+        </tr>
+      </table>
+      <p class="bodytext">More information on these files and the information they contain can be found in <a href="../../Tutorials/2008_July/wrfvar_tools.pdf">this tutorial presentation</a>. Depending on the options selected for your run, there may be more or fewer of these files. These options will be covered in more detail in other tutorials.</p>
+      <p class="bodytext">You have now successfully run the WRFDA-3DVAR test case!</p>
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> Return to main menu </span>&nbsp;&nbsp;&nbsp;<a href="../menu.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+        <tr>
+          <td><div align="right"><a href="../Help/index.html"><img src="../images/help.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;<a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote><br>
+      <p class="bodytext"><strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> or wrfhelp@ucar.edu so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

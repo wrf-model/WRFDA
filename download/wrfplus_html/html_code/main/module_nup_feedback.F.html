@@ -1,0 +1,1140 @@
+<HTML> <BODY BGCOLOR=#eeeeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<a name='2'>
+<A NAME='MODULE_NUP_FEEDBACK'><A href='../../html_code/main/module_nup_feedback.F.html#MODULE_NUP_FEEDBACK' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='3'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_nup_feedback</font> <A href='../../call_to/MODULE_NUP_FEEDBACK.html' TARGET='index'>1</A><a name='4'>
+<a name='5'>
+   implicit none<a name='6'>
+<a name='7'>
+   integer, parameter       :: smooth_option = 1   <a name='8'>
+<a name='9'>
+<A NAME='COPY_FCN'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='10'>
+   <font color=#993300>interface </font><font color=#cc0000>copy_fcn</font> <A href='../../call_to/COPY_FCN.html' TARGET='index'>3</A>,<A href='../../call_from/COPY_FCN.html' TARGET='index'>1</A><a name='11'>
+     module procedure <A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCN_REAL'>copy_fcn_real</A><A NAME="COPY_FCN_REAL_1"><A href='../../html_code/main/module_nup_feedback.F.html#module_nup_feedback.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a>, <A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCN_DOUBLE'>copy_fcn_double</A><A NAME="COPY_FCN_DOUBLE_1"><A href='../../html_code/main/module_nup_feedback.F.html#module_nup_feedback.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='12'>
+   end interface<a name='13'>
+<a name='14'>
+<A NAME='COPY_FCNM'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCNM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='15'>
+   <font color=#993300>interface </font><font color=#cc0000>copy_fcnm</font> <A href='../../call_to/COPY_FCNM.html' TARGET='index'>3</A>,<A href='../../call_from/COPY_FCNM.html' TARGET='index'>2</A><a name='16'>
+     module procedure <A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCNM_REAL'>copy_fcnm_real</A><A NAME="COPY_FCNM_REAL_1"><A href='../../html_code/main/module_nup_feedback.F.html#module_nup_feedback.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a>, <A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCNM_DOUBLE'>copy_fcnm_double</A><A NAME="COPY_FCNM_DOUBLE_1"><A href='../../html_code/main/module_nup_feedback.F.html#module_nup_feedback.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='17'>
+   end interface<a name='18'>
+<a name='19'>
+<A NAME='SMOOTHER'><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='20'>
+   <font color=#993300>interface </font><font color=#cc0000>smoother</font> <A href='../../call_to/SMOOTHER.html' TARGET='index'>3</A>,<A href='../../call_from/SMOOTHER.html' TARGET='index'>3</A><a name='21'>
+     module procedure <A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_REAL'>smoother_real</A><A NAME="SMOOTHER_REAL_1"><A href='../../html_code/main/module_nup_feedback.F.html#module_nup_feedback.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a>, <A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_DOUBLE'>smoother_double</A><A NAME="SMOOTHER_DOUBLE_1"><A href='../../html_code/main/module_nup_feedback.F.html#module_nup_feedback.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='22'>
+   end interface<a name='23'>
+<a name='24'>
+   contains<a name='25'>
+<a name='26'>
+<A NAME='COPY_FCN_REAL'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCN_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='27'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>copy_fcn_real</font> ( cfld,                                 &amp;  <font color=#447700>! CD field <A href='../../call_to/COPY_FCN_REAL.html' TARGET='index'>1</A><a name='28'></font>
+                           cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='29'>
+                           nfld,                                 &amp;  <font color=#447700>! ND field<a name='30'></font>
+                           nids, nide, njds, njde, nkds, nkde,   &amp;<a name='31'>
+                           xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='32'></font>
+                           ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='33'></font>
+                           nri, nrj                             )   <font color=#447700>! nest ratios<a name='34'></font>
+     IMPLICIT NONE<a name='35'>
+<a name='36'>
+<a name='37'>
+     INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='38'>
+                            nids, nide, nkds, nkde, njds, njde,   &amp;<a name='39'>
+                            ipos, jpos,                           &amp;<a name='40'>
+                            nri, nrj<a name='41'>
+     LOGICAL, INTENT(IN) :: xstag, ystag<a name='42'>
+<a name='43'>
+     REAL, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ), INTENT(OUT) :: cfld<a name='44'>
+     REAL, DIMENSION ( nids:nide, njds:njde, nkds:nkde, 1 ),INTENT(IN)  :: nfld<a name='45'>
+<a name='46'>
+     <font color=#447700>! Local<a name='47'></font>
+<a name='48'>
+     INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, ioffa, joffa<a name='49'>
+     INTEGER :: icmin,icmax,jcmin,jcmax<a name='50'>
+     INTEGER :: istag,jstag, ipoints,jpoints,ijpoints<a name='51'>
+<a name='52'>
+     <font color=#447700>!  Loop over the coarse grid in the area of the fine mesh.  Do not<a name='53'></font>
+     <font color=#447700>!  process the coarse grid values that are along the lateral BC<a name='54'></font>
+     <font color=#447700>!  provided to the fine grid.  Since that is in the specified zone<a name='55'></font>
+     <font color=#447700>!  for the fine grid, it should not be used in any feedback to the<a name='56'></font>
+     <font color=#447700>!  coarse grid as it should not have changed.<a name='57'></font>
+<a name='58'>
+     <font color=#447700>!  Due to peculiarities of staggering, it is simpler to handle the feedback<a name='59'></font>
+     <font color=#447700>!  for the staggerings based upon whether it is a even ratio (2::1, 4::1, etc.) or<a name='60'></font>
+     <font color=#447700>!  an odd staggering ratio (3::1, 5::1, etc.). <a name='61'></font>
+<a name='62'>
+     <font color=#447700>!  Though there are separate grid ratios for the i and j directions, this code<a name='63'></font>
+     <font color=#447700>!  is not general enough to handle aspect ratios .NE. 1 for the fine grid cell.<a name='64'></font>
+ <a name='65'>
+     <font color=#447700>!  These are local integer increments in the looping.  Basically, istag=1 means<a name='66'></font>
+     <font color=#447700>!  that we will assume one less point in the i direction.  Note that ci and cj<a name='67'></font>
+     <font color=#447700>!  have a maximum value that is decreased by istag and jstag, respectively.  <a name='68'></font>
+<a name='69'>
+     <font color=#447700>!  Horizontal momentum feedback is along the face, not within the cell.  For a<a name='70'></font>
+     <font color=#447700>!  3::1 ratio, temperature would use 9 pts for feedback, while u and v use<a name='71'></font>
+     <font color=#447700>!  only 3 points for feedback from the nest to the parent.<a name='72'></font>
+<a name='73'>
+     istag = 1 ; jstag = 1<a name='74'>
+     IF ( xstag ) istag = 0<a name='75'>
+     IF ( ystag ) jstag = 0<a name='76'>
+<a name='77'>
+     IF( MOD(nrj,2) .NE. 0) THEN  <font color=#447700>! odd refinement ratio<a name='78'></font>
+<a name='79'>
+        IF      ( ( .NOT. xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='80'>
+           DO ck = ckds, ckde<a name='81'>
+              nk = ck<a name='82'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='83'>
+                 nj = (cj-jpos)*nrj + jstag + 1<a name='84'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='85'>
+                    ni = (ci-ipos)*nri + istag + 1<a name='86'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='87'>
+                    DO ijpoints = 1 , nri * nrj<a name='88'>
+                       ipoints = MOD((ijpoints-1),nri) + 1 - nri/2 - 1<a name='89'>
+                       jpoints = (ijpoints-1)/nri + 1 - nrj/2 - 1<a name='90'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='91'>
+                                             1./REAL(nri*nrj) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='92'>
+                    END DO<a name='93'>
+                 ENDDO<a name='94'>
+              ENDDO<a name='95'>
+           ENDDO<a name='96'>
+<a name='97'>
+        ELSE IF ( (       xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='98'>
+           DO ck = ckds, ckde<a name='99'>
+              nk = ck<a name='100'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='101'>
+                 nj = (cj-jpos)*nrj + jstag + 1<a name='102'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='103'>
+                    ni = (ci-ipos)*nri + istag + 1<a name='104'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='105'>
+                    DO ijpoints = (nri+1)/2 , (nri+1)/2 + nri*(nri-1) , nri<a name='106'>
+                       ipoints = MOD((ijpoints-1),nri) + 1 - nri/2 - 1<a name='107'>
+                       jpoints = (ijpoints-1)/nri + 1 - nrj/2 - 1<a name='108'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='109'>
+                                             1./REAL(nri    ) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='110'>
+                    END DO<a name='111'>
+                 ENDDO<a name='112'>
+              ENDDO<a name='113'>
+           ENDDO<a name='114'>
+<a name='115'>
+        ELSE IF ( ( .NOT. xstag ) .AND. (       ystag ) ) THEN<a name='116'>
+           DO ck = ckds, ckde<a name='117'>
+              nk = ck<a name='118'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='119'>
+                 nj = (cj-jpos)*nrj + jstag + 1<a name='120'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='121'>
+                    ni = (ci-ipos)*nri + istag + 1<a name='122'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='123'>
+                    DO ijpoints = ( nrj*nrj +1 )/2 - nrj/2 , ( nrj*nrj +1 )/2 - nrj/2 + nrj-1<a name='124'>
+                       ipoints = MOD((ijpoints-1),nri) + 1 - nri/2 - 1<a name='125'>
+                       jpoints = (ijpoints-1)/nri + 1 - nrj/2 - 1<a name='126'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='127'>
+                                             1./REAL(    nrj) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='128'>
+                    END DO<a name='129'>
+                 ENDDO<a name='130'>
+              ENDDO<a name='131'>
+           ENDDO<a name='132'>
+<a name='133'>
+        END IF<a name='134'>
+<a name='135'>
+     <font color=#447700>!  Even refinement ratio<a name='136'></font>
+<a name='137'>
+     ELSE IF ( MOD(nrj,2) .EQ. 0) THEN<a name='138'>
+        IF ( ( .NOT. xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='139'>
+<a name='140'>
+        <font color=#447700>!  This is a simple schematic of the feedback indexing used in the even<a name='141'></font>
+        <font color=#447700>!  ratio nests.  For simplicity, a 2::1 ratio is depicted.  Only the <a name='142'></font>
+        <font color=#447700>!  mass variable staggering is shown. <a name='143'></font>
+        <font color=#447700>!                                                                  Each of<a name='144'></font>
+        <font color=#447700>!  the boxes with a "T" and four small "t" represents a coarse grid (CG)<a name='145'></font>
+        <font color=#447700>!  cell, that is composed of four (2::1 ratio) fine grid (FG) cells.<a name='146'></font>
+   <a name='147'>
+        <font color=#447700>!  Shown below is the area of the CG that is in the area of the FG.   The<a name='148'></font>
+        <font color=#447700>!  first grid point of the depicted CG is the starting location of the nest<a name='149'></font>
+        <font color=#447700>!  in the parent domain (ipos,jpos - i_parent_start and j_parent_start from<a name='150'></font>
+        <font color=#447700>!  the namelist).  <a name='151'></font>
+   <a name='152'>
+        <font color=#447700>!  For each of the CG points, the feedback loop is over each of the FG points<a name='153'></font>
+        <font color=#447700>!  within the CG cell.  For a 2::1 ratio, there are four total points (this is <a name='154'></font>
+        <font color=#447700>!  the ijpoints loop).  The feedback value to the CG is the arithmetic mean of <a name='155'></font>
+        <font color=#447700>!  all of the FG values within each CG cell.<a name='156'></font>
+<a name='157'>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='158'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='159'></font>
+<font color=#447700>! jpos+        |             ||             |                          |             ||             |<a name='160'></font>
+<font color=#447700>! (njde-njds)- |      T      ||      T      |                          |      T      ||      T      |<a name='161'></font>
+<font color=#447700>! jstag        |             ||             |                          |             ||             |<a name='162'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='163'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='164'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='165'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='166'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='167'></font>
+<font color=#447700>!              |      T      ||      T      |                          |      T      ||      T      |<a name='168'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='169'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='170'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='171'></font>
+<font color=#447700>!<a name='172'></font>
+<font color=#447700>!                   ...<a name='173'></font>
+<font color=#447700>!                   ...<a name='174'></font>
+<font color=#447700>!                   ...<a name='175'></font>
+<font color=#447700>!                   ...<a name='176'></font>
+<font color=#447700>!                   ...<a name='177'></font>
+<a name='178'>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='179'></font>
+<font color=#447700>! jpoints = 1  |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='180'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='181'></font>
+<font color=#447700>!              |      T      ||      T      |                          |      T      ||      T      |<a name='182'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='183'></font>
+<font color=#447700>! jpoints = 0, |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='184'></font>
+<font color=#447700>!  nj=3        |-------------||-------------|                          |-------------||-------------|<a name='185'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='186'></font>
+<font color=#447700>! jpoints = 1  |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='187'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='188'></font>
+<font color=#447700>!    jpos      |      T      ||      T      |          ...             |      T      ||      T      |<a name='189'></font>
+<font color=#447700>!              |             ||             |          ...             |             ||             |<a name='190'></font>
+<font color=#447700>! jpoints = 0, |  t      t   ||  t      t   |          ...             |  t      t   ||  t      t   |<a name='191'></font>
+<font color=#447700>!  nj=1        |-------------||-------------|                          |-------------||-------------|<a name='192'></font>
+<font color=#447700>!                     ^                                                                      ^<a name='193'></font>
+<font color=#447700>!                     |                                                                      |<a name='194'></font>
+<font color=#447700>!                     |                                                                      |<a name='195'></font>
+<font color=#447700>!                   ipos                                                                   ipos+<a name='196'></font>
+<font color=#447700>!     ni =        1              3                                                         (nide-nids)/nri<a name='197'></font>
+<font color=#447700>! ipoints=        0      1       0      1                                                  -istag<a name='198'></font>
+<font color=#447700>!<a name='199'></font>
+<a name='200'>
+           <font color=#447700>!  For performance benefits, users can comment out the inner most loop (and cfld=0) and<a name='201'></font>
+           <font color=#447700>!  hardcode the loop feedback.  For example, it is set up to run a 2::1 ratio<a name='202'></font>
+           <font color=#447700>!  if uncommented.  This lacks generality, but is likely to gain timing benefits<a name='203'></font>
+           <font color=#447700>!  with compilers unable to unroll inner loops that do not have parameterized sizes.<a name='204'></font>
+   <a name='205'>
+           <font color=#447700>!  The extra +1 ---------/ and the extra -1 ----\  (both for ci and cj) <a name='206'></font>
+           <font color=#447700>!                       /                        \   keeps the feedback out of the <a name='207'></font>
+           <font color=#447700>!                      /                          \  outer row/col, since that CG data<a name='208'></font>
+           <font color=#447700>!                     /                            \ specified the nest boundary originally<a name='209'></font>
+           <font color=#447700>!                    /                              \   This<a name='210'></font>
+           <font color=#447700>!                   /                                \    is just<a name='211'></font>
+           <font color=#447700>!                  /                                  \   a sentence to not end a line<a name='212'></font>
+           <font color=#447700>!                 /                                    \   with a stupid backslash<a name='213'></font>
+           DO ck = ckds, ckde<a name='214'>
+              nk = ck<a name='215'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='216'>
+                 nj = (cj-jpos)*nrj + jstag<a name='217'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='218'>
+                    ni = (ci-ipos)*nri + istag<a name='219'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='220'>
+                    DO ijpoints = 1 , nri * nrj<a name='221'>
+                       ipoints = MOD((ijpoints-1),nri)<a name='222'>
+                       jpoints = (ijpoints-1)/nri<a name='223'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='224'>
+                                             1./REAL(nri*nrj) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='225'>
+                    END DO<a name='226'>
+                 END DO<a name='227'>
+              END DO<a name='228'>
+           END DO<a name='229'>
+<a name='230'>
+        <font color=#447700>!  U<a name='231'></font>
+<a name='232'>
+        ELSE IF ( (       xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='233'>
+<font color=#447700>!              |---------------|<a name='234'></font>
+<font color=#447700>!              |               |<a name='235'></font>
+<font color=#447700>! jpoints = 1  u       u       |<a name='236'></font>
+<font color=#447700>!              |               |<a name='237'></font>
+<font color=#447700>!              U               |<a name='238'></font>
+<font color=#447700>!              |               |<a name='239'></font>
+<font color=#447700>! jpoints = 0, u       u       |<a name='240'></font>
+<font color=#447700>!  nj=3        |               |<a name='241'></font>
+<font color=#447700>!              |---------------|<a name='242'></font>
+<font color=#447700>!              |---------------|<a name='243'></font>
+<font color=#447700>!              |               |<a name='244'></font>
+<font color=#447700>! jpoints = 1  u       u       |<a name='245'></font>
+<font color=#447700>!              |               |<a name='246'></font>
+<font color=#447700>!    jpos      U               |<a name='247'></font>
+<font color=#447700>!              |               |<a name='248'></font>
+<font color=#447700>! jpoints = 0, u       u       |<a name='249'></font>
+<font color=#447700>! nj=1         |               |<a name='250'></font>
+<font color=#447700>!              |---------------|<a name='251'></font>
+<font color=#447700>! <a name='252'></font>
+<font color=#447700>!              ^               <a name='253'></font>
+<font color=#447700>!              |              <a name='254'></font>
+<font color=#447700>!              |             <a name='255'></font>
+<font color=#447700>!            ipos           <a name='256'></font>
+<font color=#447700>!     ni =     1               3<a name='257'></font>
+<font color=#447700>! ipoints=     0       1       0 <a name='258'></font>
+<font color=#447700>!<a name='259'></font>
+<a name='260'>
+           DO ck = ckds, ckde<a name='261'>
+              nk = ck<a name='262'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='263'>
+                 nj = (cj-jpos)*nrj + 1<a name='264'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='265'>
+                    ni = (ci-ipos)*nri + 1<a name='266'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='267'>
+                    DO ijpoints = 1 , nri*nrj , nri<a name='268'>
+                       ipoints = MOD((ijpoints-1),nri)<a name='269'>
+                       jpoints = (ijpoints-1)/nri<a name='270'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='271'>
+                                             1./REAL(nri    ) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='272'>
+                    END DO<a name='273'>
+                 ENDDO<a name='274'>
+              ENDDO<a name='275'>
+           ENDDO<a name='276'>
+<a name='277'>
+        <font color=#447700>!  V <a name='278'></font>
+<a name='279'>
+        ELSE IF ( ( .NOT. xstag ) .AND. (       ystag ) ) THEN<a name='280'>
+           DO ck = ckds, ckde<a name='281'>
+              nk = ck<a name='282'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='283'>
+                 nj = (cj-jpos)*nrj + 1<a name='284'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='285'>
+                    ni = (ci-ipos)*nri + 1<a name='286'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='287'>
+                    DO ijpoints = 1 , nri<a name='288'>
+                       ipoints = MOD((ijpoints-1),nri)<a name='289'>
+                       jpoints = (ijpoints-1)/nri<a name='290'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='291'>
+                                             1./REAL(nri    ) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='292'>
+                    END DO<a name='293'>
+                 ENDDO<a name='294'>
+              ENDDO<a name='295'>
+           ENDDO<a name='296'>
+        END IF<a name='297'>
+     END IF<a name='298'>
+<a name='299'>
+     RETURN<a name='300'>
+<a name='301'>
+   END SUBROUTINE copy_fcn_real<a name='302'>
+<a name='303'>
+<A NAME='COPY_FCN_DOUBLE'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCN_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='304'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>copy_fcn_double</font> ( cfld,                                 &amp;  <font color=#447700>! CD field <A href='../../call_to/COPY_FCN_DOUBLE.html' TARGET='index'>1</A><a name='305'></font>
+                           cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='306'>
+                           nfld,                                 &amp;  <font color=#447700>! ND field<a name='307'></font>
+                           nids, nide, njds, njde, nkds, nkde,   &amp;<a name='308'>
+                           xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='309'></font>
+                           ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='310'></font>
+                           nri, nrj                             )   <font color=#447700>! nest ratios<a name='311'></font>
+     IMPLICIT NONE<a name='312'>
+<a name='313'>
+<a name='314'>
+     INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='315'>
+                            nids, nide, nkds, nkde, njds, njde,   &amp;<a name='316'>
+                            ipos, jpos,                           &amp;<a name='317'>
+                            nri, nrj<a name='318'>
+     LOGICAL, INTENT(IN) :: xstag, ystag<a name='319'>
+<a name='320'>
+     DOUBLE PRECISION, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ), INTENT(OUT) :: cfld<a name='321'>
+     DOUBLE PRECISION, DIMENSION ( nids:nide, njds:njde, nkds:nkde, 1 ),INTENT(IN)  :: nfld<a name='322'>
+<a name='323'>
+     <font color=#447700>! Local<a name='324'></font>
+<a name='325'>
+     INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, ioffa, joffa<a name='326'>
+     INTEGER :: icmin,icmax,jcmin,jcmax<a name='327'>
+     INTEGER :: istag,jstag, ipoints,jpoints,ijpoints<a name='328'>
+<a name='329'>
+     <font color=#447700>!  Loop over the coarse grid in the area of the fine mesh.  Do not<a name='330'></font>
+     <font color=#447700>!  process the coarse grid values that are along the lateral BC<a name='331'></font>
+     <font color=#447700>!  provided to the fine grid.  Since that is in the specified zone<a name='332'></font>
+     <font color=#447700>!  for the fine grid, it should not be used in any feedback to the<a name='333'></font>
+     <font color=#447700>!  coarse grid as it should not have changed.<a name='334'></font>
+<a name='335'>
+     <font color=#447700>!  Due to peculiarities of staggering, it is simpler to handle the feedback<a name='336'></font>
+     <font color=#447700>!  for the staggerings based upon whether it is a even ratio (2::1, 4::1, etc.) or<a name='337'></font>
+     <font color=#447700>!  an odd staggering ratio (3::1, 5::1, etc.). <a name='338'></font>
+<a name='339'>
+     <font color=#447700>!  Though there are separate grid ratios for the i and j directions, this code<a name='340'></font>
+     <font color=#447700>!  is not general enough to handle aspect ratios .NE. 1 for the fine grid cell.<a name='341'></font>
+ <a name='342'>
+     <font color=#447700>!  These are local integer increments in the looping.  Basically, istag=1 means<a name='343'></font>
+     <font color=#447700>!  that we will assume one less point in the i direction.  Note that ci and cj<a name='344'></font>
+     <font color=#447700>!  have a maximum value that is decreased by istag and jstag, respectively.  <a name='345'></font>
+<a name='346'>
+     <font color=#447700>!  Horizontal momentum feedback is along the face, not within the cell.  For a<a name='347'></font>
+     <font color=#447700>!  3::1 ratio, temperature would use 9 pts for feedback, while u and v use<a name='348'></font>
+     <font color=#447700>!  only 3 points for feedback from the nest to the parent.<a name='349'></font>
+<a name='350'>
+     istag = 1 ; jstag = 1<a name='351'>
+     IF ( xstag ) istag = 0<a name='352'>
+     IF ( ystag ) jstag = 0<a name='353'>
+<a name='354'>
+     IF( MOD(nrj,2) .NE. 0) THEN  <font color=#447700>! odd refinement ratio<a name='355'></font>
+<a name='356'>
+        IF      ( ( .NOT. xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='357'>
+           DO ck = ckds, ckde<a name='358'>
+              nk = ck<a name='359'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='360'>
+                 nj = (cj-jpos)*nrj + jstag + 1<a name='361'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='362'>
+                    ni = (ci-ipos)*nri + istag + 1<a name='363'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='364'>
+                    DO ijpoints = 1 , nri * nrj<a name='365'>
+                       ipoints = MOD((ijpoints-1),nri) + 1 - nri/2 - 1<a name='366'>
+                       jpoints = (ijpoints-1)/nri + 1 - nrj/2 - 1<a name='367'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='368'>
+                                             1./REAL(nri*nrj) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='369'>
+                    END DO<a name='370'>
+                 ENDDO<a name='371'>
+              ENDDO<a name='372'>
+           ENDDO<a name='373'>
+<a name='374'>
+        ELSE IF ( (       xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='375'>
+           DO ck = ckds, ckde<a name='376'>
+              nk = ck<a name='377'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='378'>
+                 nj = (cj-jpos)*nrj + jstag + 1<a name='379'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='380'>
+                    ni = (ci-ipos)*nri + istag + 1<a name='381'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='382'>
+                    DO ijpoints = (nri+1)/2 , (nri+1)/2 + nri*(nri-1) , nri<a name='383'>
+                       ipoints = MOD((ijpoints-1),nri) + 1 - nri/2 - 1<a name='384'>
+                       jpoints = (ijpoints-1)/nri + 1 - nrj/2 - 1<a name='385'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='386'>
+                                             1./REAL(nri    ) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='387'>
+                    END DO<a name='388'>
+                 ENDDO<a name='389'>
+              ENDDO<a name='390'>
+           ENDDO<a name='391'>
+<a name='392'>
+        ELSE IF ( ( .NOT. xstag ) .AND. (       ystag ) ) THEN<a name='393'>
+           DO ck = ckds, ckde<a name='394'>
+              nk = ck<a name='395'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='396'>
+                 nj = (cj-jpos)*nrj + jstag + 1<a name='397'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='398'>
+                    ni = (ci-ipos)*nri + istag + 1<a name='399'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='400'>
+                    DO ijpoints = ( nrj*nrj +1 )/2 - nrj/2 , ( nrj*nrj +1 )/2 - nrj/2 + nrj-1<a name='401'>
+                       ipoints = MOD((ijpoints-1),nri) + 1 - nri/2 - 1<a name='402'>
+                       jpoints = (ijpoints-1)/nri + 1 - nrj/2 - 1<a name='403'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='404'>
+                                             1./REAL(    nrj) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='405'>
+                    END DO<a name='406'>
+                 ENDDO<a name='407'>
+              ENDDO<a name='408'>
+           ENDDO<a name='409'>
+<a name='410'>
+        END IF<a name='411'>
+<a name='412'>
+     <font color=#447700>!  Even refinement ratio<a name='413'></font>
+<a name='414'>
+     ELSE IF ( MOD(nrj,2) .EQ. 0) THEN<a name='415'>
+        IF ( ( .NOT. xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='416'>
+<a name='417'>
+        <font color=#447700>!  This is a simple schematic of the feedback indexing used in the even<a name='418'></font>
+        <font color=#447700>!  ratio nests.  For simplicity, a 2::1 ratio is depicted.  Only the <a name='419'></font>
+        <font color=#447700>!  mass variable staggering is shown. <a name='420'></font>
+        <font color=#447700>!                                                                  Each of<a name='421'></font>
+        <font color=#447700>!  the boxes with a "T" and four small "t" represents a coarse grid (CG)<a name='422'></font>
+        <font color=#447700>!  cell, that is composed of four (2::1 ratio) fine grid (FG) cells.<a name='423'></font>
+   <a name='424'>
+        <font color=#447700>!  Shown below is the area of the CG that is in the area of the FG.   The<a name='425'></font>
+        <font color=#447700>!  first grid point of the depicted CG is the starting location of the nest<a name='426'></font>
+        <font color=#447700>!  in the parent domain (ipos,jpos - i_parent_start and j_parent_start from<a name='427'></font>
+        <font color=#447700>!  the namelist).  <a name='428'></font>
+   <a name='429'>
+        <font color=#447700>!  For each of the CG points, the feedback loop is over each of the FG points<a name='430'></font>
+        <font color=#447700>!  within the CG cell.  For a 2::1 ratio, there are four total points (this is <a name='431'></font>
+        <font color=#447700>!  the ijpoints loop).  The feedback value to the CG is the arithmetic mean of <a name='432'></font>
+        <font color=#447700>!  all of the FG values within each CG cell.<a name='433'></font>
+<a name='434'>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='435'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='436'></font>
+<font color=#447700>! jpos+        |             ||             |                          |             ||             |<a name='437'></font>
+<font color=#447700>! (njde-njds)- |      T      ||      T      |                          |      T      ||      T      |<a name='438'></font>
+<font color=#447700>! jstag        |             ||             |                          |             ||             |<a name='439'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='440'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='441'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='442'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='443'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='444'></font>
+<font color=#447700>!              |      T      ||      T      |                          |      T      ||      T      |<a name='445'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='446'></font>
+<font color=#447700>!              |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='447'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='448'></font>
+<font color=#447700>!<a name='449'></font>
+<font color=#447700>!                   ...<a name='450'></font>
+<font color=#447700>!                   ...<a name='451'></font>
+<font color=#447700>!                   ...<a name='452'></font>
+<font color=#447700>!                   ...<a name='453'></font>
+<font color=#447700>!                   ...<a name='454'></font>
+<a name='455'>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='456'></font>
+<font color=#447700>! jpoints = 1  |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='457'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='458'></font>
+<font color=#447700>!              |      T      ||      T      |                          |      T      ||      T      |<a name='459'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='460'></font>
+<font color=#447700>! jpoints = 0, |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='461'></font>
+<font color=#447700>!  nj=3        |-------------||-------------|                          |-------------||-------------|<a name='462'></font>
+<font color=#447700>!              |-------------||-------------|                          |-------------||-------------|<a name='463'></font>
+<font color=#447700>! jpoints = 1  |  t      t   ||  t      t   |                          |  t      t   ||  t      t   |<a name='464'></font>
+<font color=#447700>!              |             ||             |                          |             ||             |<a name='465'></font>
+<font color=#447700>!    jpos      |      T      ||      T      |          ...             |      T      ||      T      |<a name='466'></font>
+<font color=#447700>!              |             ||             |          ...             |             ||             |<a name='467'></font>
+<font color=#447700>! jpoints = 0, |  t      t   ||  t      t   |          ...             |  t      t   ||  t      t   |<a name='468'></font>
+<font color=#447700>!  nj=1        |-------------||-------------|                          |-------------||-------------|<a name='469'></font>
+<font color=#447700>!                     ^                                                                      ^<a name='470'></font>
+<font color=#447700>!                     |                                                                      |<a name='471'></font>
+<font color=#447700>!                     |                                                                      |<a name='472'></font>
+<font color=#447700>!                   ipos                                                                   ipos+<a name='473'></font>
+<font color=#447700>!     ni =        1              3                                                         (nide-nids)/nri<a name='474'></font>
+<font color=#447700>! ipoints=        0      1       0      1                                                  -istag<a name='475'></font>
+<font color=#447700>!<a name='476'></font>
+<a name='477'>
+           <font color=#447700>!  For performance benefits, users can comment out the inner most loop (and cfld=0) and<a name='478'></font>
+           <font color=#447700>!  hardcode the loop feedback.  For example, it is set up to run a 2::1 ratio<a name='479'></font>
+           <font color=#447700>!  if uncommented.  This lacks generality, but is likely to gain timing benefits<a name='480'></font>
+           <font color=#447700>!  with compilers unable to unroll inner loops that do not have parameterized sizes.<a name='481'></font>
+   <a name='482'>
+           <font color=#447700>!  The extra +1 ---------/ and the extra -1 ----\  (both for ci and cj) <a name='483'></font>
+           <font color=#447700>!                       /                        \   keeps the feedback out of the <a name='484'></font>
+           <font color=#447700>!                      /                          \  outer row/col, since that CG data<a name='485'></font>
+           <font color=#447700>!                     /                            \ specified the nest boundary originally<a name='486'></font>
+           <font color=#447700>!                    /                              \   This<a name='487'></font>
+           <font color=#447700>!                   /                                \    is just<a name='488'></font>
+           <font color=#447700>!                  /                                  \   a sentence to not end a line<a name='489'></font>
+           <font color=#447700>!                 /                                    \   with a stupid backslash<a name='490'></font>
+           DO ck = ckds, ckde<a name='491'>
+              nk = ck<a name='492'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='493'>
+                 nj = (cj-jpos)*nrj + jstag<a name='494'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='495'>
+                    ni = (ci-ipos)*nri + istag<a name='496'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='497'>
+                    DO ijpoints = 1 , nri * nrj<a name='498'>
+                       ipoints = MOD((ijpoints-1),nri)<a name='499'>
+                       jpoints = (ijpoints-1)/nri<a name='500'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='501'>
+                                             1./REAL(nri*nrj) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='502'>
+                    END DO<a name='503'>
+                 END DO<a name='504'>
+              END DO<a name='505'>
+           END DO<a name='506'>
+<a name='507'>
+        <font color=#447700>!  U<a name='508'></font>
+<a name='509'>
+        ELSE IF ( (       xstag ) .AND. ( .NOT. ystag ) ) THEN<a name='510'>
+<font color=#447700>!              |---------------|<a name='511'></font>
+<font color=#447700>!              |               |<a name='512'></font>
+<font color=#447700>! jpoints = 1  u       u       |<a name='513'></font>
+<font color=#447700>!              |               |<a name='514'></font>
+<font color=#447700>!              U               |<a name='515'></font>
+<font color=#447700>!              |               |<a name='516'></font>
+<font color=#447700>! jpoints = 0, u       u       |<a name='517'></font>
+<font color=#447700>!  nj=3        |               |<a name='518'></font>
+<font color=#447700>!              |---------------|<a name='519'></font>
+<font color=#447700>!              |---------------|<a name='520'></font>
+<font color=#447700>!              |               |<a name='521'></font>
+<font color=#447700>! jpoints = 1  u       u       |<a name='522'></font>
+<font color=#447700>!              |               |<a name='523'></font>
+<font color=#447700>!    jpos      U               |<a name='524'></font>
+<font color=#447700>!              |               |<a name='525'></font>
+<font color=#447700>! jpoints = 0, u       u       |<a name='526'></font>
+<font color=#447700>! nj=1         |               |<a name='527'></font>
+<font color=#447700>!              |---------------|<a name='528'></font>
+<font color=#447700>! <a name='529'></font>
+<font color=#447700>!              ^               <a name='530'></font>
+<font color=#447700>!              |              <a name='531'></font>
+<font color=#447700>!              |             <a name='532'></font>
+<font color=#447700>!            ipos           <a name='533'></font>
+<font color=#447700>!     ni =     1               3<a name='534'></font>
+<font color=#447700>! ipoints=     0       1       0 <a name='535'></font>
+<font color=#447700>!<a name='536'></font>
+<a name='537'>
+           DO ck = ckds, ckde<a name='538'>
+              nk = ck<a name='539'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='540'>
+                 nj = (cj-jpos)*nrj + 1<a name='541'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='542'>
+                    ni = (ci-ipos)*nri + 1<a name='543'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='544'>
+                    DO ijpoints = 1 , nri*nrj , nri<a name='545'>
+                       ipoints = MOD((ijpoints-1),nri)<a name='546'>
+                       jpoints = (ijpoints-1)/nri<a name='547'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='548'>
+                                             1./REAL(nri    ) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='549'>
+                    END DO<a name='550'>
+                 ENDDO<a name='551'>
+              ENDDO<a name='552'>
+           ENDDO<a name='553'>
+<a name='554'>
+        <font color=#447700>!  V <a name='555'></font>
+<a name='556'>
+        ELSE IF ( ( .NOT. xstag ) .AND. (       ystag ) ) THEN<a name='557'>
+           DO ck = ckds, ckde<a name='558'>
+              nk = ck<a name='559'>
+              DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='560'>
+                 nj = (cj-jpos)*nrj + 1<a name='561'>
+                 DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='562'>
+                    ni = (ci-ipos)*nri + 1<a name='563'>
+                    cfld( ci, cj, ck, 1 ) = 0.<a name='564'>
+                    DO ijpoints = 1 , nri<a name='565'>
+                       ipoints = MOD((ijpoints-1),nri)<a name='566'>
+                       jpoints = (ijpoints-1)/nri<a name='567'>
+                       cfld( ci, cj, ck, 1 ) =  cfld( ci, cj, ck, 1 ) + &amp;<a name='568'>
+                                             1./REAL(nri    ) * nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='569'>
+                    END DO<a name='570'>
+                 ENDDO<a name='571'>
+              ENDDO<a name='572'>
+           ENDDO<a name='573'>
+        END IF<a name='574'>
+     END IF<a name='575'>
+<a name='576'>
+     RETURN<a name='577'>
+<a name='578'>
+   END SUBROUTINE copy_fcn_double<a name='579'>
+<font color=#447700>!==================================<a name='580'></font>
+<a name='581'>
+<A NAME='COPY_FCNM_REAL'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCNM_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='582'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>copy_fcnm_real</font> (  cfld,                                 &amp;  <font color=#447700>! CD field <A href='../../call_to/COPY_FCNM_REAL.html' TARGET='index'>1</A><a name='583'></font>
+                           cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='584'>
+                           nfld,                                 &amp;  <font color=#447700>! ND field<a name='585'></font>
+                           nids, nide, njds, njde, nkds, nkde,   &amp;<a name='586'>
+                           xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='587'></font>
+                           ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='588'></font>
+                           nri, nrj                             )   <font color=#447700>! nest ratios<a name='589'></font>
+     IMPLICIT NONE<a name='590'>
+<a name='591'>
+<a name='592'>
+     INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='593'>
+                            nids, nide, nkds, nkde, njds, njde,   &amp;<a name='594'>
+                            ipos, jpos,                           &amp;<a name='595'>
+                            nri, nrj<a name='596'>
+     LOGICAL, INTENT(IN) :: xstag, ystag<a name='597'>
+<a name='598'>
+     REAL, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ), INTENT(OUT) :: cfld<a name='599'>
+     REAL, DIMENSION ( nids:nide, njds:njde, nkds:nkde, 1 ), INTENT(IN) :: nfld<a name='600'>
+<a name='601'>
+     <font color=#447700>! Local<a name='602'></font>
+<a name='603'>
+     INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, ioffa, joffa<a name='604'>
+     INTEGER :: icmin,icmax,jcmin,jcmax<a name='605'>
+     INTEGER :: istag,jstag, ipoints,jpoints,ijpoints<a name='606'>
+<a name='607'>
+     istag = 1 ; jstag = 1<a name='608'>
+     IF ( xstag ) istag = 0<a name='609'>
+     IF ( ystag ) jstag = 0<a name='610'>
+<a name='611'>
+     IF( MOD(nrj,2) .NE. 0) THEN  <font color=#447700>! odd refinement ratio<a name='612'></font>
+<a name='613'>
+        DO ck = ckds, ckde<a name='614'>
+           nk = ck<a name='615'>
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='616'>
+              nj = (cj-jpos)*nrj + jstag + 1<a name='617'>
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='618'>
+                 ni = (ci-ipos)*nri + istag + 1<a name='619'>
+                 cfld( ci, cj, ck, 1 ) =  nfld( ni  , nj , nk, 1  )<a name='620'>
+              ENDDO<a name='621'>
+           ENDDO<a name='622'>
+        ENDDO<a name='623'>
+<a name='624'>
+     ELSE  <font color=#447700>! even refinement ratio, pick nearest neighbor on SW corner<a name='625'></font>
+        DO ck = ckds, ckde<a name='626'>
+           nk = ck<a name='627'>
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='628'>
+              nj = (cj-jpos)*nrj + 1<a name='629'>
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='630'>
+                 ni = (ci-ipos)*nri + 1<a name='631'>
+                 ipoints = nri/2 -1<a name='632'>
+                 jpoints = nrj/2 -1<a name='633'>
+                 cfld( ci, cj, ck, 1 ) =  nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='634'>
+              END DO<a name='635'>
+           END DO<a name='636'>
+        END DO<a name='637'>
+<a name='638'>
+     END IF<a name='639'>
+<a name='640'>
+     RETURN<a name='641'>
+<a name='642'>
+   END SUBROUTINE copy_fcnm_real<a name='643'>
+<a name='644'>
+<A NAME='COPY_FCNM_DOUBLE'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCNM_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='645'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>copy_fcnm_double</font> (  cfld,                                 &amp;  <font color=#447700>! CD field <A href='../../call_to/COPY_FCNM_DOUBLE.html' TARGET='index'>1</A><a name='646'></font>
+                           cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='647'>
+                           nfld,                                 &amp;  <font color=#447700>! ND field<a name='648'></font>
+                           nids, nide, njds, njde, nkds, nkde,   &amp;<a name='649'>
+                           xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='650'></font>
+                           ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='651'></font>
+                           nri, nrj                             )   <font color=#447700>! nest ratios<a name='652'></font>
+     IMPLICIT NONE<a name='653'>
+<a name='654'>
+<a name='655'>
+     INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='656'>
+                            nids, nide, nkds, nkde, njds, njde,   &amp;<a name='657'>
+                            ipos, jpos,                           &amp;<a name='658'>
+                            nri, nrj<a name='659'>
+     LOGICAL, INTENT(IN) :: xstag, ystag<a name='660'>
+<a name='661'>
+     DOUBLE PRECISION, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ), INTENT(OUT) :: cfld<a name='662'>
+     DOUBLE PRECISION, DIMENSION ( nids:nide, njds:njde, nkds:nkde, 1 ), INTENT(IN) :: nfld<a name='663'>
+<a name='664'>
+     <font color=#447700>! Local<a name='665'></font>
+<a name='666'>
+     INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, ioffa, joffa<a name='667'>
+     INTEGER :: icmin,icmax,jcmin,jcmax<a name='668'>
+     INTEGER :: istag,jstag, ipoints,jpoints,ijpoints<a name='669'>
+<a name='670'>
+     istag = 1 ; jstag = 1<a name='671'>
+     IF ( xstag ) istag = 0<a name='672'>
+     IF ( ystag ) jstag = 0<a name='673'>
+<a name='674'>
+     IF( MOD(nrj,2) .NE. 0) THEN  <font color=#447700>! odd refinement ratio<a name='675'></font>
+<a name='676'>
+        DO ck = ckds, ckde<a name='677'>
+           nk = ck<a name='678'>
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='679'>
+              nj = (cj-jpos)*nrj + jstag + 1<a name='680'>
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='681'>
+                 ni = (ci-ipos)*nri + istag + 1<a name='682'>
+                 cfld( ci, cj, ck , 1) =  nfld( ni  , nj , nk , 1  )<a name='683'>
+              ENDDO<a name='684'>
+           ENDDO<a name='685'>
+        ENDDO<a name='686'>
+<a name='687'>
+     ELSE  <font color=#447700>! even refinement ratio, pick nearest neighbor on SW corner<a name='688'></font>
+        DO ck = ckds, ckde<a name='689'>
+           nk = ck<a name='690'>
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='691'>
+              nj = (cj-jpos)*nrj + 1<a name='692'>
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='693'>
+                 ni = (ci-ipos)*nri + 1<a name='694'>
+                 ipoints = nri/2 -1<a name='695'>
+                 jpoints = nrj/2 -1<a name='696'>
+                 cfld( ci, cj, ck, 1 ) =  nfld( ni+ipoints , nj+jpoints , nk, 1 )<a name='697'>
+              END DO<a name='698'>
+           END DO<a name='699'>
+        END DO<a name='700'>
+<a name='701'>
+     END IF<a name='702'>
+<a name='703'>
+     RETURN<a name='704'>
+<a name='705'>
+   END SUBROUTINE copy_fcnm_double<a name='706'>
+<font color=#447700>!==================================<a name='707'></font>
+<font color=#447700>! this is the 1pt function used in feedback for integers<a name='708'></font>
+<a name='709'>
+<A NAME='COPY_FCNI'><A href='../../html_code/main/module_nup_feedback.F.html#COPY_FCNI' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='710'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>copy_fcni</font> ( cfld,                                 &amp;  <font color=#447700>! CD field <A href='../../call_to/COPY_FCNI.html' TARGET='index'>1</A>,<A href='../../call_from/COPY_FCNI.html' TARGET='index'>2</A><a name='711'></font>
+                           cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='712'>
+                           nfld,                                 &amp;  <font color=#447700>! ND field<a name='713'></font>
+                           nids, nide, njds, njde, nkds, nkde,   &amp;<a name='714'>
+                           xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='715'></font>
+                           ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='716'></font>
+                           nri, nrj                             )   <font color=#447700>! nest ratios<a name='717'></font>
+     IMPLICIT NONE<a name='718'>
+<a name='719'>
+<a name='720'>
+     INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='721'>
+                            nids, nide, nkds, nkde, njds, njde,   &amp;<a name='722'>
+                            ipos, jpos,                           &amp;<a name='723'>
+                            nri, nrj<a name='724'>
+     LOGICAL, INTENT(IN) :: xstag, ystag<a name='725'>
+<a name='726'>
+     INTEGER, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde ), INTENT(OUT) :: cfld<a name='727'>
+     INTEGER, DIMENSION ( nids:nide, njds:njde, nkds:nkde ), INTENT(IN) :: nfld<a name='728'>
+<a name='729'>
+     <font color=#447700>! Local<a name='730'></font>
+<a name='731'>
+     INTEGER ci, cj, ck, ni, nj, nk, ip, jp, ioff, joff, ioffa, joffa<a name='732'>
+     INTEGER :: icmin,icmax,jcmin,jcmax<a name='733'>
+     INTEGER :: istag,jstag, ipoints,jpoints,ijpoints<a name='734'>
+<a name='735'>
+     istag = 1 ; jstag = 1<a name='736'>
+     IF ( xstag ) istag = 0<a name='737'>
+     IF ( ystag ) jstag = 0<a name='738'>
+<a name='739'>
+     IF( MOD(nrj,2) .NE. 0) THEN  <font color=#447700>! odd refinement ratio<a name='740'></font>
+<a name='741'>
+        DO ck = ckds, ckde<a name='742'>
+           nk = ck<a name='743'>
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='744'>
+              nj = (cj-jpos)*nrj + jstag + 1<a name='745'>
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='746'>
+                 ni = (ci-ipos)*nri + istag + 1<a name='747'>
+                 cfld( ci, cj, ck ) =  nfld( ni  , nj , nk  )<a name='748'>
+              ENDDO<a name='749'>
+           ENDDO<a name='750'>
+        ENDDO<a name='751'>
+<a name='752'>
+     ELSE  <font color=#447700>! even refinement ratio<a name='753'></font>
+        DO ck = ckds, ckde<a name='754'>
+           nk = ck<a name='755'>
+           DO cj = MAX(jpos,cjds),MIN(jpos+(njde-njds)/nrj-jstag,cjde)<a name='756'>
+              nj = (cj-jpos)*nrj + 1<a name='757'>
+              DO ci = MAX(ipos,cids),MIN(ipos+(nide-nids)/nri-istag,cide)<a name='758'>
+                 ni = (ci-ipos)*nri + 1<a name='759'>
+                 ipoints = nri/2 -1<a name='760'>
+                 jpoints = nrj/2 -1<a name='761'>
+                 cfld( ci, cj, ck ) =  nfld( ni+ipoints , nj+jpoints , nk )<a name='762'>
+              END DO<a name='763'>
+           END DO<a name='764'>
+        END DO<a name='765'>
+<a name='766'>
+     END IF<a name='767'>
+<a name='768'>
+     RETURN<a name='769'>
+<a name='770'>
+   END SUBROUTINE copy_fcni<a name='771'>
+<a name='772'>
+<font color=#447700>!==================================<a name='773'></font>
+<A NAME='SMOOTHER_REAL'><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='774'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>smoother_real</font> ( cfld , &amp; <A href='../../call_to/SMOOTHER_REAL.html' TARGET='index'>1</A>,<A href='../../call_from/SMOOTHER_REAL.html' TARGET='index'>2</A><a name='775'>
+                      cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='776'>
+                      nids, nide, nkds, nkde, njds, njde,   &amp;<a name='777'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='778'></font>
+                      ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in<a name='779'></font>
+                      nri, nrj                              &amp;<a name='780'>
+                      )<a name='781'>
+ <a name='782'>
+      IMPLICIT NONE<a name='783'>
+   <a name='784'>
+      INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='785'>
+                             nids, nide, nkds, nkde, njds, njde,   &amp;<a name='786'>
+                             nri, nrj,                             &amp;  <a name='787'>
+                             ipos, jpos<a name='788'>
+      LOGICAL, INTENT(IN) :: xstag, ystag<a name='789'>
+   <a name='790'>
+      REAL, DIMENSION ( cids:cide, ckds:ckde, cjds:cjde, 1 ) :: cfld<a name='791'>
+<a name='792'>
+      <font color=#447700>!  These are the 2d smoothers used on the fedback data.  These filters<a name='793'></font>
+      <font color=#447700>!  are run on the coarse grid data (after the nested info has been<a name='794'></font>
+      <font color=#447700>!  fedback).  Only the area of the nest in the coarse grid is filtered.<a name='795'></font>
+<a name='796'>
+      IF      ( smooth_option == 0 ) THEN<a name='797'>
+<font color=#447700>! no op<a name='798'></font>
+      ELSE IF ( smooth_option == 1 ) THEN<a name='799'>
+         CALL <A href='../../html_code/share/interp_fcn.F.html#SM121'>sm121</A><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_REAL' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SM121_1"> ( cfld , &amp;<a name='800'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='801'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='802'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='803'>
+                      nri, nrj,                             &amp;  <a name='804'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='805'></font>
+                      )<a name='806'>
+      ELSE IF ( smooth_option == 2 ) THEN<a name='807'>
+         CALL <A href='../../html_code/share/interp_fcn.F.html#SMDSM'>smdsm</A><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_REAL' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SMDSM_1"> ( cfld , &amp;<a name='808'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='809'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='810'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='811'>
+                      nri, nrj,                             &amp;  <a name='812'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='813'></font>
+                      )<a name='814'>
+      END IF<a name='815'>
+<a name='816'>
+   END SUBROUTINE smoother_real <a name='817'>
+<a name='818'>
+<A NAME='SM121'><A href='../../html_code/main/module_nup_feedback.F.html#SM121' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='819'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>sm121</font> ( cfld , &amp; <A href='../../call_to/SM121.html' TARGET='index'>2</A>,<A href='../../call_from/SM121.html' TARGET='index'>1</A><a name='820'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='821'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='822'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='823'>
+                      nri, nrj,                             &amp;  <a name='824'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='825'></font>
+                      )<a name='826'>
+   <a name='827'>
+      IMPLICIT NONE<a name='828'>
+   <a name='829'>
+      INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='830'>
+                             nids, nide, nkds, nkde, njds, njde,   &amp;<a name='831'>
+                             nri, nrj,                             &amp;  <a name='832'>
+                             ipos, jpos<a name='833'>
+      LOGICAL, INTENT(IN) :: xstag, ystag<a name='834'>
+   <a name='835'>
+      REAL, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ) :: cfld<a name='836'>
+      REAL, DIMENSION ( cids:cide,            cjds:cjde ) :: cfldnew<a name='837'>
+   <a name='838'>
+      INTEGER                        :: i , j , k , loop<a name='839'>
+      INTEGER :: istag,jstag<a name='840'>
+<a name='841'>
+      INTEGER, PARAMETER  :: smooth_passes = 1 <font color=#447700>! More passes requires a larger stencil (currently 48 pt)<a name='842'></font>
+<a name='843'>
+      istag = 1 ; jstag = 1<a name='844'>
+      IF ( xstag ) istag = 0<a name='845'>
+      IF ( ystag ) jstag = 0<a name='846'>
+   <a name='847'>
+      <font color=#447700>!  Simple 1-2-1 smoother.<a name='848'></font>
+   <a name='849'>
+      smoothing_passes : DO loop = 1 , smooth_passes<a name='850'>
+   <a name='851'>
+         DO k = ckds , ckde<a name='852'>
+   <a name='853'>
+            <font color=#447700>!  Initialize dummy cfldnew<a name='854'></font>
+<a name='855'>
+            DO i = MAX(ipos,cids-3) , MIN(ipos+(nide-nids)/nri,cide+3)<a name='856'>
+               DO j = MAX(jpos,cjds-3) , MIN(jpos+(njde-njds)/nrj,cjde+3)<a name='857'>
+                  cfldnew(i,j) = cfld(i,j,k,1) <a name='858'>
+               END DO<a name='859'>
+            END DO<a name='860'>
+<a name='861'>
+            <font color=#447700>!  1-2-1 smoothing in the j direction first, <a name='862'></font>
+   <a name='863'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='864'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='865'>
+                  cfldnew(i,j) = 0.25 * ( cfld(i,j+1,k,1) + 2.*cfld(i,j,k,1) + cfld(i,j-1,k,1) )<a name='866'>
+               END DO<a name='867'>
+            END DO<a name='868'>
+<a name='869'>
+            <font color=#447700>!  then 1-2-1 smoothing in the i direction last<a name='870'></font>
+       <a name='871'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='872'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='873'>
+                  cfld(i,j,k,1) =  0.25 * ( cfldnew(i+1,j) + 2.*cfldnew(i,j) + cfldnew(i-1,j) )<a name='874'>
+               END DO<a name='875'>
+            END DO<a name='876'>
+       <a name='877'>
+         END DO<a name='878'>
+    <a name='879'>
+      END DO smoothing_passes<a name='880'>
+   <a name='881'>
+   END SUBROUTINE sm121<a name='882'>
+<a name='883'>
+<A NAME='SMDSM'><A href='../../html_code/main/module_nup_feedback.F.html#SMDSM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='884'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>smdsm</font> ( cfld , &amp; <A href='../../call_to/SMDSM.html' TARGET='index'>2</A>,<A href='../../call_from/SMDSM.html' TARGET='index'>1</A><a name='885'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='886'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='887'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='888'>
+                      nri, nrj,                             &amp;  <a name='889'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='890'></font>
+                      )<a name='891'>
+   <a name='892'>
+      IMPLICIT NONE<a name='893'>
+   <a name='894'>
+      INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='895'>
+                             nids, nide, nkds, nkde, njds, njde,   &amp;<a name='896'>
+                             nri, nrj,                             &amp;  <a name='897'>
+                             ipos, jpos<a name='898'>
+      LOGICAL, INTENT(IN) :: xstag, ystag<a name='899'>
+   <a name='900'>
+      REAL, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ) :: cfld<a name='901'>
+      REAL, DIMENSION ( cids:cide,            cjds:cjde ) :: cfldnew<a name='902'>
+   <a name='903'>
+      REAL , DIMENSION ( 2 )         :: xnu<a name='904'>
+      INTEGER                        :: i , j , k , loop , n <a name='905'>
+      INTEGER :: istag,jstag<a name='906'>
+<a name='907'>
+      INTEGER, PARAMETER  :: smooth_passes = 1 <font color=#447700>! More passes requires a larger stencil (currently 48 pt)<a name='908'></font>
+<a name='909'>
+      xnu  =  (/ 0.50 , -0.52 /)<a name='910'>
+    <a name='911'>
+      istag = 1 ; jstag = 1<a name='912'>
+      IF ( xstag ) istag = 0<a name='913'>
+      IF ( ystag ) jstag = 0<a name='914'>
+   <a name='915'>
+      <font color=#447700>!  The odd number passes of this are the "smoother", the even<a name='916'></font>
+      <font color=#447700>!  number passes are the "de-smoother" (note the different signs on xnu).<a name='917'></font>
+   <a name='918'>
+      smoothing_passes : DO loop = 1 , smooth_passes * 2<a name='919'>
+   <a name='920'>
+         n  =  2 - MOD ( loop , 2 )<a name='921'>
+    <a name='922'>
+         DO k = ckds , ckde<a name='923'>
+   <a name='924'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='925'>
+               DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='926'>
+                  cfldnew(i,j) = cfld(i,j,k,1) + xnu(n) * ((cfld(i,j+1,k,1) + cfld(i,j-1,k,1)) * 0.5-cfld(i,j,k,1))<a name='927'>
+               END DO<a name='928'>
+            END DO<a name='929'>
+       <a name='930'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='931'>
+               DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='932'>
+                  cfld(i,j,k,1) = cfldnew(i,j)<a name='933'>
+               END DO<a name='934'>
+            END DO<a name='935'>
+       <a name='936'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='937'>
+               DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='938'>
+                  cfldnew(i,j) = cfld(i,j,k,1) + xnu(n) * ((cfld(i+1,j,k,1) + cfld(i-1,j,k,1)) * 0.5-cfld(i,j,k,1))<a name='939'>
+               END DO<a name='940'>
+            END DO<a name='941'>
+       <a name='942'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='943'>
+               DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='944'>
+                  cfld(i,j,k,1) = cfldnew(i,j)<a name='945'>
+               END DO<a name='946'>
+            END DO<a name='947'>
+   <a name='948'>
+         END DO<a name='949'>
+    <a name='950'>
+      END DO smoothing_passes<a name='951'>
+   <a name='952'>
+   END SUBROUTINE smdsm<a name='953'>
+<a name='954'>
+<A NAME='SMOOTHER_DOUBLE'><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='955'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>smoother_double</font> ( cfld , &amp; <A href='../../call_to/SMOOTHER_DOUBLE.html' TARGET='index'>1</A>,<A href='../../call_from/SMOOTHER_DOUBLE.html' TARGET='index'>2</A><a name='956'>
+                      cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='957'>
+                      nids, nide, nkds, nkde, njds, njde,   &amp;<a name='958'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='959'></font>
+                      ipos, jpos,                           &amp;  <font color=#447700>! Position of lower left of nest in<a name='960'></font>
+                      nri, nrj                              &amp;<a name='961'>
+                      )<a name='962'>
+ <a name='963'>
+      IMPLICIT NONE<a name='964'>
+   <a name='965'>
+      INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='966'>
+                             nids, nide, nkds, nkde, njds, njde,   &amp;<a name='967'>
+                             nri, nrj,                             &amp;  <a name='968'>
+                             ipos, jpos<a name='969'>
+      LOGICAL, INTENT(IN) :: xstag, ystag<a name='970'>
+   <a name='971'>
+      DOUBLE PRECISION, DIMENSION ( cids:cide, ckds:ckde, cjds:cjde, 1 ) :: cfld<a name='972'>
+<a name='973'>
+      <font color=#447700>!  These are the 2d smoothers used on the fedback data.  These filters<a name='974'></font>
+      <font color=#447700>!  are run on the coarse grid data (after the nested info has been<a name='975'></font>
+      <font color=#447700>!  fedback).  Only the area of the nest in the coarse grid is filtered.<a name='976'></font>
+<a name='977'>
+      IF      ( smooth_option == 0 ) THEN<a name='978'>
+<font color=#447700>! no op<a name='979'></font>
+      ELSE IF ( smooth_option == 1 ) THEN<a name='980'>
+         CALL <A href='../../html_code/main/module_nup_feedback.F.html#SM121_DOUBLE'>sm121_double</A><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_DOUBLE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SM121_DOUBLE_1"> ( cfld , &amp;<a name='981'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='982'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='983'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='984'>
+                      nri, nrj,                             &amp;  <a name='985'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='986'></font>
+                      )<a name='987'>
+      ELSE IF ( smooth_option == 2 ) THEN<a name='988'>
+         CALL <A href='../../html_code/main/module_nup_feedback.F.html#SMDSM_DOUBLE'>smdsm_double</A><A href='../../html_code/main/module_nup_feedback.F.html#SMOOTHER_DOUBLE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SMDSM_DOUBLE_1"> ( cfld , &amp;<a name='989'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='990'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='991'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='992'>
+                      nri, nrj,                             &amp;  <a name='993'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='994'></font>
+                      )<a name='995'>
+      END IF<a name='996'>
+<a name='997'>
+   END SUBROUTINE smoother_double <a name='998'>
+<a name='999'>
+<A NAME='SM121_DOUBLE'><A href='../../html_code/main/module_nup_feedback.F.html#SM121_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1000'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>sm121_double</font> ( cfld , &amp; <A href='../../call_to/SM121_DOUBLE.html' TARGET='index'>1</A><a name='1001'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='1002'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='1003'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='1004'>
+                      nri, nrj,                             &amp;  <a name='1005'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='1006'></font>
+                      )<a name='1007'>
+   <a name='1008'>
+      IMPLICIT NONE<a name='1009'>
+   <a name='1010'>
+      INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='1011'>
+                             nids, nide, nkds, nkde, njds, njde,   &amp;<a name='1012'>
+                             nri, nrj,                             &amp;  <a name='1013'>
+                             ipos, jpos<a name='1014'>
+      LOGICAL, INTENT(IN) :: xstag, ystag<a name='1015'>
+   <a name='1016'>
+      DOUBLE PRECISION, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ) :: cfld<a name='1017'>
+      DOUBLE PRECISION, DIMENSION ( cids:cide,            cjds:cjde ) :: cfldnew<a name='1018'>
+   <a name='1019'>
+      INTEGER                        :: i , j , k , loop<a name='1020'>
+      INTEGER :: istag,jstag<a name='1021'>
+<a name='1022'>
+      INTEGER, PARAMETER  :: smooth_passes = 1 <font color=#447700>! More passes requires a larger stencil (currently 48 pt)<a name='1023'></font>
+<a name='1024'>
+      istag = 1 ; jstag = 1<a name='1025'>
+      IF ( xstag ) istag = 0<a name='1026'>
+      IF ( ystag ) jstag = 0<a name='1027'>
+   <a name='1028'>
+      <font color=#447700>!  Simple 1-2-1 smoother.<a name='1029'></font>
+   <a name='1030'>
+      smoothing_passes : DO loop = 1 , smooth_passes<a name='1031'>
+   <a name='1032'>
+         DO k = ckds , ckde<a name='1033'>
+   <a name='1034'>
+            <font color=#447700>!  Initialize dummy cfldnew<a name='1035'></font>
+<a name='1036'>
+            DO i = MAX(ipos,cids-3) , MIN(ipos+(nide-nids)/nri,cide+3)<a name='1037'>
+               DO j = MAX(jpos,cjds-3) , MIN(jpos+(njde-njds)/nrj,cjde+3)<a name='1038'>
+                  cfldnew(i,j) = cfld(i,j,k,1) <a name='1039'>
+               END DO<a name='1040'>
+            END DO<a name='1041'>
+<a name='1042'>
+            <font color=#447700>!  1-2-1 smoothing in the j direction first, <a name='1043'></font>
+   <a name='1044'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='1045'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='1046'>
+                  cfldnew(i,j) = 0.25 * ( cfld(i,j+1,k,1) + 2.*cfld(i,j,k,1) + cfld(i,j-1,k,1) )<a name='1047'>
+               END DO<a name='1048'>
+            END DO<a name='1049'>
+<a name='1050'>
+            <font color=#447700>!  then 1-2-1 smoothing in the i direction last<a name='1051'></font>
+       <a name='1052'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='1053'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='1054'>
+                  cfld(i,j,k,1) =  0.25 * ( cfldnew(i+1,j) + 2.*cfldnew(i,j) + cfldnew(i-1,j) )<a name='1055'>
+               END DO<a name='1056'>
+            END DO<a name='1057'>
+       <a name='1058'>
+         END DO<a name='1059'>
+    <a name='1060'>
+      END DO smoothing_passes<a name='1061'>
+   <a name='1062'>
+   END SUBROUTINE sm121_double<a name='1063'>
+<a name='1064'>
+<A NAME='SMDSM_DOUBLE'><A href='../../html_code/main/module_nup_feedback.F.html#SMDSM_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1065'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>smdsm_double</font> ( cfld , &amp; <A href='../../call_to/SMDSM_DOUBLE.html' TARGET='index'>1</A><a name='1066'>
+                      cids, cide, cjds, cjde, ckds, ckde,   &amp;<a name='1067'>
+                      xstag, ystag,                         &amp;  <font color=#447700>! staggering of field<a name='1068'></font>
+                      nids, nide, njds, njde, nkds, nkde,   &amp;<a name='1069'>
+                      nri, nrj,                             &amp;  <a name='1070'>
+                      ipos, jpos                            &amp;  <font color=#447700>! Position of lower left of nest in <a name='1071'></font>
+                      )<a name='1072'>
+   <a name='1073'>
+      IMPLICIT NONE<a name='1074'>
+   <a name='1075'>
+      INTEGER, INTENT(IN) :: cids, cide, ckds, ckde, cjds, cjde,   &amp;<a name='1076'>
+                             nids, nide, nkds, nkde, njds, njde,   &amp;<a name='1077'>
+                             nri, nrj,                             &amp;  <a name='1078'>
+                             ipos, jpos<a name='1079'>
+      LOGICAL, INTENT(IN) :: xstag, ystag<a name='1080'>
+   <a name='1081'>
+      DOUBLE PRECISION, DIMENSION ( cids:cide, cjds:cjde, ckds:ckde, 1 ) :: cfld<a name='1082'>
+      DOUBLE PRECISION, DIMENSION ( cids:cide,            cjds:cjde ) :: cfldnew<a name='1083'>
+   <a name='1084'>
+      DOUBLE PRECISION , DIMENSION ( 2 )         :: xnu<a name='1085'>
+      INTEGER                        :: i , j , k , loop , n <a name='1086'>
+      INTEGER :: istag,jstag<a name='1087'>
+<a name='1088'>
+      INTEGER, PARAMETER  :: smooth_passes = 1 <font color=#447700>! More passes requires a larger stencil (currently 48 pt)<a name='1089'></font>
+<a name='1090'>
+      xnu  =  (/ 0.50 , -0.52 /)<a name='1091'>
+    <a name='1092'>
+      istag = 1 ; jstag = 1<a name='1093'>
+      IF ( xstag ) istag = 0<a name='1094'>
+      IF ( ystag ) jstag = 0<a name='1095'>
+   <a name='1096'>
+      <font color=#447700>!  The odd number passes of this are the "smoother", the even<a name='1097'></font>
+      <font color=#447700>!  number passes are the "de-smoother" (note the different signs on xnu).<a name='1098'></font>
+   <a name='1099'>
+      smoothing_passes : DO loop = 1 , smooth_passes * 2<a name='1100'>
+   <a name='1101'>
+         n  =  2 - MOD ( loop , 2 )<a name='1102'>
+    <a name='1103'>
+         DO k = ckds , ckde<a name='1104'>
+   <a name='1105'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='1106'>
+               DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='1107'>
+                  cfldnew(i,j) = cfld(i,j,k,1) + xnu(n) * ((cfld(i,j+1,k,1) + cfld(i,j-1,k,1)) * 0.5-cfld(i,j,k,1))<a name='1108'>
+               END DO<a name='1109'>
+            END DO<a name='1110'>
+       <a name='1111'>
+            DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='1112'>
+               DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='1113'>
+                  cfld(i,j,k,1) = cfldnew(i,j)<a name='1114'>
+               END DO<a name='1115'>
+            END DO<a name='1116'>
+       <a name='1117'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='1118'>
+               DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='1119'>
+                  cfldnew(i,j) = cfld(i,j,k,1) + xnu(n) * ((cfld(i+1,j,k,1) + cfld(i-1,j,k,1)) * 0.5-cfld(i,j,k,1))<a name='1120'>
+               END DO<a name='1121'>
+            END DO<a name='1122'>
+       <a name='1123'>
+            DO j = MAX(jpos+2,cjds-2) , MIN(jpos+(njde-njds)/nrj-2-jstag,cjde+2)<a name='1124'>
+               DO i = MAX(ipos+2,cids-2) , MIN(ipos+(nide-nids)/nri-2-istag,cide+2)<a name='1125'>
+                  cfld(i,j,k,1) = cfldnew(i,j)<a name='1126'>
+               END DO<a name='1127'>
+            END DO<a name='1128'>
+   <a name='1129'>
+         END DO<a name='1130'>
+    <a name='1131'>
+      END DO smoothing_passes<a name='1132'>
+   <a name='1133'>
+   END SUBROUTINE smdsm_double<a name='1134'>
+<a name='1135'>
+END MODULE module_nup_feedback<a name='1136'>
+<a name='1137'>
+<font color=#447700>!==================================<a name='1138'></font>
+<a name='1139'>
+</pre></body></html>

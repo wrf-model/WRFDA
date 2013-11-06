@@ -1,0 +1,237 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+      <p class="headingtext" id="Font20">NetCDF Help</p>
+      <blockquote>
+<a name="what"></a>
+      <p class="style5" id="Font16">What the heck is netCDF?</p>
+      <p class="bodytext"><b>NetCDF</b> stands for <em>network Common Data Form</em>, and it is a machine-independent file format for storing scientific data. All WRFDA output files are in netCDF format, so the libraries for reading and creating netCDF files are necessary for using WRFDA. That's all you really need to know about netCDF in order to use WRFDA; if you are curious and would like to find out more, you can go to Unidata's <a href="http://www.unidata.ucar.edu/software/netcdf/">netCDF webpage</a>.</p>
+
+      <p class="style5" id="Font16">Do I need to install netCDF?</p>
+      <p class="bodytext">Chances are, if your computer is on a university or research laboratory network, you already have access to the needed netCDF libraries. So your first step should be to determine whether the libraries are already installed or not. If you are sure that you need to install the libraries yourself, you can <a href="#install">skip to the next section</a>.
+      <p class="bodytext">By default, netCDF libraries are installed in "/usr/local". Run the following command to see if the netCDF libraries are installed there:</p>
+      <p class="code">> ls -d /usr/local/netcdf*</p>
+      <p class="bodytext">If you see results (for example: "/usr/local/netcdf-4.1.1"), then netCDF is already installed. If not, you can either ask your system administrator if netCDF libraries are installed elsewhere, or you can <a href="#install">skip to the next section</a> and install them yourself.</p>
+      <p class="bodytext">If you've determined that netCDF is already installed on your system, you still must endure that the installed libraries were compiled with the same compilers with which you intend to compile WRF and/or WRFDA. You should find out what Fortran and C compilers are installed on your system (or, if multiple compilers are available, which ones you'd prefer to use). If you are not sure which compilers to use, or don't know which compilers are installed on your system, see the <a href="configuration.html">Configuration Help Page</a> for guidance.</p>
+      <p class="bodytext">To determine what compilers were used to compile your netCDF libraries, you should type the following command:</p>
+
+      <p class="code">> /usr/local/netcdf/bin/nc-config --all</br></br>
+                      This netCDF 4.1.1 has been built with the following features:</br>
+
+                      &nbsp;   --cc &nbsp; &nbsp; &nbsp; &nbsp;-> pgcc</br>
+                      &nbsp;   --cflags &nbsp; &nbsp;->  -I/usr/local/netcdf-4.1.1-pgi/include</br>
+                      &nbsp;   --libs &nbsp; &nbsp; &nbsp;-> -L/usr/local/netcdf-4.1.1-pgi/lib -lnetcdf -L/usr/kerberos/lib -lcurl -ldl -lgssapi_krb5 -lkr   b5 -lk5crypto -lcom_err -lidn -lssl -lcrypto -lz</br>
+                      &nbsp;   --cxx &nbsp; &nbsp; &nbsp; -> c++</br>
+                      &nbsp;   --has-c++ &nbsp; -> no</br>
+                      &nbsp;   --fc &nbsp; &nbsp; &nbsp; &nbsp;-> pgf90</br>
+                      &nbsp;   --fflags &nbsp; &nbsp;-> -g -I/usr/local/netcdf-4.1.1-pgi/include</br>
+                      &nbsp;   --flibs &nbsp; &nbsp; -> -L/usr/local/netcdf-4.1.1-pgi/lib -lnetcdf -L/usr/kerberos/lib -lcurl -ldl -lgssapi_krb5 -lkr   b5 -lk5crypto -lcom_err -lidn -lssl -lcrypto -lz</br>
+                      &nbsp;   --has-f77 &nbsp; -> yes</br>
+                      &nbsp;   --has-f90 &nbsp; -> yes</br>
+                      &nbsp;   --has-dap &nbsp; -> yes</br>
+                      &nbsp;   --has-nc2 &nbsp; -> yes</br>
+                      &nbsp;   --has-nc4 &nbsp; -> no</br>
+                      &nbsp;   --has-hdf5 &nbsp;-> no</br>
+                      &nbsp;   --has-hdf4 &nbsp;-> no</br>
+                      &nbsp;   --has-szlib -> no</br>
+                      &nbsp;   --prefix &nbsp; &nbsp;-> /usr/local/netcdf-4.1.1-pgi</br>
+                      &nbsp;   --includedir-> /usr/local/netcdf-4.1.1-pgi/include</br>
+                      &nbsp;   --version &nbsp; -> netCDF 4.1.1</br>
+</p>
+
+      <p class="bodytext">You should of course change the text "/usr/local/netcdf" to the location of your netCDF installation (for instance, in the earlier example, "/usr/local/netcdf-4.1.1").</p>
+
+      <p class="bodytext">You should pay close attention to the following lines:
+        <ul>
+          <li class="bodybullet">--cc and --fc: These are your C- and FORTRAN-compilers respectively. These should be the same as those you intend to use to compile WRF/WRFDA</li>
+          <li class="bodybullet">--version and --has-nc4: If your version number is 4.0 or later, the "has-nc4" flag <em>must</em> be set to "no". WRFDA is not yet fully compatible with NetCDF4 libraries, so this could lead to problems.</li>
+        </ul></p>
+
+      <p class="bodytext">If you've gotten to this point and everything looks good, you should be able to use your existing netCDF libraries! You can press "Back" to return to where you were previously, or <a href="../index.html">go to the tutorial home page</a>.</p>
+
+
+
+<a name="install"></a>
+      <p class="style5" id="Font16">How do I install netCDF?</p>
+      <p class="bodytext">Installing netCDF can be slightly more difficult than installing WRFDA itself, but it is still quite simple. First, you should find out what Fortran and C compilers are installed on your system (or, if multiple compilers are available, which ones you'd prefer to use). If you are not sure which compilers to use, or don't know which compilers are installed on your system, see the <a href="configuration.html">Configuration Help Page</a> for guidance.</p>
+      <p class="bodytext">The choice of compiler is important because <b>you MUST use the same compilers to compile netCDF as you use to compile WRFDA</b>. If, for example, you compiled your netcdf libraries with gfortran and gcc, attempting to compile WRFDA with (for example) pgf90 and pgcc <em>will not work</em>.</p>
+
+      <p class="bodytext">The netCDF installation process only takes about 30 minutes, and the libraries only take up around 11 Mb of space, so this should not be burdensome even for those on a tight computing and/or time budget.</p>
+
+      <p class="bodytext"><strong id="Font14">Step 1: Download and unzip the netCDF source code</strong> </p>
+      <p class="bodytext">NetCDF can be downloaded from the <a href="http://www.unidata.ucar.edu/downloads/netcdf/index.jsp">Unidata netCDF download page</a>. WRFDA is not yet compatible with the most recent version of netCDF, so you should scroll down to the bottom section titled "Old netCDF Bundled C/C++/Fortran Releases" and select the most recent link in that section. As of October 2012, this is version 4.1.3. From that page, click the link to download the most recent <em>stable</em> release of the netCDF source code, and save it to a convenient folder.</p>
+      <p class="bodytext">Now that you have downloaded the netCDF source code, it is time to configure the code to your environment and compile. In a terminal window, navigate to the directory in which you saved the netCDF tarball (netcdf-4.1.3.tar.gz) and un-tar it.</p>
+      <p class="code">> tar -xvf netcdf-4.1.3.tar.gz</p>
+
+
+      <p class="bodytext"><strong id="Font14">Step 2: Configure and compile</strong> </p>
+      <p class="bodytext">Now, navigate to the folder you just un-tarred. Now it is time to select your compilers (again, if you are unsure of which compilers to use, see the <a href="configuration.html">Configuration Help Page</a>). Set the environment variable "FC" to the name of the Fortran compiler you will be using, and set "CC" to the name of the C compiler you will be using. We recommend using Gnu, Intel, or PGI compilers if possible. </p>
+MAKE A NOTE HERE: IF "SETENV" DOESN'T WORK, YOU ARE LIKELY USING A DIFFERENT TERMINAL SHELL. SEE OUR TERMINAL SHELL HELP PAGE.
+      <p class="code">> setenv FC gfortran</br>
+                      > setenv CC gcc</p>
+      <p class="bodytext">Finally, you should configure netCDF so it will install in the correct folder. Typically netCDF will install in the /usr/local directory by default, but if you do not have administrative privileges on your machine, you will need to set your own directory. Any directory that you can write to will suffice; for demonstration purposes, we will use <span class="style6" id="Font12">/user/home/jdoe/netcdf_4.1.3</span> as our installation directory. Ensure that you are in the netcdf source directory that you just unpacked, and enter the following:</p>
+      <p class="code">> ./configure --prefix=/user/home/jdoe/netcdf_4.1.3 --disable-netcdf-4</p>
+      <p class="bodytext">The "--disable-netcdf-4" option is very important, as omitting it introduces many complications which are beyond the scope of this tutorial. </p>
+      <p class="bodytext">The <span class="style6" id="Font12">./configure</span> script will run a large number of checks, and if successful will end with no error messages. Once the script is finished, complete the installation by entering the following:
+      <p class="code">> make check install</p>
+      <p class="bodytext">If everything works correctly, a long series of "make" commands will end with a message beginning with "Congratulations! You have successfully installed netCDF!". If you see this message, you are done, and can move on to the <a href="../Introduction/start.html">tutorial branch that best suits you</a>.</p>
+      <p class="bodytext">If you receive a "Permission denied" error, ensure that your installation directory (the "--prefix=" statement) is set to a directory for which you have write permissions. If the error persists, or if you receive other errors, contact <strong><em>wrfhelp@ucar.edu</em></strong>.</p>
+
+
+
+
+      </blockquote>
+      <br>
+      <strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+
+      </table>      
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

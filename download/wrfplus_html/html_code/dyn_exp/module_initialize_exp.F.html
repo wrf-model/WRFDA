@@ -1,0 +1,169 @@
+<HTML> <BODY BGCOLOR=#bbeeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!IDEAL:MODEL_LAYER:INITIALIZATION<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<font color=#447700>!  This MODULE holds the routines which are used to perform various initializations<a name='5'></font>
+<font color=#447700>!  for the individual domains.  <a name='6'></font>
+<a name='7'>
+<font color=#447700>!  This MODULE CONTAINS the following routines:<a name='8'></font>
+<a name='9'>
+<font color=#447700>!  initialize_field_test - 1. Set different fields to different constant<a name='10'></font>
+<font color=#447700>!                             values.  This is only a test.  If the correct<a name='11'></font>
+<font color=#447700>!                             domain is not found (based upon the "id")<a name='12'></font>
+<font color=#447700>!                             then a fatal error is issued.               <a name='13'></font>
+<a name='14'>
+<A NAME='MODULE_INITIALIZE'><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#MODULE_INITIALIZE' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='15'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_initialize</font> <A href='../../call_to/MODULE_INITIALIZE.html' TARGET='index'>7</A><a name='16'>
+<a name='17'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#module_initialize_exp.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_21"><a name='18'>
+   USE module_state_description<a name='19'>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#module_initialize_exp.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_31"><a name='20'>
+   USE <A href='../../html_code/frame/module_timing.F.html#MODULE_TIMING'>module_timing</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#module_initialize_exp.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_TIMING_9"><a name='21'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#module_initialize_exp.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_34"><a name='22'>
+<a name='23'>
+<a name='24'>
+CONTAINS<a name='25'>
+<a name='26'>
+<A NAME='INIT_DOMAIN_EXP'><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='27'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_domain_exp</font> ( grid, &amp; <A href='../../call_to/INIT_DOMAIN_EXP.html' TARGET='index'>1</A>,<A href='../../call_from/INIT_DOMAIN_EXP.html' TARGET='index'>1</A><a name='28'>
+<font color=#447700>!<a name='29'></font>
+# include &lt;<A href='../../html_code/include/exp_dummy_args.inc.html'>exp_dummy_args.inc</A>&gt;<A NAME="exp_dummy_args.inc_1"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='30'>
+<font color=#447700>!<a name='31'></font>
+)<a name='32'>
+   IMPLICIT NONE<a name='33'>
+<a name='34'>
+   <font color=#447700>!  Input data.<a name='35'></font>
+   TYPE (domain), POINTER :: grid<a name='36'>
+<a name='37'>
+# include &lt;<A href='../../html_code/include/exp_dummy_decl.inc.html'>exp_dummy_decl.inc</A>&gt;<A NAME="exp_dummy_decl.inc_2"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='38'>
+<a name='39'>
+   TYPE (grid_config_rec_type)              :: config_flags<a name='40'>
+<a name='41'>
+   <font color=#447700>!  Local data<a name='42'></font>
+   INTEGER                             ::                       &amp;<a name='43'>
+                                  ids, ide, jds, jde, kds, kde, &amp;<a name='44'>
+                                  ims, ime, jms, jme, kms, kme, &amp;<a name='45'>
+                                  its, ite, jts, jte, kts, kte, &amp;<a name='46'>
+                                  i, j, k<a name='47'>
+<a name='48'>
+#define COPY_IN<a name='49'>
+#include &lt;<A href='../../html_code/include/exp_scalar_derefs.inc.html'>exp_scalar_derefs.inc</A>&gt;<A NAME="exp_scalar_derefs.inc_3"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='50'>
+<a name='51'>
+   SELECT CASE ( model_data_order )<a name='52'>
+         CASE ( DATA_ORDER_ZXY )<a name='53'>
+   kds = grid%sd31 ; kde = grid%ed31 ;<a name='54'>
+   ids = grid%sd32 ; ide = grid%ed32 ;<a name='55'>
+   jds = grid%sd33 ; jde = grid%ed33 ;<a name='56'>
+<a name='57'>
+   kms = grid%sm31 ; kme = grid%em31 ;<a name='58'>
+   ims = grid%sm32 ; ime = grid%em32 ;<a name='59'>
+   jms = grid%sm33 ; jme = grid%em33 ;<a name='60'>
+<a name='61'>
+   kts = grid%sp31 ; kte = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='62'></font>
+   its = grid%sp32 ; ite = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='63'></font>
+   jts = grid%sp33 ; jte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='64'></font>
+         CASE ( DATA_ORDER_XYZ )<a name='65'>
+   ids = grid%sd31 ; ide = grid%ed31 ;<a name='66'>
+   jds = grid%sd32 ; jde = grid%ed32 ;<a name='67'>
+   kds = grid%sd33 ; kde = grid%ed33 ;<a name='68'>
+<a name='69'>
+   ims = grid%sm31 ; ime = grid%em31 ;<a name='70'>
+   jms = grid%sm32 ; jme = grid%em32 ;<a name='71'>
+   kms = grid%sm33 ; kme = grid%em33 ;<a name='72'>
+<a name='73'>
+   its = grid%sp31 ; ite = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='74'></font>
+   jts = grid%sp32 ; jte = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='75'></font>
+   kts = grid%sp33 ; kte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='76'></font>
+         CASE ( DATA_ORDER_XZY )<a name='77'>
+   ids = grid%sd31 ; ide = grid%ed31 ;<a name='78'>
+   kds = grid%sd32 ; kde = grid%ed32 ;<a name='79'>
+   jds = grid%sd33 ; jde = grid%ed33 ;<a name='80'>
+<a name='81'>
+   ims = grid%sm31 ; ime = grid%em31 ;<a name='82'>
+   kms = grid%sm32 ; kme = grid%em32 ;<a name='83'>
+   jms = grid%sm33 ; jme = grid%em33 ;<a name='84'>
+<a name='85'>
+   its = grid%sp31 ; ite = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='86'></font>
+   kts = grid%sp32 ; kte = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='87'></font>
+   jts = grid%sp33 ; jte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='88'></font>
+<a name='89'>
+   END SELECT<a name='90'>
+<a name='91'>
+<a name='92'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_9"> ( grid%id , model_config_rec , config_flags )<a name='93'>
+<a name='94'>
+<font color=#447700>! set the boundaries of the X array<a name='95'></font>
+    DO j = jts, jte<a name='96'>
+      DO k = kts, kte<a name='97'>
+        DO i = its, ite<a name='98'>
+          IF ( i == ids .OR. i == ide-1 .OR. j == jds .OR. j == jde-1 ) THEN<a name='99'>
+            x_1(i,k,j) = 1.<a name='100'>
+            x_2(i,k,j) = 1.<a name='101'>
+          ELSE<a name='102'>
+            x_1(i,k,j) = 0.<a name='103'>
+            x_2(i,k,j) = 0.<a name='104'>
+          ENDIF<a name='105'>
+        ENDDO<a name='106'>
+      ENDDO<a name='107'>
+    ENDDO<a name='108'>
+<a name='109'>
+#define COPY_OUT<a name='110'>
+#include &lt;<A href='../../html_code/include/exp_scalar_derefs.inc.html'>exp_scalar_derefs.inc</A>&gt;<A NAME="exp_scalar_derefs.inc_4"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='111'>
+<a name='112'>
+   RETURN<a name='113'>
+<a name='114'>
+   END SUBROUTINE init_domain_exp<a name='115'>
+   <a name='116'>
+<font color=#447700>!-------------------------------------------------------------------<a name='117'></font>
+<font color=#447700>! this is a wrapper for the solver-specific init_domain routines.<a name='118'></font>
+<font color=#447700>! Also dereferences the grid variables and passes them down as arguments.<a name='119'></font>
+<font color=#447700>! This is crucial, since the lower level routines may do message passing<a name='120'></font>
+<font color=#447700>! and this will get fouled up on machines that insist on passing down<a name='121'></font>
+<font color=#447700>! copies of assumed-shape arrays (by passing down as arguments, the <a name='122'></font>
+<font color=#447700>! data are treated as assumed-size -- ie. f77 -- arrays and the copying<a name='123'></font>
+<font color=#447700>! business is avoided).  Fie on the F90 designers.  Fie and a pox.<a name='124'></font>
+<a name='125'>
+<A NAME='INIT_DOMAIN'><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='126'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_domain</font> ( grid ) <A href='../../call_to/INIT_DOMAIN.html' TARGET='index'>3</A>,<A href='../../call_from/INIT_DOMAIN.html' TARGET='index'>24</A><a name='127'>
+<a name='128'>
+   IMPLICIT NONE<a name='129'>
+<a name='130'>
+   <font color=#447700>!  Input data.<a name='131'></font>
+   TYPE (domain), POINTER :: grid <a name='132'>
+   <font color=#447700>!  Local data.<a name='133'></font>
+   INTEGER                :: dyn_opt <a name='134'>
+   INTEGER :: idum1, idum2<a name='135'>
+<a name='136'>
+#ifdef DEREF_KLUDGE<a name='137'>
+<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='138'></font>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33<a name='139'>
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x<a name='140'>
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y<a name='141'>
+#endif<a name='142'>
+<a name='143'>
+#include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_5"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='144'>
+<a name='145'>
+   CALL nl_get_dyn_opt( 1, dyn_opt )<a name='146'>
+   <a name='147'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG'>set_scalar_indices_from_config</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_SCALAR_INDICES_FROM_CONFIG_8"> ( head_grid%id , idum1, idum2 )<a name='148'>
+<a name='149'>
+   IF ( dyn_opt .eq. DYN_EXP  ) THEN<a name='150'>
+     CALL <A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN_EXP'>init_domain_exp</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INIT_DOMAIN_EXP_1">( grid, &amp;<a name='151'>
+<font color=#447700>!<a name='152'></font>
+#include &lt;<A href='../../html_code/include/exp_actual_args.inc.html'>exp_actual_args.inc</A>&gt;<A NAME="exp_actual_args.inc_6"><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='153'>
+<font color=#447700>!<a name='154'></font>
+                        )<a name='155'>
+   ELSE<a name='156'>
+     WRITE(0,*)' init_domain: unknown or unimplemented dyn_opt = ',dyn_opt<a name='157'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_73"> ( ' init_domain: unknown or unimplemented dyn_opt ' )<a name='158'>
+   ENDIF<a name='159'>
+<a name='160'>
+   END SUBROUTINE init_domain<a name='161'>
+<a name='162'>
+<A NAME='INIT_MODULE_INITIALIZE'><A href='../../html_code/dyn_exp/module_initialize_exp.F.html#INIT_MODULE_INITIALIZE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='163'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_initialize</font>,<A href='../../call_from/INIT_MODULE_INITIALIZE.html' TARGET='index'>8</A><a name='164'>
+   END SUBROUTINE init_module_initialize<a name='165'>
+<a name='166'>
+<a name='167'>
+END MODULE module_initialize<a name='168'>
+</pre></body></html>

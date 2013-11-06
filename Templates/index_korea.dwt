@@ -1,0 +1,42 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>2010 Korea Tutorial</title>
+<!-- TemplateEndEditable -->
+<style type="text/css">
+<!--
+body {
+	background-color: #000025;
+	background-image: url(../Tutorials/2010_Korea/images/bg.jpg);
+	background-repeat: repeat-x;
+}
+-->
+</style>
+<link href="../Tutorials/2010_Korea/css/layout.css" rel="stylesheet" type="text/css" />
+<!-- TemplateBeginEditable name="head" --><!-- TemplateEndEditable -->
+</head>
+
+<body>
+<div id="Wrapper">
+  <div id="logo"><a href="http://www.mmm.ucar.edu/wrf/users/wrfda"><img src="../images/header.jpg" alt="WRFDA logo" width="566" height="56" /></a></div>
+  <div id="Navigation"><a href="../Tutorials/2010_Korea/index.html">Home</a> | Presentation | Practices | Bonus Practices</div>
+  <div id="HeaderImg"></div>
+  <div id="bodyArea">
+    <div id="left">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo hendrerit mi. Praesent libero lorem, sollicitudin bibendum, ultricies in, pharetra id, risus. Donec malesuada tristique felis. Etiam ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor sollicitudin tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur volutpat lacus quis pede. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin eu enim. Maecenas porttitor metus sit amet tortor. Aenean non tellus in ante interdum ornare. Integer blandit consectetur sem. Morbi in leo quis felis vehicula pharetra. Suspendisse porta felis eu turpis. Ut vestibulum.</p>
+      <p>Nunc luctus, tellus quis volutpat ultricies, leo sapien sagittis justo, vitae suscipit justo magna ac dolor. Maecenas libero est, consectetur auctor, rutrum in, laoreet eu, diam. Ut tempor, lorem sagittis ultrices lacinia, purus nisl suscipit nibh, vitae dapibus diam enim in velit. Nunc lacus. Fusce diam nibh, rutrum eget, pellentesque at, varius vitae, lectus. Vestibulum porta. Donec lorem ipsum, rutrum a, gravida id, consequat vitae, magna. Donec tempor enim. Sed urna. Proin eu pede. Aliquam a nisi. Nullam ipsum urna, vestibulum hendrerit, tincidunt vel, ornare et, pede. Etiam neque lacus, convallis ut, dapibus sit amet, viverra in, urna.</p>
+      <p>Nulla sodales sapien quis metus. Morbi dolor. Phasellus cursus augue vel mauris. Maecenas vitae sapien. Ut pretium risus. In sem diam, feugiat non, porta vel, adipiscing et, libero. Sed aliquet ornare tellus. Quisque justo est, tristique quis, bibendum sed, varius vel, velit. Duis a enim. Morbi egestas, turpis quis posuere malesuada, elit diam tincidunt massa, sit amet dignissim nisi libero in odio. Cras eu est. Maecenas tempus enim eget erat. In hac habitasse platea dictumst. Duis varius mi vitae pede. Quisque dignissim mauris nec turpis. Nulla sed dui. Ut nulla mauris, molestie id, tincidunt sit amet, vehicula sit amet, nulla.</p>
+      <p>Suspendisse potenti. Etiam ut quam ut nulla ornare dictum. Suspendisse faucibus auctor massa. Mauris gravida, pede in laoreet molestie, nisl velit blandit massa, non tincidunt nisi sem at felis. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Nulla quam elit, varius at, pulvinar nec, placerat sed, odio. Aliquam congue, justo molestie elementum imperdiet, diam nisl posuere mi, et venenatis felis lorem ac sem. Maecenas luctus. Sed tempus nunc vitae urna. Fusce luctus mi a libero. Vivamus mollis, ipsum et feugiat ullamcorper, ipsum purus dignissim nibh, vel pulvinar ligula dui nec felis. Etiam ac justo.</p>
+      <p>Morbi imperdiet pulvinar purus. Fusce et erat non sapien tincidunt porta. Integer adipiscing. Vivamus justo odio, interdum sit amet, imperdiet sed, convallis at, risus. Morbi venenatis. Proin id metus. Nulla sed felis eu mi vestibulum blandit. Cras enim libero, pharetra luctus, tristique a, molestie sed, metus. In varius, erat a pharetra ullamcorper, purus massa consectetur eros, et commodo orci lorem in lacus. Nunc pede elit, pellentesque sed, placerat eget, porta sit amet, elit. Vestibulum eu odio. Phasellus elit odio, gravida a, mollis ac, posuere id, leo. Donec diam. Proin varius lorem eget nibh. </p>
+    </div>
+    <div id="right">
+      <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed commodo hendrerit mi. Praesent libero lorem, sollicitudin bibendum, ultricies in, pharetra id, risus. Donec malesuada tristique felis. Etiam ligula. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec auctor sollicitudin tortor. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur volutpat lacus quis pede. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Proin eu enim. Maecenas porttitor metus sit amet tortor. Aenean non tellus in ante interdum ornare. Integer blandit consectetur sem. Morbi in leo quis felis vehicula pharetra. Suspendisse porta felis eu turpis. Ut vestibulum.</p>
+      <p>Nunc luctus, tellus quis volutpat ultricies, leo sapien sagittis justo, vitae suscipit justo magna ac dolor. Maecenas libero est, consectetur auctor, rutrum in, laoreet eu, diam. Ut tempor, lorem sagittis ultrices lacinia, purus nisl suscipit nibh, vitae dapibus diam enim in velit. Nunc lacus. Fusce diam nibh, rutrum eget, pellentesque at, varius vitae, lectus. Vestibulum porta. Donec lorem ipsum, rutrum a, gravida id, consequat vitae, magna. Donec tempor enim. Sed urna. Proin eu pede. Aliquam a nisi. Nullam ipsum urna, vestibulum hendrerit, tincidunt vel, ornare et, pede. Etiam neque lacus, convallis ut, dapibus sit amet, viverra in, urna.</p>
+    </div>
+    <div id="footer">Copyright info</div>
+  </div>
+</div>
+</body>
+</html>

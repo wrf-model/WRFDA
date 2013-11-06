@@ -1,0 +1,604 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_SURFACE_DRIVER'><A href='../../html_code/phys/module_surface_driver.F.html#MODULE_SURFACE_DRIVER' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_surface_driver</font> <A href='../../call_to/MODULE_SURFACE_DRIVER.html' TARGET='index'>5</A><a name='5'>
+CONTAINS<a name='6'>
+<a name='7'>
+<A NAME='SURFACE_DRIVER'><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='8'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>surface_driver</font>(                                         &amp; <A href='../../call_to/SURFACE_DRIVER.html' TARGET='index'>3</A>,<A href='../../call_from/SURFACE_DRIVER.html' TARGET='index'>30</A><a name='9'>
+     &amp;           ACSNOM,ACSNOW,AKHS,AKMS,ALBEDO,BR,CANWAT,CAPG        &amp;<a name='10'>
+     &amp;          ,CHKLOWQ,CONFIG_FLAGS,DT,DX,DZ8W,DZS,EMISS,GLW        &amp;<a name='11'>
+     &amp;          ,GRDFLX,GSW,GZ1OZ0,HFX,HOL,HT,IFSNOW,ISFFLX           &amp;<a name='12'>
+     &amp;          ,ISLTYP,ITIMESTEP,IVGTYP,LOWLYR,MAVAIL,MOIST,MOL,RMOL &amp;<a name='13'>
+     &amp;          ,NUM_SOIL_LAYERS,N_MOIST,P8W,PBLH,PI_PHY,PSHLTR,PSIH  &amp;<a name='14'>
+     &amp;          ,PSIM,P_PHY,Q10,Q2,QFX,QSFC,QSHLTR,QZ0,RAINBL         &amp;<a name='15'>
+     &amp;          ,RAINCV,RAINNCV,REGIME,RHO,SFCEVP,SFCEXC,SFCRUNOFF    &amp;<a name='16'>
+     &amp;          ,SMOIS,SMSTAV,SMSTOT,SNOALB,SNOW,SNOWC,SNOWH,STEPBL   &amp;<a name='17'>
+     &amp;          ,T2,TH10,TH2,THC,THZ0,TH_PHY,TMN,TSHLTR,TSK,TSLB      &amp;<a name='18'>
+     &amp;          ,T_PHY,U10,UDRUNOFF,UST,UZ0,U_FRAME,U_PHY,V10,VEGFRA  &amp;<a name='19'>
+     &amp;          ,VZ0,V_FRAME,V_PHY,WARM_RAIN,WSPD,XICE,XLAND,Z,ZNT,ZS &amp;<a name='20'>
+     &amp;          ,CT,TKE_MYJ                                           &amp;<a name='21'>
+     &amp;          ,ALBBCK,LH,SH2O,SHDMAX,SHDMIN,Z0                      &amp;<a name='22'>
+     &amp;          ,FLQC,FLHC,QSG,QVG,QCG,SOILT1,TSNAV                   &amp; <font color=#447700>! RUC LSM only<a name='23'></font>
+     &amp;          ,SMFR3D,KEEPFR3DFLAG                                  &amp;<a name='24'>
+     &amp;          ,PSFC                                                 &amp;<a name='25'>
+     &amp;          ,ids,ide,jds,jde,kds,kde                              &amp;<a name='26'>
+     &amp;          ,ims,ime,jms,jme,kms,kme                              &amp;<a name='27'>
+     &amp;          ,i_start,i_end,j_start,j_end,kts,kte,num_tiles        &amp;<a name='28'>
+     &amp;          ,POTEVP,SNOPCX,SOILTB,SR                              ) <font color=#447700>! optional args<a name='29'></font>
+<a name='30'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_109"><a name='31'>
+   USE module_state_description<a name='32'>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_44"><a name='33'>
+<a name='34'>
+<font color=#447700>! *** add new modules of schemes here<a name='35'></font>
+<a name='36'>
+   USE <A href='../../html_code/phys/module_sf_sfclay.F.html#MODULE_SF_SFCLAY'>module_sf_sfclay</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_SFCLAY_2"><a name='37'>
+   USE <A href='../../html_code/phys/module_sf_myjsfc.F.html#MODULE_SF_MYJSFC'>module_sf_myjsfc</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_MYJSFC_2"><a name='38'>
+   USE <A href='../../html_code/phys/module_sf_noahlsm.F.html#MODULE_SF_NOAHLSM'>module_sf_noahlsm</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_NOAHLSM_2"><a name='39'>
+   USE <A href='../../html_code/phys/module_sf_ruclsm.F.html#MODULE_SF_RUCLSM'>module_sf_ruclsm</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_RUCLSM_2"><a name='40'>
+#if ( NMM_CORE == 1 )<a name='41'>
+   USE <A href='../../html_code/phys/module_sf_lsm_nmm.F.html#MODULE_SF_LSM_NMM'>module_sf_lsm_nmm</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_LSM_NMM_2"><a name='42'>
+#endif<a name='43'>
+<a name='44'>
+   USE <A href='../../html_code/phys/module_sf_slab.F.html#MODULE_SF_SLAB'>module_sf_slab</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_SLAB_2"><a name='45'>
+<font color=#447700>!<a name='46'></font>
+   USE <A href='../../html_code/phys/module_sf_sfcdiags.F.html#MODULE_SF_SFCDIAGS'>module_sf_sfcdiags</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SF_SFCDIAGS_1"><a name='47'>
+<font color=#447700>!<a name='48'></font>
+<a name='49'>
+   <font color=#447700>!  This driver calls subroutines for the surface parameterizations.<a name='50'></font>
+   <font color=#447700>!<a name='51'></font>
+   <font color=#447700>!  surface layer: (between surface and pbl)<a name='52'></font>
+   <font color=#447700>!      1. sfclay<a name='53'></font>
+   <font color=#447700>!      2. myjsfc<a name='54'></font>
+   <font color=#447700>!  surface: ground temp/lsm scheme:<a name='55'></font>
+   <font color=#447700>!      1. slab<a name='56'></font>
+   <font color=#447700>!      2. Noah LSM<a name='57'></font>
+   <font color=#447700>!      99. NMM LSM (NMM core only)<a name='58'></font>
+<font color=#447700>!------------------------------------------------------------------<a name='59'></font>
+   IMPLICIT NONE<a name='60'>
+<font color=#447700>!======================================================================<a name='61'></font>
+<font color=#447700>! Grid structure in physics part of WRF<a name='62'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='63'></font>
+<font color=#447700>! The horizontal velocities used in the physics are unstaggered<a name='64'></font>
+<font color=#447700>! relative to temperature/moisture variables. All predicted<a name='65'></font>
+<font color=#447700>! variables are carried at half levels except w, which is at full<a name='66'></font>
+<font color=#447700>! levels. Some arrays with names (*8w) are at w (full) levels.<a name='67'></font>
+<font color=#447700>!<a name='68'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='69'></font>
+<font color=#447700>! In WRF, kms (smallest number) is the bottom level and kme (largest<a name='70'></font>
+<font color=#447700>! number) is the top level.  In your scheme, if 1 is at the top level,<a name='71'></font>
+<font color=#447700>! then you have to reverse the order in the k direction.<a name='72'></font>
+<font color=#447700>!<a name='73'></font>
+<font color=#447700>!         kme      -   half level (no data at this level)<a name='74'></font>
+<font color=#447700>!         kme    ----- full level<a name='75'></font>
+<font color=#447700>!         kme-1    -   half level<a name='76'></font>
+<font color=#447700>!         kme-1  ----- full level<a name='77'></font>
+<font color=#447700>!         .<a name='78'></font>
+<font color=#447700>!         kms+2    -   half level<a name='79'></font>
+<font color=#447700>!         kms+2  ----- full level<a name='80'></font>
+<font color=#447700>!         kms+1    -   half level<a name='81'></font>
+<font color=#447700>!         kms+1  ----- full level<a name='82'></font>
+<font color=#447700>!         kms      -   half level<a name='83'></font>
+<font color=#447700>!         kms    ----- full level<a name='84'></font>
+<font color=#447700>!<a name='85'></font>
+<font color=#447700>!======================================================================<a name='86'></font>
+<font color=#447700>! Definitions<a name='87'></font>
+<font color=#447700>!-----------<a name='88'></font>
+<font color=#447700>! Theta      potential temperature (K)<a name='89'></font>
+<font color=#447700>! Qv         water vapor mixing ratio (kg/kg)<a name='90'></font>
+<font color=#447700>! Qc         cloud water mixing ratio (kg/kg)<a name='91'></font>
+<font color=#447700>! Qr         rain water mixing ratio (kg/kg)<a name='92'></font>
+<font color=#447700>! Qi         cloud ice mixing ratio (kg/kg)<a name='93'></font>
+<font color=#447700>! Qs         snow mixing ratio (kg/kg)<a name='94'></font>
+<font color=#447700>!-----------------------------------------------------------------<a name='95'></font>
+<font color=#447700>!-- itimestep     number of time steps<a name='96'></font>
+<font color=#447700>!-- GLW           downward long wave flux at ground surface (W/m^2)<a name='97'></font>
+<font color=#447700>!-- GSW           downward short wave flux at ground surface (W/m^2)<a name='98'></font>
+<font color=#447700>!-- EMISS         surface emissivity (between 0 and 1)<a name='99'></font>
+<font color=#447700>!-- TSK           surface temperature (K)<a name='100'></font>
+<font color=#447700>!-- TMN           soil temperature at lower boundary (K)<a name='101'></font>
+<font color=#447700>!-- XLAND         land mask (1 for land, 2 for water)<a name='102'></font>
+<font color=#447700>!-- ZNT           time-varying roughness length (m)<a name='103'></font>
+<font color=#447700>!-- Z0            background roughness length (m)<a name='104'></font>
+<font color=#447700>!-- MAVAIL        surface moisture availability (between 0 and 1)<a name='105'></font>
+<font color=#447700>!-- UST           u* in similarity theory (m/s)<a name='106'></font>
+<font color=#447700>!-- MOL           T* (similarity theory) (K)<a name='107'></font>
+<font color=#447700>!-- HOL           PBL height over Monin-Obukhov length<a name='108'></font>
+<font color=#447700>!-- PBLH          PBL height (m)<a name='109'></font>
+<font color=#447700>!-- CAPG          heat capacity for soil (J/K/m^3)<a name='110'></font>
+<font color=#447700>!-- THC           thermal inertia (Cal/cm/K/s^0.5)<a name='111'></font>
+<font color=#447700>!-- SNOWC         flag indicating snow coverage (1 for snow cover)<a name='112'></font>
+<font color=#447700>!-- HFX           net upward heat flux at the surface (W/m^2)<a name='113'></font>
+<font color=#447700>!-- QFX           net upward moisture flux at the surface (kg/m^2/s)<a name='114'></font>
+<font color=#447700>!-- LH            net upward latent heat flux at surface (W/m^2)<a name='115'></font>
+<font color=#447700>!-- REGIME        flag indicating PBL regime (stable, unstable, etc.)<a name='116'></font>
+<font color=#447700>!-- tke_myj       turbulence kinetic energy from Mellor-Yamada-Janjic (MYJ) (m^2/s^2)<a name='117'></font>
+<font color=#447700>!-- akhs          sfc exchange coefficient of heat/moisture from MYJ<a name='118'></font>
+<font color=#447700>!-- akms          sfc exchange coefficient of momentum from MYJ<a name='119'></font>
+<font color=#447700>!-- thz0          potential temperature at roughness length (K)<a name='120'></font>
+<font color=#447700>!-- uz0           u wind component at roughness length (m/s)<a name='121'></font>
+<font color=#447700>!-- vz0           v wind component at roughness length (m/s)<a name='122'></font>
+<font color=#447700>!-- qsfc          specific humidity at lower boundary (kg/kg)<a name='123'></font>
+<font color=#447700>!-- u10           diagnostic 10-m u component from surface layer<a name='124'></font>
+<font color=#447700>!-- v10           diagnostic 10-m v component from surface layer<a name='125'></font>
+<font color=#447700>!-- th2           diagnostic 2-m theta from surface layer and lsm<a name='126'></font>
+<font color=#447700>!-- t2            diagnostic 2-m temperature from surface layer and lsm<a name='127'></font>
+<font color=#447700>!-- q2            diagnostic 2-m mixing ratio from surface layer and lsm<a name='128'></font>
+<font color=#447700>!-- tshltr        diagnostic 2-m theta from MYJ<a name='129'></font>
+<font color=#447700>!-- th10          diagnostic 10-m theta from MYJ<a name='130'></font>
+<font color=#447700>!-- qshltr        diagnostic 2-m specific humidity from MYJ<a name='131'></font>
+<font color=#447700>!-- q10           diagnostic 10-m specific humidity from MYJ<a name='132'></font>
+<font color=#447700>!-- lowlyr        index of lowest model layer above ground<a name='133'></font>
+<font color=#447700>!-- rr            dry air density (kg/m^3)<a name='134'></font>
+<font color=#447700>!-- u_phy         u-velocity interpolated to theta points (m/s)<a name='135'></font>
+<font color=#447700>!-- v_phy         v-velocity interpolated to theta points (m/s)<a name='136'></font>
+<font color=#447700>!-- th_phy        potential temperature (K)<a name='137'></font>
+<font color=#447700>!-- moist         moisture array (4D - last index is species) (kg/kg)<a name='138'></font>
+<font color=#447700>!-- p_phy         pressure (Pa)<a name='139'></font>
+<font color=#447700>!-- pi_phy        exner function (dimensionless)<a name='140'></font>
+<font color=#447700>!-- pshltr        diagnostic shelter (2m) pressure from MYJ (Pa)<a name='141'></font>
+<font color=#447700>!-- p8w           pressure at full levels (Pa)<a name='142'></font>
+<font color=#447700>!-- t_phy         temperature (K)<a name='143'></font>
+<font color=#447700>!-- dz8w          dz between full levels (m)<a name='144'></font>
+<font color=#447700>!-- z             height above sea level (m)<a name='145'></font>
+<font color=#447700>!-- config_flags<a name='146'></font>
+<font color=#447700>!-- DX            horizontal space interval (m)<a name='147'></font>
+<font color=#447700>!-- DT            time step (second)<a name='148'></font>
+<font color=#447700>!-- PSFC          pressure at the surface (Pa)<a name='149'></font>
+<font color=#447700>!-- TSLB          <a name='150'></font>
+<font color=#447700>!-- ZS<a name='151'></font>
+<font color=#447700>!-- DZS<a name='152'></font>
+<font color=#447700>!-- num_soil_layers number of soil layer<a name='153'></font>
+<font color=#447700>!-- IFSNOW      ifsnow=1 for snow-cover effects<a name='154'></font>
+<font color=#447700>!<a name='155'></font>
+<font color=#447700>!-- P_QV          species index for water vapor<a name='156'></font>
+<font color=#447700>!-- P_QC          species index for cloud water<a name='157'></font>
+<font color=#447700>!-- P_QR          species index for rain water<a name='158'></font>
+<font color=#447700>!-- P_QI          species index for cloud ice<a name='159'></font>
+<font color=#447700>!-- P_QS          species index for snow<a name='160'></font>
+<font color=#447700>!-- P_QG          species index for graupel<a name='161'></font>
+<font color=#447700>!-- ids           start index for i in domain<a name='162'></font>
+<font color=#447700>!-- ide           end index for i in domain<a name='163'></font>
+<font color=#447700>!-- jds           start index for j in domain<a name='164'></font>
+<font color=#447700>!-- jde           end index for j in domain<a name='165'></font>
+<font color=#447700>!-- kds           start index for k in domain<a name='166'></font>
+<font color=#447700>!-- kde           end index for k in domain<a name='167'></font>
+<font color=#447700>!-- ims           start index for i in memory<a name='168'></font>
+<font color=#447700>!-- ime           end index for i in memory<a name='169'></font>
+<font color=#447700>!-- jms           start index for j in memory<a name='170'></font>
+<font color=#447700>!-- jme           end index for j in memory<a name='171'></font>
+<font color=#447700>!-- kms           start index for k in memory<a name='172'></font>
+<font color=#447700>!-- kme           end index for k in memory<a name='173'></font>
+<font color=#447700>!-- its           start index for i in tile<a name='174'></font>
+<font color=#447700>!-- ite           end index for i in tile<a name='175'></font>
+<font color=#447700>!-- jts           start index for j in tile<a name='176'></font>
+<font color=#447700>!-- jte           end index for j in tile<a name='177'></font>
+<font color=#447700>!-- kts           start index for k in tile<a name='178'></font>
+<font color=#447700>!-- kte           end index for k in tile<a name='179'></font>
+<font color=#447700>!<a name='180'></font>
+<font color=#447700>!******************************************************************<a name='181'></font>
+<font color=#447700>!------------------------------------------------------------------ <a name='182'></font>
+<a name='183'>
+   INTEGER, INTENT(IN) ::                                             &amp;<a name='184'>
+     &amp;           ids,ide,jds,jde,kds,kde                              &amp;<a name='185'>
+     &amp;          ,ims,ime,jms,jme,kms,kme                              &amp;<a name='186'>
+     &amp;          ,kts,kte,num_tiles<a name='187'>
+<a name='188'>
+   INTEGER, DIMENSION(num_tiles), INTENT(IN) ::                       &amp;<a name='189'>
+     &amp;           i_start,i_end,j_start,j_end<a name='190'>
+<a name='191'>
+   TYPE(grid_config_rec_type), INTENT(IN )::   CONFIG_FLAGS<a name='192'>
+   INTEGER, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   ISLTYP<a name='193'>
+   INTEGER, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   IVGTYP<a name='194'>
+   INTEGER, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   LOWLYR<a name='195'>
+   INTEGER, INTENT(IN )::   IFSNOW<a name='196'>
+   INTEGER, INTENT(IN )::   ISFFLX<a name='197'>
+   INTEGER, INTENT(IN )::   ITIMESTEP<a name='198'>
+   INTEGER, INTENT(IN )::   NUM_SOIL_LAYERS<a name='199'>
+   INTEGER, INTENT(IN )::   N_MOIST<a name='200'>
+   INTEGER, INTENT(IN )::   STEPBL<a name='201'>
+   LOGICAL, INTENT(IN )::   WARM_RAIN<a name='202'>
+   REAL , INTENT(IN )::   U_FRAME<a name='203'>
+   REAL , INTENT(IN )::   V_FRAME<a name='204'>
+   REAL, DIMENSION( ims:ime , 1:num_soil_layers, jms:jme ), INTENT(INOUT)::   SMOIS<a name='205'>
+   REAL, DIMENSION( ims:ime , 1:num_soil_layers, jms:jme ), INTENT(INOUT)::   TSLB<a name='206'>
+   REAL, DIMENSION( ims:ime , 1:num_soil_layers, jms:jme ), INTENT(INOUT)::   SMFR3D<a name='207'>
+   REAL, DIMENSION( ims:ime , 1:num_soil_layers, jms:jme ), INTENT(INOUT)::   KEEPFR3DFLAG<a name='208'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   GLW<a name='209'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   GSW<a name='210'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   HT<a name='211'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   RAINCV<a name='212'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   RAINNCV<a name='213'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   THC<a name='214'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   TMN<a name='215'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   VEGFRA<a name='216'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   XICE<a name='217'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   XLAND<a name='218'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT)::   MAVAIL<a name='219'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT)::   EMISS<a name='220'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT)::   SNOALB<a name='221'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT)::   T2<a name='222'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   ACSNOW<a name='223'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   AKHS<a name='224'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   AKMS<a name='225'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   ALBEDO<a name='226'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   CANWAT<a name='227'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   CAPG<a name='228'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   GRDFLX<a name='229'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   HFX<a name='230'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   HOL<a name='231'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   MOL<a name='232'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   RMOL<a name='233'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   PBLH<a name='234'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   Q2<a name='235'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   QFX<a name='236'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   QSFC<a name='237'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   QZ0<a name='238'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   RAINBL<a name='239'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   REGIME<a name='240'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   SFCRUNOFF<a name='241'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   SMSTAV<a name='242'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   SMSTOT<a name='243'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   SNOW<a name='244'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   SNOWC<a name='245'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   SNOWH<a name='246'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   TH2<a name='247'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   THZ0<a name='248'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   TSK<a name='249'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   UDRUNOFF<a name='250'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   UST<a name='251'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   UZ0<a name='252'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   VZ0<a name='253'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   WSPD<a name='254'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , INTENT(INOUT)::   ZNT<a name='255'>
+   REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(INOUT)::   POTEVP <font color=#447700>! NMM LSM<a name='256'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(INOUT)::   SNOPCX <font color=#447700>! NMM LSM<a name='257'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(INOUT)::   SOILTB <font color=#447700>! NMM LSM<a name='258'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ) , OPTIONAL, INTENT(IN)::   SR <font color=#447700>! NMM LSM<a name='259'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   BR<a name='260'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   CHKLOWQ<a name='261'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   GZ1OZ0<a name='262'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   PSHLTR<a name='263'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   PSIH<a name='264'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   PSIM<a name='265'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   Q10<a name='266'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   QSHLTR<a name='267'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   TH10<a name='268'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   TSHLTR<a name='269'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   U10<a name='270'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   V10<a name='271'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(OUT)::   PSFC<a name='272'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   ACSNOM<a name='273'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   SFCEVP<a name='274'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   SFCEXC<a name='275'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   FLHC<a name='276'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   FLQC<a name='277'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   QSG<a name='278'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   QVG<a name='279'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   QCG<a name='280'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   SOILT1<a name='281'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)::   TSNAV<a name='282'>
+   REAL, DIMENSION( ims:ime, jms:jme ), INTENT(INOUT) ::   CT<a name='283'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   DZ8W<a name='284'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   P8W<a name='285'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   PI_PHY<a name='286'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   P_PHY<a name='287'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   RHO<a name='288'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   TH_PHY<a name='289'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   T_PHY<a name='290'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   U_PHY<a name='291'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   V_PHY<a name='292'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(IN )::   Z<a name='293'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ), INTENT(INOUT) ::   TKE_MYJ<a name='294'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme, n_moist ) , INTENT(IN )::   MOIST<a name='295'>
+   REAL, DIMENSION(1:num_soil_layers), INTENT(IN)::   DZS<a name='296'>
+   REAL, DIMENSION(1:num_soil_layers), INTENT(IN)::   ZS<a name='297'>
+   REAL, INTENT(IN )::   DT<a name='298'>
+   REAL, INTENT(IN )::   DX<a name='299'>
+<a name='300'>
+<font color=#447700>!  arguments for NCAR surface physics<a name='301'></font>
+<a name='302'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT )::   ALBBCK  <font color=#447700>! INOUT needed for NMM<a name='303'></font>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT )::   LH<a name='304'>
+   REAL, DIMENSION( ims:ime , 1:num_soil_layers, jms:jme ), INTENT(INOUT)::   SH2O<a name='305'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   SHDMAX<a name='306'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   SHDMIN<a name='307'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN )::   Z0<a name='308'>
+<a name='309'>
+<font color=#447700>!  LOCAL  VAR<a name='310'></font>
+<a name='311'>
+   REAL,       DIMENSION( ims:ime, kms:kme, jms:jme ) ::v_phytmp<a name='312'>
+   REAL,       DIMENSION( ims:ime, kms:kme, jms:jme ) ::u_phytmp<a name='313'>
+<a name='314'>
+   REAL,       DIMENSION( ims:ime, jms:jme )          ::  TSKOLD, &amp;<a name='315'>
+                                                          USTOLD, &amp;<a name='316'>
+                                                          ZNTOLD, &amp;<a name='317'>
+                                                             ZOL<a name='318'>
+<a name='319'>
+   REAL,       DIMENSION( ims:ime, jms:jme )          ::          &amp;<a name='320'>
+                                                             QGH, &amp;<a name='321'>
+                                                             CHS, &amp;<a name='322'>
+                                                             CPM, &amp;<a name='323'>
+                                                            CHS2, &amp;<a name='324'>
+                                                            CQS2<a name='325'>
+<a name='326'>
+   REAL    :: DTMIN,DTBL<a name='327'>
+<font color=#447700>!<a name='328'></font>
+   INTEGER :: i,J,K,NK,jj,ij<a name='329'>
+   LOGICAL :: radiation<a name='330'>
+<font color=#447700>!<a name='331'></font>
+<font color=#447700>!<a name='332'></font>
+<font color=#447700>!------------------------------------------------------------------<a name='333'></font>
+<font color=#447700>!<a name='334'></font>
+<a name='335'>
+  if (config_flags%sf_sfclay_physics .eq. 0) return<a name='336'>
+<a name='337'>
+  v_phytmp = 0.<a name='338'>
+  u_phytmp = 0.<a name='339'>
+  TSKOLD = 0.<a name='340'>
+  USTOLD = 0.<a name='341'>
+  ZNTOLD = 0.<a name='342'>
+  ZOL = 0.<a name='343'>
+  QGH = 0.<a name='344'>
+  CHS = 0.<a name='345'>
+  CPM = 0.<a name='346'>
+  CHS2 = 0.<a name='347'>
+  DTMIN = 0.<a name='348'>
+  DTBL = 0.<a name='349'>
+<a name='350'>
+<font color=#447700>! RAINBL in mm (Accumulation between PBL calls)<a name='351'></font>
+<a name='352'>
+  <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='353'></font>
+  <font color=#447700>!$OMP PRIVATE ( ij, i, j, k )<a name='354'></font>
+  DO ij = 1 , num_tiles<a name='355'>
+    DO j=j_start(ij),j_end(ij)<a name='356'>
+    DO i=i_start(ij),i_end(ij)<a name='357'>
+       RAINBL(i,j) = RAINBL(i,j) + RAINCV(i,j) + RAINNCV(i,j) <a name='358'>
+       RAINBL(i,j) = MAX (RAINBL(i,j), 0.0) <a name='359'>
+    ENDDO<a name='360'>
+    ENDDO<a name='361'>
+  ENDDO<a name='362'>
+  <font color=#447700>!$OMP END PARALLEL DO<a name='363'></font>
+<a name='364'>
+  IF (itimestep .eq. 1 .or. mod(itimestep,STEPBL) .eq. 0) THEN<a name='365'>
+<a name='366'>
+  radiation = .false.<a name='367'>
+  IF (config_flags%ra_lw_physics .gt. 0) radiation = .true.<a name='368'>
+<a name='369'>
+<font color=#447700>!---- <a name='370'></font>
+<font color=#447700>! CALCULATE CONSTANT<a name='371'></font>
+ <a name='372'>
+     DTMIN=DT/60.<a name='373'>
+<font color=#447700>! Surface schemes need PBL time step for updates and accumulations<a name='374'></font>
+<font color=#447700>! Assume these schemes provide no tendencies<a name='375'></font>
+     DTBL=DT*STEPBL<a name='376'>
+<a name='377'>
+<font color=#447700>! SAVE OLD VALUES<a name='378'></font>
+<a name='379'>
+<a name='380'>
+     <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='381'></font>
+     <font color=#447700>!$OMP PRIVATE ( ij, i, j, k )<a name='382'></font>
+     DO ij = 1 , num_tiles<a name='383'>
+       DO j=j_start(ij),j_end(ij)<a name='384'>
+       DO i=i_start(ij),i_end(ij)<a name='385'>
+          TSKOLD(i,j)=TSK(i,j)<a name='386'>
+          USTOLD(i,j)=UST(i,j)<a name='387'>
+          ZNTOLD(i,j)=ZNT(i,j)<a name='388'>
+<font color=#447700>! PSFC : in Pa<a name='389'></font>
+          PSFC(I,J)=p8w(I,kts,J)<a name='390'>
+<font color=#447700>! REVERSE ORDER IN THE VERTICAL DIRECTION<a name='391'></font>
+          DO k=kts,kte<a name='392'>
+            v_phytmp(i,k,j)=v_phy(i,k,j)+v_frame<a name='393'>
+            u_phytmp(i,k,j)=u_phy(i,k,j)+u_frame<a name='394'>
+          ENDDO<a name='395'>
+       ENDDO<a name='396'>
+       ENDDO<a name='397'>
+     ENDDO<a name='398'>
+     <font color=#447700>!$OMP END PARALLEL DO<a name='399'></font>
+<a name='400'>
+     <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='401'></font>
+     <font color=#447700>!$OMP PRIVATE ( ij, i, j, k )<a name='402'></font>
+     DO ij = 1 , num_tiles<a name='403'>
+     sfclay_select: SELECT CASE(config_flags%sf_sfclay_physics)<a name='404'>
+<a name='405'>
+     CASE (SFCLAYSCHEME)<a name='406'>
+#if (NMM_CORE <font color=#447700>!= 1)<a name='407'></font>
+<font color=#447700>! DX varies spatially in NMM, therefore, SFCLAY cannot be called<a name='408'></font>
+<font color=#447700>! because it takes a scalar DX. NMM passes in a dummy value for this<a name='409'></font>
+<font color=#447700>! scalar.  NEEDS FURTHER ATTENTION. JM 20050215<a name='410'></font>
+       CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_175">( 100, 'in SFCLAY' )<a name='411'>
+         CALL <A href='../../html_code/phys/module_sf_sfclay.F.html#SFCLAY'>SFCLAY</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SFCLAY_1">(u_phytmp,v_phytmp,t_phy,moist(ims,kms,jms,P_QV),&amp;<a name='412'>
+               p_phy,dz8w,CP,G,RCP,R_d,XLV,PSFC,CHS,CHS2,CQS2,CPM, &amp;<a name='413'>
+               ZNTOLD,USTOLD,PBLH,MAVAIL,ZOL,MOL,REGIME,PSIM,PSIH, &amp;<a name='414'>
+               XLAND,HFX,QFX,LH,TSK,FLHC,FLQC,QGH,QSFC,RMOL,       &amp;<a name='415'>
+               U10,V10,TH2,T2,Q2,                                  &amp;<a name='416'>
+               GZ1OZ0,WSPD,BR,ISFFLX,DX,                           &amp;<a name='417'>
+               SVP1,SVP2,SVP3,SVPT0,EP_1,EP_2,KARMAN,EOMEG,STBOLT, &amp;<a name='418'>
+               ids,ide, jds,jde, kds,kde,                          &amp;<a name='419'>
+               ims,ime, jms,jme, kms,kme,                          &amp;<a name='420'>
+               i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='421'>
+#else<a name='422'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_201">('SFCLAY cannot be used with NMM')<a name='423'>
+#endif<a name='424'>
+      CASE (MYJSFCSCHEME)<a name='425'>
+<a name='426'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_176">(100,'in MYJSFC')<a name='427'>
+            CALL <A href='../../html_code/phys/module_sf_myjsfc.F.html#MYJSFC'>MYJSFC</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MYJSFC_1">(itimestep,ht,dz8w,                         &amp;<a name='428'>
+              p_phy,p8w,th_phy,t_phy,                              &amp;<a name='429'>
+              moist(ims,kms,jms,P_QV),moist(ims,kms,jms,P_QC),     &amp;<a name='430'>
+              u_phy,v_phy,tke_myj,                                 &amp;<a name='431'>
+              TSK,QSFC,THZ0,QZ0,UZ0,VZ0,                           &amp;<a name='432'>
+              LOWLYR,                                              &amp;<a name='433'>
+              XLAND,                                               &amp;<a name='434'>
+              UST,ZNT,PBLH,MAVAIL,RMOL,                            &amp;<a name='435'>
+              AKHS,AKMS,                                           &amp;<a name='436'>
+              CHS,CHS2,CQS2,HFX,QFX,LH,FLHC,FLQC,QGH,CPM,CT,       &amp;<a name='437'>
+              U10,V10,TSHLTR,TH10,QSHLTR,Q10,PSHLTR,               &amp;<a name='438'>
+              ids,ide, jds,jde, kds,kde,                           &amp;<a name='439'>
+              ims,ime, jms,jme, kms,kme,                           &amp;<a name='440'>
+              i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='441'>
+<a name='442'>
+     CASE DEFAULT<a name='443'>
+        <a name='444'>
+       WRITE( wrf_err_message , * ) 'The sfclay option does not exist: sf_sfclay_physics = ', config_flags%sf_sfclay_physics<a name='445'>
+       CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_202"> ( wrf_err_message )<a name='446'>
+<a name='447'>
+     END SELECT sfclay_select<a name='448'>
+     ENDDO<a name='449'>
+     <font color=#447700>!$OMP END PARALLEL DO<a name='450'></font>
+<a name='451'>
+     IF (ISFFLX.EQ.0 ) GOTO 430<a name='452'>
+     <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='453'></font>
+     <font color=#447700>!$OMP PRIVATE ( ij, i, j, k )<a name='454'></font>
+     DO ij = 1 , num_tiles<a name='455'>
+<a name='456'>
+     sfc_select: SELECT CASE(config_flags%sf_surface_physics)<a name='457'>
+<a name='458'>
+     CASE (SLABSCHEME)<a name='459'>
+    <a name='460'>
+<a name='461'>
+           DO j=j_start(ij),j_end(ij)<a name='462'>
+           DO i=i_start(ij),i_end(ij)<a name='463'>
+<font color=#447700>!          CQS2 ACCOUNTS FOR MAVAIL FOR SFCDIAGS 2M Q<a name='464'></font>
+              CQS2(I,J)= CQS2(I,J)*MAVAIL(I,J)<a name='465'>
+           ENDDO<a name='466'>
+           ENDDO<a name='467'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_177">(100,'in SLAB')<a name='468'>
+          CALL <A href='../../html_code/phys/module_sf_slab.F.html#SLAB'>SLAB</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SLAB_1">(t_phy,moist(ims,kms,jms,P_QV),p_phy,FLHC,FLQC,  &amp;<a name='469'>
+             PSFC,XLAND,TMN,HFX,QFX,LH,TSK,QSFC,CHKLOWQ,          &amp;<a name='470'>
+             GSW,GLW,CAPG,THC,SNOWC,EMISS,MAVAIL,                 &amp;<a name='471'>
+             DTBL,RCP,XLV,DTMIN,IFSNOW,                           &amp;<a name='472'>
+             SVP1,SVP2,SVP3,SVPT0,EP_2,KARMAN,EOMEG,STBOLT,       &amp;<a name='473'>
+             TSLB,ZS,DZS,num_soil_layers,radiation,               &amp;<a name='474'>
+             ids,ide, jds,jde, kds,kde,                           &amp;<a name='475'>
+             ims,ime, jms,jme, kms,kme,                           &amp;<a name='476'>
+             i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='477'>
+<a name='478'>
+<a name='479'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_178">(100,'in SFCDIAGS')<a name='480'>
+          CALL <A href='../../html_code/phys/module_sf_sfcdiags.F.html#SFCDIAGS'>SFCDIAGS</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SFCDIAGS_1">(HFX,QFX,TSK,QSFC,CHS2,CQS2,T2,TH2,Q2,      &amp;<a name='481'>
+                     PSFC,CP,R_d,RCP,                              &amp;<a name='482'>
+                     ids,ide, jds,jde, kds,kde,                    &amp;<a name='483'>
+                     ims,ime, jms,jme, kms,kme,                    &amp;<a name='484'>
+             i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='485'>
+<a name='486'>
+#if ( NMM_CORE == 1 )<a name='487'>
+     CASE (NMMLSMSCHEME)<a name='488'>
+         IF ( config_flags%dyn_opt .EQ. DYN_NMM ) THEN<a name='489'>
+           CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_179">(100,'in NMM LSM')<a name='490'>
+           CALL <A href='../../html_code/phys/module_sf_lsm_nmm.F.html#NMMLSM'>nmmlsm</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NMMLSM_1">(dz8w,moist(ims,kms,jms,P_QV),p8w,rho,       &amp;<a name='491'>
+                t_phy,th_phy,TSK,CHS,                           &amp;<a name='492'>
+                HFX,QFX,QGH,GSW,GLW,LH,RMOL,                    &amp;<a name='493'>
+                SMSTAV,SMSTOT,SFCRUNOFF,                        &amp;<a name='494'>
+                UDRUNOFF,IVGTYP,ISLTYP,VEGFRA,SFCEVP,POTEVP,    &amp;<a name='495'>
+                GRDFLX,SFCEXC,ACSNOW,ACSNOM,SNOPCX,             &amp;<a name='496'>
+                ALBBCK,TMN,XLAND,XICE,QZ0,                      &amp;<a name='497'>
+                th2,q2,SNOWC,CQS2,QSFC,SOILTB,CHKLOWQ,RAINBL,   &amp;<a name='498'>
+                num_soil_layers,DTBL,DZS,itimestep,             &amp;<a name='499'>
+                SMOIS,TSLB,SNOW,CANWAT,CPM,RCP,SR,              &amp;    <font color=#447700>!TSLB<a name='500'></font>
+                ALBEDO,SNOALB,SH2O,SNOWH,                       &amp;<a name='501'>
+                ids,ide, jds,jde, kds,kde,                      &amp;<a name='502'>
+                ims,ime, jms,jme, kms,kme,                      &amp;<a name='503'>
+                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='504'>
+          ELSE<a name='505'>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_203">( 'Must specify NMM core with NMM LSM' )<a name='506'>
+          ENDIF<a name='507'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_180">(100,'back from NMM LSM')<a name='508'>
+#endif<a name='509'>
+<a name='510'>
+     CASE (LSMSCHEME)<a name='511'>
+<a name='512'>
+<font color=#447700>!------------------------------------------------------------------<a name='513'></font>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_181">(100,'in NOAH LSM')<a name='514'>
+           CALL <A href='../../html_code/phys/module_sf_noahlsm.F.html#LSM'>lsm</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LSM_1">(dz8w,moist(ims,kms,jms,P_QV),p8w,t_phy,TSK,  &amp;<a name='515'>
+                HFX,QFX,LH,GRDFLX,QGH,GSW,GLW,SMSTAV,SMSTOT,    &amp;<a name='516'>
+                SFCRUNOFF,UDRUNOFF,IVGTYP,ISLTYP,VEGFRA,        &amp;<a name='517'>
+                ALBEDO,ALBBCK,ZNT,Z0, TMN,XLAND,XICE, EMISS,    &amp;<a name='518'>
+                SNOWC,QSFC,RAINBL,                              &amp; <a name='519'>
+                num_soil_layers,DTBL,DZS,itimestep,             &amp;<a name='520'>
+                SMOIS,TSLB,SNOW,CANWAT,CHS, CPM,RCP,            &amp;    <a name='521'>
+                SH2O,SNOWH,                                     &amp; <font color=#447700>!H  <a name='522'></font>
+                SNOALB,SHDMIN,SHDMAX,                           &amp; <font color=#447700>!I<a name='523'></font>
+                ACSNOW,ACSNOW,                                  &amp; <font color=#447700>!O <a name='524'></font>
+                ids,ide, jds,jde, kds,kde,                      &amp;<a name='525'>
+                ims,ime, jms,jme, kms,kme,                      &amp;<a name='526'>
+                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='527'>
+<a name='528'>
+           DO j=j_start(ij),j_end(ij)<a name='529'>
+           DO i=i_start(ij),i_end(ij)<a name='530'>
+              CHKLOWQ(I,J)= 1.0<a name='531'>
+           ENDDO<a name='532'>
+           ENDDO<a name='533'>
+         <a name='534'>
+          CALL <A href='../../html_code/phys/module_sf_sfcdiags.F.html#SFCDIAGS'>SFCDIAGS</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SFCDIAGS_2">(HFX,QFX,TSK,QSFC,CQS2,CQS2,T2,TH2,Q2,      &amp;<a name='535'>
+                     PSFC,CP,R_d,RCP,                              &amp;<a name='536'>
+                     ids,ide, jds,jde, kds,kde,                    &amp;<a name='537'>
+                     ims,ime, jms,jme, kms,kme,                    &amp;<a name='538'>
+             i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='539'>
+<font color=#447700>!------------------------------------------------------------------<a name='540'></font>
+<a name='541'>
+     CASE (RUCLSMSCHEME)<a name='542'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_182">(100,'in RUC LSM')<a name='543'>
+           CALL <A href='../../html_code/phys/module_sf_ruclsm.F.html#LSMRUC'>LSMRUC</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LSMRUC_1">(DTBL,itimestep,num_soil_layers,          &amp;<a name='544'>
+                ZS,RAINBL,SNOW,SNOWC,                           &amp;<a name='545'>
+                dz8w,P8W,T_PHY,moist(ims,kms,jms,p_qv),         &amp; <font color=#447700>!p8W in [PA]<a name='546'></font>
+                moist(ims,kms,jms,P_QC),RHO,                    &amp;<a name='547'>
+                GLW,GSW,EMISS,CHKLOWQ,                          &amp;<a name='548'>
+                FLQC,FLHC,MAVAIL,CANWAT,VEGFRA,ALBEDO,ZNT,      &amp;<a name='549'>
+                QSFC,QSG,QVG,QCG,SOILT1,TSNAV,                  &amp;<a name='550'>
+                TMN,IVGTYP,ISLTYP,XLAND,XICE,                   &amp;<a name='551'>
+                CP,G,XLV,STBOLT,                                &amp;<a name='552'>
+                SMOIS,SMSTAV,SMSTOT,TSLB,TSK,HFX,QFX,LH,        &amp;<a name='553'>
+                SFCRUNOFF,UDRUNOFF,SFCEXC,                      &amp;<a name='554'>
+                SFCEVP,GRDFLX,ACSNOW,                           &amp;<a name='555'>
+                SMFR3D,KEEPFR3DFLAG,                            &amp;<a name='556'>
+                ids,ide, jds,jde, kds,kde,                      &amp;<a name='557'>
+                ims,ime, jms,jme, kms,kme,                      &amp;<a name='558'>
+                i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='559'>
+<a name='560'>
+           DO j=j_start(ij),j_end(ij)<a name='561'>
+           DO i=i_start(ij),i_end(ij)<a name='562'>
+              CHKLOWQ(I,J)= 1.0<a name='563'>
+           ENDDO<a name='564'>
+           ENDDO<a name='565'>
+<a name='566'>
+          CALL <A href='../../html_code/phys/module_sf_sfcdiags.F.html#SFCDIAGS'>SFCDIAGS</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SFCDIAGS_3">(HFX,QFX,TSK,QSFC,CHS2,CQS2,T2,TH2,Q2,      &amp;<a name='567'>
+                     PSFC,CP,R_d,RCP,                              &amp;<a name='568'>
+                     ids,ide, jds,jde, kds,kde,                    &amp;<a name='569'>
+                     ims,ime, jms,jme, kms,kme,                    &amp;<a name='570'>
+             i_start(ij),i_end(ij), j_start(ij),j_end(ij), kts,kte    )<a name='571'>
+<a name='572'>
+     CASE DEFAULT<a name='573'>
+<a name='574'>
+       WRITE( wrf_err_message , * ) 'The surface option does not exist: sf_surface_physics = ', config_flags%sf_surface_physics<a name='575'>
+       CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_surface_driver.F.html#SURFACE_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_204"> ( wrf_err_message )<a name='576'>
+<a name='577'>
+     END SELECT sfc_select<a name='578'>
+     ENDDO<a name='579'>
+     <font color=#447700>!$OMP END PARALLEL DO<a name='580'></font>
+<a name='581'>
+ 430 CONTINUE<a name='582'>
+<a name='583'>
+<a name='584'>
+<font color=#447700>! Reset RAINBL in mm (Accumulation between PBL calls)<a name='585'></font>
+<a name='586'>
+     <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='587'></font>
+     <font color=#447700>!$OMP PRIVATE ( ij, i, j, k )<a name='588'></font>
+     DO ij = 1 , num_tiles<a name='589'>
+       DO j=j_start(ij),j_end(ij)<a name='590'>
+       DO i=i_start(ij),i_end(ij)<a name='591'>
+          RAINBL(i,j) = 0.<a name='592'>
+       ENDDO<a name='593'>
+       ENDDO<a name='594'>
+     ENDDO<a name='595'>
+     <font color=#447700>!$OMP END PARALLEL DO<a name='596'></font>
+<a name='597'>
+   ENDIF<a name='598'>
+<a name='599'>
+   END SUBROUTINE surface_driver<a name='600'>
+<a name='601'>
+END MODULE module_surface_driver<a name='602'>
+<a name='603'>
+</pre></body></html>

@@ -1,0 +1,458 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_CUMULUS_DRIVER'><A href='../../html_code/phys/module_cumulus_driver.F.html#MODULE_CUMULUS_DRIVER' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_cumulus_driver</font> <A href='../../call_to/MODULE_CUMULUS_DRIVER.html' TARGET='index'>5</A><a name='6'>
+CONTAINS<a name='7'>
+<A NAME='CUMULUS_DRIVER'><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='8'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>cumulus_driver</font>(                                         &amp; <A href='../../call_to/CUMULUS_DRIVER.html' TARGET='index'>3</A>,<A href='../../call_from/CUMULUS_DRIVER.html' TARGET='index'>18</A><a name='9'>
+                 <font color=#447700>! Order dependent args for domain, mem, and tile dims<a name='10'></font>
+                      ids,ide, jds,jde, kds,kde                       &amp;<a name='11'>
+                     ,ims,ime, jms,jme, kms,kme                       &amp;<a name='12'>
+                     ,i_start,i_end,j_start,j_end,kts,kte,num_tiles   &amp;<a name='13'>
+                 <font color=#447700>! Order independent args (use VAR= in call)<a name='14'></font>
+                 <font color=#447700>! --Prognostic<a name='15'></font>
+                     ,u,v,th,t,w                                      &amp;<a name='16'>
+                     ,p,pi,rho                                        &amp;<a name='17'>
+                 <font color=#447700>! --Other arguments<a name='18'></font>
+                     ,itimestep,dt,dx                                 &amp;<a name='19'>
+                     ,rainc,raincv,nca                                &amp;<a name='20'>
+                     ,dz8w,p8w                                        &amp;<a name='21'>
+                     ,w0avg,stepcu                                    &amp;<a name='22'>
+                     ,cldefi,lowlyr,xland,cu_act_flag,warm_rain       &amp;<a name='23'>
+                     ,htop,hbot,kpbl,ht                               &amp;  <a name='24'>
+                     ,ensdim,maxiens,maxens,maxens2,maxens3           &amp;<a name='25'>
+                 <font color=#447700>! Package selection variable<a name='26'></font>
+                     ,cu_physics                                      &amp;<a name='27'>
+                 <font color=#447700>! Optional moisture tracers <a name='28'></font>
+                     ,qv_curr, qc_curr, qr_curr                       &amp;<a name='29'>
+                     ,qi_curr, qs_curr, qg_curr                       &amp; <a name='30'>
+                     ,qv_prev, qc_prev, qr_prev                       &amp; <a name='31'>
+                     ,qi_prev, qs_prev, qg_prev                       &amp;<a name='32'>
+                 <font color=#447700>! Optional arguments for GD scheme<a name='33'></font>
+                     ,apr_gr,apr_w,apr_mc,apr_st,apr_as,apr_capma     &amp;<a name='34'>
+                     ,apr_capme,apr_capmi                             &amp;<a name='35'>
+                     ,mass_flux,xf_ens,pr_ens                         &amp;<a name='36'>
+                 <font color=#447700>! Optional moisture and other tendencies<a name='37'></font>
+                     ,rqvcuten,rqccuten,rqrcuten                      &amp;<a name='38'>
+                     ,rqicuten,rqscuten,rqgcuten                      &amp;<a name='39'>
+                     ,rqvblten,rqvften                                &amp;<a name='40'>
+                     ,rthcuten,rthraten,rthblten,rthften              &amp;<a name='41'>
+                 <font color=#447700>! Optional moisture tracer flags <a name='42'></font>
+                     ,f_qv,f_qc,f_qr                                  &amp;<a name='43'>
+                     ,f_qi,f_qs,f_qg                                  &amp;<a name='44'>
+                                                                      )<a name='45'>
+<font color=#447700>!----------------------------------------------------------------------<a name='46'></font>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_34"><a name='47'>
+   USE module_state_description, ONLY:     KFSCHEME,BMJSCHEME         &amp;<a name='48'>
+                                          ,KFETASCHEME,GDSCHEME       &amp;<a name='49'>
+                                          ,SASSCHEME<a name='50'>
+<a name='51'>
+<font color=#447700>! *** add new modules of schemes here<a name='52'></font>
+<a name='53'>
+   USE <A href='../../html_code/phys/module_cu_kf.F.html#MODULE_CU_KF'>module_cu_kf</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_KF_1"><a name='54'>
+   USE <A href='../../html_code/phys/module_cu_bmj.F.html#MODULE_CU_BMJ'>module_cu_bmj</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_BMJ_1"><a name='55'>
+   USE <A href='../../html_code/phys/module_cu_kfeta.F.html#MODULE_CU_KFETA'>module_cu_kfeta</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_KFETA_1"><a name='56'>
+   USE <A href='../../html_code/phys/module_cu_gd.F.html#MODULE_CU_GD'>module_cu_gd</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_GD_1"><a name='57'>
+   USE <A href='../../html_code/phys/module_cu_sas.F.html#MODULE_CU_SAS'>module_cu_sas</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_SAS_1"><a name='58'>
+   USE <A href='../../html_code/phys/module_cu_du.F.html#MODULE_CU_DU'>module_cu_du</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CU_DU_6"><a name='59'>
+<a name='60'>
+   <font color=#447700>!  This driver calls subroutines for the cumulus parameterizations.<a name='61'></font>
+   <font color=#447700>!<a name='62'></font>
+   <font color=#447700>!  1. Kain &amp; Fritsch (1993)<a name='63'></font>
+   <font color=#447700>!  2. Betts-Miller-Janjic (Janjic, 1994)<a name='64'></font>
+   <font color=#447700>!<a name='65'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='66'></font>
+   IMPLICIT NONE<a name='67'>
+<font color=#447700>!======================================================================<a name='68'></font>
+<font color=#447700>! Grid structure in physics part of WRF<a name='69'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='70'></font>
+<font color=#447700>! The horizontal velocities used in the physics are unstaggered<a name='71'></font>
+<font color=#447700>! relative to temperature/moisture variables. All predicted<a name='72'></font>
+<font color=#447700>! variables are carried at half levels except w, which is at full<a name='73'></font>
+<font color=#447700>! levels. Some arrays with names (*8w) are at w (full) levels.<a name='74'></font>
+<font color=#447700>!<a name='75'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='76'></font>
+<font color=#447700>! In WRF, kms (smallest number) is the bottom level and kme (largest<a name='77'></font>
+<font color=#447700>! number) is the top level.  In your scheme, if 1 is at the top level,<a name='78'></font>
+<font color=#447700>! then you have to reverse the order in the k direction.<a name='79'></font>
+<font color=#447700>!<a name='80'></font>
+<font color=#447700>!         kme      -   half level (no data at this level)<a name='81'></font>
+<font color=#447700>!         kme    ----- full level<a name='82'></font>
+<font color=#447700>!         kme-1    -   half level<a name='83'></font>
+<font color=#447700>!         kme-1  ----- full level<a name='84'></font>
+<font color=#447700>!         .<a name='85'></font>
+<font color=#447700>!         .<a name='86'></font>
+<font color=#447700>!         .<a name='87'></font>
+<font color=#447700>!         kms+2    -   half level<a name='88'></font>
+<font color=#447700>!         kms+2  ----- full level<a name='89'></font>
+<font color=#447700>!         kms+1    -   half level<a name='90'></font>
+<font color=#447700>!         kms+1  ----- full level<a name='91'></font>
+<font color=#447700>!         kms      -   half level<a name='92'></font>
+<font color=#447700>!         kms    ----- full level<a name='93'></font>
+<font color=#447700>!<a name='94'></font>
+<font color=#447700>!======================================================================<a name='95'></font>
+<font color=#447700>! Definitions<a name='96'></font>
+<font color=#447700>!-----------<a name='97'></font>
+<font color=#447700>! Rho_d      dry density (kg/m^3)<a name='98'></font>
+<font color=#447700>! Theta_m    moist potential temperature (K)<a name='99'></font>
+<font color=#447700>! Qv         water vapor mixing ratio (kg/kg)<a name='100'></font>
+<font color=#447700>! Qc         cloud water mixing ratio (kg/kg)<a name='101'></font>
+<font color=#447700>! Qr         rain water mixing ratio (kg/kg)<a name='102'></font>
+<font color=#447700>! Qi         cloud ice mixing ratio (kg/kg)<a name='103'></font>
+<font color=#447700>! Qs         snow mixing ratio (kg/kg)<a name='104'></font>
+<font color=#447700>!-----------------------------------------------------------------<a name='105'></font>
+<font color=#447700>!-- DT            time step (second)<a name='106'></font>
+<font color=#447700>!-- itimestep     number of time step (integer)   <a name='107'></font>
+<font color=#447700>!-- DX            horizontal space interval (m)<a name='108'></font>
+<font color=#447700>!-- rr            dry air density (kg/m^3)<a name='109'></font>
+<font color=#447700>!<a name='110'></font>
+<font color=#447700>!-- RTHCUTEN      Theta tendency due to <a name='111'></font>
+<font color=#447700>!                 cumulus scheme precipitation (K/s)<a name='112'></font>
+<font color=#447700>!-- RQVCUTEN      Qv tendency due to <a name='113'></font>
+<font color=#447700>!                 cumulus scheme precipitation (kg/kg/s)<a name='114'></font>
+<font color=#447700>!-- RQRCUTEN      Qr tendency due to <a name='115'></font>
+<font color=#447700>!                 cumulus scheme precipitation (kg/kg/s)<a name='116'></font>
+<font color=#447700>!-- RQCCUTEN      Qc tendency due to <a name='117'></font>
+<font color=#447700>!                 cumulus scheme precipitation (kg/kg/s)<a name='118'></font>
+<font color=#447700>!-- RQSCUTEN      Qs tendency due to <a name='119'></font>
+<font color=#447700>!                 cumulus scheme precipitation (kg/kg/s)<a name='120'></font>
+<font color=#447700>!-- RQICUTEN      Qi tendency due to <a name='121'></font>
+<font color=#447700>!                 cumulus scheme precipitation (kg/kg/s)<a name='122'></font>
+<font color=#447700>!<a name='123'></font>
+<font color=#447700>!-- RAINC         accumulated total cumulus scheme precipitation (mm)<a name='124'></font>
+<font color=#447700>!-- RAINCV        cumulus scheme precipitation (mm)<a name='125'></font>
+<font color=#447700>!-- NCA           counter of the cloud relaxation <a name='126'></font>
+<font color=#447700>!                 time in KF cumulus scheme (integer)<a name='127'></font>
+<font color=#447700>!-- u_phy         u-velocity interpolated to theta points (m/s)<a name='128'></font>
+<font color=#447700>!-- v_phy         v-velocity interpolated to theta points (m/s)<a name='129'></font>
+<font color=#447700>!-- th_phy        potential temperature (K)<a name='130'></font>
+<font color=#447700>!-- t_phy         temperature (K)<a name='131'></font>
+<font color=#447700>!-- w             vertical velocity (m/s)<a name='132'></font>
+<font color=#447700>!-- moist         moisture array (4D - last index is species) (kg/kg)<a name='133'></font>
+<font color=#447700>!-- dz8w          dz between full levels (m)<a name='134'></font>
+<font color=#447700>!-- p8w           pressure at full levels (Pa)  <a name='135'></font>
+<font color=#447700>!-- p_phy         pressure (Pa)<a name='136'></font>
+<font color=#447700>!-- pi_phy        exner function (dimensionless)<a name='137'></font>
+<font color=#447700>!                 points (dimensionless)<a name='138'></font>
+<font color=#447700>!-- RTHRATEN      radiative temp forcing for Grell-Devenyi scheme<a name='139'></font>
+<font color=#447700>!-- RTHBLTEN      PBL temp forcing for Grell-Devenyi scheme<a name='140'></font>
+<font color=#447700>!-- RQVBLTEN      PBL moisture forcing for Grell-Devenyi scheme<a name='141'></font>
+<font color=#447700>!-- RTHFTEN<a name='142'></font>
+<font color=#447700>!-- RQVFTEN<a name='143'></font>
+<font color=#447700>!-- MASS_FLUX<a name='144'></font>
+<font color=#447700>!-- XF_ENS<a name='145'></font>
+<font color=#447700>!-- PR_ENS<a name='146'></font>
+<font color=#447700>!-- warm_rain<a name='147'></font>
+<font color=#447700>!-- CU_ACT_FLAG<a name='148'></font>
+<font color=#447700>!-- W0AVG         average vertical velocity, (for KF scheme) (m/s)<a name='149'></font>
+<font color=#447700>!-- rho           density (kg/m^3)<a name='150'></font>
+<font color=#447700>!-- CLDEFI        precipitation efficiency (for BMJ scheme) (dimensionless)<a name='151'></font>
+<font color=#447700>!-- STEPCU        # of fundamental timesteps between convection calls<a name='152'></font>
+<font color=#447700>!-- XLAND         land-sea mask (1.0 for land; 2.0 for water)<a name='153'></font>
+<font color=#447700>!-- LOWLYR        index of lowest model layer above the ground<a name='154'></font>
+<font color=#447700>!-- XLV0          latent heat of vaporization constant <a name='155'></font>
+<font color=#447700>!                 used in temperature dependent formula (J/kg)<a name='156'></font>
+<font color=#447700>!-- XLV1          latent heat of vaporization constant <a name='157'></font>
+<font color=#447700>!                 used in temperature dependent formula (J/kg/K)<a name='158'></font>
+<font color=#447700>!-- XLS0          latent heat of sublimation constant <a name='159'></font>
+<font color=#447700>!                 used in temperature dependent formula (J/kg)<a name='160'></font>
+<font color=#447700>!-- XLS1          latent heat of sublimation constant<a name='161'></font>
+<font color=#447700>!                 used in temperature dependent formula (J/kg/K)<a name='162'></font>
+<font color=#447700>!-- R_d           gas constant for dry air ( 287. J/kg/K)<a name='163'></font>
+<font color=#447700>!-- R_v           gas constant for water vapor (461 J/k/kg)<a name='164'></font>
+<font color=#447700>!-- Cp            specific heat at constant pressure (1004 J/k/kg)<a name='165'></font>
+<font color=#447700>!-- rvovrd        R_v divided by R_d (dimensionless)<a name='166'></font>
+<font color=#447700>!-- G             acceleration due to gravity (m/s^2)<a name='167'></font>
+<font color=#447700>!-- EP_1          constant for virtual temperature <a name='168'></font>
+<font color=#447700>!                 (R_v/R_d - 1) (dimensionless)<a name='169'></font>
+<font color=#447700>!-- pi_phy        the exner function, (p/p0)**(R/Cp) (none unit)<a name='170'></font>
+<font color=#447700>!-- ids           start index for i in domain<a name='171'></font>
+<font color=#447700>!-- ide           end index for i in domain<a name='172'></font>
+<font color=#447700>!-- jds           start index for j in domain<a name='173'></font>
+<font color=#447700>!-- jde           end index for j in domain<a name='174'></font>
+<font color=#447700>!-- kds           start index for k in domain<a name='175'></font>
+<font color=#447700>!-- kde           end index for k in domain<a name='176'></font>
+<font color=#447700>!-- ims           start index for i in memory<a name='177'></font>
+<font color=#447700>!-- ime           end index for i in memory<a name='178'></font>
+<font color=#447700>!-- jms           start index for j in memory<a name='179'></font>
+<font color=#447700>!-- jme           end index for j in memory<a name='180'></font>
+<font color=#447700>!-- kms           start index for k in memory<a name='181'></font>
+<font color=#447700>!-- kme           end index for k in memory<a name='182'></font>
+<font color=#447700>!-- i_start       start indices for i in tile<a name='183'></font>
+<font color=#447700>!-- i_end         end indices for i in tile<a name='184'></font>
+<font color=#447700>!-- j_start       start indices for j in tile<a name='185'></font>
+<font color=#447700>!-- j_end         end indices for j in tile<a name='186'></font>
+<font color=#447700>!-- kts           start index for k in tile<a name='187'></font>
+<font color=#447700>!-- kte           end index for k in tile<a name='188'></font>
+<font color=#447700>!-- num_tiles     number of tiles<a name='189'></font>
+<font color=#447700>!-- HBOT          index of lowest model layer with convection<a name='190'></font>
+<font color=#447700>!-- HTOP          index of highest model layer with convection<a name='191'></font>
+<font color=#447700>!-- LBOT          index of lowest model layer with convection<a name='192'></font>
+<font color=#447700>!-- LTOP          index of highest model layer with convection<a name='193'></font>
+<font color=#447700>!-- KPBL          layer index of the PBL<a name='194'></font>
+<font color=#447700>!<a name='195'></font>
+<font color=#447700>!======================================================================<a name='196'></font>
+<a name='197'>
+   INTEGER,      INTENT(IN   )    ::                             &amp;<a name='198'>
+                                      ids,ide, jds,jde, kds,kde, &amp;<a name='199'>
+                                      ims,ime, jms,jme, kms,kme, &amp;<a name='200'>
+                                                        kts,kte, &amp;<a name='201'>
+                                      itimestep, num_tiles<a name='202'>
+   INTEGER, DIMENSION(num_tiles), INTENT(IN) ::                       &amp;<a name='203'>
+     &amp;           i_start,i_end,j_start,j_end<a name='204'>
+<a name='205'>
+   INTEGER,      INTENT(IN   )    ::                             &amp;<a name='206'>
+                           ensdim,maxiens,maxens,maxens2,maxens3<a name='207'>
+<a name='208'>
+   INTEGER,      INTENT(IN   )    ::   cu_physics<a name='209'>
+   INTEGER,      INTENT(IN   )    ::   STEPCU<a name='210'>
+   LOGICAL,      INTENT(IN   )    ::   warm_rain<a name='211'>
+<a name='212'>
+   INTEGER,DIMENSION( ims:ime, jms:jme ),                        &amp;<a name='213'>
+           INTENT(IN ) ::                                LOWLYR<a name='214'>
+<a name='215'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                 &amp;<a name='216'>
+         INTENT(IN ) ::                                          &amp;<a name='217'>
+                                                           dz8w  &amp;<a name='218'>
+                                                      ,     p8w  &amp;<a name='219'>
+                                                      ,       p  &amp;<a name='220'>
+                                                      ,      pi  &amp;<a name='221'>
+                                                      ,       u  &amp;<a name='222'>
+                                                      ,       v  &amp;<a name='223'>
+                                                      ,      th  &amp;<a name='224'>
+                                                      ,       t  &amp;<a name='225'>
+                                                      ,     rho  &amp;<a name='226'>
+                                                      ,       w<a name='227'>
+<a name='228'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                 &amp;<a name='229'>
+         INTENT(INOUT)  ::                                       &amp;<a name='230'>
+                                                          W0AVG<a name='231'>
+<a name='232'>
+   REAL, DIMENSION( ims:ime , jms:jme ), INTENT(IN) ::           &amp;<a name='233'>
+                                                       HT,XLAND<a name='234'>
+<a name='235'>
+   REAL, DIMENSION( ims:ime , jms:jme ),                         &amp;<a name='236'>
+          INTENT(INOUT) ::                                RAINC  &amp;<a name='237'>
+                                                    ,    RAINCV  &amp;<a name='238'>
+                                                    ,       NCA  &amp; <a name='239'>
+                                                    ,      HTOP  &amp; <a name='240'>
+                                                    ,      HBOT  &amp;<a name='241'>
+                                                    ,    CLDEFI <a name='242'>
+ <a name='243'>
+<a name='244'>
+   INTEGER, DIMENSION( ims:ime , jms:jme ),                      &amp;<a name='245'>
+                    INTENT(IN) ::                          KPBL<a name='246'>
+<a name='247'>
+<a name='248'>
+   LOGICAL, DIMENSION( ims:ime , jms:jme ),                      &amp;<a name='249'>
+          INTENT(INOUT) :: CU_ACT_FLAG<a name='250'>
+<a name='251'>
+   REAL,  INTENT(IN   ) :: DT, DX<a name='252'>
+<a name='253'>
+<font color=#447700>!<a name='254'></font>
+<font color=#447700>! optional arguments<a name='255'></font>
+<font color=#447700>!<a name='256'></font>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                 &amp;<a name='257'>
+         OPTIONAL, INTENT(INOUT) ::                              &amp;<a name='258'>
+                      <font color=#447700>! optional moisture tracers<a name='259'></font>
+                      <font color=#447700>! 2 time levels; if only one then use CURR<a name='260'></font>
+                      qv_curr, qc_curr, qr_curr                  &amp;<a name='261'>
+                     ,qi_curr, qs_curr, qg_curr                  &amp; <a name='262'>
+                     ,qv_prev, qc_prev, qr_prev                  &amp; <a name='263'>
+                     ,qi_prev, qs_prev, qg_prev                  &amp;<a name='264'>
+                      <font color=#447700>! optional moisture and other tendencies<a name='265'></font>
+                     ,rqvcuten,rqccuten,rqrcuten                 &amp;<a name='266'>
+                     ,rqicuten,rqscuten,rqgcuten                 &amp;<a name='267'>
+                     ,rqvblten,rqvften                           &amp;<a name='268'>
+                     ,rthraten,rthblten                          &amp;<a name='269'>
+                     ,rthften,rthcuten<a name='270'>
+<a name='271'>
+   REAL, DIMENSION( ims:ime , jms:jme ),                         &amp;<a name='272'>
+                    OPTIONAL,                                    &amp;<a name='273'>
+                    INTENT(INOUT) ::                             &amp;<a name='274'>
+                apr_gr,apr_w,apr_mc,apr_st,apr_as,apr_capma      &amp;<a name='275'>
+               ,apr_capme,apr_capmi                              &amp;<a name='276'>
+                                                    , MASS_FLUX<a name='277'>
+<a name='278'>
+   REAL, DIMENSION( ims:ime , jms:jme , 1:ensdim ),              &amp;<a name='279'>
+          OPTIONAL,                                              &amp;<a name='280'>
+          INTENT(INOUT) ::                       XF_ENS, PR_ENS<a name='281'>
+<a name='282'>
+<font color=#447700>!<a name='283'></font>
+<font color=#447700>! Flags relating to the optional tendency arrays declared above<a name='284'></font>
+<font color=#447700>! Models that carry the optional tendencies will provdide the<a name='285'></font>
+<font color=#447700>! optional arguments at compile time; these flags all the model<a name='286'></font>
+<font color=#447700>! to determine at run-time whether a particular tracer is in<a name='287'></font>
+<font color=#447700>! use or not.<a name='288'></font>
+<font color=#447700>!<a name='289'></font>
+   LOGICAL, INTENT(IN), OPTIONAL ::                             &amp;<a name='290'>
+                                                      f_qv      &amp;<a name='291'>
+                                                     ,f_qc      &amp;<a name='292'>
+                                                     ,f_qr      &amp;<a name='293'>
+                                                     ,f_qi      &amp;<a name='294'>
+                                                     ,f_qs      &amp;<a name='295'>
+                                                     ,f_qg<a name='296'>
+<a name='297'>
+<a name='298'>
+<font color=#447700>! LOCAL  VAR<a name='299'></font>
+<a name='300'>
+   INTEGER :: i,j,k,its,ite,jts,jte,ij<a name='301'>
+<a name='302'>
+<font color=#447700>!-----------------------------------------------------------------<a name='303'></font>
+<a name='304'>
+   IF (cu_physics .eq. 0) return<a name='305'>
+<a name='306'>
+<font color=#447700>! DON'T JUDGE TIME STEP HERE, SINCE KF NEEDS ACCUMULATED W FIELD.<a name='307'></font>
+<font color=#447700>! DO IT INSIDE THE INDIVIDUAL CUMULUS SCHEME<a name='308'></font>
+<a name='309'>
+<font color=#447700>! SET START AND END POINTS FOR TILES<a name='310'></font>
+      <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='311'></font>
+      <font color=#447700>!$OMP PRIVATE ( ij ,its,ite,jts,jte, i,j,k)<a name='312'></font>
+<a name='313'>
+      DO ij = 1 , num_tiles<a name='314'>
+        its = i_start(ij)<a name='315'>
+        ite = i_end(ij)<a name='316'>
+        jts = j_start(ij)<a name='317'>
+        jte = j_end(ij)<a name='318'>
+<a name='319'>
+<a name='320'>
+   cps_select: SELECT CASE(cu_physics)<a name='321'>
+<a name='322'>
+     CASE (KFSCHEME)<a name='323'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_148">(100,'in kfcps')<a name='324'>
+<a name='325'>
+          CALL <A href='../../html_code/phys/module_cu_kf.F.html#KFCPS'>KFCPS</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KFCPS_1">(                                           &amp;<a name='326'>
+              <font color=#447700>! order independent arguments<a name='327'></font>
+                DT=dt ,KTAU=itimestep ,DX=dx ,RHO=rho           &amp;<a name='328'>
+               ,U=u ,V=v ,TH=th ,T=t ,W=w                       &amp;<a name='329'>
+               ,PCPS=p ,PI=pi                                   &amp;<a name='330'>
+               ,XLV0=xlv0 ,XLV1=xlv1 ,XLS0=xls0 ,XLS1=xls1      &amp;<a name='331'>
+               ,RAINCV=raincv ,NCA=nca                          &amp;<a name='332'>
+               ,DZ8W=dz8w                                       &amp;<a name='333'>
+               ,W0AVG=w0avg                                     &amp;<a name='334'>
+               ,CP=cp ,R=r_d ,G=g ,EP1=ep_1 ,EP2=ep_2           &amp;<a name='335'>
+               ,SVP1=svp1 ,SVP2=svp2 ,SVP3=svp3 ,SVPT0=svpt0    &amp;<a name='336'>
+               ,STEPCU=stepcu                                   &amp;<a name='337'>
+               ,CU_ACT_FLAG=cu_act_flag                         &amp;<a name='338'>
+               ,WARM_RAIN=warm_rain                             &amp;<a name='339'>
+               ,QV=qv_curr                                      &amp;<a name='340'>
+               ,IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &amp;<a name='341'>
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &amp;<a name='342'>
+               ,ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte &amp;<a name='343'>
+              <font color=#447700>! optionals<a name='344'></font>
+               ,RTHCUTEN=rthcuten ,RQVCUTEN=rqvcuten            &amp;<a name='345'>
+               ,RQCCUTEN=rqccuten ,RQRCUTEN=rqrcuten            &amp;<a name='346'>
+               ,RQICUTEN=rqicuten ,RQSCUTEN=rqscuten            &amp;<a name='347'>
+               ,F_QV=f_qv,F_QC=f_qc,F_QR=f_qr                   &amp;<a name='348'>
+               ,F_QI=f_qi,F_QS=f_qs                             &amp;<a name='349'>
+                                                                )<a name='350'>
+<a name='351'>
+     CASE (BMJSCHEME)<a name='352'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_149">(100,'in bmj_cps')<a name='353'>
+          CALL <A href='../../html_code/phys/module_cu_bmj.F.html#BMJDRV'>BMJDRV</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="BMJDRV_1">(                                          &amp;<a name='354'>
+                TH=th,T=T ,RAINCV=raincv, RHO=rho               &amp;<a name='355'>
+               ,DT=dt ,ITIMESTEP=itimestep ,STEPCU=stepcu       &amp;<a name='356'>
+               ,CUTOP=htop, CUBOT=hbot, KPBL=kpbl               &amp;<a name='357'>
+               ,DZ8W=dz8w ,PINT=p8w, PMID=p, PI=pi              &amp;<a name='358'>
+               ,CP=cp ,R=r_d ,ELWV=xlv ,ELIV=xls ,G=g           &amp;<a name='359'>
+               ,TFRZ=svpt0 ,D608=ep_1 ,CLDEFI=cldefi            &amp;<a name='360'>
+               ,LOWLYR=lowlyr ,XLAND=xland                      &amp;<a name='361'>
+               ,CU_ACT_FLAG=cu_act_flag                         &amp;<a name='362'>
+               ,QV=qv_curr                                      &amp;<a name='363'>
+               ,IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &amp;<a name='364'>
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &amp;<a name='365'>
+               ,ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte &amp;<a name='366'>
+              <font color=#447700>! optionals<a name='367'></font>
+               ,RTHCUTEN=rthcuten ,RQVCUTEN=rqvcuten            &amp;<a name='368'>
+                                                                )<a name='369'>
+<a name='370'>
+     CASE (KFETASCHEME)<a name='371'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_150">(100,'in kf_eta_cps')<a name='372'>
+          CALL <A href='../../html_code/phys/module_cu_kfeta.F.html#KF_ETA_CPS'>KF_ETA_CPS</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KF_ETA_CPS_1">(                                      &amp;<a name='373'>
+                U=u ,V=v ,TH=th ,T=t ,W=w ,RHO=rho              &amp;<a name='374'>
+               ,RAINCV=raincv, NCA=nca ,DZ8W=dz8w               &amp;<a name='375'>
+               ,PCPS=p, PI=pi ,W0AVG=W0AVG                      &amp;<a name='376'>
+               ,CUTOP=HTOP,CUBOT=HBOT                           &amp;<a name='377'>
+               ,XLV0=XLV0 ,XLV1=XLV1 ,XLS0=XLS0 ,XLS1=XLS1      &amp;<a name='378'>
+               ,CP=CP ,R=R_d ,G=G ,EP1=EP_1 ,EP2=EP_2           &amp;<a name='379'>
+               ,SVP1=SVP1 ,SVP2=SVP2 ,SVP3=SVP3 ,SVPT0=SVPT0    &amp;<a name='380'>
+               ,DT=dt ,KTAU=itimestep ,DX=dx                    &amp;<a name='381'>
+               ,STEPCU=stepcu                                   &amp;<a name='382'>
+               ,CU_ACT_FLAG=cu_act_flag ,warm_rain=warm_rain    &amp;<a name='383'>
+               ,QV=qv_curr                                      &amp;<a name='384'>
+               ,IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &amp;<a name='385'>
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &amp;<a name='386'>
+               ,ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte &amp;<a name='387'>
+              <font color=#447700>! optionals<a name='388'></font>
+               ,RTHCUTEN=rthcuten                               &amp;<a name='389'>
+               ,RQVCUTEN=rqvcuten ,RQCCUTEN=rqccuten            &amp;<a name='390'>
+               ,RQRCUTEN=rqrcuten ,RQICUTEN=rqicuten            &amp;<a name='391'>
+               ,RQSCUTEN=rqscuten                               &amp;<a name='392'>
+               ,F_QV=f_qv,F_QC=f_qc,F_QR=f_qr                   &amp;<a name='393'>
+               ,F_QI=f_qi,F_QS=f_qs                             &amp;<a name='394'>
+                                                                )<a name='395'>
+<a name='396'>
+     CASE (GDSCHEME)<a name='397'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_151">(100,'in grelldrv')<a name='398'>
+          CALL <A href='../../html_code/phys/module_cu_gd.F.html#GRELLDRV'>GRELLDRV</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GRELLDRV_1">(                                        &amp;<a name='399'>
+                DT=dt, ITIMESTEP=itimestep, DX=dx               &amp;<a name='400'>
+               ,U=u,V=v,T=t,W=w ,RHO=rho                        &amp;<a name='401'>
+               ,P=p,PI=pi ,Q=qv_curr ,RAINCV=raincv             &amp;<a name='402'>
+               ,DZ8W=dz8w ,XLV=xlv0,CP=cp,G=g,R_V=r_v           &amp;<a name='403'>
+               ,APR_GR=apr_gr,APR_W=apr_w,APR_MC=apr_mc         &amp;<a name='404'>
+               ,APR_ST=apr_st,APR_AS=apr_as                     &amp;<a name='405'>
+               ,APR_CAPMA=apr_capma,APR_CAPME=apr_capme         &amp;<a name='406'>
+               ,APR_CAPMI=apr_capmi,MASS_FLUX=mass_flux         &amp;<a name='407'>
+               ,XF_ENS=xf_ens,PR_ENS=pr_ens,HT=ht               &amp;<a name='408'>
+               ,ENSDIM=ensdim,MAXIENS=maxiens,MAXENS=maxens     &amp;<a name='409'>
+               ,MAXENS2=maxens2,MAXENS3=maxens3                 &amp;<a name='410'>
+               ,STEPCU=STEPCU                                   &amp;<a name='411'>
+               ,CU_ACT_FLAG=CU_ACT_FLAG,warm_rain=warm_rain     &amp;<a name='412'>
+               ,IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &amp;<a name='413'>
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &amp;<a name='414'>
+               ,ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte &amp;<a name='415'>
+              <font color=#447700>! optionals<a name='416'></font>
+               ,RTHCUTEN=RTHCUTEN ,RTHFTEN=RTHFTEN              &amp; <a name='417'>
+               ,RTHRATEN=RTHRATEN,RTHBLTEN=RTHBLTEN             &amp;<a name='418'>
+               ,RQVCUTEN=RQVCUTEN,RQCCUTEN=RQCCUTEN             &amp;<a name='419'>
+               ,RQICUTEN=RQICUTEN ,RQVFTEN=RQVFTEN              &amp;<a name='420'>
+               ,RQVBLTEN=RQVBLTEN                               &amp;<a name='421'>
+               ,F_QV=f_qv,F_QC=f_qc,F_QR=f_qr                   &amp;<a name='422'>
+               ,F_QI=f_qi,F_QS=f_qs                             &amp;<a name='423'>
+                                                                )<a name='424'>
+     CASE (SASSCHEME)<a name='425'>
+                                                                                                                                           <a name='426'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_152">(100,'in cu_sas')<a name='427'>
+            CALL <A href='../../html_code/phys/module_cu_sas.F.html#CU_SAS'>CU_SAS</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CU_SAS_1">(                                        &amp;<a name='428'>
+                DT=dt,ITIMESTEP=itimestep,STEPCU=STEPCU         &amp;<a name='429'>
+               ,RAINCV=RAINCV,HTOP=HTOP,HBOT=HBOT               &amp;<a name='430'>
+               ,U3D=u,V3D=v,W=w,T3D=t,PI3D=pi,RHO3D=rho         &amp;<a name='431'>
+               ,QV3D=QV_CURR,QC3D=QC_CURR,QI3D=QI_CURR          &amp;<a name='432'>
+               ,DZ8W=dz8w,PCPS=p,P8W=p8w,XLAND=XLAND            &amp;<a name='433'>
+               ,CU_ACT_FLAG=CU_ACT_FLAG                         &amp;<a name='434'>
+               ,IDS=ids,IDE=ide,JDS=jds,JDE=jde,KDS=kds,KDE=kde &amp;<a name='435'>
+               ,IMS=ims,IME=ime,JMS=jms,JME=jme,KMS=kms,KME=kme &amp;<a name='436'>
+               ,ITS=its,ITE=ite,JTS=jts,JTE=jte,KTS=kts,KTE=kte &amp;<a name='437'>
+              <font color=#447700>! optionals<a name='438'></font>
+               ,RTHCUTEN=RTHCUTEN,RQVCUTEN=RQVCUTEN             &amp;<a name='439'>
+               ,RQCCUTEN=RQCCUTEN,RQICUTEN=RQICUTEN             &amp;<a name='440'>
+               ,F_QV=f_qv,F_QC=f_qc,F_QR=f_qr                   &amp;<a name='441'>
+               ,F_QI=f_qi,F_QS=f_qs                             &amp;<a name='442'>
+                                                                )<a name='443'>
+<a name='444'>
+     CASE DEFAULT <a name='445'>
+<a name='446'>
+         WRITE( wrf_err_message , * ) 'The cumulus option does not exist: cu_physics = ', cu_physics<a name='447'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_cumulus_driver.F.html#CUMULUS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_146"> ( wrf_err_message )<a name='448'>
+<a name='449'>
+   END SELECT cps_select<a name='450'>
+<a name='451'>
+      ENDDO<a name='452'>
+      <font color=#447700>!$OMP END PARALLEL DO<a name='453'></font>
+<a name='454'>
+   END SUBROUTINE cumulus_driver<a name='455'>
+<a name='456'>
+END MODULE module_cumulus_driver<a name='457'>
+</pre></body></html>

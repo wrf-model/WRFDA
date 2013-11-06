@@ -1,0 +1,1067 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<a name='2'>
+<font color=#447700>! ----------------------------------------------------------------------<a name='3'></font>
+<font color=#447700>! ----------------------------------------------------------------------<a name='4'></font>
+<a name='5'>
+<A NAME='TEST_SOLVE_EM'><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='6'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>test_solve_em</font> ( grid , config_flags , &amp;,<A href='../../call_from/TEST_SOLVE_EM.html' TARGET='index'>31</A><a name='7'>
+<font color=#447700>! Actual arguments generated from Registry<a name='8'></font>
+#include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_1"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='9'>
+<font color=#447700>!<a name='10'></font>
+                    )<a name='11'>
+<a name='12'>
+<a name='13'>
+<font color=#447700>! Driver layer modules<a name='14'></font>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_19"><a name='15'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_32"><a name='16'>
+   USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_6"><a name='17'>
+   USE <A href='../../html_code/frame/module_machine.F.html#MODULE_MACHINE'>module_machine</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MACHINE_6"><a name='18'>
+   USE <A href='../../html_code/frame/module_tiles.F.html#MODULE_TILES'>module_tiles</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_TILES_7"><a name='19'>
+   USE <A href='../../html_code/frame/module_dm_stubs.F.html#MODULE_DM'>module_dm</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DM_16"><a name='20'>
+<font color=#447700>! Mediation layer modules<a name='21'></font>
+<font color=#447700>! Model layer modules<a name='22'></font>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_29"><a name='23'>
+   USE <A href='../../html_code/dyn_em/module_small_step_em.F.html#MODULE_SMALL_STEP_EM'>module_small_step_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SMALL_STEP_EM_7"><a name='24'>
+   USE <A href='../../html_code/dyn_em/module_em.F.html#MODULE_EM'>module_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_EM_7"><a name='25'>
+   USE <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#MODULE_BIG_STEP_UTILITIES_EM'>module_big_step_utilities_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BIG_STEP_UTILITIES_EM_15"><a name='26'>
+   USE <A href='../../html_code/share/module_bc.F.html#MODULE_BC'>module_bc</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_25"><a name='27'>
+   USE <A href='../../html_code/dyn_em/module_bc_em.F.html#MODULE_BC_EM'>module_bc_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_EM_8"><a name='28'>
+   USE <A href='../../html_code/dyn_em/module_solvedebug_em.F.html#MODULE_SOLVEDEBUG_EM'>module_solvedebug_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SOLVEDEBUG_EM_5"><a name='29'>
+   USE <A href='../../html_code/phys/module_physics_addtendc.F.html#MODULE_PHYSICS_ADDTENDC'>module_physics_addtendc</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_PHYSICS_ADDTENDC_5"><a name='30'>
+   USE <A href='../../html_code/dyn_em/module_diffusion_em.F.html#MODULE_DIFFUSION_EM'>module_diffusion_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DIFFUSION_EM_7"><a name='31'>
+<font color=#447700>! Registry generated module<a name='32'></font>
+   USE module_state_description<a name='33'>
+   USE <A href='../../html_code/phys/module_radiation_driver.F.html#MODULE_RADIATION_DRIVER'>module_radiation_driver</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_RADIATION_DRIVER_5"><a name='34'>
+   USE <A href='../../html_code/phys/module_surface_driver.F.html#MODULE_SURFACE_DRIVER'>module_surface_driver</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_SURFACE_DRIVER_5"><a name='35'>
+   USE <A href='../../html_code/phys/module_cumulus_driver.F.html#MODULE_CUMULUS_DRIVER'>module_cumulus_driver</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CUMULUS_DRIVER_5"><a name='36'>
+   USE <A href='../../html_code/phys/module_microphysics_driver.F.html#MODULE_MICROPHYSICS_DRIVER'>module_microphysics_driver</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MICROPHYSICS_DRIVER_5"><a name='37'>
+   USE <A href='../../html_code/phys/module_pbl_driver.F.html#MODULE_PBL_DRIVER'>module_pbl_driver</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_PBL_DRIVER_5"><a name='38'>
+<a name='39'>
+   USE <A href='../../html_code/dyn_em/module_small_step_em_tl.F.html#G_MODULE_SMALL_STEP_EM'>g_module_small_step_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="G_MODULE_SMALL_STEP_EM_3"><a name='40'>
+   USE <A href='../../html_code/dyn_em/module_em_tl.F.html#G_MODULE_EM'>g_module_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="G_MODULE_EM_3"><a name='41'>
+   USE <A href='../../html_code/dyn_em/module_big_step_utilities_em_tl.F.html#G_MODULE_BIG_STEP_UTILITIES_EM'>g_module_big_step_utilities_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="G_MODULE_BIG_STEP_UTILITIES_EM_5"><a name='42'>
+   USE <A href='../../html_code/dyn_em/module_bc_tl.F.html#G_MODULE_BC'>g_module_bc</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="G_MODULE_BC_5"><a name='43'>
+   USE <A href='../../html_code/dyn_em/module_bc_em_tl.F.html#G_MODULE_BC_EM'>g_module_bc_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="G_MODULE_BC_EM_3"><a name='44'>
+   USE <A href='../../html_code/dyn_em/module_diffusion_em_tl.F.html#G_MODULE_DIFFUSION_EM'>g_module_diffusion_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="G_MODULE_DIFFUSION_EM_3"><a name='45'>
+<a name='46'>
+<font color=#447700>!   USE a_module_small_step_em<a name='47'></font>
+<font color=#447700>!   USE a_module_em<a name='48'></font>
+<font color=#447700>!   USE a_module_big_step_utilities_em<a name='49'></font>
+<font color=#447700>!   USE a_module_bc<a name='50'></font>
+<font color=#447700>!   USE a_module_bc_em<a name='51'></font>
+<font color=#447700>!   USE a_module_diffusion_em<a name='52'></font>
+<a name='53'>
+   IMPLICIT NONE<a name='54'>
+<a name='55'>
+<font color=#447700>!  INTERFACE<a name='56'></font>
+<font color=#447700>! include  &lt;../share/solve_em.int&gt;<a name='57'></font>
+<font color=#447700>! include  &lt;../share/solve_em_tl.int&gt;<a name='58'></font>
+<font color=#447700>! include  &lt;../share/solve_em_ad.int&gt;<a name='59'></font>
+<font color=#447700>!  END INTERFACE<a name='60'></font>
+<a name='61'>
+   <font color=#447700>!  Input data.<a name='62'></font>
+<a name='63'>
+   TYPE(domain) , TARGET          :: grid<a name='64'>
+<a name='65'>
+   <font color=#447700>!  Definitions of dummy arguments to this routine (generated from Registry).<a name='66'></font>
+#include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_2"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='67'>
+<a name='68'>
+   <font color=#447700>!  Structure that contains run-time configuration (namelist) data for domain<a name='69'></font>
+   TYPE (grid_config_rec_type) , INTENT(IN)          :: config_flags<a name='70'>
+<a name='71'>
+   <font color=#447700>! Local data<a name='72'></font>
+<a name='73'>
+   INTEGER                         :: k_start , k_end, its, ite, jts, jte<a name='74'>
+   INTEGER                         :: ids , ide , jds , jde , kds , kde , &amp;<a name='75'>
+                                      ims , ime , jms , jme , kms , kme , &amp;<a name='76'>
+                                      ips , ipe , jps , jpe , kps , kpe<a name='77'>
+   INTEGER                         :: ij , iteration<a name='78'>
+   INTEGER                         :: im , num_3d_m , ic , num_3d_c<a name='79'>
+   INTEGER                         :: loop<a name='80'>
+   INTEGER                         :: ijds, ijde<a name='81'>
+   INTEGER                         :: itmpstep<a name='82'>
+   INTEGER                         :: sz<a name='83'>
+<a name='84'>
+<font color=#447700>! storage for tendencies and decoupled state (generated from Registry)<a name='85'></font>
+#include &lt;<A href='../../html_code/include/em_i1_decl.inc.html'>em_i1_decl.inc</A>&gt;<A NAME="em_i1_decl.inc_3"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='86'>
+<a name='87'>
+   INTEGER :: rc<a name='88'>
+   INTEGER :: number_of_small_timesteps, rk_step<a name='89'>
+   INTEGER :: klevel,ijm,ijp,i,j,k,size1,size2    <font color=#447700>! for prints/plots only<a name='90'></font>
+   INTEGER :: idum1, idum2, dynamics_option<a name='91'>
+<a name='92'>
+   INTEGER :: rk_order, iwmax, jwmax, kwmax<a name='93'>
+   REAL :: dt_rk, dts_rk, dtm, wmax<a name='94'>
+   LOGICAL :: leapfrog<a name='95'>
+   INTEGER :: l,kte,kk<a name='96'>
+<a name='97'>
+<font color=#447700>! These are used if -DDEREF_KLUDGE is compiled<a name='98'></font>
+<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='99'></font>
+   INTEGER     :: sm31  , em31  , sm32  , em32  , sm33  , em33<a name='100'>
+   INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x<a name='101'>
+   INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y<a name='102'>
+<a name='103'>
+<font color=#447700>!---------------------------------------------<a name='104'></font>
+<font color=#447700>!---------------------------------------------<a name='105'></font>
+<a name='106'>
+<a name='107'>
+   INTEGER :: kts  <font color=#447700>!zzma<a name='108'></font>
+<a name='109'>
+<font color=#447700>!---------------------------------------------------------------------------------------<a name='110'></font>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_1<a name='111'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_2<a name='112'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ru<a name='113'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ru_m<a name='114'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ru_tend<a name='115'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_u_save<a name='116'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_v_1<a name='117'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_v_2<a name='118'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_rv<a name='119'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_rv_m<a name='120'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_rv_tend<a name='121'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_v_save<a name='122'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_w_1<a name='123'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_w_2<a name='124'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ww<a name='125'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_rw<a name='126'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ph_1<a name='127'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_ph_2<a name='128'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_phb<a name='129'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_php<a name='130'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_t_1<a name='131'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_t_2<a name='132'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_t_save<a name='133'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mu_1<a name='134'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mu_2<a name='135'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mub<a name='136'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mudf<a name='137'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_muu<a name='138'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_muv<a name='139'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_mut<a name='140'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: S_muts<a name='141'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_p<a name='142'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_al<a name='143'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_alt<a name='144'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_z<a name='145'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: S_moist_1<a name='146'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: S_moist_2<a name='147'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_u_b<a name='148'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_u_bt<a name='149'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_v_b<a name='150'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_v_bt<a name='151'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_w_b<a name='152'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_w_bt<a name='153'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_ph_b<a name='154'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_ph_bt<a name='155'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_t_b<a name='156'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_t_bt<a name='157'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),1,grid%spec_bdy_width,4)           :: S_mu_b<a name='158'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),1,grid%spec_bdy_width,4)           :: S_mu_bt<a name='159'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqv_b<a name='160'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqv_bt<a name='161'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqc_b<a name='162'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqc_bt<a name='163'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqr_b<a name='164'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqr_bt<a name='165'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqi_b<a name='166'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqi_bt<a name='167'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqs_b<a name='168'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqs_bt<a name='169'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqg_b<a name='170'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: S_rqg_bt<a name='171'>
+real      ,DIMENSION(grid%spec_bdy_width)           :: S_fcx<a name='172'>
+real      ,DIMENSION(grid%spec_bdy_width)           :: S_gcx<a name='173'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: S_xkmhd<a name='174'>
+<a name='175'>
+<a name='176'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_u_1<a name='177'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_u_2<a name='178'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ru<a name='179'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ru_m<a name='180'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ru_tend<a name='181'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_u_save<a name='182'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_v_1<a name='183'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_v_2<a name='184'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_rv<a name='185'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_rv_m<a name='186'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_rv_tend<a name='187'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_v_save<a name='188'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_w_1<a name='189'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_w_2<a name='190'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ww<a name='191'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_rw<a name='192'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ph_1<a name='193'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_ph_2<a name='194'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_phb<a name='195'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_php<a name='196'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_t_1<a name='197'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_t_2<a name='198'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_t_save<a name='199'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mu_1<a name='200'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mu_2<a name='201'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mub<a name='202'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mudf<a name='203'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_muu<a name='204'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_muv<a name='205'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_mut<a name='206'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm33:grid%em33)           :: B_muts<a name='207'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_p<a name='208'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_al<a name='209'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_alt<a name='210'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_z<a name='211'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: B_moist_1<a name='212'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33,num_moist)           :: B_moist_2<a name='213'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_u_b<a name='214'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_u_bt<a name='215'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_v_b<a name='216'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_v_bt<a name='217'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_w_b<a name='218'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_w_bt<a name='219'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_ph_b<a name='220'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_ph_bt<a name='221'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_t_b<a name='222'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_t_bt<a name='223'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),1,grid%spec_bdy_width,4)           :: B_mu_b<a name='224'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),1,grid%spec_bdy_width,4)           :: B_mu_bt<a name='225'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqv_b<a name='226'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqv_bt<a name='227'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqc_b<a name='228'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqc_bt<a name='229'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqr_b<a name='230'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqr_bt<a name='231'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqi_b<a name='232'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqi_bt<a name='233'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqs_b<a name='234'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqs_bt<a name='235'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqg_b<a name='236'>
+real      ,DIMENSION(max(grid%ed31,grid%ed33),grid%sd32:grid%ed32,grid%spec_bdy_width,4)           :: B_rqg_bt<a name='237'>
+real      ,DIMENSION(grid%spec_bdy_width)           :: B_fcx<a name='238'>
+real      ,DIMENSION(grid%spec_bdy_width)           :: B_gcx<a name='239'>
+real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: B_xkmhd<a name='240'>
+<a name='241'>
+<font color=#447700>!---------------------------------------------------------------------------------------<a name='242'></font>
+<font color=#447700>!---------------------------------------------------------------------------------------<a name='243'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_cqu<a name='244'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_phm<a name='245'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_cqv<a name='246'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_pm1<a name='247'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_cqw<a name='248'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_a<a name='249'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_gamma<a name='250'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_alpha<a name='251'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_rho<a name='252'></font>
+<font color=#447700>!real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33)           :: a_c2a<a name='253'></font>
+<a name='254'>
+<a name='255'>
+<font color=#447700>!---------------------------------------------------------------------------------------<a name='256'></font>
+<font color=#447700>!---------------------------------------------------------------------------------------<a name='257'></font>
+<a name='258'>
+   REAL :: SAVE_L, COEF, ALPHA_M, FACTOR, VAL_N, VAL_L, VAL_A<a name='259'>
+   INTEGER :: NT,h<a name='260'>
+<a name='261'>
+<font color=#447700>! Define benchmarking timers if -DBENCH is compiled<a name='262'></font>
+#include &lt;<A href='../../html_code/include/bench_solve_em_def.h.html'>bench_solve_em_def.h</A>&gt;<A NAME="bench_solve_em_def.h_4"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='263'>
+<a name='264'>
+<font color=#447700>!----------------------<a name='265'></font>
+<font color=#447700>! Executable statements<a name='266'></font>
+<font color=#447700>!----------------------<a name='267'></font>
+<a name='268'>
+<font color=#447700>! Trick problematic compilers into not performing copy-in/copy-out by adding<a name='269'></font>
+<font color=#447700>! indices to array arguments in the CALL statements in this routine.<a name='270'></font>
+<font color=#447700>! It has the effect of passing only the first element of the array, rather<a name='271'></font>
+<font color=#447700>! than the entire array.  See:<a name='272'></font>
+<font color=#447700>! http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='273'></font>
+#include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_5"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='274'>
+<font color=#447700>! Limit the number of arguments if compiled with -DLIMIT_ARGS by copying<a name='275'></font>
+<font color=#447700>! scalar (non-array) arguments out of the grid data structure into locally<a name='276'></font>
+<font color=#447700>! defined copies (defined in em_dummy_decl.inc, above, as they are if they<a name='277'></font>
+<font color=#447700>! are arguments). An equivalent include of em_scalar_derefs.inc appears<a name='278'></font>
+<font color=#447700>! at the end of the routine to copy back any chnaged non-array values.<a name='279'></font>
+<font color=#447700>! The definition of COPY_IN or COPY_OUT before the include defines the<a name='280'></font>
+<font color=#447700>! direction of the copy.  Em_scalar_derefs.inc is generated from Registry<a name='281'></font>
+#define COPY_IN<a name='282'>
+#include &lt;<A href='../../html_code/include/em_scalar_derefs.inc.html'>em_scalar_derefs.inc</A>&gt;<A NAME="em_scalar_derefs.inc_6"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='283'>
+<a name='284'>
+<font color=#447700>! Needed by some comm layers, e.g. RSL. If needed, nmm_data_calls.inc is<a name='285'></font>
+<font color=#447700>! generated from the registry.  The definition of REGISTER_I1 allows<a name='286'></font>
+<font color=#447700>! I1 data to be communicated in this routine if necessary.<a name='287'></font>
+#ifdef DM_PARALLEL<a name='288'>
+#    define REGISTER_I1<a name='289'>
+#      include &lt;<A href='../../html_code/include/em_data_calls.inc.html'>em_data_calls.inc</A>&gt;<A NAME="em_data_calls.inc_7"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='290'>
+#endif<a name='291'>
+<a name='292'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='293'></font>
+<font color=#447700>!&lt;pre&gt;<a name='294'></font>
+<font color=#447700>! solve_em is the main driver for advancing a grid a single timestep.<a name='295'></font>
+<font color=#447700>! It is a mediation-layer routine -&gt; DM and SM calls are made where<a name='296'></font>
+<font color=#447700>! needed for parallel processing.<a name='297'></font>
+<font color=#447700>!<a name='298'></font>
+<font color=#447700>! solve_em can integrate the equations using 3 time-integration methods<a name='299'></font>
+<font color=#447700>!<a name='300'></font>
+<font color=#447700>!    - 3rd order Runge-Kutta time integration (recommended)<a name='301'></font>
+<font color=#447700>!<a name='302'></font>
+<font color=#447700>!    - 2nd order Runge-Kutta time integration<a name='303'></font>
+<font color=#447700>!<a name='304'></font>
+<font color=#447700>!    - Leapfrog time integration<a name='305'></font>
+<font color=#447700>!      (note: the leapfrog scheme is not correctly implemented<a name='306'></font>
+<font color=#447700>!      for most of the physics)<a name='307'></font>
+<font color=#447700>!<a name='308'></font>
+<font color=#447700>! The main sections of solve_em are<a name='309'></font>
+<font color=#447700>!<a name='310'></font>
+<font color=#447700>! (1) Runge-Kutta (RK) loop<a name='311'></font>
+<font color=#447700>!<a name='312'></font>
+<font color=#447700>! (2) Non-timesplit physics (i.e., tendencies computed for updating<a name='313'></font>
+<font color=#447700>!     model state variables during the first RK sub-step (loop)<a name='314'></font>
+<font color=#447700>!<a name='315'></font>
+<font color=#447700>! (3) Small (acoustic, sound) timestep loop - within the RK sub-steps<a name='316'></font>
+<font color=#447700>!<a name='317'></font>
+<font color=#447700>! (4) Scalar advance for moist and chem scalar variables (and TKE)<a name='318'></font>
+<font color=#447700>!     within the RK sub-steps.<a name='319'></font>
+<font color=#447700>!<a name='320'></font>
+<font color=#447700>! (5) time-split physics (after the RK step), currently this includes<a name='321'></font>
+<font color=#447700>!     only microphyics<a name='322'></font>
+<font color=#447700>!<a name='323'></font>
+<font color=#447700>! A more detailed description of these sections follows.<a name='324'></font>
+<font color=#447700>!&lt;/pre&gt;<a name='325'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='326'></font>
+<a name='327'>
+<font color=#447700>! Initialize timers if compiled with -DBENCH<a name='328'></font>
+#include &lt;<A href='../../html_code/include/bench_solve_em_init.h.html'>bench_solve_em_init.h</A>&gt;<A NAME="bench_solve_em_init.h_8"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='329'>
+<a name='330'>
+<font color=#447700>!  zzma: new definition end<a name='331'></font>
+<a name='332'>
+   its = grid%sp31-3 ; ite = grid%ep31+3<a name='333'>
+   kts = grid%sp32 ; kte = grid%ep32<a name='334'>
+   jts = grid%sp33-3 ; jte = grid%ep33+3<a name='335'>
+   print*,'its =',its<a name='336'>
+   print*,'ite =',ite<a name='337'>
+<a name='338'>
+   print*,'jts =',jts<a name='339'>
+   print*,'jte =',jte<a name='340'>
+<a name='341'>
+   print*,'kts =',kts<a name='342'>
+   print*,'kte =',kte<a name='343'>
+   print*,'num_moist =',num_moist<a name='344'>
+   print*,'grid%ed31 =',grid%ed31<a name='345'>
+   print*,'grid%ed32 =',grid%ed32<a name='346'>
+   print*,'grid%spec_bdy_width =',grid%spec_bdy_width<a name='347'>
+<a name='348'>
+   S_u_1 = u_1 <a name='349'>
+   S_u_2 = u_2 <a name='350'>
+   S_v_1 = v_1 <a name='351'>
+   S_v_2 = v_2 <a name='352'>
+   S_w_1 = w_1 <a name='353'>
+   S_w_2 = w_2 <a name='354'>
+   S_ph_1 = ph_1 <a name='355'>
+   S_ph_2 = ph_2 <a name='356'>
+   S_t_1 = t_1 <a name='357'>
+   S_t_2 = t_2 <a name='358'>
+   S_mu_1 = mu_1 <a name='359'>
+   S_mu_2 = mu_2 <a name='360'>
+   S_p = p <a name='361'>
+   S_al = al <a name='362'>
+   S_moist_1 = moist_1 <a name='363'>
+   S_moist_2 = moist_2 <a name='364'>
+<font color=#447700>!   S_u_b = u_b <a name='365'></font>
+<font color=#447700>!   S_u_bt = u_bt <a name='366'></font>
+<font color=#447700>!   S_v_b = v_b <a name='367'></font>
+<font color=#447700>!   S_v_bt = v_bt <a name='368'></font>
+<font color=#447700>!   S_w_b = w_b <a name='369'></font>
+<font color=#447700>!   S_w_bt = w_bt <a name='370'></font>
+<font color=#447700>!   S_ph_b = ph_b <a name='371'></font>
+<font color=#447700>!   S_ph_bt = ph_bt <a name='372'></font>
+<font color=#447700>!   S_t_b = t_b <a name='373'></font>
+<font color=#447700>!   S_t_bt = t_bt <a name='374'></font>
+<font color=#447700>!   S_mu_b = mu_b <a name='375'></font>
+<font color=#447700>!   S_mu_bt = mu_bt <a name='376'></font>
+<font color=#447700>!   S_rqv_b = rqv_b <a name='377'></font>
+<font color=#447700>!   S_rqv_bt = rqv_bt <a name='378'></font>
+<a name='379'>
+<font color=#447700>!-------------<a name='380'></font>
+<font color=#447700>!  goto 1234   !zzma<a name='381'></font>
+<font color=#447700>!-------------<a name='382'></font>
+<a name='383'>
+<font color=#447700>!NLM<a name='384'></font>
+<a name='385'>
+   CALL <A href='../../html_code/dyn_em/solve_em.F.html#SOLVE_EM'>solve_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLVE_EM_1"> ( grid , config_flags , &amp;<a name='386'>
+<font color=#447700>! Actual arguments generated from Registry<a name='387'></font>
+#include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_9"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='388'>
+<font color=#447700>!<a name='389'></font>
+                    )<a name='390'>
+<a name='391'>
+   do i=its,ite<a name='392'>
+   do k=kts,kte<a name='393'>
+   do j=jts,jte<a name='394'>
+    B_u_1(i,k,j) = u_1(i,k,j)<a name='395'>
+    B_u_2(i,k,j) = u_2(i,k,j) <a name='396'>
+    B_v_1(i,k,j) = v_1(i,k,j)<a name='397'>
+    B_v_2(i,k,j) = v_2(i,k,j)<a name='398'>
+    B_w_1(i,k,j) = w_1(i,k,j)<a name='399'>
+    B_w_2(i,k,j) = w_2(i,k,j)<a name='400'>
+    B_ph_1(i,k,j) = ph_1(i,k,j)<a name='401'>
+    B_ph_2(i,k,j) = ph_2(i,k,j)<a name='402'>
+    B_t_1(i,k,j) = t_1(i,k,j)<a name='403'>
+    B_t_2(i,k,j) = t_2(i,k,j)<a name='404'>
+    B_p(i,k,j) = p(i,k,j)<a name='405'>
+    B_al(i,k,j) = al(i,k,j)<a name='406'>
+    B_z(i,k,j) = z(i,k,j)<a name='407'>
+   enddo<a name='408'>
+   enddo<a name='409'>
+   enddo<a name='410'>
+<a name='411'>
+   do i=its,ite<a name='412'>
+   do j=jts,jte<a name='413'>
+    B_mu_1(i,j) =mu_1(i,j)<a name='414'>
+    B_mu_2(i,j) =mu_2(i,j)<a name='415'>
+    B_mudf(i,j) =mudf(i,j)<a name='416'>
+   enddo<a name='417'>
+   enddo<a name='418'>
+<a name='419'>
+   do i=its,ite<a name='420'>
+   do k=kts,kte<a name='421'>
+   do j=jts,jte<a name='422'>
+   do h=1,num_moist<a name='423'>
+    B_moist_1(i,k,j,h) =moist_1(i,k,j,h)<a name='424'>
+    B_moist_2(i,k,j,h) =moist_2(i,k,j,h)<a name='425'>
+   enddo<a name='426'>
+   enddo<a name='427'>
+   enddo<a name='428'>
+   enddo<a name='429'>
+<a name='430'>
+<font color=#447700>!  TCL<a name='431'></font>
+<a name='432'>
+   u_1 = S_u_1 <a name='433'>
+   u_2 = S_u_2 <a name='434'>
+   v_1 = S_v_1 <a name='435'>
+   v_2 = S_v_2 <a name='436'>
+   w_1 = S_w_1 <a name='437'>
+   w_2 = S_w_2 <a name='438'>
+   ph_1 = S_ph_1 <a name='439'>
+   ph_2 = S_ph_2 <a name='440'>
+   t_1 = S_t_1 <a name='441'>
+   t_2 = S_t_2 <a name='442'>
+   mu_1 = S_mu_1 <a name='443'>
+   mu_2 = S_mu_2 <a name='444'>
+   p = S_p <a name='445'>
+   al = S_al <a name='446'>
+   moist_1 = S_moist_1 <a name='447'>
+   moist_2 = S_moist_2 <a name='448'>
+<font color=#447700>!   u_b = S_u_b <a name='449'></font>
+<font color=#447700>!   u_bt = S_u_bt <a name='450'></font>
+<font color=#447700>!   v_b = S_v_b <a name='451'></font>
+<font color=#447700>!   v_bt = S_v_bt <a name='452'></font>
+<font color=#447700>!   w_b = S_w_b <a name='453'></font>
+<font color=#447700>!   w_bt = S_w_bt <a name='454'></font>
+<font color=#447700>!   ph_b = S_ph_b <a name='455'></font>
+<font color=#447700>!   ph_bt = S_ph_bt <a name='456'></font>
+<font color=#447700>!   t_b = S_t_b <a name='457'></font>
+<font color=#447700>!   t_bt = S_t_bt <a name='458'></font>
+<font color=#447700>!   mu_b = S_mu_b <a name='459'></font>
+<font color=#447700>!   mu_bt = S_mu_bt <a name='460'></font>
+<font color=#447700>!   rqv_b = S_rqv_b <a name='461'></font>
+<font color=#447700>!   rqv_bt = S_rqv_bt <a name='462'></font>
+<a name='463'>
+<a name='464'>
+   g_u_1 = u_1 <a name='465'>
+   g_u_2 = u_2 <a name='466'>
+   g_v_1 = v_1 <a name='467'>
+   g_v_2 = v_2 <a name='468'>
+   g_w_1 = w_1 <a name='469'>
+   g_w_2 = w_2 <a name='470'>
+   g_ph_1 = ph_1 <a name='471'>
+   g_ph_2 = ph_2 <a name='472'>
+   g_t_1 = t_1 <a name='473'>
+   g_t_2 = t_2 <a name='474'>
+   g_mu_1 = mu_1 <a name='475'>
+   g_mu_2 = mu_2 <a name='476'>
+   g_p = p <a name='477'>
+   g_al = al <a name='478'>
+   g_moist_1 = moist_1 <a name='479'>
+   g_moist_2 = moist_2 <a name='480'>
+   g_u_b = 0.0 <a name='481'>
+   g_u_bt = 0.0 <a name='482'>
+   g_v_b = 0.0 <a name='483'>
+   g_v_bt = 0.0 <a name='484'>
+   g_w_b = 0.0 <a name='485'>
+   g_w_bt = 0.0 <a name='486'>
+   g_ph_b = 0.0 <a name='487'>
+   g_ph_bt = 0.0 <a name='488'>
+   g_t_b = 0.0 <a name='489'>
+   g_t_bt = 0.0 <a name='490'>
+   g_mu_b = 0.0 <a name='491'>
+   g_mu_bt = 0.0 <a name='492'>
+   g_rqv_b = 0.0 <a name='493'>
+   g_rqv_bt = 0.0 <a name='494'>
+<a name='495'>
+   CALL <A href='../../html_code/dyn_em/solve_em_tl.F.html#SOLVE_EM_TL'>solve_em_tl</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLVE_EM_TL_1"> ( grid , config_flags , &amp;<a name='496'>
+<font color=#447700>! Actual arguments generated from Registry<a name='497'></font>
+#include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_10"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='498'>
+<font color=#447700>!<a name='499'></font>
+                    )<a name='500'>
+<a name='501'>
+   SAVE_L =0.0<a name='502'>
+   do i=its,ite<a name='503'>
+   do k=kts,kte<a name='504'>
+   do j=jts,jte<a name='505'>
+      SAVE_L =SAVE_L + g_u_1(i,k,j)  * g_u_1(i,k,j)    &amp;<a name='506'>
+                     + g_u_2(i,k,j)  * g_u_2(i,k,j)    &amp;<a name='507'>
+                     + g_v_1(i,k,j)  * g_v_1(i,k,j)    &amp;<a name='508'>
+                     + g_v_2(i,k,j)  * g_v_2(i,k,j)    &amp;<a name='509'>
+                     + g_w_1(i,k,j)  * g_w_1(i,k,j)    &amp;<a name='510'>
+                     + g_w_2(i,k,j)  * g_w_2(i,k,j)    &amp;<a name='511'>
+                     + g_ph_1(i,k,j)  * g_ph_1(i,k,j)  &amp;<a name='512'>
+                     + g_ph_2(i,k,j)  * g_ph_2(i,k,j)  &amp;<a name='513'>
+                     + g_t_1(i,k,j)  * g_t_1(i,k,j)    &amp;<a name='514'>
+                     + g_t_2(i,k,j)  * g_t_2(i,k,j)    &amp;<a name='515'>
+                     + g_p(i,k,j)  * g_p(i,k,j)    &amp;<a name='516'>
+                     + g_al(i,k,j)  * g_al(i,k,j)    &amp;<a name='517'>
+                     + g_z(i,k,j)  * g_z(i,k,j)    <a name='518'>
+<a name='519'>
+   enddo<a name='520'>
+   enddo<a name='521'>
+   enddo<a name='522'>
+<a name='523'>
+   do i=its,ite<a name='524'>
+   do j=jts,jte<a name='525'>
+      SAVE_L =SAVE_L + g_mu_1(i,j)  * g_mu_1(i,j)    &amp;<a name='526'>
+                     + g_mu_2(i,j)  * g_mu_2(i,j)    &amp;<a name='527'>
+                     + g_mudf(i,j)  * g_mudf(i,j)    <a name='528'>
+   enddo<a name='529'>
+   enddo<a name='530'>
+   do i=its,ite<a name='531'>
+   do k=kts,kte<a name='532'>
+   do j=jts,jte<a name='533'>
+   do h=1,num_moist<a name='534'>
+      SAVE_L =SAVE_L + g_moist_1(i,k,j,h)  * g_moist_1(i,k,j,h)    &amp;<a name='535'>
+                     + g_moist_2(i,k,j,h)  * g_moist_2(i,k,j,h) <a name='536'>
+   enddo<a name='537'>
+   enddo<a name='538'>
+   enddo<a name='539'>
+   enddo<a name='540'>
+<a name='541'>
+   ALPHA_M=1.<a name='542'>
+   DO NT=1,11<a name='543'>
+      ALPHA_M=0.1*ALPHA_M<a name='544'>
+      FACTOR=1.+ALPHA_M<a name='545'>
+   u_1 = FACTOR*S_u_1 <a name='546'>
+   u_2 = FACTOR*S_u_2 <a name='547'>
+   v_1 = FACTOR*S_v_1 <a name='548'>
+   v_2 = FACTOR*S_v_2 <a name='549'>
+   w_1 = FACTOR*S_w_1 <a name='550'>
+   w_2 = FACTOR*S_w_2 <a name='551'>
+   ph_1 = FACTOR*S_ph_1 <a name='552'>
+   ph_2 = FACTOR*S_ph_2 <a name='553'>
+   t_1 = FACTOR*S_t_1 <a name='554'>
+   t_2 = FACTOR*S_t_2 <a name='555'>
+   mu_1 = FACTOR*S_mu_1 <a name='556'>
+   mu_2 = FACTOR*S_mu_2 <a name='557'>
+   p = FACTOR*S_p <a name='558'>
+   al = FACTOR*S_al <a name='559'>
+   moist_1 = FACTOR*S_moist_1 <a name='560'>
+   moist_2 = FACTOR*S_moist_2 <a name='561'>
+<font color=#447700>!   u_b = FACTOR*S_u_b <a name='562'></font>
+<font color=#447700>!   u_bt = FACTOR*S_u_bt <a name='563'></font>
+<font color=#447700>!   v_b = FACTOR*S_v_b <a name='564'></font>
+<font color=#447700>!   v_bt = FACTOR*S_v_bt <a name='565'></font>
+<font color=#447700>!   w_b = FACTOR*S_w_b <a name='566'></font>
+<font color=#447700>!   w_bt = FACTOR*S_w_bt <a name='567'></font>
+<font color=#447700>!   ph_b = FACTOR*S_ph_b <a name='568'></font>
+<font color=#447700>!   ph_bt = FACTOR*S_ph_bt <a name='569'></font>
+<font color=#447700>!   t_b = FACTOR*S_t_b <a name='570'></font>
+<font color=#447700>!   t_bt = FACTOR*S_t_bt <a name='571'></font>
+<font color=#447700>!   mu_b = FACTOR*S_mu_b <a name='572'></font>
+<font color=#447700>!   mu_bt = FACTOR*S_mu_bt <a name='573'></font>
+<font color=#447700>!   rqv_b = FACTOR*S_rqv_b <a name='574'></font>
+<font color=#447700>!   rqv_bt = FACTOR*S_rqv_bt <a name='575'></font>
+<a name='576'>
+<a name='577'>
+   CALL <A href='../../html_code/dyn_em/solve_em.F.html#SOLVE_EM'>solve_em</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLVE_EM_2"> ( grid , config_flags , &amp;<a name='578'>
+<font color=#447700>! Actual arguments generated from Registry<a name='579'></font>
+#include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_11"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='580'>
+<font color=#447700>!<a name='581'></font>
+                    )<a name='582'>
+    VAL_N = 0.0<a name='583'>
+<a name='584'>
+   do i=its,ite<a name='585'>
+   do k=kts,kte<a name='586'>
+   do j=jts,jte<a name='587'>
+      VAL_N=VAL_N  + (u_1(i,k,j)  - B_u_1(i,k,j) ) *(u_1(i,k,j)  - B_u_1(i,k,j))     &amp;<a name='588'>
+                   + (u_2(i,k,j)  - B_u_2(i,k,j) ) *(u_2(i,k,j)  - B_u_2(i,k,j))     &amp;<a name='589'>
+                   + (v_1(i,k,j)  - B_v_1(i,k,j) ) *(v_1(i,k,j)  - B_v_1(i,k,j))     &amp;<a name='590'>
+                   + (v_2(i,k,j)  - B_v_2(i,k,j) ) *(v_2(i,k,j)  - B_v_2(i,k,j))     &amp;<a name='591'>
+                   + (w_1(i,k,j)  - B_w_1(i,k,j) ) *(w_1(i,k,j)  - B_w_1(i,k,j))     &amp;<a name='592'>
+                   + (w_2(i,k,j)  - B_w_2(i,k,j) ) *(w_2(i,k,j)  - B_w_2(i,k,j))     &amp;<a name='593'>
+                   + (ph_1(i,k,j)  - B_ph_1(i,k,j) ) *(ph_1(i,k,j)  - B_ph_1(i,k,j)) &amp;<a name='594'>
+                   + (ph_2(i,k,j)  - B_ph_2(i,k,j) ) *(ph_2(i,k,j)  - B_ph_2(i,k,j)) &amp;<a name='595'>
+                   + (t_1(i,k,j)  - B_t_1(i,k,j) ) *(t_1(i,k,j)  - B_t_1(i,k,j))     &amp;<a name='596'>
+                   + (t_2(i,k,j)  - B_t_2(i,k,j) ) *(t_2(i,k,j)  - B_t_2(i,k,j))     &amp;<a name='597'>
+                   + (p(i,k,j)  - B_p(i,k,j) ) *(p(i,k,j)  - B_p(i,k,j))     &amp;<a name='598'>
+                   + (al(i,k,j)  - B_al(i,k,j) ) *(al(i,k,j)  - B_al(i,k,j))     &amp;<a name='599'>
+                   + (z(i,k,j)  - B_z(i,k,j) ) *(z(i,k,j)  - B_z(i,k,j))     <a name='600'>
+   enddo<a name='601'>
+   enddo<a name='602'>
+   enddo<a name='603'>
+<a name='604'>
+<a name='605'>
+   do i=its,ite<a name='606'>
+   do j=jts,jte<a name='607'>
+      VAL_N=VAL_N  + (mu_1(i,j) -B_mu_1(i,j))*(mu_1(i,j) -B_mu_1(i,j))    &amp;<a name='608'>
+                   + (mu_2(i,j) -B_mu_2(i,j))*(mu_2(i,j) -B_mu_2(i,j))    &amp;<a name='609'>
+                   + (mudf(i,j) -B_mudf(i,j))*(mudf(i,j) -B_mudf(i,j))  <a name='610'>
+   enddo<a name='611'>
+   enddo<a name='612'>
+   do i=its,ite<a name='613'>
+   do k=kts,kte<a name='614'>
+   do j=jts,jte<a name='615'>
+   do h=1,num_moist<a name='616'>
+      VAL_N=VAL_N  + (moist_1(i,k,j,h) -B_moist_1(i,k,j,h))*(moist_1(i,k,j,h) -B_moist_1(i,k,j,h))  &amp;<a name='617'>
+                   + (moist_2(i,k,j,h) -B_moist_2(i,k,j,h))*(moist_2(i,k,j,h) -B_moist_2(i,k,j,h))<a name='618'>
+   enddo<a name='619'>
+   enddo<a name='620'>
+   enddo<a name='621'>
+   enddo<a name='622'>
+<a name='623'>
+      VAL_L=SAVE_L*ALPHA_M**2<a name='624'>
+      COEF=VAL_N/VAL_L<a name='625'>
+      WRITE(6, fmt='(A,E9.4,A,E22.13,A,E13.6,A,E13.6)') &amp;<a name='626'>
+         'g_em_sn: ALPHA_M=',ALPHA_M,'  COEF=',COEF, &amp;<a name='627'>
+         '  VAL_N=',VAL_N,'  VAL_L=',VAL_L<a name='628'>
+   ENDDO<a name='629'>
+<a name='630'>
+<font color=#447700>!  ADJ test<a name='631'></font>
+<font color=#447700>!-------------<a name='632'></font>
+<font color=#447700>!1234 continue  !zzma<a name='633'></font>
+<font color=#447700>!-------------<a name='634'></font>
+<a name='635'>
+   FACTOR=0.1<a name='636'>
+<a name='637'>
+   u_1 = S_u_1 <a name='638'>
+   u_2 = S_u_2 <a name='639'>
+   v_1 = S_v_1 <a name='640'>
+   v_2 = S_v_2 <a name='641'>
+   w_1 = S_w_1 <a name='642'>
+   w_2 = S_w_2 <a name='643'>
+   ph_1 = S_ph_1 <a name='644'>
+   ph_2 = S_ph_2 <a name='645'>
+   t_1 = S_t_1 <a name='646'>
+   t_2 = S_t_2 <a name='647'>
+   mu_1 = S_mu_1 <a name='648'>
+   mu_2 = S_mu_2 <a name='649'>
+   p = S_p <a name='650'>
+   al = S_al <a name='651'>
+   moist_1 = S_moist_1 <a name='652'>
+   moist_2 = S_moist_2 <a name='653'>
+<font color=#447700>!   u_b = S_u_b <a name='654'></font>
+<font color=#447700>!   u_bt = S_u_bt <a name='655'></font>
+<font color=#447700>!   v_b = S_v_b <a name='656'></font>
+<font color=#447700>!   v_bt = S_v_bt <a name='657'></font>
+<font color=#447700>!   w_b = S_w_b <a name='658'></font>
+<font color=#447700>!   w_bt = S_w_bt <a name='659'></font>
+<font color=#447700>!   ph_b = S_ph_b <a name='660'></font>
+<font color=#447700>!   ph_bt = S_ph_bt <a name='661'></font>
+<font color=#447700>!   t_b = S_t_b <a name='662'></font>
+<font color=#447700>!   t_bt = S_t_bt <a name='663'></font>
+<font color=#447700>!   mu_b = S_mu_b <a name='664'></font>
+<font color=#447700>!   mu_bt = S_mu_bt <a name='665'></font>
+<font color=#447700>!   rqv_b = S_rqv_b <a name='666'></font>
+<font color=#447700>!   rqv_bt = S_rqv_bt <a name='667'></font>
+<a name='668'>
+<a name='669'>
+<a name='670'>
+<a name='671'>
+   g_u_1 = FACTOR*S_u_1 <a name='672'>
+   g_u_2 = FACTOR*S_u_2 <a name='673'>
+   g_v_1 = FACTOR*S_v_1 <a name='674'>
+   g_v_2 = FACTOR*S_v_2 <a name='675'>
+   g_w_1 = FACTOR*S_w_1 <a name='676'>
+   g_w_2 = FACTOR*S_w_2 <a name='677'>
+   g_ph_1 = FACTOR*S_ph_1 <a name='678'>
+   g_ph_2 = FACTOR*S_ph_2 <a name='679'>
+   g_t_1 = FACTOR*S_t_1 <a name='680'>
+   g_t_2 = FACTOR*S_t_2 <a name='681'>
+   g_mu_1 = FACTOR*S_mu_1 <a name='682'>
+   g_mu_2 = FACTOR*S_mu_2 <a name='683'>
+   g_p = FACTOR*S_p <a name='684'>
+   g_al = FACTOR*S_al <a name='685'>
+   g_moist_1 = FACTOR*S_moist_1 <a name='686'>
+   g_moist_2 = FACTOR*S_moist_2 <a name='687'>
+<font color=#447700>!   g_u_b = FACTOR*S_u_b <a name='688'></font>
+<font color=#447700>!   g_u_bt = FACTOR*S_u_bt <a name='689'></font>
+<font color=#447700>!   g_v_b = FACTOR*S_v_b <a name='690'></font>
+<font color=#447700>!   g_v_bt = FACTOR*S_v_bt <a name='691'></font>
+<font color=#447700>!   g_w_b = FACTOR*S_w_b <a name='692'></font>
+<font color=#447700>!   g_w_bt = FACTOR*S_w_bt <a name='693'></font>
+<font color=#447700>!   g_ph_b = FACTOR*S_ph_b <a name='694'></font>
+<font color=#447700>!   g_ph_bt = FACTOR*S_ph_bt <a name='695'></font>
+<font color=#447700>!   g_t_b = FACTOR*S_t_b <a name='696'></font>
+<font color=#447700>!   g_t_bt = FACTOR*S_t_bt <a name='697'></font>
+<font color=#447700>!   g_mu_b = FACTOR*S_mu_b <a name='698'></font>
+<font color=#447700>!   g_mu_bt = FACTOR*S_mu_bt <a name='699'></font>
+<font color=#447700>!   g_rqv_b = FACTOR*S_rqv_b <a name='700'></font>
+<font color=#447700>!   g_rqv_bt = FACTOR*S_rqv_bt <a name='701'></font>
+<a name='702'>
+   g_u_b = 0.<a name='703'>
+   g_u_bt =0.<a name='704'>
+   g_v_b = 0.<a name='705'>
+   g_v_bt =0.<a name='706'>
+   g_w_b = 0.<a name='707'>
+   g_w_bt =0.<a name='708'>
+   g_ph_b =0.<a name='709'>
+   g_ph_bt =0.<a name='710'>
+   g_t_b = 0.<a name='711'>
+   g_t_bt =0.<a name='712'>
+   g_mu_b =0.<a name='713'>
+   g_mu_bt =0.<a name='714'>
+   g_rqv_b =0.<a name='715'>
+   g_rqv_bt =0.<a name='716'>
+<a name='717'>
+<a name='718'>
+<font color=#447700>!   g_u_1 =0.0<a name='719'></font>
+<font color=#447700>!   g_v_1 =0.0<a name='720'></font>
+<font color=#447700>!   g_w_1 =0.0<a name='721'></font>
+<font color=#447700>!   g_ph_1 =0.0<a name='722'></font>
+<font color=#447700>!   g_t_1 = 0.0<a name='723'></font>
+<font color=#447700>!   g_moist_1 =0.0<a name='724'></font>
+<font color=#447700>!   g_w_2 = 0.0<a name='725'></font>
+<font color=#447700>!   g_mu_1 =0.0<a name='726'></font>
+<a name='727'>
+<font color=#447700>!   g_u_2 =0.0<a name='728'></font>
+<font color=#447700>!   g_v_2 =0.0<a name='729'></font>
+<font color=#447700>!   g_ph_2 =0.0<a name='730'></font>
+<font color=#447700>!   g_t_2 =0.0<a name='731'></font>
+<a name='732'>
+<font color=#447700>!   g_mu_2 = 0.0<a name='733'></font>
+<font color=#447700>!   g_p = 0.0<a name='734'></font>
+<font color=#447700>!   g_al = 0.0<a name='735'></font>
+<font color=#447700>!   g_moist_2 = 0.0<a name='736'></font>
+<a name='737'>
+   B_u_1 = g_u_1 <a name='738'>
+   B_u_2 = g_u_2 <a name='739'>
+   B_v_1 = g_v_1 <a name='740'>
+   B_v_2 = g_v_2 <a name='741'>
+   B_w_1 = g_w_1 <a name='742'>
+   B_w_2 = g_w_2 <a name='743'>
+   B_ph_1 = g_ph_1 <a name='744'>
+   B_ph_2 = g_ph_2 <a name='745'>
+   B_t_1 = g_t_1 <a name='746'>
+   B_t_2 = g_t_2 <a name='747'>
+   B_mu_1 = g_mu_1 <a name='748'>
+   B_mu_2 = g_mu_2 <a name='749'>
+   B_p = g_p <a name='750'>
+   B_al = g_al <a name='751'>
+   B_moist_1 = g_moist_1 <a name='752'>
+   B_moist_2 = g_moist_2 <a name='753'>
+<font color=#447700>!   B_u_b = g_u_b <a name='754'></font>
+<font color=#447700>!   B_u_bt = g_u_bt <a name='755'></font>
+<font color=#447700>!   B_v_b = g_v_b <a name='756'></font>
+<font color=#447700>!   B_v_bt = g_v_bt <a name='757'></font>
+<font color=#447700>!   B_w_b = g_w_b <a name='758'></font>
+<font color=#447700>!   B_w_bt = g_w_bt <a name='759'></font>
+<font color=#447700>!   B_ph_b = g_ph_b <a name='760'></font>
+<font color=#447700>!   B_ph_bt = g_ph_bt <a name='761'></font>
+<font color=#447700>!   B_t_b = g_t_b <a name='762'></font>
+<font color=#447700>!   B_t_bt = g_t_bt <a name='763'></font>
+<font color=#447700>!   B_mu_b = g_mu_b <a name='764'></font>
+<font color=#447700>!   B_mu_bt = g_mu_bt <a name='765'></font>
+<font color=#447700>!   B_rqv_b = g_rqv_b <a name='766'></font>
+<font color=#447700>!   B_rqv_bt = g_rqv_bt <a name='767'></font>
+<a name='768'>
+<a name='769'>
+   CALL <A href='../../html_code/dyn_em/solve_em_tl.F.html#SOLVE_EM_TL'>solve_em_tl</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLVE_EM_TL_2"> ( grid , config_flags , &amp;<a name='770'>
+<font color=#447700>! Actual arguments generated from Registry<a name='771'></font>
+#include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_12"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='772'>
+<font color=#447700>!<a name='773'></font>
+                    )<a name='774'>
+<a name='775'>
+   g_z=0.; g_mudf=0.<a name='776'>
+<a name='777'>
+   VAL_L =0.0<a name='778'>
+   do i=its,ite<a name='779'>
+   do k=kts,kte<a name='780'>
+   do j=jts,jte<a name='781'>
+      VAL_L =VAL_L + g_u_1(i,k,j)  * g_u_1(i,k,j)    &amp;<a name='782'>
+                     + g_u_2(i,k,j)  * g_u_2(i,k,j)    &amp;<a name='783'>
+                     + g_v_1(i,k,j)  * g_v_1(i,k,j)    &amp;<a name='784'>
+                     + g_v_2(i,k,j)  * g_v_2(i,k,j)    &amp;<a name='785'>
+                     + g_w_1(i,k,j)  * g_w_1(i,k,j)    &amp;<a name='786'>
+                     + g_w_2(i,k,j)  * g_w_2(i,k,j)    &amp;<a name='787'>
+                     + g_ph_1(i,k,j)  * g_ph_1(i,k,j)  &amp;<a name='788'>
+                     + g_ph_2(i,k,j)  * g_ph_2(i,k,j)  &amp;<a name='789'>
+                     + g_t_1(i,k,j)  * g_t_1(i,k,j)    &amp;<a name='790'>
+                     + g_t_2(i,k,j)  * g_t_2(i,k,j)    &amp;<a name='791'>
+                     + g_p(i,k,j)  * g_p(i,k,j)    &amp;<a name='792'>
+                     + g_al(i,k,j)  * g_al(i,k,j)    &amp;<a name='793'>
+                     + g_z(i,k,j)  * g_z(i,k,j)<a name='794'>
+<a name='795'>
+   enddo<a name='796'>
+   enddo<a name='797'>
+   enddo<a name='798'>
+<a name='799'>
+   do i=its,ite<a name='800'>
+   do j=jts,jte<a name='801'>
+      VAL_L =VAL_L + g_mu_1(i,j)  * g_mu_1(i,j)    &amp;<a name='802'>
+                     + g_mu_2(i,j)  * g_mu_2(i,j)    &amp;<a name='803'>
+                     + g_mudf(i,j)  * g_mudf(i,j)<a name='804'>
+   enddo<a name='805'>
+   enddo<a name='806'>
+   do i=its,ite<a name='807'>
+   do k=kts,kte<a name='808'>
+   do j=jts,jte<a name='809'>
+   do h=1,num_moist<a name='810'>
+      VAL_L =VAL_L + g_moist_1(i,k,j,h)  * g_moist_1(i,k,j,h)    &amp;<a name='811'>
+                     + g_moist_2(i,k,j,h)  * g_moist_2(i,k,j,h)<a name='812'>
+   enddo<a name='813'>
+   enddo<a name='814'>
+   enddo<a name='815'>
+   enddo<a name='816'>
+<a name='817'>
+<a name='818'>
+<font color=#447700>!  ADJ<a name='819'></font>
+<a name='820'>
+   u_1 = S_u_1 <a name='821'>
+   u_2 = S_u_2 <a name='822'>
+   v_1 = S_v_1 <a name='823'>
+   v_2 = S_v_2 <a name='824'>
+   w_1 = S_w_1 <a name='825'>
+   w_2 = S_w_2 <a name='826'>
+   ph_1 = S_ph_1 <a name='827'>
+   ph_2 = S_ph_2 <a name='828'>
+   t_1 = S_t_1 <a name='829'>
+   t_2 = S_t_2 <a name='830'>
+   mu_1 = S_mu_1 <a name='831'>
+   mu_2 = S_mu_2 <a name='832'>
+   p = S_p <a name='833'>
+   al = S_al <a name='834'>
+   moist_1 = S_moist_1 <a name='835'>
+   moist_2 = S_moist_2 <a name='836'>
+<font color=#447700>!   u_b = S_u_b <a name='837'></font>
+<font color=#447700>!   u_bt = S_u_bt <a name='838'></font>
+<font color=#447700>!   v_b = S_v_b <a name='839'></font>
+<font color=#447700>!   v_bt = S_v_bt <a name='840'></font>
+<font color=#447700>!   w_b = S_w_b <a name='841'></font>
+<font color=#447700>!  w_bt = S_w_bt <a name='842'></font>
+<font color=#447700>!  ph_b = S_ph_b <a name='843'></font>
+<font color=#447700>!  ph_bt = S_ph_bt <a name='844'></font>
+<font color=#447700>!  t_b = S_t_b <a name='845'></font>
+<font color=#447700>!  t_bt = S_t_bt <a name='846'></font>
+<font color=#447700>!  mu_b = S_mu_b <a name='847'></font>
+<font color=#447700>!  mu_bt = S_mu_bt <a name='848'></font>
+<font color=#447700>!  rqv_b = S_rqv_b <a name='849'></font>
+<font color=#447700>!  rqv_bt = S_rqv_bt <a name='850'></font>
+<a name='851'>
+<a name='852'>
+<a name='853'>
+<a name='854'>
+   a_u_1 = 0.<a name='855'>
+   a_u_2 = 0.<a name='856'>
+   a_v_1 = 0.<a name='857'>
+   a_v_2 =0.<a name='858'>
+   a_w_1 =0.<a name='859'>
+   a_w_2 =0.<a name='860'>
+   a_ph_1 =0.<a name='861'>
+   a_ph_2 = 0.<a name='862'>
+   a_t_1 = 0.<a name='863'>
+   a_t_2 =0.<a name='864'>
+   a_mu_1 = 0.<a name='865'>
+   a_mu_2 =0.<a name='866'>
+   a_p = 0.<a name='867'>
+   a_al =0.<a name='868'>
+   a_moist_1 = 0.<a name='869'>
+   a_moist_2 =0.<a name='870'>
+   a_u_b = 0.<a name='871'>
+   a_u_bt = 0.<a name='872'>
+   a_v_b = 0.<a name='873'>
+   a_v_bt =0.<a name='874'>
+   a_w_b = 0.<a name='875'>
+   a_w_bt =0.<a name='876'>
+   a_ph_b =0.<a name='877'>
+   a_ph_bt =0.<a name='878'>
+   a_t_b = 0.<a name='879'>
+   a_t_bt =0.<a name='880'>
+   a_mu_b =0.<a name='881'>
+   a_mu_bt =0.<a name='882'>
+   a_rqv_b =0.<a name='883'>
+   a_rqv_bt =0.<a name='884'>
+<a name='885'>
+   a_u_1 = g_u_1 <a name='886'>
+   a_u_2 = g_u_2 <a name='887'>
+   a_v_1 = g_v_1 <a name='888'>
+   a_v_2 = g_v_2 <a name='889'>
+   a_w_1 = g_w_1 <a name='890'>
+   a_w_2 = g_w_2 <a name='891'>
+   a_ph_1 = g_ph_1 <a name='892'>
+   a_ph_2 = g_ph_2 <a name='893'>
+   a_t_1 = g_t_1 <a name='894'>
+   a_t_2 = g_t_2 <a name='895'>
+   a_mu_1 = g_mu_1 <a name='896'>
+   a_mu_2 = g_mu_2 <a name='897'>
+   a_mudf = g_mudf <a name='898'>
+   a_p = g_p <a name='899'>
+   a_al = g_al <a name='900'>
+   a_z = g_z <a name='901'>
+   a_moist_1 = g_moist_1 <a name='902'>
+   a_moist_2 = g_moist_2 <a name='903'>
+<a name='904'>
+   CALL <A href='../../html_code/dyn_em/solve_em_ad.F.html#SOLVE_EM_AD'>solve_em_ad</A><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLVE_EM_AD_1"> ( grid , config_flags , &amp;<a name='905'>
+<font color=#447700>!<a name='906'></font>
+#include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_13"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='907'>
+<font color=#447700>!<a name='908'></font>
+                 )<a name='909'>
+<a name='910'>
+    VAL_A=0.0<a name='911'>
+<a name='912'>
+   do i=its,ite<a name='913'>
+   do k=kts,kte<a name='914'>
+   do j=jts,jte<a name='915'>
+      VAL_A= VAL_A + a_u_1(i,k,j) * B_u_1(i,k,j)               &amp;<a name='916'>
+            + a_u_2(i,k,j) * B_u_2(i,k,j)               &amp;<a name='917'>
+            + a_v_1(i,k,j) * B_v_1(i,k,j)               &amp;<a name='918'>
+            + a_v_2(i,k,j) * B_v_2(i,k,j)               &amp;<a name='919'>
+            + a_w_1(i,k,j) * B_w_1(i,k,j)               &amp;<a name='920'>
+            + a_w_2(i,k,j) * B_w_2(i,k,j)               &amp;<a name='921'>
+            + a_ph_1(i,k,j) * B_ph_1(i,k,j)             &amp;<a name='922'>
+            + a_ph_2(i,k,j) * B_ph_2(i,k,j)             &amp;<a name='923'>
+            + a_t_1(i,k,j) * B_t_1(i,k,j)               &amp;<a name='924'>
+            + a_t_2(i,k,j) * B_t_2(i,k,j)               &amp;<a name='925'>
+            + a_p(i,k,j) * B_p(i,k,j)                   &amp;<a name='926'>
+            + a_al(i,k,j) * B_al(i,k,j)  <a name='927'>
+<a name='928'>
+   enddo<a name='929'>
+   enddo<a name='930'>
+   enddo<a name='931'>
+   do i=its,ite<a name='932'>
+   do j=jts,jte<a name='933'>
+      VAL_A= VAL_A + a_mu_1(i,j) * B_mu_1(i,j)                 &amp;<a name='934'>
+            + a_mu_2(i,j) * B_mu_2(i,j)        <a name='935'>
+   enddo<a name='936'>
+   enddo<a name='937'>
+   do i=its,ite<a name='938'>
+   do k=kts,kte<a name='939'>
+   do j=jts,jte<a name='940'>
+   do h=1,num_moist<a name='941'>
+      VAL_A= VAL_A + a_moist_1(i,k,j,h) * B_moist_1(i,k,j,h)   &amp;<a name='942'>
+            + a_moist_2(i,k,j,h) * B_moist_2(i,k,j,h)   <a name='943'>
+   enddo<a name='944'>
+   enddo<a name='945'>
+   enddo<a name='946'>
+   enddo<a name='947'>
+   do i=1,max(grid%ed31,grid%ed33)<a name='948'>
+   do k=kts,kte<a name='949'>
+   do j=1,grid%spec_bdy_width<a name='950'>
+   do h=1,4<a name='951'>
+<font color=#447700>!      VAL_A= VAL_A + a_u_b(i,k,j,h) * B_u_b(i,k,j,h)           &amp;<a name='952'></font>
+<font color=#447700>!            + a_u_bt(i,k,j,h) * B_u_bt(i,k,j,h)         &amp;<a name='953'></font>
+<font color=#447700>!            + a_v_b(i,k,j,h) * B_v_b(i,k,j,h)           &amp;<a name='954'></font>
+<font color=#447700>!            + a_v_bt(i,k,j,h) * B_v_bt(i,k,j,h)         &amp;<a name='955'></font>
+<font color=#447700>!            + a_w_b(i,k,j,h) * B_w_b(i,k,j,h)           &amp;<a name='956'></font>
+<font color=#447700>!            + a_w_bt(i,k,j,h) * B_w_bt(i,k,j,h)         &amp;<a name='957'></font>
+<font color=#447700>!            + a_ph_b(i,k,j,h) * B_ph_b(i,k,j,h)         &amp;<a name='958'></font>
+<font color=#447700>!            + a_ph_bt(i,k,j,h) * B_ph_bt(i,k,j,h)       &amp;<a name='959'></font>
+<font color=#447700>!            + a_t_b(i,k,j,h) * B_t_b(i,k,j,h)           &amp;<a name='960'></font>
+<font color=#447700>!            + a_t_bt(i,k,j,h) * B_t_bt(i,k,j,h)         &amp;<a name='961'></font>
+<font color=#447700>!            + a_mu_b(i,k,j,h) * B_mu_b(i,k,j,h)         &amp;<a name='962'></font>
+<font color=#447700>!            + a_mu_bt(i,k,j,h) * B_mu_bt(i,k,j,h)       &amp;<a name='963'></font>
+<font color=#447700>!            + a_rqv_b(i,k,j,h) * B_rqv_b(i,k,j,h)       &amp;<a name='964'></font>
+<font color=#447700>!            + a_rqv_bt(i,k,j,h) * B_rqv_bt(i,k,j,h)  <a name='965'></font>
+   enddo<a name='966'>
+   enddo<a name='967'>
+   enddo<a name='968'>
+   enddo<a name='969'>
+<a name='970'>
+   print*, '                '<a name='971'>
+   write(6,*) 'a_em: '<a name='972'>
+   write(6,fmt='(A,E22.13)') '      VAL_TL: ', VAL_L<a name='973'>
+   write(6,fmt='(A,E22.13)') '      VAL_AD: ', VAL_A<a name='974'>
+<a name='975'>
+<font color=#447700>!  RECOVER<a name='976'></font>
+<a name='977'>
+   u_1 = S_u_1 <a name='978'>
+   u_2 = S_u_2 <a name='979'>
+   ru = S_ru <a name='980'>
+   ru_m = S_ru_m <a name='981'>
+   ru_tend = S_ru_tend <a name='982'>
+   u_save = S_u_save <a name='983'>
+   v_1 = S_v_1 <a name='984'>
+   v_2 = S_v_2 <a name='985'>
+   rv = S_rv <a name='986'>
+   rv_m = S_rv_m <a name='987'>
+   rv_tend = S_rv_tend <a name='988'>
+   v_save = S_v_save <a name='989'>
+   w_1 = S_w_1 <a name='990'>
+   w_2 = S_w_2 <a name='991'>
+   ww = S_ww <a name='992'>
+   rw = S_rw <a name='993'>
+   ph_1 = S_ph_1 <a name='994'>
+   ph_2 = S_ph_2 <a name='995'>
+   phb = S_phb <a name='996'>
+   php = S_php <a name='997'>
+   t_1 = S_t_1 <a name='998'>
+   t_2 = S_t_2 <a name='999'>
+   t_save = S_t_save <a name='1000'>
+   mu_1 = S_mu_1 <a name='1001'>
+   mu_2 = S_mu_2 <a name='1002'>
+   mub = S_mub <a name='1003'>
+   mudf = S_mudf <a name='1004'>
+   muu = S_muu <a name='1005'>
+   muv = S_muv <a name='1006'>
+   mut = S_mut <a name='1007'>
+   muts = S_muts <a name='1008'>
+   p = S_p <a name='1009'>
+   al = S_al <a name='1010'>
+   alt = S_alt <a name='1011'>
+   z = S_z <a name='1012'>
+   moist_1 = S_moist_1 <a name='1013'>
+   moist_2 = S_moist_2 <a name='1014'>
+   u_b = S_u_b <a name='1015'>
+   u_bt = S_u_bt <a name='1016'>
+   v_b = S_v_b <a name='1017'>
+   v_bt = S_v_bt <a name='1018'>
+   w_b = S_w_b <a name='1019'>
+   w_bt = S_w_bt <a name='1020'>
+   ph_b = S_ph_b <a name='1021'>
+   ph_bt = S_ph_bt <a name='1022'>
+   t_b = S_t_b <a name='1023'>
+   t_bt = S_t_bt <a name='1024'>
+   mu_b = S_mu_b <a name='1025'>
+   mu_bt = S_mu_bt <a name='1026'>
+   rqv_b = S_rqv_b <a name='1027'>
+   rqv_bt = S_rqv_bt <a name='1028'>
+   rqc_b = S_rqc_b <a name='1029'>
+   rqc_bt = S_rqc_bt <a name='1030'>
+   rqr_b = S_rqr_b <a name='1031'>
+   rqr_bt = S_rqr_bt <a name='1032'>
+   rqi_b = S_rqi_b <a name='1033'>
+   rqi_bt = S_rqi_bt <a name='1034'>
+   rqs_b = S_rqs_b <a name='1035'>
+   rqs_bt = S_rqs_bt <a name='1036'>
+   rqg_b = S_rqg_b <a name='1037'>
+   rqg_bt = S_rqg_bt <a name='1038'>
+   fcx = S_fcx <a name='1039'>
+   gcx = S_gcx <a name='1040'>
+   xkmhd = S_xkmhd <a name='1041'>
+<font color=#447700>!***********************************************************<a name='1042'></font>
+<font color=#447700>!***********************************************************<a name='1043'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E+00  COEF=   0.1002139921065E+01  VAL_N= 0.106907E+12  VAL_L= 0.106679E+12<a name='1044'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-01  COEF=   0.1000033706173E+01  VAL_N= 0.106683E+10  VAL_L= 0.106679E+10<a name='1045'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-02  COEF=   0.9998179439761E+00  VAL_N= 0.106660E+08  VAL_L= 0.106679E+08<a name='1046'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-03  COEF=   0.9997966495443E+00  VAL_N= 0.106657E+06  VAL_L= 0.106679E+06<a name='1047'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-04  COEF=   0.9997944894996E+00  VAL_N= 0.106657E+04  VAL_L= 0.106679E+04<a name='1048'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-05  COEF=   0.9997942733074E+00  VAL_N= 0.106657E+02  VAL_L= 0.106679E+02<a name='1049'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-06  COEF=   0.9997942529592E+00  VAL_N= 0.106657E+00  VAL_L= 0.106679E+00<a name='1050'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-07  COEF=   0.9997942382646E+00  VAL_N= 0.106657E-02  VAL_L= 0.106679E-02<a name='1051'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-08  COEF=   0.9997943929116E+00  VAL_N= 0.106657E-04  VAL_L= 0.106679E-04<a name='1052'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-09  COEF=   0.9997942529716E+00  VAL_N= 0.106657E-06  VAL_L= 0.106679E-06<a name='1053'></font>
+<font color=#447700>!g_em_sn: ALPHA_M=.1000E-10  COEF=   0.9997953239580E+00  VAL_N= 0.106657E-08  VAL_L= 0.106679E-08<a name='1054'></font>
+<a name='1055'>
+<font color=#447700>! a_em:<a name='1056'></font>
+<font color=#447700>!      VAL_TL:    0.1065110571042E+12<a name='1057'></font>
+<font color=#447700>!      VAL_AD:    0.1065110571042E+12<a name='1058'></font>
+<font color=#447700>!***********************************************************<a name='1059'></font>
+<font color=#447700>!***********************************************************<a name='1060'></font>
+<font color=#447700>!---------------------------------------------------------------------------------------<a name='1061'></font>
+<a name='1062'>
+END SUBROUTINE test_solve_em<a name='1063'>
+<a name='1064'>
+<a name='1065'>
+<a name='1066'>
+</pre></body></html>

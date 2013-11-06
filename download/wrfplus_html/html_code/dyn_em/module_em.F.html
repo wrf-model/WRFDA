@@ -1,0 +1,1765 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:DYNAMICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_EM'><A href='../../html_code/dyn_em/module_em.F.html#MODULE_EM' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_em</font> <A href='../../call_to/MODULE_EM.html' TARGET='index'>7</A><a name='6'>
+<a name='7'>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/dyn_em/module_em.F.html#module_em.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_10"><a name='8'>
+   USE <A href='../../html_code/dyn_em/module_advect_em.F.html#MODULE_ADVECT_EM'>module_advect_em</A><A href='../../html_code/dyn_em/module_em.F.html#module_em.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_ADVECT_EM_3"><a name='9'>
+   USE <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#MODULE_BIG_STEP_UTILITIES_EM'>module_big_step_utilities_em</A><A href='../../html_code/dyn_em/module_em.F.html#module_em.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BIG_STEP_UTILITIES_EM_8"><a name='10'>
+   USE module_state_description<a name='11'>
+<a name='12'>
+CONTAINS<a name='13'>
+<a name='14'>
+<font color=#447700>!------------------------------------------------------------------------<a name='15'></font>
+<a name='16'>
+<A NAME='RK_STEP_PREP'><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='17'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>rk_step_prep</font>  ( config_flags, rk_step,           &amp; <A href='../../call_to/RK_STEP_PREP.html' TARGET='index'>15</A>,<A href='../../call_from/RK_STEP_PREP.html' TARGET='index'>7</A><a name='18'>
+                           u, v, w, t, ph, mu,              &amp;<a name='19'>
+                           moist,                           &amp;<a name='20'>
+                           ru, rv, rw, ww, php, alt, muu, muv,  &amp;<a name='21'>
+                           mub, mut, phb, pb, p, al, alb,   &amp;<a name='22'>
+                           cqu, cqv, cqw,                   &amp;<a name='23'>
+                           msfu, msfv, msft,                &amp;<a name='24'>
+                           fnm, fnp, dnw, rdx, rdy,         &amp;<a name='25'>
+                           n_moist,                         &amp;<a name='26'>
+                           ids, ide, jds, jde, kds, kde,    &amp;<a name='27'>
+                           ims, ime, jms, jme, kms, kme,    &amp;<a name='28'>
+                           its, ite, jts, jte, kts, kte    )<a name='29'>
+<a name='30'>
+   IMPLICIT NONE<a name='31'>
+<a name='32'>
+<a name='33'>
+   <font color=#447700>!  Input data.<a name='34'></font>
+<a name='35'>
+   TYPE(grid_config_rec_type   ) ,   INTENT(IN   ) :: config_flags<a name='36'>
+<a name='37'>
+   INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='38'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='39'>
+                                    its, ite, jts, jte, kts, kte<a name='40'>
+<a name='41'>
+   INTEGER ,       INTENT(IN   ) :: n_moist, rk_step<a name='42'>
+<a name='43'>
+   REAL ,          INTENT(IN   ) :: rdx, rdy<a name='44'>
+<a name='45'>
+   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &amp;<a name='46'>
+                                               INTENT(IN   ) ::  u,       &amp;<a name='47'>
+                                                                 v,       &amp;<a name='48'>
+                                                                 w,       &amp;<a name='49'>
+                                                                 t,       &amp;<a name='50'>
+                                                                 ph,      &amp;<a name='51'>
+                                                                 phb,     &amp;<a name='52'>
+                                                                 pb,      &amp;<a name='53'>
+                                                                 al,      &amp;<a name='54'>
+                                                                 alb<a name='55'>
+<a name='56'>
+   REAL , DIMENSION( ims:ime , kms:kme , jms:jme  ) ,                     &amp;<a name='57'>
+                                               INTENT(  OUT) ::  ru,      &amp;<a name='58'>
+                                                                 rv,      &amp;<a name='59'>
+                                                                 rw,      &amp;<a name='60'>
+                                                                 ww,      &amp;<a name='61'>
+                                                                 php,     &amp;<a name='62'>
+                                                                 cqu,     &amp;<a name='63'>
+                                                                 cqv,     &amp;<a name='64'>
+                                                                 cqw,     &amp;<a name='65'>
+                                                                 alt<a name='66'>
+<a name='67'>
+   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &amp;<a name='68'>
+                                               INTENT(IN   ) ::  p<a name='69'>
+                                                                 <a name='70'>
+<a name='71'>
+<a name='72'>
+<a name='73'>
+   REAL , DIMENSION( ims:ime, kms:kme, jms:jme, n_moist ), INTENT(   IN) :: &amp;<a name='74'>
+                                                           moist<a name='75'>
+<a name='76'>
+   REAL , DIMENSION( ims:ime , jms:jme ) ,    INTENT(IN   ) :: msft,   &amp;<a name='77'>
+                                                               msfu,   &amp;<a name='78'>
+                                                               msfv,   &amp;<a name='79'>
+                                                               mu,     &amp;<a name='80'>
+                                                               mub<a name='81'>
+<a name='82'>
+   REAL , DIMENSION( ims:ime , jms:jme ) ,    INTENT(  OUT) :: muu,    &amp;<a name='83'>
+                                                               muv,    &amp;<a name='84'>
+                                                               mut<a name='85'>
+<a name='86'>
+   REAL , DIMENSION( kms:kme ) ,    INTENT(IN   ) :: fnm, fnp, dnw<a name='87'>
+<a name='88'>
+   integer :: k<a name='89'>
+<a name='90'>
+<a name='91'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='92'></font>
+<font color=#447700>!<a name='93'></font>
+<font color=#447700>!  rk_step_prep prepares a number of diagnostic quantities <a name='94'></font>
+<font color=#447700>!  in preperation for a Runge-Kutta timestep.  subroutines called<a name='95'></font>
+<font color=#447700>!  by rk_step_prep calculate<a name='96'></font>
+<font color=#447700>!<a name='97'></font>
+<font color=#447700>!  (1) total column dry air mass (mut, call to calculate_full)<a name='98'></font>
+<font color=#447700>!<a name='99'></font>
+<font color=#447700>!  (2) total column dry air mass at u and v points <a name='100'></font>
+<font color=#447700>!      (muu, muv, call to calculate_mu_uv)<a name='101'></font>
+<font color=#447700>!<a name='102'></font>
+<font color=#447700>!  (3) mass-coupled velocities for advection<a name='103'></font>
+<font color=#447700>!      (ru, rv, and rw, call to couple_momentum)<a name='104'></font>
+<font color=#447700>!<a name='105'></font>
+<font color=#447700>!  (4) omega (call to calc_ww_cp)<a name='106'></font>
+<font color=#447700>!<a name='107'></font>
+<font color=#447700>!  (5) moisture coefficients (cqu, cqv, cqw, call to calc_cq)<a name='108'></font>
+<font color=#447700>!<a name='109'></font>
+<font color=#447700>!  (6) inverse density (alt, call to calc_alt)<a name='110'></font>
+<font color=#447700>!<a name='111'></font>
+<font color=#447700>!  (7) geopotential at pressure points (php, call to calc_php)<a name='112'></font>
+<font color=#447700>!<a name='113'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='114'></font>
+<a name='115'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CALCULATE_FULL'>calculate_full</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CALCULATE_FULL_1">( mut, mub, mu,             &amp;<a name='116'>
+                        ids, ide, jds, jde, 1, 2, &amp;<a name='117'>
+                        ims, ime, jms, jme, 1, 1, &amp;<a name='118'>
+                        its, ite, jts, jte, 1, 1 )<a name='119'>
+<a name='120'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CALC_MU_UV'>calc_mu_uv</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CALC_MU_UV_1"> ( config_flags,                  &amp;<a name='121'>
+                     mu, mub, muu, muv,             &amp;<a name='122'>
+                     ids, ide, jds, jde, kds, kde,  &amp;<a name='123'>
+                     ims, ime, jms, jme, kms, kme,  &amp;<a name='124'>
+                     its, ite, jts, jte, kts, kte  )<a name='125'>
+<a name='126'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#COUPLE_MOMENTUM'>couple_momentum</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COUPLE_MOMENTUM_1">( muu, ru, u, msfu,              &amp;<a name='127'>
+                         muv, rv, v, msfv,              &amp;<a name='128'>
+                         mut, rw, w, msft,              &amp;<a name='129'>
+                         ids, ide, jds, jde, kds, kde,  &amp;<a name='130'>
+                         ims, ime, jms, jme, kms, kme,  &amp;<a name='131'>
+                         its, ite, jts, jte, kts, kte  )<a name='132'>
+<a name='133'>
+<font color=#447700>!  new call, couples V with mu, also has correct map factors.  WCS, 3 june 2001<a name='134'></font>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CALC_WW_CP'>calc_ww_cp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CALC_WW_CP_1"> ( u, v, mu, mub, ww,               &amp;<a name='135'>
+                     rdx, rdy, msft, msfu, msfv, dnw, &amp;<a name='136'>
+                     ids, ide, jds, jde, kds, kde,    &amp;<a name='137'>
+                     ims, ime, jms, jme, kms, kme,    &amp;<a name='138'>
+                     its, ite, jts, jte, kts, kte    )<a name='139'>
+<a name='140'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CALC_CQ'>calc_cq</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CALC_CQ_1"> ( moist, cqu, cqv, cqw, n_moist, &amp;<a name='141'>
+                  ids, ide, jds, jde, kds, kde,  &amp;<a name='142'>
+                  ims, ime, jms, jme, kms, kme,  &amp;<a name='143'>
+                  its, ite, jts, jte, kts, kte  )<a name='144'>
+<a name='145'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CALC_ALT'>calc_alt</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CALC_ALT_1"> ( alt, al, alb,                 &amp;<a name='146'>
+                   ids, ide, jds, jde, kds, kde, &amp;<a name='147'>
+                   ims, ime, jms, jme, kms, kme, &amp;<a name='148'>
+                   its, ite, jts, jte, kts, kte )<a name='149'>
+<a name='150'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CALC_PHP'>calc_php</A><A href='../../html_code/dyn_em/module_em.F.html#RK_STEP_PREP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CALC_PHP_1"> ( php, ph, phb,                 &amp;<a name='151'>
+                   ids, ide, jds, jde, kds, kde, &amp;<a name='152'>
+                   ims, ime, jms, jme, kms, kme, &amp;<a name='153'>
+                   its, ite, jts, jte, kts, kte )<a name='154'>
+<a name='155'>
+END SUBROUTINE rk_step_prep<a name='156'>
+<a name='157'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='158'></font>
+<a name='159'>
+<A NAME='RK_TENDENCY'><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='160'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>rk_tendency</font> ( config_flags, rk_step,                           &amp; <A href='../../call_to/RK_TENDENCY.html' TARGET='index'>13</A>,<A href='../../call_from/RK_TENDENCY.html' TARGET='index'>45</A><a name='161'>
+                         ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &amp;<a name='162'>
+                         ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &amp;<a name='163'>
+                         mu_tend, u_save, v_save, w_save, ph_save,        &amp;<a name='164'>
+                         t_save, mu_save, RTHFTEN,                        &amp;<a name='165'>
+                         ru, rv, rw, ww,                                  &amp;<a name='166'>
+                         u, v, w, t, ph,                                  &amp;<a name='167'>
+                         u_old, v_old, w_old, t_old, ph_old,              &amp;<a name='168'>
+                         h_diabatic, phb,t_init,                          &amp;<a name='169'>
+                         mu, mut, muu, muv, mub,                          &amp;<a name='170'>
+                         al, alt, p, pb, php, cqu, cqv, cqw,              &amp;<a name='171'>
+                         u_base, v_base, t_base, qv_base, z_base,         &amp;<a name='172'>
+                         msfu, msfv, msft, f, e, sina, cosa,              &amp;<a name='173'>
+                         fnm, fnp, rdn, rdnw,                             &amp;<a name='174'>
+                         dt, rdx, rdy, khdif, kvdif, xkmhd,               &amp;<a name='175'>
+                         cf1, cf2, cf3, cfn, cfn1, n_moist,               &amp;<a name='176'>
+                         non_hydrostatic, leapfrog,                       &amp;<a name='177'>
+                         ids, ide, jds, jde, kds, kde,                    &amp;<a name='178'>
+                         ims, ime, jms, jme, kms, kme,                    &amp;<a name='179'>
+                         its, ite, jts, jte, kts, kte                    )<a name='180'>
+<a name='181'>
+   IMPLICIT NONE<a name='182'>
+<a name='183'>
+   <font color=#447700>!  Input data.<a name='184'></font>
+<a name='185'>
+   TYPE(grid_config_rec_type)    ,           INTENT(IN   ) :: config_flags<a name='186'>
+<a name='187'>
+   INTEGER ,               INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='188'>
+                                            ims, ime, jms, jme, kms, kme, &amp;<a name='189'>
+                                            its, ite, jts, jte, kts, kte<a name='190'>
+<a name='191'>
+   LOGICAL ,               INTENT(IN   ) :: non_hydrostatic, leapfrog<a name='192'>
+<a name='193'>
+   INTEGER ,               INTENT(IN   ) :: n_moist, rk_step<a name='194'>
+<a name='195'>
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) ,              &amp;<a name='196'>
+                                        INTENT(IN   ) :: ru,      &amp;<a name='197'>
+                                                         rv,      &amp;<a name='198'>
+                                                         rw,      &amp;<a name='199'>
+                                                         ww,      &amp; <a name='200'>
+                                                         u,       &amp;<a name='201'>
+                                                         v,       &amp;<a name='202'>
+                                                         w,       &amp;<a name='203'>
+                                                         t,       &amp;<a name='204'>
+                                                         ph,      &amp;<a name='205'>
+                                                         u_old,   &amp;<a name='206'>
+                                                         v_old,   &amp;<a name='207'>
+                                                         w_old,   &amp;<a name='208'>
+                                                         t_old,   &amp;<a name='209'>
+                                                         ph_old,  &amp;<a name='210'>
+                                                         phb,     &amp;<a name='211'>
+                                                         al,      &amp;<a name='212'>
+                                                         alt,     &amp;<a name='213'>
+                                                         p,       &amp;<a name='214'>
+                                                         pb,      &amp;<a name='215'>
+                                                         php,     &amp;<a name='216'>
+                                                         cqu,     &amp;<a name='217'>
+                                                         cqv,     &amp;<a name='218'>
+                                                         t_init,  &amp;<a name='219'>
+                                                         xkmhd,  &amp;<a name='220'>
+                                                         h_diabatic<a name='221'>
+<a name='222'>
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) ,              &amp;<a name='223'>
+                                        INTENT(OUT  ) :: ru_tend, &amp;<a name='224'>
+                                                         rv_tend, &amp;<a name='225'>
+                                                         rw_tend, &amp;<a name='226'>
+                                                         t_tend,  &amp;<a name='227'>
+                                                         ph_tend, &amp;<a name='228'>
+                                                         RTHFTEN, &amp;<a name='229'>
+                                                          u_save, &amp;<a name='230'>
+                                                          v_save, &amp;<a name='231'>
+                                                          w_save, &amp;<a name='232'>
+                                                         ph_save, &amp;<a name='233'>
+                                                          t_save<a name='234'>
+<a name='235'>
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) ,               &amp;<a name='236'>
+                                        INTENT(INOUT) :: ru_tendf, &amp;<a name='237'>
+                                                         rv_tendf, &amp;<a name='238'>
+                                                         rw_tendf, &amp;<a name='239'>
+                                                         t_tendf,  &amp;<a name='240'>
+                                                         ph_tendf, &amp;<a name='241'>
+                                                         cqw<a name='242'>
+<a name='243'>
+   REAL , DIMENSION( ims:ime , jms:jme ) ,         INTENT(  OUT) :: mu_tend, &amp;<a name='244'>
+                                                                    mu_save<a name='245'>
+<a name='246'>
+   REAL , DIMENSION( ims:ime , jms:jme ) ,         INTENT(IN   ) :: msfu,    &amp;<a name='247'>
+                                                                    msfv,    &amp;<a name='248'>
+                                                                    msft,    &amp;<a name='249'>
+                                                                    f,       &amp;<a name='250'>
+                                                                    e,       &amp;<a name='251'>
+                                                                    sina,    &amp;<a name='252'>
+                                                                    cosa,    &amp;<a name='253'>
+                                                                    mu,      &amp;<a name='254'>
+                                                                    mut,     &amp;<a name='255'>
+                                                                    mub,     &amp;<a name='256'>
+                                                                    muu,     &amp;<a name='257'>
+                                                                    muv<a name='258'>
+<a name='259'>
+   REAL , DIMENSION( kms:kme ) ,                 INTENT(IN   ) :: fnm,     &amp;<a name='260'>
+                                                                  fnp,     &amp;<a name='261'>
+                                                                  rdn,     &amp;<a name='262'>
+                                                                  rdnw,    &amp;<a name='263'>
+                                                                  u_base,  &amp;<a name='264'>
+                                                                  v_base,  &amp;<a name='265'>
+                                                                  t_base,  &amp;<a name='266'>
+                                                                  qv_base, &amp;<a name='267'>
+                                                                  z_base<a name='268'>
+<a name='269'>
+   REAL ,                                      INTENT(IN   ) :: rdx,     &amp;<a name='270'>
+                                                                rdy,     &amp;<a name='271'>
+                                                                dt,      &amp;<a name='272'>
+                                                                khdif,   &amp;<a name='273'>
+                                                                kvdif<a name='274'>
+<a name='275'>
+   REAL    :: kdift, khdq, kvdq, cfn, cfn1, cf1, cf2, cf3<a name='276'>
+   INTEGER :: i,j,k<a name='277'>
+<a name='278'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='279'></font>
+<font color=#447700>!<a name='280'></font>
+<font color=#447700>!  rk_tendency computes the large-timestep tendency terms in the <a name='281'></font>
+<font color=#447700>!  momentum, thermodynamic (theta), and geopotential equations.  <a name='282'></font>
+<font color=#447700>!  These terms include:<a name='283'></font>
+<font color=#447700>!<a name='284'></font>
+<font color=#447700>!  (1) advection (for u, v, w, theta - calls to advect_u, advect_v,<a name='285'></font>
+<font color=#447700>!                 advect_w, and advact_scalar).<a name='286'></font>
+<font color=#447700>!<a name='287'></font>
+<font color=#447700>!  (2) geopotential equation terms (advection and "gw" - call to rhs_ph).<a name='288'></font>
+<font color=#447700>!<a name='289'></font>
+<font color=#447700>!  (3) buoyancy term in vertical momentum equation (call to pg_buoy_w).<a name='290'></font>
+<font color=#447700>!<a name='291'></font>
+<font color=#447700>!  (4) Coriolis and curvature terms in u,v,w momentum equations<a name='292'></font>
+<font color=#447700>!      (calls to subroutines coriolis, curvature)<a name='293'></font>
+<font color=#447700>!<a name='294'></font>
+<font color=#447700>!  (5) 3D diffusion on coordinate surfaces.<a name='295'></font>
+<font color=#447700>!<a name='296'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='297'></font>
+<a name='298'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_1"> ( ru_tend,                      &amp;<a name='299'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='300'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='301'>
+                    its, ite, jts, jte, kts, kte )<a name='302'>
+<a name='303'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_2"> ( rv_tend,                      &amp;<a name='304'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='305'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='306'>
+                    its, ite, jts, jte, kts, kte )<a name='307'>
+<a name='308'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_3"> ( rw_tend,                      &amp;<a name='309'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='310'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='311'>
+                    its, ite, jts, jte, kts, kte )<a name='312'>
+<a name='313'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_4"> ( t_tend,                       &amp;<a name='314'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='315'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='316'>
+                    its, ite, jts, jte, kts, kte )<a name='317'>
+<a name='318'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_5"> ( ph_tend,                      &amp;<a name='319'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='320'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='321'>
+                    its, ite, jts, jte, kts, kte )<a name='322'>
+<a name='323'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_6"> ( u_save,                       &amp;<a name='324'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='325'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='326'>
+                    its, ite, jts, jte, kts, kte )<a name='327'>
+<a name='328'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_7"> ( v_save,                       &amp;<a name='329'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='330'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='331'>
+                    its, ite, jts, jte, kts, kte )<a name='332'>
+<a name='333'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_8"> ( w_save,                       &amp;<a name='334'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='335'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='336'>
+                    its, ite, jts, jte, kts, kte )<a name='337'>
+<a name='338'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_9"> ( ph_save,                       &amp;<a name='339'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='340'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='341'>
+                    its, ite, jts, jte, kts, kte )<a name='342'>
+<a name='343'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_10"> ( t_save,                       &amp;<a name='344'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='345'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='346'>
+                    its, ite, jts, jte, kts, kte )<a name='347'>
+<a name='348'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_11"> ( mu_tend,                  &amp;<a name='349'>
+                    ids, ide, jds, jde, 1, 1, &amp;<a name='350'>
+                    ims, ime, jms, jme, 1, 1, &amp;<a name='351'>
+                    its, ite, jts, jte, 1, 1 )<a name='352'>
+<a name='353'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_12"> ( mu_save,                  &amp;<a name='354'>
+                    ids, ide, jds, jde, 1, 1, &amp;<a name='355'>
+                    ims, ime, jms, jme, 1, 1, &amp;<a name='356'>
+                    its, ite, jts, jte, 1, 1 )<a name='357'>
+<a name='358'>
+   IF (.not. leapfrog ) THEN<a name='359'>
+<a name='360'>
+     <font color=#447700>!  advection tendencies<a name='361'></font>
+<a name='362'>
+     CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_U'>advect_u</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_U_1"> ( u, u , ru_tend, ru, rv, ww,   &amp;<a name='363'>
+                     mut, config_flags,            &amp;<a name='364'>
+                     msfu, msfv, msft,             &amp;<a name='365'>
+                     fnm, fnp, rdx, rdy, rdnw,     &amp;<a name='366'>
+                     ids, ide, jds, jde, kds, kde, &amp;<a name='367'>
+                     ims, ime, jms, jme, kms, kme, &amp;<a name='368'>
+                     its, ite, jts, jte, kts, kte )<a name='369'>
+<a name='370'>
+     CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_V'>advect_v</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_V_1"> ( v, v , rv_tend, ru, rv, ww,   &amp;<a name='371'>
+                     mut, config_flags,            &amp;<a name='372'>
+                     msfu, msfv, msft,             &amp;<a name='373'>
+                     fnm, fnp, rdx, rdy, rdnw,     &amp;<a name='374'>
+                     ids, ide, jds, jde, kds, kde, &amp;<a name='375'>
+                     ims, ime, jms, jme, kms, kme, &amp;<a name='376'>
+                     its, ite, jts, jte, kts, kte )<a name='377'>
+<a name='378'>
+     IF (non_hydrostatic)                          &amp;<a name='379'>
+     CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_W'>advect_w</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_W_1"> ( w, w, rw_tend, ru, rv, ww,    &amp;<a name='380'>
+                     mut, config_flags,            &amp;<a name='381'>
+                     msfu, msfv, msft,             &amp;<a name='382'>
+                     fnm, fnp, rdx, rdy, rdn,      &amp;<a name='383'>
+                     ids, ide, jds, jde, kds, kde, &amp;<a name='384'>
+                     ims, ime, jms, jme, kms, kme, &amp;<a name='385'>
+                     its, ite, jts, jte, kts, kte )<a name='386'>
+<a name='387'>
+<font color=#447700>!  theta flux divergence<a name='388'></font>
+<a name='389'>
+     CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_SCALAR'>advect_scalar</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_SCALAR_3"> ( t, t, t_tend, ru, rv, ww,     &amp;<a name='390'>
+                          mut, config_flags,            &amp;<a name='391'>
+                          msfu, msfv, msft, fnm, fnp,   &amp;<a name='392'>
+                          rdx, rdy, rdnw,               &amp;<a name='393'>
+                          ids, ide, jds, jde, kds, kde, &amp;<a name='394'>
+                          ims, ime, jms, jme, kms, kme, &amp;<a name='395'>
+                          its, ite, jts, jte, kts, kte ) <a name='396'>
+<a name='397'>
+     IF ( config_flags%cu_physics == GDSCHEME ) THEN<a name='398'>
+<a name='399'>
+     <font color=#447700>! theta advection only:<a name='400'></font>
+<a name='401'>
+         CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#SET_TEND'>set_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TEND_1">( RTHFTEN, t_tend, msft,           &amp;<a name='402'>
+                        ids, ide, jds, jde, kds, kde,    &amp;<a name='403'>
+                        ims, ime, jms, jme, kms, kme,    &amp;<a name='404'>
+                        its, ite, jts, jte, kts, kte     )<a name='405'>
+<a name='406'>
+     END IF<a name='407'>
+<a name='408'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#RHS_PH'>rhs_ph</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RHS_PH_1">( ph_tend, u, v, ww, ph, ph, phb, w, &amp;<a name='409'>
+                  mut, muu, muv,                     &amp;<a name='410'>
+                  fnm, fnp,                          &amp;<a name='411'>
+                  rdnw, cfn, cfn1, rdx, rdy, msft,   &amp;<a name='412'>
+                  non_hydrostatic,                   &amp;<a name='413'>
+                  config_flags,                      &amp;<a name='414'>
+                  ids, ide, jds, jde, kds, kde,      &amp;<a name='415'>
+                  ims, ime, jms, jme, kms, kme,      &amp;<a name='416'>
+                  its, ite, jts, jte, kts, kte      )<a name='417'>
+<a name='418'>
+  ELSE  <font color=#447700>! leapfrog option<a name='419'></font>
+<a name='420'>
+    CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_U'>advect_u</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_U_2"> ( u, u_old, ru_tend, ru, rv, ww, &amp;<a name='421'>
+                    mut, config_flags,             &amp;<a name='422'>
+                    msfu, msfv, msft,              &amp;<a name='423'>
+                    fnm, fnp, rdx, rdy, rdnw,      &amp;<a name='424'>
+                    ids, ide, jds, jde, kds, kde,  &amp;<a name='425'>
+                    ims, ime, jms, jme, kms, kme,  &amp;<a name='426'>
+                    its, ite, jts, jte, kts, kte  )<a name='427'>
+<a name='428'>
+    CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_V'>advect_v</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_V_2"> ( v, v_old, rv_tend, ru, rv, ww, &amp;<a name='429'>
+                    mut, config_flags,             &amp;<a name='430'>
+                    msfu, msfv, msft,              &amp;<a name='431'>
+                    fnm, fnp, rdx, rdy, rdnw,      &amp;<a name='432'>
+                    ids, ide, jds, jde, kds, kde,  &amp;<a name='433'>
+                    ims, ime, jms, jme, kms, kme,  &amp;<a name='434'>
+                    its, ite, jts, jte, kts, kte  )<a name='435'>
+<a name='436'>
+    IF (non_hydrostatic)                           &amp;<a name='437'>
+    CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_W'>advect_w</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_W_2"> ( w, w_old, rw_tend, ru, rv, ww, &amp;<a name='438'>
+                    mut, config_flags,             &amp;<a name='439'>
+                    msfu, msfv, msft,              &amp;<a name='440'>
+                    fnm, fnp, rdx, rdy, rdn,       &amp;<a name='441'>
+                    ids, ide, jds, jde, kds, kde,  &amp;<a name='442'>
+                    ims, ime, jms, jme, kms, kme,  &amp;<a name='443'>
+                    its, ite, jts, jte, kts, kte  )<a name='444'>
+<a name='445'>
+<font color=#447700>!  theta flux divergence<a name='446'></font>
+<a name='447'>
+    CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_SCALAR'>advect_scalar</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_SCALAR_4"> ( t, t_old, t_tend, ru, rv, ww, &amp;<a name='448'>
+                         mut, config_flags,            &amp;<a name='449'>
+                         msfu, msfv, msft, fnm, fnp,   &amp;<a name='450'>
+                         rdx, rdy, rdnw,               &amp;<a name='451'>
+                         ids, ide, jds, jde, kds, kde, &amp;<a name='452'>
+                         ims, ime, jms, jme, kms, kme, &amp;<a name='453'>
+                         its, ite, jts, jte, kts, kte )<a name='454'>
+<a name='455'>
+    CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#RHS_PH'>rhs_ph</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RHS_PH_2">( ph_tend, u, v, ww, ph, ph_old, phb, w, &amp;<a name='456'>
+                 mut, muu, muv,                         &amp;<a name='457'>
+                 fnm, fnp,                              &amp;<a name='458'>
+                 rdnw, cfn, cfn1, rdx, rdy, msft,       &amp;<a name='459'>
+                 non_hydrostatic,                       &amp;<a name='460'>
+                 config_flags,                          &amp;<a name='461'>
+                 ids, ide, jds, jde, kds, kde,          &amp;<a name='462'>
+                 ims, ime, jms, jme, kms, kme,          &amp;<a name='463'>
+                 its, ite, jts, jte, kts, kte          )<a name='464'>
+<a name='465'>
+  END IF<a name='466'>
+<a name='467'>
+  CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_PRESSURE_GRADIENT'>horizontal_pressure_gradient</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_PRESSURE_GRADIENT_1">( ru_tend,rv_tend,                &amp;<a name='468'>
+                                     ph,alt,p,pb,al,php,cqu,cqv,     &amp;<a name='469'>
+                                     muu,muv,mu,fnm,fnp,rdnw,        &amp;<a name='470'>
+                                     cf1,cf2,cf3,rdx,rdy,msft,       &amp;<a name='471'>
+                                     config_flags, non_hydrostatic,  &amp;<a name='472'>
+                                     ids, ide, jds, jde, kds, kde,   &amp;<a name='473'>
+                                     ims, ime, jms, jme, kms, kme,   &amp;<a name='474'>
+                                     its, ite, jts, jte, kts, kte   )<a name='475'>
+<a name='476'>
+  IF (non_hydrostatic)                            &amp;<a name='477'>
+  CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#PG_BUOY_W'>pg_buoy_w</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PG_BUOY_W_1">( rw_tend, p, cqw, mu, mub,       &amp;<a name='478'>
+                  rdnw, rdn, g, msft,             &amp;<a name='479'>
+                  ids, ide, jds, jde, kds, kde,   &amp;<a name='480'>
+                  ims, ime, jms, jme, kms, kme,   &amp;<a name='481'>
+                  its, ite, jts, jte, kts, kte   )<a name='482'>
+<a name='483'>
+  IF(config_flags%w_damping.eq.1)THEN<a name='484'>
+    CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#W_DAMP'>w_damp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="W_DAMP_1">   ( rw_tend, ww, w, mut, rdnw, dt,  &amp;<a name='485'>
+                    ids, ide, jds, jde, kds, kde,   &amp;<a name='486'>
+                    ims, ime, jms, jme, kms, kme,   &amp;<a name='487'>
+                    its, ite, jts, jte, kts, kte   )<a name='488'>
+  ENDIF<a name='489'>
+<a name='490'>
+  IF(config_flags%pert_coriolis) THEN<a name='491'>
+<a name='492'>
+    CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#PERTURBATION_CORIOLIS'>perturbation_coriolis</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="PERTURBATION_CORIOLIS_1"> ( ru, rv, rw,                   &amp;<a name='493'>
+                                 ru_tend,  rv_tend,  rw_tend,  &amp;<a name='494'>
+                                 config_flags,                 &amp;<a name='495'>
+                                 u_base, v_base, z_base,       &amp;<a name='496'>
+                                 muu, muv, phb, ph,            &amp;<a name='497'>
+                                 f, e, sina, cosa, fnm, fnp,   &amp;<a name='498'>
+                                 ids, ide, jds, jde, kds, kde, &amp;<a name='499'>
+                                 ims, ime, jms, jme, kms, kme, &amp;<a name='500'>
+                                 its, ite, jts, jte, kts, kte )<a name='501'>
+  ELSE<a name='502'>
+<a name='503'>
+    CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CORIOLIS'>coriolis</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CORIOLIS_1"> ( ru, rv, rw,                   &amp;<a name='504'>
+                    ru_tend,  rv_tend,  rw_tend,  &amp;<a name='505'>
+                    config_flags,                 &amp;<a name='506'>
+                    f, e, sina, cosa, fnm, fnp,   &amp;<a name='507'>
+                    ids, ide, jds, jde, kds, kde, &amp;<a name='508'>
+                    ims, ime, jms, jme, kms, kme, &amp;<a name='509'>
+                    its, ite, jts, jte, kts, kte )<a name='510'>
+<a name='511'>
+   END IF<a name='512'>
+<a name='513'>
+<a name='514'>
+  CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#CURVATURE'>curvature</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CURVATURE_1"> ( ru, rv, rw, u, v, w,            &amp;<a name='515'>
+                   ru_tend,  rv_tend,  rw_tend,    &amp;<a name='516'>
+                   config_flags,                   &amp;<a name='517'>
+                   msfu, msfv, fnm, fnp, rdx, rdy, &amp;<a name='518'>
+                   ids, ide, jds, jde, kds, kde,   &amp;<a name='519'>
+                   ims, ime, jms, jme, kms, kme,   &amp;<a name='520'>
+                   its, ite, jts, jte, kts, kte   )<a name='521'>
+<a name='522'>
+<font color=#447700>!**************************************************************<a name='523'></font>
+<font color=#447700>!<a name='524'></font>
+<font color=#447700>!  Next, the terms that we integrate only with forward-in-time<a name='525'></font>
+<font color=#447700>!  (evaluate with time t variables).<a name='526'></font>
+<font color=#447700>!<a name='527'></font>
+<font color=#447700>!**************************************************************<a name='528'></font>
+<a name='529'>
+  forward_step: IF( rk_step == 1 ) THEN<a name='530'>
+<a name='531'>
+    diff_opt1 : IF (config_flags%diff_opt .eq. 1) THEN<a name='532'>
+   <a name='533'>
+      leapfrog_test : IF( .not. leapfrog ) THEN<a name='534'>
+<a name='535'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_1"> ('u', u, ru_tendf, mut, config_flags, &amp;<a name='536'>
+                                        msfu, msfv, msft,               &amp;<a name='537'>
+                                        khdif, xkmhd, rdx, rdy,         &amp;<a name='538'>
+                                        ids, ide, jds, jde, kds, kde,   &amp;<a name='539'>
+                                        ims, ime, jms, jme, kms, kme,   &amp;<a name='540'>
+                                        its, ite, jts, jte, kts, kte   )<a name='541'>
+<a name='542'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_2"> ('v', v, rv_tendf, mut, config_flags, &amp;<a name='543'>
+                                        msfu, msfv, msft,               &amp;<a name='544'>
+                                        khdif, xkmhd, rdx, rdy,         &amp;<a name='545'>
+                                        ids, ide, jds, jde, kds, kde,   &amp;<a name='546'>
+                                        ims, ime, jms, jme, kms, kme,   &amp;<a name='547'>
+                                        its, ite, jts, jte, kts, kte   )<a name='548'>
+<a name='549'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_3"> ('w', w, rw_tendf, mut, config_flags, &amp;<a name='550'>
+                                        msfu, msfv, msft,               &amp;<a name='551'>
+                                        khdif, xkmhd, rdx, rdy,         &amp;<a name='552'>
+                                        ids, ide, jds, jde, kds, kde,   &amp;<a name='553'>
+                                        ims, ime, jms, jme, kms, kme,   &amp;<a name='554'>
+                                        its, ite, jts, jte, kts, kte   )<a name='555'>
+<a name='556'>
+        khdq = 3.*khdif<a name='557'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION_3DMP'>horizontal_diffusion_3dmp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_3DMP_1"> ( 'm', t, t_tendf, mut,         &amp;<a name='558'>
+                                         config_flags, t_init,         &amp;<a name='559'>
+                                         msfu, msfv, msft,             &amp;<a name='560'>
+                                         khdq , xkmhd, rdx, rdy,       &amp;<a name='561'>
+                                         ids, ide, jds, jde, kds, kde, &amp;<a name='562'>
+                                         ims, ime, jms, jme, kms, kme, &amp;<a name='563'>
+                                         its, ite, jts, jte, kts, kte )<a name='564'>
+<a name='565'>
+        pbl_test : IF (config_flags%bl_pbl_physics .eq. 0) THEN<a name='566'>
+<a name='567'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_U'>vertical_diffusion_u</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_U_1"> ( u, ru_tendf, config_flags,      &amp;<a name='568'>
+                                      u_base,                         &amp;<a name='569'>
+                                      alt, muu, rdn, rdnw, kvdif,     &amp;<a name='570'>
+                                      ids, ide, jds, jde, kds, kde,   &amp;<a name='571'>
+                                      ims, ime, jms, jme, kms, kme,   &amp;<a name='572'>
+                                      its, ite, jts, jte, kts, kte   )<a name='573'>
+<a name='574'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_V'>vertical_diffusion_v</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_V_1"> ( v, rv_tendf, config_flags,      &amp;<a name='575'>
+                                      v_base,                         &amp;<a name='576'>
+                                      alt, muv, rdn, rdnw, kvdif,     &amp;<a name='577'>
+                                      ids, ide, jds, jde, kds, kde,   &amp;<a name='578'>
+                                      ims, ime, jms, jme, kms, kme,   &amp;<a name='579'>
+                                      its, ite, jts, jte, kts, kte   )<a name='580'>
+<a name='581'>
+          IF (non_hydrostatic)                                           &amp;<a name='582'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION'>vertical_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_1"> ( 'w', w, rw_tendf, config_flags,      &amp;<a name='583'>
+                                    alt, mut, rdn, rdnw, kvdif,          &amp;<a name='584'>
+                                    ids, ide, jds, jde, kds, kde,        &amp;<a name='585'>
+                                    ims, ime, jms, jme, kms, kme,        &amp;<a name='586'>
+                                    its, ite, jts, jte, kts, kte        )<a name='587'>
+<a name='588'>
+          kvdq = 3.*kvdif<a name='589'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_3DMP'>vertical_diffusion_3dmp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_3DMP_1"> ( t, t_tendf, config_flags, t_init,     &amp;<a name='590'>
+                                         alt, mut, rdn, rdnw, kvdq ,           &amp;<a name='591'>
+                                         ids, ide, jds, jde, kds, kde,         &amp;<a name='592'>
+                                         ims, ime, jms, jme, kms, kme,         &amp;<a name='593'>
+                                         its, ite, jts, jte, kts, kte         )<a name='594'>
+<a name='595'>
+        ENDIF pbl_test<a name='596'>
+<a name='597'>
+   <font color=#447700>!  Theta tendency computations.<a name='598'></font>
+<a name='599'>
+      ELSE <font color=#447700>! leapfrog diffusion<a name='600'></font>
+<a name='601'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_4"> ('u', u_old, ru_tendf, mut, config_flags, &amp;<a name='602'>
+                                        msfu, msfv, msft,                   &amp;<a name='603'>
+                                        khdif, xkmhd, rdx, rdy,                    &amp;<a name='604'>
+                                        ids, ide, jds, jde, kds, kde,       &amp;<a name='605'>
+                                        ims, ime, jms, jme, kms, kme,       &amp;<a name='606'>
+                                        its, ite, jts, jte, kts, kte       )<a name='607'>
+<a name='608'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_5"> ('v', v_old, rv_tendf, mut, config_flags, &amp;<a name='609'>
+                                        msfu, msfv, msft,                   &amp;<a name='610'>
+                                        khdif, xkmhd, rdx, rdy,                    &amp;<a name='611'>
+                                        ids, ide, jds, jde, kds, kde,       &amp;<a name='612'>
+                                        ims, ime, jms, jme, kms, kme,       &amp;<a name='613'>
+                                        its, ite, jts, jte, kts, kte       )<a name='614'>
+<a name='615'>
+        IF (non_hydrostatic)                                                &amp;<a name='616'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_6"> ('w', w_old, rw_tendf, mut, config_flags, &amp;<a name='617'>
+                                        msfu, msfv, msft,                   &amp;<a name='618'>
+                                        khdif, xkmhd, rdx, rdy,                    &amp;<a name='619'>
+                                        ids, ide, jds, jde, kds, kde,       &amp;<a name='620'>
+                                        ims, ime, jms, jme, kms, kme,       &amp;<a name='621'>
+                                        its, ite, jts, jte, kts, kte       )<a name='622'>
+<a name='623'>
+        khdq = 3.*khdif<a name='624'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION_3DMP'>horizontal_diffusion_3dmp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_3DMP_2"> ( 'm', t_old, t_tendf, mut,     &amp;<a name='625'>
+                                         config_flags, t_init,         &amp;<a name='626'>
+                                         msfu, msfv, msft,             &amp;<a name='627'>
+                                         khdq , xkmhd, rdx, rdy,              &amp;<a name='628'>
+                                         ids, ide, jds, jde, kds, kde, &amp;<a name='629'>
+                                         ims, ime, jms, jme, kms, kme, &amp;<a name='630'>
+                                         its, ite, jts, jte, kts, kte )<a name='631'>
+<a name='632'>
+        pbl_test_lf : IF (config_flags%bl_pbl_physics .eq. 0) THEN<a name='633'>
+<a name='634'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_U'>vertical_diffusion_u</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_U_2"> ( u_old, ru_tendf, config_flags,      &amp;<a name='635'>
+                                      u_base,                             &amp;<a name='636'>
+                                      alt, muu, rdn, rdnw, kvdif,         &amp;<a name='637'>
+                                      ids, ide, jds, jde, kds, kde,       &amp;<a name='638'>
+                                      ims, ime, jms, jme, kms, kme,       &amp;<a name='639'>
+                                      its, ite, jts, jte, kts, kte       )<a name='640'>
+<a name='641'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_V'>vertical_diffusion_v</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_V_2"> ( v_old, rv_tendf, config_flags,      &amp;<a name='642'>
+                                      v_base,                             &amp;<a name='643'>
+                                      alt, muv, rdn, rdnw, kvdif,         &amp;<a name='644'>
+                                      ids, ide, jds, jde, kds, kde,       &amp;<a name='645'>
+                                      ims, ime, jms, jme, kms, kme,       &amp;<a name='646'>
+                                      its, ite, jts, jte, kts, kte       )<a name='647'>
+<a name='648'>
+          IF (non_hydrostatic)                                              &amp;<a name='649'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION'>vertical_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_2"> ( 'w', w_old, rw_tendf, config_flags,     &amp;<a name='650'>
+                                    alt, mut, rdn, rdnw, kvdif,             &amp;<a name='651'>
+                                    ids, ide, jds, jde, kds, kde,           &amp;<a name='652'>
+                                    ims, ime, jms, jme, kms, kme,           &amp;<a name='653'>
+                                    its, ite, jts, jte, kts, kte           )<a name='654'>
+<a name='655'>
+          kvdq = 3.*kvdif<a name='656'>
+          CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_3DMP'>vertical_diffusion_3dmp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_3DMP_2"> ( t_old, t_tendf, config_flags, t_init, &amp;<a name='657'>
+                                         alt, mut, rdn, rdnw, kvdq ,           &amp;<a name='658'>
+                                         ids, ide, jds, jde, kds, kde,         &amp;<a name='659'>
+                                         ims, ime, jms, jme, kms, kme,         &amp;<a name='660'>
+                                         its, ite, jts, jte, kts, kte         )<a name='661'>
+        ENDIF pbl_test_lf<a name='662'>
+<a name='663'>
+      END IF leapfrog_test<a name='664'>
+        <a name='665'>
+    END IF diff_opt1<a name='666'>
+<a name='667'>
+  END IF forward_step<a name='668'>
+<a name='669'>
+END SUBROUTINE rk_tendency<a name='670'>
+<a name='671'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='672'></font>
+<a name='673'>
+<A NAME='RK_ADDTEND_DRY'><A href='../../html_code/dyn_em/module_em.F.html#RK_ADDTEND_DRY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='674'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>rk_addtend_dry</font> ( ru_tend, rv_tend, rw_tend, ph_tend, t_tend,      &amp; <A href='../../call_to/RK_ADDTEND_DRY.html' TARGET='index'>12</A><a name='675'>
+                            ru_tendf, rv_tendf, rw_tendf, ph_tendf, t_tendf, &amp;<a name='676'>
+                            u_save, v_save, w_save, ph_save, t_save, rk_step,&amp;<a name='677'>
+                            h_diabatic, mut, msft, msfu, msfv,               &amp;<a name='678'>
+                            ids,ide, jds,jde, kds,kde,                       &amp;<a name='679'>
+                            ims,ime, jms,jme, kms,kme,                       &amp;<a name='680'>
+                            ips,ipe, jps,jpe, kps,kpe,                       &amp;<a name='681'>
+                            its,ite, jts,jte, kts,kte                       )<a name='682'>
+<a name='683'>
+   IMPLICIT NONE<a name='684'>
+<a name='685'>
+   <font color=#447700>!  Input data.<a name='686'></font>
+<a name='687'>
+   INTEGER ,               INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='688'>
+                                            ims, ime, jms, jme, kms, kme, &amp;<a name='689'>
+                                            ips, ipe, jps, jpe, kps, kpe, &amp;<a name='690'>
+                                            its, ite, jts, jte, kts, kte<a name='691'>
+   INTEGER ,               INTENT(IN   ) :: rk_step<a name='692'>
+<a name='693'>
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) , INTENT(INOUT) :: ru_tend, &amp;<a name='694'>
+                                                                      rv_tend, &amp;<a name='695'>
+                                                                      rw_tend, &amp;<a name='696'>
+                                                                      ph_tend, &amp;<a name='697'>
+                                                                      t_tend,  &amp;<a name='698'>
+                                                                      ru_tendf, &amp;<a name='699'>
+                                                                      rv_tendf, &amp;<a name='700'>
+                                                                      rw_tendf, &amp;<a name='701'>
+                                                                      ph_tendf, &amp;<a name='702'>
+                                                                      t_tendf<a name='703'>
+<a name='704'>
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) , INTENT(IN   ) ::  u_save,  &amp;<a name='705'>
+                                                                       v_save,  &amp;<a name='706'>
+                                                                       w_save,  &amp;<a name='707'>
+                                                                      ph_save,  &amp;<a name='708'>
+                                                                       t_save,  &amp;<a name='709'>
+                                                                      h_diabatic<a name='710'>
+<a name='711'>
+   REAL , DIMENSION( ims:ime , jms:jme ) ,         INTENT(IN   ) :: mut, &amp;<a name='712'>
+                                                                    msft, &amp;<a name='713'>
+                                                                    msfu, &amp;<a name='714'>
+                                                                    msfv<a name='715'>
+<a name='716'>
+<a name='717'>
+<font color=#447700>! Local<a name='718'></font>
+   INTEGER :: i, j, k<a name='719'>
+<a name='720'>
+<a name='721'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='722'></font>
+<font color=#447700>!<a name='723'></font>
+<font color=#447700>! rk_addtend_dry constructs the full large-timestep tendency terms for<a name='724'></font>
+<font color=#447700>! momentum (u,v,w), theta and geopotential equations.   This is accomplished<a name='725'></font>
+<font color=#447700>! by combining the physics tendencies (in *tendf; these are computed <a name='726'></font>
+<font color=#447700>! the first RK substep, held fixed thereafter) with the RK tendencies <a name='727'></font>
+<font color=#447700>! (in *tend, these include advection, pressure gradient, etc; <a name='728'></font>
+<font color=#447700>! these change each rk substep).  Output is in *tend.<a name='729'></font>
+<font color=#447700>!<a name='730'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='731'></font>
+<a name='732'>
+<font color=#447700>!  Finally, add the forward-step tendency to the rk_tendency<a name='733'></font>
+<a name='734'>
+<font color=#447700>! u/v/w/save contain bc tendency that needs to be multiplied by msf<a name='735'></font>
+<font color=#447700>!  before adding it to physics tendency (*tendf)<a name='736'></font>
+<font color=#447700>! For momentum we need the final tendency to include an inverse msf<a name='737'></font>
+<font color=#447700>! physics/bc tendency needs to be divided, advection tendency already has it<a name='738'></font>
+<a name='739'>
+<font color=#447700>! For scalars we need the final tendency to include an inverse msf<a name='740'></font>
+<font color=#447700>! advection tendency is OK, physics/bc tendency needs to be divided by msf<a name='741'></font>
+<a name='742'>
+   DO j = jts,MIN(jte,jde-1)<a name='743'>
+   DO k = kts,kte-1<a name='744'>
+   DO i = its,ite<a name='745'>
+     IF(rk_step == 1)ru_tendf(i,k,j) = ru_tendf(i,k,j) +  u_save(i,k,j)*msfu(i,j)<a name='746'>
+     ru_tend(i,k,j) = ru_tend(i,k,j) + ru_tendf(i,k,j)/msfu(i,j)<a name='747'>
+   ENDDO<a name='748'>
+   ENDDO<a name='749'>
+   ENDDO<a name='750'>
+<a name='751'>
+   DO j = jts,jte<a name='752'>
+   DO k = kts,kte-1<a name='753'>
+   DO i = its,MIN(ite,ide-1)<a name='754'>
+     IF(rk_step == 1)rv_tendf(i,k,j) = rv_tendf(i,k,j) +  v_save(i,k,j)*msfv(i,j)<a name='755'>
+     rv_tend(i,k,j) = rv_tend(i,k,j) + rv_tendf(i,k,j)/msfv(i,j)<a name='756'>
+   ENDDO<a name='757'>
+   ENDDO<a name='758'>
+   ENDDO<a name='759'>
+<a name='760'>
+   DO j = jts,MIN(jte,jde-1)<a name='761'>
+   DO k = kts,kte<a name='762'>
+   DO i = its,MIN(ite,ide-1)<a name='763'>
+     IF(rk_step == 1)rw_tendf(i,k,j) = rw_tendf(i,k,j) +  w_save(i,k,j)*msft(i,j)<a name='764'>
+     rw_tend(i,k,j) = rw_tend(i,k,j) + rw_tendf(i,k,j)/msft(i,j)<a name='765'>
+     IF(rk_step == 1)ph_tendf(i,k,j) = ph_tendf(i,k,j) +  ph_save(i,k,j)<a name='766'>
+     ph_tend(i,k,j) = ph_tend(i,k,j) + ph_tendf(i,k,j)/msft(i,j)<a name='767'>
+   ENDDO<a name='768'>
+   ENDDO<a name='769'>
+   ENDDO<a name='770'>
+<a name='771'>
+   DO j = jts,MIN(jte,jde-1)<a name='772'>
+   DO k = kts,kte-1<a name='773'>
+   DO i = its,MIN(ite,ide-1)<a name='774'>
+     IF(rk_step == 1)t_tendf(i,k,j) = t_tendf(i,k,j) +  t_save(i,k,j)<a name='775'>
+      t_tend(i,k,j) =  t_tend(i,k,j) +  t_tendf(i,k,j)/msft(i,j)  &amp;<a name='776'>
+                                     +  mut(i,j)*h_diabatic(i,k,j)/msft(i,j)<a name='777'>
+   ENDDO<a name='778'>
+   ENDDO<a name='779'>
+   ENDDO<a name='780'>
+<a name='781'>
+END SUBROUTINE rk_addtend_dry<a name='782'>
+<a name='783'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='784'></font>
+<a name='785'>
+<A NAME='RK_SCALAR_TEND'><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='786'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>rk_scalar_tend</font> ( scs, sce, config_flags,    &amp; <A href='../../call_to/RK_SCALAR_TEND.html' TARGET='index'>16</A>,<A href='../../call_from/RK_SCALAR_TEND.html' TARGET='index'>10</A><a name='787'>
+                            rk_step, dt,                  &amp;<a name='788'>
+                            ru, rv, ww, mut, alt,         &amp;<a name='789'>
+                            scalar_old, scalar,           &amp;<a name='790'>
+                            scalar_tends, advect_tend,    &amp;<a name='791'>
+                            RQVFTEN,                      &amp;<a name='792'>
+                            base, moist_step, fnm, fnp,   &amp;<a name='793'>
+                            msfu, msfv, msft,             &amp;<a name='794'>
+                            rdx, rdy, rdn, rdnw,          &amp;<a name='795'>
+                            khdif, kvdif, xkmhd,          &amp;<a name='796'>
+                            leapfrog,                     &amp;<a name='797'>
+                            ids, ide, jds, jde, kds, kde, &amp;<a name='798'>
+                            ims, ime, jms, jme, kms, kme, &amp;<a name='799'>
+                            its, ite, jts, jte, kts, kte )<a name='800'>
+<a name='801'>
+   IMPLICIT NONE<a name='802'>
+<a name='803'>
+   <font color=#447700>!  Input data.<a name='804'></font>
+<a name='805'>
+   TYPE(grid_config_rec_type   ) ,   INTENT(IN   ) :: config_flags<a name='806'>
+<a name='807'>
+   INTEGER ,                INTENT(IN   ) :: rk_step, scs, sce<a name='808'>
+   INTEGER ,                INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='809'>
+                                             ims, ime, jms, jme, kms, kme, &amp;<a name='810'>
+                                             its, ite, jts, jte, kts, kte<a name='811'>
+<a name='812'>
+   LOGICAL , INTENT(IN   ) :: moist_step<a name='813'>
+<a name='814'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                &amp;<a name='815'>
+                                         INTENT(INOUT)  :: scalar,     &amp;<a name='816'>
+                                                           scalar_old<a name='817'>
+<a name='818'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce ),                      &amp;<a name='819'>
+                                         INTENT(  OUT)  :: scalar_tends<a name='820'>
+                                                    <a name='821'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme  ) :: advect_tend<a name='822'>
+<a name='823'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme  ), INTENT(OUT  ) :: RQVFTEN<a name='824'>
+<a name='825'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme  ), INTENT(IN   ) ::     ru,  &amp;<a name='826'>
+                                                                      rv,  &amp;<a name='827'>
+                                                                      ww,  &amp;<a name='828'>
+                                                                      xkmhd,  &amp;<a name='829'>
+                                                                      alt<a name='830'>
+<a name='831'>
+<a name='832'>
+   REAL , DIMENSION( kms:kme ) ,                 INTENT(IN   ) :: fnm,  &amp;<a name='833'>
+                                                                  fnp,  &amp;<a name='834'>
+                                                                  rdn,  &amp;<a name='835'>
+                                                                  rdnw, &amp;<a name='836'>
+                                                                  base<a name='837'>
+<a name='838'>
+   REAL , DIMENSION( ims:ime , jms:jme ) ,       INTENT(IN   ) :: msfu,    &amp;<a name='839'>
+                                                                  msfv,    &amp;<a name='840'>
+                                                                  msft,    &amp;<a name='841'>
+                                                                  mut<a name='842'>
+<a name='843'>
+<a name='844'>
+   REAL ,                                        INTENT(IN   ) :: rdx,     &amp;<a name='845'>
+                                                                  rdy,     &amp;<a name='846'>
+                                                                  khdif,   &amp;<a name='847'>
+                                                                  kvdif<a name='848'>
+<a name='849'>
+   REAL ,                                        INTENT(IN   ) :: dt<a name='850'>
+<a name='851'>
+   LOGICAL, INTENT(IN   ) :: leapfrog<a name='852'>
+<a name='853'>
+<a name='854'>
+   <font color=#447700>! Local data<a name='855'></font>
+  <a name='856'>
+   INTEGER :: im, i,j,k<a name='857'>
+<a name='858'>
+   REAL    :: khdq, kvdq, tendency<a name='859'>
+<a name='860'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='861'></font>
+<font color=#447700>!<a name='862'></font>
+<font color=#447700>! rk_scalar_tend calls routines that computes scalar tendency from advection <a name='863'></font>
+<font color=#447700>! and 3D mixing (TKE or fixed eddy viscosities).<a name='864'></font>
+<font color=#447700>!<a name='865'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='866'></font>
+<a name='867'>
+<a name='868'>
+   khdq = khdif/prandtl<a name='869'>
+   kvdq = kvdif/prandtl<a name='870'>
+<a name='871'>
+  scalar_loop : DO im = scs, sce<a name='872'>
+<a name='873'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_13"> ( advect_tend(ims,kms,jms),     &amp;<a name='874'>
+                      ids, ide, jds, jde, kds, kde, &amp;<a name='875'>
+                      ims, ime, jms, jme, kms, kme, &amp;<a name='876'>
+                      its, ite, jts, jte, kts, kte )<a name='877'>
+<a name='878'>
+   IF (.not. leapfrog ) THEN<a name='879'>
+<a name='880'>
+      CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_SCALAR'>advect_scalar</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_SCALAR_5">     ( scalar(ims,kms,jms,im),        &amp;<a name='881'>
+                               scalar(ims,kms,jms,im),        &amp;<a name='882'>
+                               advect_tend(ims,kms,jms),      &amp;<a name='883'>
+                               ru, rv, ww, mut, config_flags, &amp;<a name='884'>
+                               msfu, msfv, msft, fnm, fnp,    &amp;<a name='885'>
+                               rdx, rdy, rdnw,                &amp;<a name='886'>
+                               ids, ide, jds, jde, kds, kde,  &amp;<a name='887'>
+                               ims, ime, jms, jme, kms, kme,  &amp;<a name='888'>
+                               its, ite, jts, jte, kts, kte  )<a name='889'>
+<a name='890'>
+    ELSE<a name='891'>
+<a name='892'>
+      CALL <A href='../../html_code/dyn_em/module_advect_em.F.html#ADVECT_SCALAR'>advect_scalar</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ADVECT_SCALAR_6">     ( scalar(ims,kms,jms,im),        &amp;<a name='893'>
+                               scalar_old(ims,kms,jms,im),    &amp;<a name='894'>
+                               advect_tend(ims,kms,jms),      &amp;<a name='895'>
+                               ru, rv, ww, mut, config_flags, &amp;<a name='896'>
+                               msfu, msfv, msft, fnm, fnp,    &amp;<a name='897'>
+                               rdx, rdy, rdnw,                &amp;<a name='898'>
+                               ids, ide, jds, jde, kds, kde,  &amp;<a name='899'>
+                               ims, ime, jms, jme, kms, kme,  &amp;<a name='900'>
+                               its, ite, jts, jte, kts, kte  )<a name='901'>
+<a name='902'>
+    END IF<a name='903'>
+<a name='904'>
+    IF( config_flags%cu_physics == GDSCHEME .and. moist_step .and. ( im == P_QV) ) THEN<a name='905'>
+<a name='906'>
+        CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#SET_TEND'>set_tend</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TEND_2">( RQVFTEN, advect_tend, msft,     &amp;<a name='907'>
+                       ids, ide, jds, jde, kds, kde,   &amp;<a name='908'>
+                       ims, ime, jms, jme, kms, kme,   &amp;<a name='909'>
+                       its, ite, jts, jte, kts, kte      )<a name='910'>
+    ENDIF<a name='911'>
+<a name='912'>
+    diff_opt1 : IF (config_flags%diff_opt .eq. 1) THEN<a name='913'>
+<a name='914'>
+    rk_step_1: IF( rk_step == 1 ) THEN<a name='915'>
+<a name='916'>
+<a name='917'>
+    IF (.not. leapfrog ) THEN<a name='918'>
+<a name='919'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_7"> ( 'm', scalar(ims,kms,jms,im),            &amp;<a name='920'>
+                                      scalar_tends(ims,kms,jms,im), mut, &amp;<a name='921'>
+                                      config_flags,                      &amp;<a name='922'>
+                                      msfu, msfv, msft, khdq , xkmhd, rdx, rdy, &amp;<a name='923'>
+                                      ids, ide, jds, jde, kds, kde,      &amp;<a name='924'>
+                                      ims, ime, jms, jme, kms, kme,      &amp;<a name='925'>
+                                      its, ite, jts, jte, kts, kte      )<a name='926'>
+<a name='927'>
+        pbl_test : IF (config_flags%bl_pbl_physics .eq. 0) THEN<a name='928'>
+<a name='929'>
+     IF( (moist_step) .and. ( im == P_QV)) THEN<a name='930'>
+<a name='931'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_MP'>vertical_diffusion_mp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_MP_1"> ( scalar(ims,kms,jms,im),       &amp;<a name='932'>
+                                  scalar_tends(ims,kms,jms,im), &amp;<a name='933'>
+                                  config_flags, base,           &amp;<a name='934'>
+                                  alt, mut, rdn, rdnw, kvdq ,   &amp;<a name='935'>
+                                  ids, ide, jds, jde, kds, kde, &amp;<a name='936'>
+                                  ims, ime, jms, jme, kms, kme, &amp;<a name='937'>
+                                  its, ite, jts, jte, kts, kte )<a name='938'>
+<a name='939'>
+     ELSE <a name='940'>
+<a name='941'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION'>vertical_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_3"> (  'm', scalar(ims,kms,jms,im),       &amp;<a name='942'>
+                                     scalar_tends(ims,kms,jms,im), &amp;<a name='943'>
+                                     config_flags,                 &amp;<a name='944'>
+                                     alt, mut, rdn, rdnw, kvdq,    &amp;<a name='945'>
+                                     ids, ide, jds, jde, kds, kde, &amp;<a name='946'>
+                                     ims, ime, jms, jme, kms, kme, &amp;<a name='947'>
+                                     its, ite, jts, jte, kts, kte )<a name='948'>
+<a name='949'>
+     END IF<a name='950'>
+<a name='951'>
+        ENDIF pbl_test<a name='952'>
+<a name='953'>
+    ELSE<a name='954'>
+<a name='955'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#HORIZONTAL_DIFFUSION'>horizontal_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HORIZONTAL_DIFFUSION_8"> ( 'm', scalar_old(ims,kms,jms,im),        &amp;<a name='956'>
+                                      scalar_tends(ims,kms,jms,im), mut, &amp;<a name='957'>
+                                      config_flags,                      &amp;<a name='958'>
+                                      msfu, msfv, msft, khdq , xkmhd, rdx, rdy, &amp;<a name='959'>
+                                      ids, ide, jds, jde, kds, kde,      &amp;<a name='960'>
+                                      ims, ime, jms, jme, kms, kme,      &amp;<a name='961'>
+                                      its, ite, jts, jte, kts, kte      )<a name='962'>
+<a name='963'>
+        pbl_test_lf : IF (config_flags%bl_pbl_physics .eq. 0) THEN<a name='964'>
+<a name='965'>
+   IF( (moist_step) .and. ( im == P_QV)) THEN<a name='966'>
+<a name='967'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION_MP'>vertical_diffusion_mp</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_MP_2"> ( scalar_old(ims,kms,jms,im),   &amp;<a name='968'>
+                                  scalar_tends(ims,kms,jms,im), &amp;<a name='969'>
+                                  config_flags, base,           &amp;<a name='970'>
+                                  alt, mut, rdn, rdnw, kvdq ,   &amp;<a name='971'>
+                                  ids, ide, jds, jde, kds, kde, &amp;<a name='972'>
+                                  ims, ime, jms, jme, kms, kme, &amp;<a name='973'>
+                                  its, ite, jts, jte, kts, kte )<a name='974'>
+<a name='975'>
+    ELSE<a name='976'>
+<a name='977'>
+     CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#VERTICAL_DIFFUSION'>vertical_diffusion</A><A href='../../html_code/dyn_em/module_em.F.html#RK_SCALAR_TEND' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="VERTICAL_DIFFUSION_4"> (  'm', scalar_old(ims,kms,jms,im),   &amp;<a name='978'>
+                                     scalar_tends(ims,kms,jms,im), &amp;<a name='979'>
+                                     config_flags,                 &amp;<a name='980'>
+                                     alt, mut, rdn, rdnw, kvdq,    &amp;<a name='981'>
+                                     ids, ide, jds, jde, kds, kde, &amp;<a name='982'>
+                                     ims, ime, jms, jme, kms, kme, &amp;<a name='983'>
+                                     its, ite, jts, jte, kts, kte )<a name='984'>
+<a name='985'>
+    END IF<a name='986'>
+<a name='987'>
+        ENDIF pbl_test_lf<a name='988'>
+<a name='989'>
+   END IF <font color=#447700>! leapfrog test<a name='990'></font>
+<a name='991'>
+<a name='992'>
+  ENDIF rk_step_1<a name='993'>
+<a name='994'>
+  ENDIF diff_opt1<a name='995'>
+<a name='996'>
+ END DO scalar_loop<a name='997'>
+<a name='998'>
+END SUBROUTINE rk_scalar_tend<a name='999'>
+<a name='1000'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='1001'></font>
+<a name='1002'>
+<A NAME='RK_UPDATE_SCALAR'><A href='../../html_code/dyn_em/module_em.F.html#RK_UPDATE_SCALAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1003'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>rk_update_scalar</font>( scs, sce,                      &amp; <A href='../../call_to/RK_UPDATE_SCALAR.html' TARGET='index'>15</A><a name='1004'>
+                             scalar_1, scalar_2, sc_tend,   &amp;<a name='1005'>
+                             advect_tend, msft,             &amp;<a name='1006'>
+                             mu_old, mu_new, mu_base,       &amp;<a name='1007'>
+                             rk_step, dt, spec_zone,        &amp;<a name='1008'>
+                             epsts, leapfrog, config_flags, &amp;<a name='1009'>
+                             ids, ide, jds, jde, kds, kde,  &amp;<a name='1010'>
+                             ims, ime, jms, jme, kms, kme,  &amp;<a name='1011'>
+                             its, ite, jts, jte, kts, kte  )<a name='1012'>
+<a name='1013'>
+   IMPLICIT NONE<a name='1014'>
+<a name='1015'>
+   <font color=#447700>!  Input data.<a name='1016'></font>
+<a name='1017'>
+   TYPE(grid_config_rec_type   ) ,   INTENT(IN   ) :: config_flags<a name='1018'>
+<a name='1019'>
+   INTEGER ,                INTENT(IN   ) :: scs, sce, rk_step, spec_zone<a name='1020'>
+   INTEGER ,                INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='1021'>
+                                             ims, ime, jms, jme, kms, kme, &amp;<a name='1022'>
+                                             its, ite, jts, jte, kts, kte<a name='1023'>
+<a name='1024'>
+   REAL,                    INTENT(IN   ) :: dt, epsts<a name='1025'>
+<a name='1026'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme , scs:sce),                &amp;<a name='1027'>
+         INTENT(INOUT)                                  :: scalar_1,  &amp;<a name='1028'>
+                                                           scalar_2,  &amp;<a name='1029'>
+                                                           sc_tend<a name='1030'>
+<a name='1031'>
+   REAL, DIMENSION(ims:ime, kms:kme, jms:jme ),                &amp;<a name='1032'>
+         INTENT(IN)                                  :: advect_tend<a name='1033'>
+<a name='1034'>
+   REAL, DIMENSION(ims:ime, jms:jme  ), INTENT(IN   ) ::  mu_old,  &amp;<a name='1035'>
+                                                          mu_new,  &amp;<a name='1036'>
+                                                          mu_base, &amp;<a name='1037'>
+                                                          msft<a name='1038'>
+<a name='1039'>
+   LOGICAL, INTENT(IN   ) :: leapfrog<a name='1040'>
+<a name='1041'>
+   INTEGER :: i,j,k,im<a name='1042'>
+   REAL    :: sc_middle, msfsq<a name='1043'>
+   REAL, DIMENSION(its:ite) :: muold, r_munew<a name='1044'>
+<a name='1045'>
+   REAL, DIMENSION(its:ite, kts:kte, jts:jte  ) :: tendency<a name='1046'>
+<a name='1047'>
+   INTEGER :: i_start,i_end,j_start,j_end,k_start,k_end<a name='1048'>
+   INTEGER :: i_start_spc,i_end_spc,j_start_spc,j_end_spc,k_start_spc,k_end_spc<a name='1049'>
+<a name='1050'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='1051'></font>
+<font color=#447700>!<a name='1052'></font>
+<font color=#447700>!  rk_scalar_update advances the scalar equation given the time t value<a name='1053'></font>
+<font color=#447700>!  of the scalar and the scalar tendency.  <a name='1054'></font>
+<font color=#447700>!<a name='1055'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='1056'></font>
+<a name='1057'>
+<font color=#447700>!<a name='1058'></font>
+<font color=#447700>!  set loop limits.<a name='1059'></font>
+<a name='1060'>
+      i_start = its<a name='1061'>
+      i_end   = ite<a name='1062'>
+      j_start = jts<a name='1063'>
+      j_end   = jte<a name='1064'>
+      k_start = kts<a name='1065'>
+      k_end   = kte-1<a name='1066'>
+      IF(j_end == jde) j_end = j_end - 1<a name='1067'>
+      IF(i_end == ide) i_end = i_end - 1<a name='1068'>
+<a name='1069'>
+      i_start_spc = i_start<a name='1070'>
+      i_end_spc   = i_end<a name='1071'>
+      j_start_spc = j_start<a name='1072'>
+      j_end_spc   = j_end<a name='1073'>
+      k_start_spc = k_start<a name='1074'>
+      k_end_spc   = k_end<a name='1075'>
+<a name='1076'>
+    IF( config_flags%nested .or. config_flags%specified ) THEN<a name='1077'>
+      i_start = max( its,ids+spec_zone )<a name='1078'>
+      i_end   = min( ite,ide-spec_zone-1 )<a name='1079'>
+      j_start = max( jts,jds+spec_zone )<a name='1080'>
+      j_end   = min( jte,jde-spec_zone-1 )<a name='1081'>
+      k_start = kts<a name='1082'>
+      k_end   = min( kte, kde-1 )<a name='1083'>
+    ENDIF<a name='1084'>
+<a name='1085'>
+   IF( .not. leapfrog ) THEN<a name='1086'>
+<a name='1087'>
+    IF ( rk_step == 1 ) THEN<a name='1088'>
+<a name='1089'>
+      <font color=#447700>!  replace t-dt values (in scalar_1) with t values scalar_2,<a name='1090'></font>
+      <font color=#447700>!  then compute new values by adding tendency to values at t<a name='1091'></font>
+<a name='1092'>
+      DO  im = scs,sce<a name='1093'>
+<a name='1094'>
+       DO  j = jts, min(jte,jde-1)<a name='1095'>
+       DO  k = kts, min(kte,kde-1)<a name='1096'>
+       DO  i = its, min(ite,ide-1)<a name='1097'>
+           tendency(i,k,j) = 0.<a name='1098'>
+       ENDDO<a name='1099'>
+       ENDDO<a name='1100'>
+       ENDDO<a name='1101'>
+   <a name='1102'>
+       DO  j = j_start,j_end<a name='1103'>
+       DO  k = k_start,k_end<a name='1104'>
+       DO  i = i_start,i_end<a name='1105'>
+           tendency(i,k,j) = advect_tend(i,k,j) * msft(i,j)<a name='1106'>
+       ENDDO<a name='1107'>
+       ENDDO<a name='1108'>
+       ENDDO<a name='1109'>
+   <a name='1110'>
+       DO  j = j_start_spc,j_end_spc<a name='1111'>
+       DO  k = k_start_spc,k_end_spc<a name='1112'>
+       DO  i = i_start_spc,i_end_spc<a name='1113'>
+           tendency(i,k,j) = tendency(i,k,j) + sc_tend(i,k,j,im)<a name='1114'>
+       ENDDO<a name='1115'>
+       ENDDO<a name='1116'>
+       ENDDO<a name='1117'>
+   <a name='1118'>
+      DO  j = jts, min(jte,jde-1)<a name='1119'>
+<a name='1120'>
+      DO  i = its, min(ite,ide-1)<a name='1121'>
+        muold(i) = mu_old(i,j) + mu_base(i,j)<a name='1122'>
+        r_munew(i) = 1./(mu_new(i,j) + mu_base(i,j))<a name='1123'>
+      ENDDO<a name='1124'>
+<a name='1125'>
+      DO  k = kts, min(kte,kde-1)<a name='1126'>
+      DO  i = its, min(ite,ide-1)<a name='1127'>
+<a name='1128'>
+        scalar_1(i,k,j,im) = scalar_2(i,k,j,im)<a name='1129'>
+        scalar_2(i,k,j,im) = (muold(i)*scalar_1(i,k,j,im)   &amp;<a name='1130'>
+                             + dt*tendency(i,k,j))*r_munew(i)<a name='1131'>
+<a name='1132'>
+      ENDDO<a name='1133'>
+      ENDDO<a name='1134'>
+      ENDDO<a name='1135'>
+<a name='1136'>
+      ENDDO<a name='1137'>
+<a name='1138'>
+    ELSE<a name='1139'>
+<a name='1140'>
+      <font color=#447700>!  just compute new values, scalar_1 already at time t.<a name='1141'></font>
+<a name='1142'>
+      DO  im = scs, sce<a name='1143'>
+<a name='1144'>
+       DO  j = jts, min(jte,jde-1)<a name='1145'>
+       DO  k = kts, min(kte,kde-1)<a name='1146'>
+       DO  i = its, min(ite,ide-1)<a name='1147'>
+           tendency(i,k,j) = 0.<a name='1148'>
+       ENDDO<a name='1149'>
+       ENDDO<a name='1150'>
+       ENDDO<a name='1151'>
+   <a name='1152'>
+       DO  j = j_start,j_end<a name='1153'>
+       DO  k = k_start,k_end<a name='1154'>
+       DO  i = i_start,i_end<a name='1155'>
+           tendency(i,k,j) = advect_tend(i,k,j) * msft(i,j)<a name='1156'>
+       ENDDO<a name='1157'>
+       ENDDO<a name='1158'>
+       ENDDO<a name='1159'>
+   <a name='1160'>
+       DO  j = j_start_spc,j_end_spc<a name='1161'>
+       DO  k = k_start_spc,k_end_spc<a name='1162'>
+       DO  i = i_start_spc,i_end_spc<a name='1163'>
+           tendency(i,k,j) = tendency(i,k,j) + sc_tend(i,k,j,im)<a name='1164'>
+       ENDDO<a name='1165'>
+       ENDDO<a name='1166'>
+       ENDDO<a name='1167'>
+<a name='1168'>
+      DO  j = jts, min(jte,jde-1)<a name='1169'>
+<a name='1170'>
+      DO  i = its, min(ite,ide-1)<a name='1171'>
+        muold(i) = mu_old(i,j) + mu_base(i,j)<a name='1172'>
+        r_munew(i) = 1./(mu_new(i,j) + mu_base(i,j))<a name='1173'>
+      ENDDO<a name='1174'>
+<a name='1175'>
+      DO  k = kts, min(kte,kde-1)<a name='1176'>
+      DO  i = its, min(ite,ide-1)<a name='1177'>
+<a name='1178'>
+        scalar_2(i,k,j,im) = (muold(i)*scalar_1(i,k,j,im)   &amp;<a name='1179'>
+                             + dt*tendency(i,k,j))*r_munew(i)<a name='1180'>
+<a name='1181'>
+      ENDDO<a name='1182'>
+      ENDDO<a name='1183'>
+      ENDDO<a name='1184'>
+<a name='1185'>
+      ENDDO<a name='1186'>
+<a name='1187'>
+    END IF<a name='1188'>
+<a name='1189'>
+   ELSE  <font color=#447700>!  leapfrog model, do time filter here also<a name='1190'></font>
+<a name='1191'>
+      DO  im = scs, sce<a name='1192'>
+<a name='1193'>
+       DO  j = jts, min(jte,jde-1)<a name='1194'>
+       DO  k = kts, min(kte,kde-1)<a name='1195'>
+       DO  i = its, min(ite,ide-1)<a name='1196'>
+           tendency(i,k,j) = 0.<a name='1197'>
+       ENDDO<a name='1198'>
+       ENDDO<a name='1199'>
+       ENDDO<a name='1200'>
+   <a name='1201'>
+       DO  j = j_start,j_end<a name='1202'>
+       DO  k = k_start,k_end<a name='1203'>
+       DO  i = i_start,i_end<a name='1204'>
+           tendency(i,k,j) = advect_tend(i,k,j)<a name='1205'>
+       ENDDO<a name='1206'>
+       ENDDO<a name='1207'>
+       ENDDO<a name='1208'>
+   <a name='1209'>
+       DO  j = j_start_spc,j_end_spc<a name='1210'>
+       DO  k = k_start_spc,k_end_spc<a name='1211'>
+       DO  i = i_start_spc,i_end_spc<a name='1212'>
+           tendency(i,k,j) = tendency(i,k,j) + sc_tend(i,k,j,im)<a name='1213'>
+       ENDDO<a name='1214'>
+       ENDDO<a name='1215'>
+       ENDDO<a name='1216'>
+      DO  j = jts, min(jte,jde-1)<a name='1217'>
+<a name='1218'>
+      DO  i = its, min(ite,ide-1)<a name='1219'>
+        muold(i) = mu_old(i,j) + mu_base(i,j)<a name='1220'>
+        r_munew(i) = 1./(mu_new(i,j) + mu_base(i,j))<a name='1221'>
+      ENDDO<a name='1222'>
+<a name='1223'>
+      DO  k = kts, min(kte,kde-1)<a name='1224'>
+      DO  i = its, min(ite,ide-1)<a name='1225'>
+<a name='1226'>
+        sc_middle = scalar_2(i,k,j,im)<a name='1227'>
+        scalar_2(i,k,j,im) = (muold(i)*scalar_1(i,k,j,im)   &amp;<a name='1228'>
+                           + (msft(i,j)**2)*2*dt*tendency(i,k,j))*r_munew(i)<a name='1229'>
+<a name='1230'>
+     <font color=#447700>!  asselin time filter here<a name='1231'></font>
+<a name='1232'>
+        scalar_1(i,k,j,im) = sc_middle + epsts*( scalar_1(i,k,j,im)   &amp;<a name='1233'>
+                                                -2*sc_middle          &amp;<a name='1234'>
+                                                +scalar_2(i,k,j,im)  )<a name='1235'>
+      ENDDO<a name='1236'>
+      ENDDO<a name='1237'>
+      ENDDO<a name='1238'>
+<a name='1239'>
+      ENDDO<a name='1240'>
+<a name='1241'>
+   END IF <font color=#447700>! end if for leapfrog branch<a name='1242'></font>
+<a name='1243'>
+<font color=#447700>!  leapfrog update, we are putting the time filter here <a name='1244'></font>
+<font color=#447700>!  at present<a name='1245'></font>
+<a name='1246'>
+END SUBROUTINE rk_update_scalar<a name='1247'>
+<a name='1248'>
+<font color=#447700>!------------------------------------------------------------<a name='1249'></font>
+<a name='1250'>
+<A NAME='TIME_FILTER'><A href='../../html_code/dyn_em/module_em.F.html#TIME_FILTER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1251'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>time_filter</font>  ( u_1, u_2, u_save,             &amp; <A href='../../call_to/TIME_FILTER.html' TARGET='index'>3</A><a name='1252'>
+                          v_1, v_2, v_save,             &amp;<a name='1253'>
+                          w_1, w_2, w_save,             &amp;<a name='1254'>
+                          t_1, t_2, t_save,             &amp;<a name='1255'>
+                          ph_1, ph_2, ph_save,          &amp;<a name='1256'>
+                          mu_1, mu_2, mu_save,          &amp;<a name='1257'>
+                          epsts,                        &amp; <a name='1258'>
+                          ids, ide, jds, jde, kds, kde, &amp;<a name='1259'>
+                          ims, ime, jms, jme, kms, kme, &amp;<a name='1260'>
+                          its, ite, jts, jte, kts, kte )<a name='1261'>
+<a name='1262'>
+   IMPLICIT NONE<a name='1263'>
+<a name='1264'>
+   <font color=#447700>!  Input data.<a name='1265'></font>
+<a name='1266'>
+<a name='1267'>
+   INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='1268'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='1269'>
+                                    its, ite, jts, jte, kts, kte<a name='1270'>
+<a name='1271'>
+   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                        &amp;<a name='1272'>
+                                               INTENT(INOUT) ::  u_1,       &amp;<a name='1273'>
+                                                                 v_1,       &amp;<a name='1274'>
+                                                                 w_1,       &amp;<a name='1275'>
+                                                                 t_1,       &amp;<a name='1276'>
+                                                                 ph_1,      &amp;<a name='1277'>
+                                                                 u_2,       &amp;<a name='1278'>
+                                                                 v_2,       &amp;<a name='1279'>
+                                                                 w_2,       &amp;<a name='1280'>
+                                                                 t_2,       &amp;<a name='1281'>
+                                                                 ph_2<a name='1282'>
+<a name='1283'>
+<a name='1284'>
+   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                           &amp;<a name='1285'>
+                                               INTENT(IN   ) ::  u_save,       &amp;<a name='1286'>
+                                                                 v_save,       &amp;<a name='1287'>
+                                                                 w_save,       &amp;<a name='1288'>
+                                                                 t_save,       &amp;<a name='1289'>
+                                                                 ph_save<a name='1290'>
+<a name='1291'>
+<a name='1292'>
+   REAL , DIMENSION(  ims:ime , jms:jme ) ,                                  &amp;<a name='1293'>
+                                               INTENT(INOUT) ::  mu_1,       &amp;<a name='1294'>
+                                                                 mu_2<a name='1295'>
+<a name='1296'>
+   REAL , DIMENSION(  ims:ime , jms:jme ) ,                                  &amp;<a name='1297'>
+                                               INTENT(IN   ) ::  mu_save<a name='1298'>
+<a name='1299'>
+   REAL , INTENT(IN   )  :: epsts<a name='1300'>
+<a name='1301'>
+   INTEGER :: i,j,k<a name='1302'>
+<a name='1303'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='1304'></font>
+<font color=#447700>!<a name='1305'></font>
+<font color=#447700>!  Asselin timefilter for momentum, theta, geopotential, and mu.<a name='1306'></font>
+<font color=#447700>!  Used with leapfrog option.<a name='1307'></font>
+<font color=#447700>!<a name='1308'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='1309'></font>
+<a name='1310'>
+      DO  j = jts, min(jte,jde-1)<a name='1311'>
+      DO  k = kts, min(kte,kde-1)<a name='1312'>
+      DO  i = its, ite<a name='1313'>
+<a name='1314'>
+      u_1(i,k,j) = u_save(i,k,j) + epsts*( u_1(i,k,j)       &amp;<a name='1315'>
+                                          -2*u_save(i,k,j)  &amp;<a name='1316'>
+                                           +u_2(i,k,j)      )<a name='1317'>
+      ENDDO<a name='1318'>
+      ENDDO<a name='1319'>
+      ENDDO<a name='1320'>
+<a name='1321'>
+      DO  j = jts, jde<a name='1322'>
+      DO  k = kts, min(kte,kde-1)<a name='1323'>
+      DO  i = its, min(ite,ide-1)<a name='1324'>
+<a name='1325'>
+      v_1(i,k,j) = v_save(i,k,j) + epsts*( v_1(i,k,j)       &amp;<a name='1326'>
+                                          -2*v_save(i,k,j)  &amp;<a name='1327'>
+                                          +v_2(i,k,j)      )<a name='1328'>
+      ENDDO<a name='1329'>
+      ENDDO<a name='1330'>
+      ENDDO<a name='1331'>
+<a name='1332'>
+      DO  j = jts, min(jte,jde-1)<a name='1333'>
+      DO  k = kts, kte<a name='1334'>
+      DO  i = its, min(ite,ide-1)<a name='1335'>
+<a name='1336'>
+      w_1(i,k,j) = w_save(i,k,j) + epsts*( w_1(i,k,j)       &amp;<a name='1337'>
+                                          -2*w_save(i,k,j)  &amp;<a name='1338'>
+                                          +w_2(i,k,j)      )<a name='1339'>
+      ph_1(i,k,j) = ph_save(i,k,j) + epsts*( ph_1(i,k,j)     &amp;<a name='1340'>
+                                          -2*ph_save(i,k,j)  &amp;<a name='1341'>
+                                          +ph_2(i,k,j)      )<a name='1342'>
+      ENDDO<a name='1343'>
+      ENDDO<a name='1344'>
+      ENDDO<a name='1345'>
+<a name='1346'>
+      DO  j = jts, min(jte,jde-1)<a name='1347'>
+      DO  k = kts, min(kte,kde-1)<a name='1348'>
+      DO  i = its, min(ite,ide-1)<a name='1349'>
+<a name='1350'>
+      t_1(i,k,j) = t_save(i,k,j) + epsts*( t_1(i,k,j)       &amp;<a name='1351'>
+                                          -2*t_save(i,k,j)  &amp;<a name='1352'>
+                                          +t_2(i,k,j)      )<a name='1353'>
+<a name='1354'>
+      ENDDO<a name='1355'>
+      ENDDO<a name='1356'>
+      ENDDO<a name='1357'>
+<a name='1358'>
+      DO  j = jts, min(jte,jde-1)<a name='1359'>
+      DO  i = its, min(ite,ide-1)<a name='1360'>
+<a name='1361'>
+      mu_1(i,j) = mu_save(i,j) + epsts*( mu_1(i,j)       &amp;<a name='1362'>
+                                          -2*mu_save(i,j)  &amp;<a name='1363'>
+                                          +mu_2(i,j)      )<a name='1364'>
+<a name='1365'>
+      ENDDO<a name='1366'>
+      ENDDO<a name='1367'>
+<a name='1368'>
+END SUBROUTINE time_filter<a name='1369'>
+<a name='1370'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1371'></font>
+<a name='1372'>
+<A NAME='INIT_ZERO_TENDENCY'><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1373'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>init_zero_tendency</font>(ru_tendf, rv_tendf, rw_tendf, ph_tendf,  &amp; <A href='../../call_to/INIT_ZERO_TENDENCY.html' TARGET='index'>14</A>,<A href='../../call_from/INIT_ZERO_TENDENCY.html' TARGET='index'>8</A><a name='1374'>
+                              t_tendf,  tke_tendf,                     &amp;<a name='1375'>
+                              moist_tendf,chem_tendf,                  &amp;<a name='1376'>
+                              n_moist,n_chem,rk_step,                  &amp;<a name='1377'>
+                              ids, ide, jds, jde, kds, kde,            &amp;<a name='1378'>
+                              ims, ime, jms, jme, kms, kme,            &amp;<a name='1379'>
+                              its, ite, jts, jte, kts, kte             )<a name='1380'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1381'></font>
+   IMPLICIT NONE<a name='1382'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1383'></font>
+<a name='1384'>
+   INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='1385'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='1386'>
+                                    its, ite, jts, jte, kts, kte<a name='1387'>
+<a name='1388'>
+   INTEGER ,       INTENT(IN   ) :: n_moist,n_chem,rk_step<a name='1389'>
+<a name='1390'>
+   REAL , DIMENSION( ims:ime , kms:kme, jms:jme  ) , INTENT(INOUT) ::  &amp;<a name='1391'>
+                                                             ru_tendf, &amp;<a name='1392'>
+                                                             rv_tendf, &amp;<a name='1393'>
+                                                             rw_tendf, &amp;<a name='1394'>
+                                                             ph_tendf, &amp;<a name='1395'>
+                                                              t_tendf, &amp;<a name='1396'>
+                                                            tke_tendf<a name='1397'>
+<a name='1398'>
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_moist),INTENT(INOUT)::&amp;<a name='1399'>
+                                                          moist_tendf<a name='1400'>
+<a name='1401'>
+   REAL , DIMENSION(ims:ime, kms:kme, jms:jme, n_chem ),INTENT(INOUT)::&amp;<a name='1402'>
+                                                          chem_tendf<a name='1403'>
+<a name='1404'>
+<font color=#447700>! LOCAL VARS<a name='1405'></font>
+<a name='1406'>
+   INTEGER :: im, ic<a name='1407'>
+<a name='1408'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='1409'></font>
+<font color=#447700>!<a name='1410'></font>
+<font color=#447700>! init_zero_tendency <a name='1411'></font>
+<font color=#447700>! sets tendency arrays to zero for all prognostic variables.<a name='1412'></font>
+<font color=#447700>!<a name='1413'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='1414'></font>
+<a name='1415'>
+<a name='1416'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_14"> ( ru_tendf,                        &amp;<a name='1417'>
+                    ids, ide, jds, jde, kds, kde,    &amp;<a name='1418'>
+                    ims, ime, jms, jme, kms, kme,    &amp;<a name='1419'>
+                    its, ite, jts, jte, kts, kte     )<a name='1420'>
+<a name='1421'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_15"> ( rv_tendf,                        &amp;<a name='1422'>
+                    ids, ide, jds, jde, kds, kde,    &amp;<a name='1423'>
+                    ims, ime, jms, jme, kms, kme,    &amp;<a name='1424'>
+                    its, ite, jts, jte, kts, kte     )<a name='1425'>
+<a name='1426'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_16"> ( rw_tendf,                        &amp;<a name='1427'>
+                    ids, ide, jds, jde, kds, kde,    &amp;<a name='1428'>
+                    ims, ime, jms, jme, kms, kme,    &amp;<a name='1429'>
+                    its, ite, jts, jte, kts, kte     )<a name='1430'>
+<a name='1431'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_17"> ( ph_tendf,                        &amp;<a name='1432'>
+                    ids, ide, jds, jde, kds, kde,    &amp;<a name='1433'>
+                    ims, ime, jms, jme, kms, kme,    &amp;<a name='1434'>
+                    its, ite, jts, jte, kts, kte     )<a name='1435'>
+<a name='1436'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_18"> ( t_tendf,                         &amp;<a name='1437'>
+                    ids, ide, jds, jde, kds, kde,    &amp;<a name='1438'>
+                    ims, ime, jms, jme, kms, kme,    &amp;<a name='1439'>
+                    its, ite, jts, jte, kts, kte     )<a name='1440'>
+<a name='1441'>
+   CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_19"> ( tke_tendf,                       &amp;<a name='1442'>
+                    ids, ide, jds, jde, kds, kde,    &amp;<a name='1443'>
+                    ims, ime, jms, jme, kms, kme,    &amp;<a name='1444'>
+                    its, ite, jts, jte, kts, kte     )<a name='1445'>
+<a name='1446'>
+<font color=#447700>!   DO im=PARAM_FIRST_SCALAR,n_moist<a name='1447'></font>
+   DO im=1,n_moist                      <font color=#447700>! make sure first one is zero too<a name='1448'></font>
+      CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_20"> ( moist_tendf(ims,kms,jms,im),  &amp;<a name='1449'>
+                       ids, ide, jds, jde, kds, kde, &amp;<a name='1450'>
+                       ims, ime, jms, jme, kms, kme, &amp;<a name='1451'>
+                       its, ite, jts, jte, kts, kte  )<a name='1452'>
+   ENDDO<a name='1453'>
+<a name='1454'>
+#if xyh0<a name='1455'>
+<font color=#447700>!   DO ic=PARAM_FIRST_SCALAR,n_chem<a name='1456'></font>
+   DO ic=1,n_chem                       <font color=#447700>! make sure first one is zero too<a name='1457'></font>
+      CALL <A href='../../html_code/dyn_em/module_big_step_utilities_em.F.html#ZERO_TEND'>zero_tend</A><A href='../../html_code/dyn_em/module_em.F.html#INIT_ZERO_TENDENCY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_TEND_21"> ( chem_tendf(ims,kms,jms,ic),   &amp;<a name='1458'>
+                       ids, ide, jds, jde, kds, kde, &amp;<a name='1459'>
+                       ims, ime, jms, jme, kms, kme, &amp;<a name='1460'>
+                       its, ite, jts, jte, kts, kte  )<a name='1461'>
+   ENDDO<a name='1462'>
+#endif<a name='1463'>
+<a name='1464'>
+END SUBROUTINE init_zero_tendency<a name='1465'>
+<a name='1466'>
+<font color=#447700>!===================================================================<a name='1467'></font>
+<a name='1468'>
+<a name='1469'>
+<A NAME='DUMP_DATA'><A href='../../html_code/dyn_em/module_em.F.html#DUMP_DATA' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1470'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>dump_data</font>( a, field, io_unit,            &amp;<a name='1471'>
+                      ims, ime, jms, jme, kms, kme, &amp;<a name='1472'>
+                      ids, ide, jds, jde, kds, kde )<a name='1473'>
+implicit none<a name='1474'>
+integer ::  ims, ime, jms, jme, kms, kme, &amp;<a name='1475'>
+            ids, ide, jds, jde, kds, kde <a name='1476'>
+real, dimension(ims:ime, kms:kme, jds:jde) :: a<a name='1477'>
+character :: field<a name='1478'>
+integer :: io_unit<a name='1479'>
+<a name='1480'>
+integer :: is,ie,js,je,ks,ke<a name='1481'>
+<a name='1482'>
+<font color=#447700>!&lt;DESCRIPTION<a name='1483'></font>
+<font color=#447700>!<a name='1484'></font>
+<font color=#447700>! quick and dirty debug io utility<a name='1485'></font>
+<font color=#447700>!<a name='1486'></font>
+<font color=#447700>!&lt;/DESCRIPTION<a name='1487'></font>
+<a name='1488'>
+is = ids<a name='1489'>
+ie = ide-1<a name='1490'>
+js = jds<a name='1491'>
+je = jde-1<a name='1492'>
+ks = kds<a name='1493'>
+ke = kde-1<a name='1494'>
+<a name='1495'>
+if(field == 'u') ie = ide<a name='1496'>
+if(field == 'v') je = jde<a name='1497'>
+if(field == 'w') ke = kde<a name='1498'>
+<a name='1499'>
+write(io_unit) is,ie,ks,ke,js,je<a name='1500'>
+write(io_unit) a(is:ie, ks:ke, js:je)<a name='1501'>
+<a name='1502'>
+end subroutine dump_data<a name='1503'>
+<a name='1504'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1505'></font>
+<a name='1506'>
+<A NAME='CALCULATE_PHY_TEND'><A href='../../html_code/dyn_em/module_em.F.html#CALCULATE_PHY_TEND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1507'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>calculate_phy_tend</font> (config_flags,mu,pi3d,                   &amp; <A href='../../call_to/CALCULATE_PHY_TEND.html' TARGET='index'>3</A><a name='1508'>
+                     RTHRATEN,                                         &amp;<a name='1509'>
+                     RUBLTEN,RVBLTEN,RTHBLTEN,                         &amp;<a name='1510'>
+                     RQVBLTEN,RQCBLTEN,RQIBLTEN,                       &amp;<a name='1511'>
+                     RTHCUTEN,RQVCUTEN,RQCCUTEN,RQRCUTEN,              &amp;<a name='1512'>
+                     RQICUTEN,RQSCUTEN,                                &amp;<a name='1513'>
+                     ids,ide, jds,jde, kds,kde,                        &amp;<a name='1514'>
+                     ims,ime, jms,jme, kms,kme,                        &amp;<a name='1515'>
+                     its,ite, jts,jte, kts,kte                         )<a name='1516'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1517'></font>
+      IMPLICIT NONE<a name='1518'>
+<a name='1519'>
+      TYPE(grid_config_rec_type), INTENT(IN)     ::      config_flags<a name='1520'>
+<a name='1521'>
+      INTEGER,  INTENT(IN   )   ::          ids,ide, jds,jde, kds,kde, &amp;<a name='1522'>
+                                            ims,ime, jms,jme, kms,kme, &amp;<a name='1523'>
+                                            its,ite, jts,jte, kts,kte<a name='1524'>
+<a name='1525'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )               , &amp;<a name='1526'>
+                INTENT(IN   )   ::                               pi3d<a name='1527'>
+                                                                 <a name='1528'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                        , &amp;<a name='1529'>
+                INTENT(IN   )   ::                                 mu<a name='1530'>
+      <a name='1531'>
+                                                           <a name='1532'>
+<font color=#447700>! radiation<a name='1533'></font>
+<a name='1534'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme ),                &amp;<a name='1535'>
+                INTENT(INOUT)   ::                           RTHRATEN<a name='1536'>
+<a name='1537'>
+<font color=#447700>! cumulus<a name='1538'></font>
+<a name='1539'>
+      REAL,     DIMENSION( ims:ime , kms:kme , jms:jme ),              &amp;<a name='1540'>
+                INTENT(INOUT)   ::                                     &amp;<a name='1541'>
+                                                             RTHCUTEN, &amp;<a name='1542'>
+                                                             RQVCUTEN, &amp;<a name='1543'>
+                                                             RQCCUTEN, &amp;<a name='1544'>
+                                                             RQRCUTEN, &amp;<a name='1545'>
+                                                             RQICUTEN, &amp;<a name='1546'>
+                                                             RQSCUTEN<a name='1547'>
+<font color=#447700>! pbl<a name='1548'></font>
+<a name='1549'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )               , &amp;<a name='1550'>
+                INTENT(INOUT)   ::                            RUBLTEN, &amp;<a name='1551'>
+                                                              RVBLTEN, &amp;<a name='1552'>
+                                                             RTHBLTEN, &amp;<a name='1553'>
+                                                             RQVBLTEN, &amp;<a name='1554'>
+                                                             RQCBLTEN, &amp;<a name='1555'>
+                                                             RQIBLTEN<a name='1556'>
+<a name='1557'>
+      INTEGER :: i,k,j<a name='1558'>
+      INTEGER :: itf,ktf,jtf<a name='1559'>
+<a name='1560'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1561'></font>
+<a name='1562'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='1563'></font>
+<font color=#447700>!<a name='1564'></font>
+<font color=#447700>!  calculate_phy_tend couples the physics tendencies to the column mass (mu),<a name='1565'></font>
+<font color=#447700>!  because prognostic equations are in flux form, but physics tendencies are<a name='1566'></font>
+<font color=#447700>!  computed for uncoupled variables.<a name='1567'></font>
+<font color=#447700>!<a name='1568'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='1569'></font>
+<a name='1570'>
+      itf=MIN(ite,ide-1)<a name='1571'>
+      jtf=MIN(jte,jde-1)<a name='1572'>
+      ktf=MIN(kte,kde-1)<a name='1573'>
+<a name='1574'>
+<font color=#447700>! radiation<a name='1575'></font>
+<a name='1576'>
+   IF (config_flags%ra_lw_physics .gt. 0 .or. config_flags%ra_sw_physics .gt. 0) THEN<a name='1577'>
+<a name='1578'>
+      DO J=jts,jtf<a name='1579'>
+      DO K=kts,ktf<a name='1580'>
+      DO I=its,itf<a name='1581'>
+         RTHRATEN(I,K,J)=mu(I,J)*RTHRATEN(I,K,J)<a name='1582'>
+      ENDDO<a name='1583'>
+      ENDDO<a name='1584'>
+      ENDDO<a name='1585'>
+<a name='1586'>
+   ENDIF<a name='1587'>
+<a name='1588'>
+<font color=#447700>! cumulus<a name='1589'></font>
+<a name='1590'>
+   IF (config_flags%cu_physics .gt. 0) THEN<a name='1591'>
+<a name='1592'>
+      DO J=jts,jtf<a name='1593'>
+      DO I=its,itf<a name='1594'>
+      DO K=kts,ktf<a name='1595'>
+         RTHCUTEN(I,K,J)=mu(I,J)*RTHCUTEN(I,K,J)<a name='1596'>
+         RQVCUTEN(I,K,J)=mu(I,J)*RQVCUTEN(I,K,J)<a name='1597'>
+      ENDDO<a name='1598'>
+      ENDDO<a name='1599'>
+      ENDDO<a name='1600'>
+<a name='1601'>
+      IF (P_QC .ge. PARAM_FIRST_SCALAR)THEN<a name='1602'>
+         DO J=jts,jtf<a name='1603'>
+         DO I=its,itf<a name='1604'>
+         DO K=kts,ktf<a name='1605'>
+            RQCCUTEN(I,K,J)=mu(I,J)*RQCCUTEN(I,K,J)<a name='1606'>
+         ENDDO<a name='1607'>
+         ENDDO<a name='1608'>
+         ENDDO<a name='1609'>
+      ENDIF<a name='1610'>
+<a name='1611'>
+      IF (P_QR .ge. PARAM_FIRST_SCALAR)THEN<a name='1612'>
+         DO J=jts,jtf<a name='1613'>
+         DO I=its,itf<a name='1614'>
+         DO K=kts,ktf<a name='1615'>
+            RQRCUTEN(I,K,J)=mu(I,J)*RQRCUTEN(I,K,J)<a name='1616'>
+         ENDDO<a name='1617'>
+         ENDDO<a name='1618'>
+         ENDDO<a name='1619'>
+      ENDIF<a name='1620'>
+<a name='1621'>
+      IF (P_QI .ge. PARAM_FIRST_SCALAR)THEN<a name='1622'>
+         DO J=jts,jtf<a name='1623'>
+         DO I=its,itf<a name='1624'>
+         DO K=kts,ktf<a name='1625'>
+            RQICUTEN(I,K,J)=mu(I,J)*RQICUTEN(I,K,J)<a name='1626'>
+         ENDDO<a name='1627'>
+         ENDDO<a name='1628'>
+         ENDDO<a name='1629'>
+      ENDIF<a name='1630'>
+<a name='1631'>
+      IF(P_QS .ge. PARAM_FIRST_SCALAR)THEN<a name='1632'>
+         DO J=jts,jtf<a name='1633'>
+         DO I=its,itf<a name='1634'>
+         DO K=kts,ktf<a name='1635'>
+            RQSCUTEN(I,K,J)=mu(I,J)*RQSCUTEN(I,K,J)<a name='1636'>
+         ENDDO<a name='1637'>
+         ENDDO<a name='1638'>
+         ENDDO<a name='1639'>
+      ENDIF<a name='1640'>
+<a name='1641'>
+   ENDIF<a name='1642'>
+<a name='1643'>
+<font color=#447700>! pbl<a name='1644'></font>
+<a name='1645'>
+   IF (config_flags%bl_pbl_physics .gt. 0) THEN<a name='1646'>
+<a name='1647'>
+      DO J=jts,jtf<a name='1648'>
+      DO K=kts,ktf<a name='1649'>
+      DO I=its,itf<a name='1650'>
+         RUBLTEN(I,K,J) =mu(I,J)*RUBLTEN(I,K,J)<a name='1651'>
+         RVBLTEN(I,K,J) =mu(I,J)*RVBLTEN(I,K,J)<a name='1652'>
+         RTHBLTEN(I,K,J)=mu(I,J)*RTHBLTEN(I,K,J)<a name='1653'>
+      ENDDO<a name='1654'>
+      ENDDO<a name='1655'>
+      ENDDO<a name='1656'>
+<a name='1657'>
+      IF (P_QV .ge. PARAM_FIRST_SCALAR) THEN<a name='1658'>
+         DO J=jts,jtf<a name='1659'>
+         DO K=kts,ktf<a name='1660'>
+         DO I=its,itf<a name='1661'>
+            RQVBLTEN(I,K,J)=mu(I,J)*RQVBLTEN(I,K,J)<a name='1662'>
+         ENDDO<a name='1663'>
+         ENDDO<a name='1664'>
+         ENDDO<a name='1665'>
+      ENDIF<a name='1666'>
+<a name='1667'>
+      IF (P_QC .ge. PARAM_FIRST_SCALAR) THEN<a name='1668'>
+         DO J=jts,jtf<a name='1669'>
+         DO K=kts,ktf<a name='1670'>
+         DO I=its,itf<a name='1671'>
+           RQCBLTEN(I,K,J)=mu(I,J)*RQCBLTEN(I,K,J)<a name='1672'>
+         ENDDO<a name='1673'>
+         ENDDO<a name='1674'>
+         ENDDO<a name='1675'>
+      ENDIF<a name='1676'>
+<a name='1677'>
+      IF (P_QI .ge. PARAM_FIRST_SCALAR) THEN<a name='1678'>
+         DO J=jts,jtf<a name='1679'>
+         DO K=kts,ktf<a name='1680'>
+         DO I=its,itf<a name='1681'>
+            RQIBLTEN(I,K,J)=mu(I,J)*RQIBLTEN(I,K,J)<a name='1682'>
+         ENDDO<a name='1683'>
+         ENDDO<a name='1684'>
+         ENDDO<a name='1685'>
+      ENDIF<a name='1686'>
+<a name='1687'>
+    ENDIF<a name='1688'>
+<a name='1689'>
+END SUBROUTINE calculate_phy_tend<a name='1690'>
+<a name='1691'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1692'></font>
+<a name='1693'>
+<A NAME='POSITIVE_DEFINITE_FILTER'><A href='../../html_code/dyn_em/module_em.F.html#POSITIVE_DEFINITE_FILTER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1694'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>positive_definite_filter</font> ( a,                          &amp;<a name='1695'>
+                                      ids,ide, jds,jde, kds,kde,  &amp;<a name='1696'>
+                                      ims,ime, jms,jme, kms,kme,  &amp;<a name='1697'>
+                                      its,ite, jts,jte, kts,kte  )<a name='1698'>
+<a name='1699'>
+  IMPLICIT NONE<a name='1700'>
+<a name='1701'>
+  INTEGER,  INTENT(IN   )   ::          ids,ide, jds,jde, kds,kde, &amp;<a name='1702'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='1703'>
+                                        its,ite, jts,jte, kts,kte<a name='1704'>
+<a name='1705'>
+  REAL, DIMENSION( ims:ime , kms:kme , jms:jme  ), INTENT(INOUT) :: a<a name='1706'>
+<a name='1707'>
+  INTEGER :: i,k,j<a name='1708'>
+<a name='1709'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='1710'></font>
+<font color=#447700>!<a name='1711'></font>
+<font color=#447700>! debug and testing code for bounding a variable<a name='1712'></font>
+<font color=#447700>!<a name='1713'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='1714'></font>
+<a name='1715'>
+  DO j=jts,min(jte,jde-1)<a name='1716'>
+  DO k=kts,kte-1<a name='1717'>
+  DO i=its,min(ite,ide-1)<a name='1718'>
+<font color=#447700>!    a(i,k,j) = max(a(i,k,j),0.)<a name='1719'></font>
+    a(i,k,j) = min(1000.,max(a(i,k,j),0.))<a name='1720'>
+  ENDDO<a name='1721'>
+  ENDDO<a name='1722'>
+  ENDDO<a name='1723'>
+<a name='1724'>
+  END SUBROUTINE positive_definite_filter<a name='1725'>
+<a name='1726'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1727'></font>
+<a name='1728'>
+<A NAME='BOUND_TKE'><A href='../../html_code/dyn_em/module_em.F.html#BOUND_TKE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1729'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>bound_tke</font> ( tke, tke_upper_bound,       &amp; <A href='../../call_to/BOUND_TKE.html' TARGET='index'>3</A><a name='1730'>
+                       ids,ide, jds,jde, kds,kde,  &amp;<a name='1731'>
+                       ims,ime, jms,jme, kms,kme,  &amp;<a name='1732'>
+                       its,ite, jts,jte, kts,kte  )<a name='1733'>
+<a name='1734'>
+  IMPLICIT NONE<a name='1735'>
+<a name='1736'>
+  INTEGER,  INTENT(IN   )   ::          ids,ide, jds,jde, kds,kde, &amp;<a name='1737'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='1738'>
+                                        its,ite, jts,jte, kts,kte<a name='1739'>
+<a name='1740'>
+  REAL, DIMENSION( ims:ime , kms:kme , jms:jme  ), INTENT(INOUT) :: tke<a name='1741'>
+  REAL, INTENT(   IN) :: tke_upper_bound<a name='1742'>
+<a name='1743'>
+  INTEGER :: i,k,j<a name='1744'>
+<a name='1745'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='1746'></font>
+<font color=#447700>!<a name='1747'></font>
+<font color=#447700>! bounds tke between zero and tke_upper_bound.<a name='1748'></font>
+<font color=#447700>!<a name='1749'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='1750'></font>
+<a name='1751'>
+  DO j=jts,min(jte,jde-1)<a name='1752'>
+  DO k=kts,kte-1<a name='1753'>
+  DO i=its,min(ite,ide-1)<a name='1754'>
+    tke(i,k,j) = min(tke_upper_bound,max(tke(i,k,j),0.))<a name='1755'>
+  ENDDO<a name='1756'>
+  ENDDO<a name='1757'>
+  ENDDO<a name='1758'>
+<a name='1759'>
+  END SUBROUTINE bound_tke<a name='1760'>
+<a name='1761'>
+<a name='1762'>
+<a name='1763'>
+END MODULE module_em<a name='1764'>
+</pre></body></html>

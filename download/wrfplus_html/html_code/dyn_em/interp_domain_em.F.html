@@ -1,0 +1,64 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+#ifdef DM_PARALLEL<a name='2'>
+<a name='3'>
+<A NAME='DUMMY_INTERP_EM'><A href='../../html_code/dyn_em/interp_domain_em.F.html#DUMMY_INTERP_EM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='4'>
+<font color=#993300>subroutine </font><font color=#cc0000>dummy_interp_em</font><a name='5'>
+<font color=#447700>! these routines will be provided the module_dm from the appropriate external package<a name='6'></font>
+<font color=#447700>! this dummy routine is just here for compilers that complain if they do not see <a name='7'></font>
+<font color=#447700>! some fortran<a name='8'></font>
+end<a name='9'>
+<a name='10'>
+#else<a name='11'>
+<A NAME='INTERP_DOMAIN_EM_PART1'><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='12'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>interp_domain_em_part1</font> ( grid, ngrid, config_flags ,  &amp; <A href='../../call_to/INTERP_DOMAIN_EM_PART1.html' TARGET='index'>2</A>,<A href='../../call_from/INTERP_DOMAIN_EM_PART1.html' TARGET='index'>4</A><a name='13'>
+<font color=#447700>!<a name='14'></font>
+#include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_1"><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='15'>
+<font color=#447700>!<a name='16'></font>
+                 )<a name='17'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_2"><a name='18'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_2"><a name='19'>
+         TYPE(domain), POINTER :: grid , ngrid<a name='20'>
+#include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_2"><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='21'>
+<a name='22'>
+      INTEGER nlev<a name='23'>
+      INTEGER i,j,pig,pjg,cm,cn,nig,njg,k<a name='24'>
+      TYPE (grid_config_rec_type)            :: config_flags<a name='25'>
+      INTEGER       ::          cids, cide, cjds, cjde, ckds, ckde,    &amp;<a name='26'>
+                                cims, cime, cjms, cjme, ckms, ckme,    &amp;<a name='27'>
+                                cips, cipe, cjps, cjpe, ckps, ckpe<a name='28'>
+      INTEGER       ::          nids, nide, njds, njde, nkds, nkde,    &amp;<a name='29'>
+                                nims, nime, njms, njme, nkms, nkme,    &amp;<a name='30'>
+                                nips, nipe, njps, njpe, nkps, nkpe<a name='31'>
+<a name='32'>
+#define COPY_IN<a name='33'>
+#include &lt;<A href='../../html_code/include/em_scalar_derefs.inc.html'>em_scalar_derefs.inc</A>&gt;<A NAME="em_scalar_derefs.inc_3"><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='34'>
+<a name='35'>
+      CALL <A href='../../html_code/frame/module_domain.F.html#GET_IJK_FROM_GRID'>get_ijk_from_grid</A><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GET_IJK_FROM_GRID_2"> (  grid ,                   &amp;<a name='36'>
+                                cids, cide, cjds, cjde, ckds, ckde,    &amp;<a name='37'>
+                                cims, cime, cjms, cjme, ckms, ckme,    &amp;<a name='38'>
+                                cips, cipe, cjps, cjpe, ckps, ckpe    )<a name='39'>
+      CALL <A href='../../html_code/frame/module_domain.F.html#GET_IJK_FROM_GRID'>get_ijk_from_grid</A><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GET_IJK_FROM_GRID_3"> (  ngrid ,              &amp;<a name='40'>
+                                nids, nide, njds, njde, nkds, nkde,    &amp;<a name='41'>
+                                nims, nime, njms, njme, nkms, nkme,    &amp;<a name='42'>
+                                nips, nipe, njps, njpe, nkps, nkpe    )<a name='43'>
+<a name='44'>
+      nlev  = ckde - ckds + 1<a name='45'>
+<a name='46'>
+      <font color=#447700>! code here to interpolate the data into the nested domain<a name='47'></font>
+#  include "<A href='../../html_code/include/em_nest_interpdown_interp.inc.html'>em_nest_interpdown_interp.inc</A>"<A NAME="em_nest_interpdown_interp.inc_4"><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='48'>
+<a name='49'>
+#define COPY_OUT<a name='50'>
+#include &lt;<A href='../../html_code/include/em_scalar_derefs.inc.html'>em_scalar_derefs.inc</A>&gt;<A NAME="em_scalar_derefs.inc_5"><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='51'>
+      RETURN<a name='52'>
+<a name='53'>
+END SUBROUTINE interp_domain_em_part1<a name='54'>
+<a name='55'>
+<font color=#447700>! Stub ... not used in serial code<a name='56'></font>
+<A NAME='INTERP_DOMAIN_EM_PART2'><A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='57'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>interp_domain_em_part2</font> <A href='../../call_to/INTERP_DOMAIN_EM_PART2.html' TARGET='index'>1</A><a name='58'>
+END SUBROUTINE interp_domain_em_part2<a name='59'>
+<a name='60'>
+#endif<a name='61'>
+<a name='62'>
+<a name='63'>
+</pre></body></html>

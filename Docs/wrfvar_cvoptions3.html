@@ -1,0 +1,179 @@
+<html><head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<meta name="Generator" content="Corel WordPerfect 8">
+<title></title>
+</head><body alink="#ff0000" bgcolor="#C2F4C4" link="#0000ff" text="#000000" vlink="#551a8b">
+
+<p align="center"><font size="+2"><strong>Documentation on CV_OPTIONS=3</strong></font> <font size="+2"><strong>in WRF 3D Var</strong></font></p>
+
+<br wp="BR1"><br wp="BR2">
+<p align="center">Wan-Shu Wu</p>
+
+<br wp="BR1"><br wp="BR2">
+<p>This documentation is adopted from Wu et al ( 2002). For detailed discussion and other
+relevant issues please refer to the paper. </p>
+
+<p>The functional to be minimized is </p>
+
+<ul>
+  <li> <em>J</em> = 1/2 [<strong>x</strong><sup>T </sup> <strong>B</strong><sup>-1</sup> <strong>x</strong> + (<strong>Hx</strong>-<strong>y</strong>)<sup>T <strong> </strong></sup><strong></strong><strong>R</strong><sup>-1 </sup> (<strong>Hx</strong>-<strong>y</strong> )] 			</li>
+</ul>
+
+<p>where 										</p>
+<font face="Courier">
+</font><ul>
+<font face="Courier">  <li></li></font><strong>x</strong>	is a vector of analysis increments, 				
+  <li><strong>B</strong>	is the background error covariance matrix, </li>
+<font face="Courier">  <li></li></font><strong>y</strong>	is a vector of the observational residuals, <strong>y</strong>=<strong>y</strong><sub>obs</sub> - <strong>Hx</strong><sub>guess</sub> 
+  <li><strong>R</strong>	is the observational and representativeness error covariance matrix, </li>
+<font face="Courier">  <li></li></font><strong>H</strong>	is a transformation operator from the analysis variable to the form of the
+observation vector.
+
+<br wp="BR1"><br wp="BR2"></ul>
+
+<p><font color="#0000ff"><strong>Definition of Analysis Variables</strong></font></p>
+
+<p>The analysis variables, defined on the grid, are: stream function (S); unbalanced part of
+velocity potential (Z<sub>u</sub>); the unbalanced part of temperature (T<sub>u</sub>); unbalanced part of surface
+pressure(P<sub>u</sub>); and pseudo relative humidity (water vapor mixing ratio divided by the saturated
+value from the guess field, Dee and Da Silva, 2002 ).</p>
+
+<br wp="BR1"><br wp="BR2">
+<p><font color="#0000ff"><strong>Background Error Covariance</strong></font></p>
+
+<p>The background error <strong>B </strong>can be written as<strong> </strong></p>
+
+<ul>
+  <li><strong>(VB<sub>z</sub> B<sub>x</sub>B<sub>y</sub>) (VB<sub>z</sub> B<sub>x</sub>B<sub>y</sub>)<font size="-1"><sup>T</sup></font></strong><font size="-1"></font></li>
+</ul>
+
+<p>where <strong></strong></p>
+
+<ul>
+  <li><strong>V</strong> is the standard deviations of the error.<strong>  Subroutine:
+</strong>DA_VToX_Transforms<strong>/</strong>da_apply_be.inc<strong> </strong></li>
+  <li><strong>B<sub>x</sub>, B<sub>y</sub> and B<sub>z</sub> </strong>are applications of recursive filters ( Purser et al 2003a, b ) in the x, y
+and z directions.  <strong>Subroutine: </strong>DA_VToX_Transforms<strong>/</strong>da_apply_rf.inc</li>
+
+<br wp="BR1"><br wp="BR2"></ul>
+
+<p>The amplitudes and scales of the default background error statistics are defined as functions
+of latitude and height on the global domain. (default statistics file: wrfstat) These statistics are
+automatically interpolated to any user defined WRF domain and grid. The input parameters
+as1, as2, as3, as4, as5 in record11 are the tuning coefficients for the five analysis variables.
+These parameters are arrays with 3 elements each for variance, horizontal scale and vertical
+scale respectively.</p>
+
+<p><strong>Subroutine: </strong>DA_Setup_Structures/da_setup_background_errors3.inc</p>
+
+<br wp="BR1"><br wp="BR2">
+<p><font color="#0000ff"><strong>Calculation of Balanced Part Variables</strong></font></p>
+
+<p>For 3D Var in physical space, the multivariate coupling between the mass and wind variables
+is challenging. Since the variables are defined in physical space, it is not easy to apply a
+linear balance operator (Parrish &amp; Derber 1992) which includes the inverse of the Laplacian
+operator. However, the relation between the mass field and the stream function is linear, so
+that statistical regression between the two is possible.</p>
+
+<p> </p>
+
+<p>The balanced part of the temperature increment is defined as T<sub>b</sub> =<strong>G</strong><em>S</em> where matrix <strong>G</strong> projects
+stream function increments to a vertical profile of the balanced part of temperature
+increments. Linear regression is used to calculate the <strong>G</strong> matrix. Since the variables are
+defined on the grid this matrix can be latitude dependent. The balanced part of the surface
+pressure increment is defined as P<sub>b</sub> = <strong>W</strong><em>S</em>   where matrix <strong>W</strong> integrates the appropriate
+contribution of the stream function from each level. The balance design is crucial; the
+assimilation degrades quickly without it. For example, without mass-wind balance the fit of
+the guess field to the surface pressure observations worsens with time and doubles in
+magnitude within two days (8 cycles) of the assimilation. However <em>with</em> statistical linear
+balance defined in the analysis variables, the quality of the first guess field is maintained.</p>
+
+<p>     </p>
+
+<p>A vertically localized correlation between the velocity potential and the stream function is
+also implemented to take into account the positive correlation between divergence and
+vorticity in the planetary boundary layer. The balanced part of the velocity potential is
+defined as Z<sub>b</sub> = <em>c</em> <em>S</em> where coefficient <em>c</em> is a function of latitude and height.</p>
+
+<p><strong>Subroutine:</strong> DA_VToX_Transforms/da_transform_bal.inc</p>
+
+<br wp="BR1"><br wp="BR2">
+<p>The balance projection is included as part of the forward operator <strong>H</strong>. For example, calculation
+of  <strong>H</strong><sup>T <strong> </strong></sup><strong></strong><strong>R</strong><sup>-1 </sup> (<strong>Hx</strong>-<strong>y</strong> ) involves the following steps:</p>
+
+<ul>
+  <li>calculate T<sub>b</sub>, Z<sub>b</sub> and P<sub>b</sub> from the analysis variable <em>S</em> and add them to the unbalanced
+parts to obtain the total fields.</li>
+  <li>convert <em>S</em> and <em>Z</em> to U and V wind components.</li>
+  <li>observational forward model of the observation, e.g., interpolation to the observation
+location for most of the conventional data.</li>
+  <li>calculate the residual, multiply by <strong>R</strong><sup>-1</sup>, 				</li>
+  <li>apply the adjoint of the first three steps in reverse order.</li>
+
+<br wp="BR1"><br wp="BR2"></ul>
+
+<p>						</p>
+
+<br wp="BR1"><br wp="BR2">
+<p><font color="#0000ff"><strong></strong></font><font color="#0000ff"><strong>Estimation of Default Background Error Covariance</strong></font><strong></strong></p>
+
+<p>The error variance is estimated in grid space by what has become
+known as the NMC method
+(Parrish and Derber 1992) . The statistics are estimated with the
+differences of 24 and 48-hour GFS forecasts with T170 resolution valid
+at the same time for 357 cases distributed over
+a period of one year. Both the amplitudes and the scales of the
+background error have to be
+tuned to represent the (6-hr? 3-hr?) forecast error in the guess
+fields. This is the reason for
+the tuning parameters mentioned above. The statistics that project
+multivariate relations
+among variables are also derived from the NMC method.</p>
+
+<p>The variance of each variable and the variance of its second derivative are used to estimate its
+horizontal scales. For example, the horizontal scales of the stream function can be estimated
+from the variance of the vorticity and stream function.</p>
+
+<p>The vertical scales are estimated with the vertical correlation of each variable. A table is built
+to cover the range of vertical scales for the variables. The table is then used to find the scales
+in vertical grid units. The filter profile and the vertical correlation are fitted locally.  The
+scale of the best fit from the table is assigned as the scale of the variable at that vertical level
+for each latitude. Note that the vertical scales are locally defined so that the negative
+correlation further away in the vertical direction is not included.</p>
+
+<br wp="BR1"><br wp="BR2">
+<p>The steps to produce the error statistics are</p>
+
+<ul>
+  <li>use least-squares fit to find the multivariate projection arrays.</li>
+  <li>subtract balanced part, calculated with the projection arrays, from the total error fields</li>
+  <li>calculate the variance and scales of the unbalanced fields</li>
+
+<br wp="BR1"><br wp="BR2">
+<br wp="BR1"><br wp="BR2"></ul>
+
+<p align="center"><strong>REFERENCES</strong></p>
+
+<p>		Dee, D. P., and A. M. Da Silva, 2002: On the choice of variable for atmospheric moisture
+analysis. <em>Mon. Wea. Rev</em>., <strong>131</strong>, 155-171.</p>
+
+<p>		Parrish, D. F., and J. C. Derber, 1992: The National Meteorological Center's Spectral
+Statistical-interpolation Analysis System. <em>Mon. Wea. Rev</em>., <strong>120</strong>, 1747-1763.</p>
+
+<p>		Purser, R. J., W.-S. Wu,  D. F. Parrish, and N. M. Roberts, 2003a: Numerical aspects of the
+applications of recursive filters to variational statistical analysis. Part I: spatially
+homogeneous and isotropic Gaussian covariances. <em>Mon. Wea. Rev.</em>, <strong>131</strong>,</p>
+
+<p>		Purser, R. J., W.-S. Wu,  D. F. Parrish, and N. M. Roberts, 2003b: Numerical aspects of the
+applications of recursive filters to variational statistical analysis. Part II: spatially
+inhomogeneous and anisotropic general covariances. <em>Mon. Wea. Rev.</em><strong>, 131</strong>,<strong></strong></p>
+
+<p>		Wu, W.-S., R. J. Purser, and D. F. Parrish, 2002: Three dimensional variational analysis with
+spatially inhomogeneous covariance. <em>Mon. Wea. Rev</em>. <strong>130</strong>. 2905-2916.<strong></strong></p>
+
+<br wp="BR1"><br wp="BR2">
+<br wp="BR1"><br wp="BR2">
+<br wp="BR1"><br wp="BR2">
+<br wp="BR1"><br wp="BR2">
+</body></html>

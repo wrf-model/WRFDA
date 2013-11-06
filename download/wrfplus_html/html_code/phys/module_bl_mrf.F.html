@@ -1,0 +1,1371 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_BL_MRF'><A href='../../html_code/phys/module_bl_mrf.F.html#MODULE_BL_MRF' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_bl_mrf</font> <A href='../../call_to/MODULE_BL_MRF.html' TARGET='index'>2</A><a name='5'>
+<a name='6'>
+CONTAINS<a name='7'>
+<a name='8'>
+<font color=#447700>!-------------------------------------------------------------------          <a name='9'></font>
+<A NAME='MRF'><A href='../../html_code/phys/module_bl_mrf.F.html#MRF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='10'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>MRF</font>(U3D,V3D,TH3D,T3D,QV3D,QC3D,QI3D,P3D,PI3D,        &amp; <A href='../../call_to/MRF.html' TARGET='index'>1</A>,<A href='../../call_from/MRF.html' TARGET='index'>1</A><a name='11'>
+                  RUBLTEN,RVBLTEN,RTHBLTEN,                        &amp;<a name='12'>
+                  RQVBLTEN,RQCBLTEN,RQIBLTEN,                      &amp; <a name='13'>
+                  CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,           &amp;<a name='14'>
+                  dz8w,z,XLV,RV,PSFC,       &amp;<a name='15'>
+                  ZNT,UST,ZOL,HOL,PBL,REGIME,PSIM,PSIH,            &amp;<a name='16'>
+                  XLAND,HFX,QFX,TSK,GZ1OZ0,WSPD,BR,                &amp;<a name='17'>
+                  DT,DTMIN,KPBL2D,                                 &amp;<a name='18'>
+                  SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,&amp;<a name='19'>
+                  ids,ide, jds,jde, kds,kde,                       &amp;<a name='20'>
+                  ims,ime, jms,jme, kms,kme,                       &amp;<a name='21'>
+                  its,ite, jts,jte, kts,kte                        )<a name='22'>
+<font color=#447700>!-------------------------------------------------------------------<a name='23'></font>
+      IMPLICIT NONE<a name='24'>
+<font color=#447700>!-------------------------------------------------------------------<a name='25'></font>
+<font color=#447700>!-- U3D         3D u-velocity interpolated to theta points (m/s)<a name='26'></font>
+<font color=#447700>!-- V3D         3D v-velocity interpolated to theta points (m/s)<a name='27'></font>
+<font color=#447700>!-- TH3D        3D potential temperature (K)<a name='28'></font>
+<font color=#447700>!-- T3D         temperature (K)<a name='29'></font>
+<font color=#447700>!-- QV3D        3D water vapor mixing ratio (Kg/Kg)<a name='30'></font>
+<font color=#447700>!-- QC3D        3D cloud mixing ratio (Kg/Kg)<a name='31'></font>
+<font color=#447700>!-- QI3D        3D ice mixing ratio (Kg/Kg)<a name='32'></font>
+<font color=#447700>!-- P3D         3D pressure (Pa)<a name='33'></font>
+<font color=#447700>!-- PI3D        3D exner function (dimensionless)<a name='34'></font>
+<font color=#447700>!-- rr3D        3D dry air density (kg/m^3)<a name='35'></font>
+<font color=#447700>!-- RUBLTEN     U tendency due to<a name='36'></font>
+<font color=#447700>!               PBL parameterization (m/s^2)<a name='37'></font>
+<font color=#447700>!-- RVBLTEN     V tendency due to<a name='38'></font>
+<font color=#447700>!               PBL parameterization (m/s^2)<a name='39'></font>
+<font color=#447700>!-- RTHBLTEN    Theta tendency due to<a name='40'></font>
+<font color=#447700>!               PBL parameterization (K/s)<a name='41'></font>
+<font color=#447700>!-- RQVBLTEN    Qv tendency due to<a name='42'></font>
+<font color=#447700>!               PBL parameterization (kg/kg/s)<a name='43'></font>
+<font color=#447700>!-- RQCBLTEN    Qc tendency due to<a name='44'></font>
+<font color=#447700>!               PBL parameterization (kg/kg/s)<a name='45'></font>
+<font color=#447700>!-- RQIBLTEN    Qi tendency due to<a name='46'></font>
+<font color=#447700>!               PBL parameterization (kg/kg/s)<a name='47'></font>
+<font color=#447700>!-- CP          heat capacity at constant pressure for dry air (J/kg/K)<a name='48'></font>
+<font color=#447700>!-- G           acceleration due to gravity (m/s^2)<a name='49'></font>
+<font color=#447700>!-- ROVCP       R/CP<a name='50'></font>
+<font color=#447700>!-- R           gas constant for dry air (J/kg/K)<a name='51'></font>
+<font color=#447700>!-- ROVG        R/G<a name='52'></font>
+<font color=#447700>!-- P_QI        species index for cloud ice<a name='53'></font>
+<font color=#447700>!-- dz8w        dz between full levels (m)<a name='54'></font>
+<font color=#447700>!-- z           height above sea level (m)<a name='55'></font>
+<font color=#447700>!-- XLV         latent heat of vaporization (J/kg)<a name='56'></font>
+<font color=#447700>!-- RV          gas constant for water vapor (J/kg/K)<a name='57'></font>
+<font color=#447700>!-- PSFC        pressure at the surface (Pa)<a name='58'></font>
+<font color=#447700>!-- ZNT         roughness length (m)<a name='59'></font>
+<font color=#447700>!-- UST         u* in similarity theory (m/s)<a name='60'></font>
+<font color=#447700>!-- ZOL         z/L height over Monin-Obukhov length<a name='61'></font>
+<font color=#447700>!-- HOL         PBL height over Monin-Obukhov length<a name='62'></font>
+<font color=#447700>!-- PBL         PBL height (m)<a name='63'></font>
+<font color=#447700>!-- REGIME      flag indicating PBL regime (stable, unstable, etc.)<a name='64'></font>
+<font color=#447700>!-- PSIM        similarity stability function for momentum<a name='65'></font>
+<font color=#447700>!-- PSIH        similarity stability function for heat<a name='66'></font>
+<font color=#447700>!-- XLAND       land mask (1 for land, 2 for water)<a name='67'></font>
+<font color=#447700>!-- HFX         upward heat flux at the surface (W/m^2)<a name='68'></font>
+<font color=#447700>!-- QFX         upward moisture flux at the surface (kg/m^2/s)<a name='69'></font>
+<font color=#447700>!-- TSK         surface temperature (K)<a name='70'></font>
+<font color=#447700>!-- GZ1OZ0      log(z/z0) where z0 is roughness length<a name='71'></font>
+<font color=#447700>!-- WSPD        wind speed at lowest model level (m/s)<a name='72'></font>
+<font color=#447700>!-- BR          bulk Richardson number in surface layer<a name='73'></font>
+<font color=#447700>!-- DT          time step (s)<a name='74'></font>
+<font color=#447700>!-- DTMIN       time step (minute)<a name='75'></font>
+<font color=#447700>!-- rvovrd      R_v divided by R_d (dimensionless)<a name='76'></font>
+<font color=#447700>!-- SVP1        constant for saturation vapor pressure (kPa)<a name='77'></font>
+<font color=#447700>!-- SVP2        constant for saturation vapor pressure (dimensionless)<a name='78'></font>
+<font color=#447700>!-- SVP3        constant for saturation vapor pressure (K)<a name='79'></font>
+<font color=#447700>!-- SVPT0       constant for saturation vapor pressure (K)<a name='80'></font>
+<font color=#447700>!-- EP1         constant for virtual temperature (R_v/R_d - 1) (dimensionless)<a name='81'></font>
+<font color=#447700>!-- EP2         constant for specific humidity calculation<a name='82'></font>
+<font color=#447700>!-- KARMAN      Von Karman constant<a name='83'></font>
+<font color=#447700>!-- EOMEG       angular velocity of earth's rotation (rad/s)<a name='84'></font>
+<font color=#447700>!-- STBOLT      Stefan-Boltzmann constant (W/m^2/K^4)<a name='85'></font>
+<font color=#447700>!-- ids         start index for i in domain<a name='86'></font>
+<font color=#447700>!-- ide         end index for i in domain<a name='87'></font>
+<font color=#447700>!-- jds         start index for j in domain<a name='88'></font>
+<font color=#447700>!-- jde         end index for j in domain<a name='89'></font>
+<font color=#447700>!-- kds         start index for k in domain<a name='90'></font>
+<font color=#447700>!-- kde         end index for k in domain<a name='91'></font>
+<font color=#447700>!-- ims         start index for i in memory<a name='92'></font>
+<font color=#447700>!-- ime         end index for i in memory<a name='93'></font>
+<font color=#447700>!-- jms         start index for j in memory<a name='94'></font>
+<font color=#447700>!-- jme         end index for j in memory<a name='95'></font>
+<font color=#447700>!-- kms         start index for k in memory<a name='96'></font>
+<font color=#447700>!-- kme         end index for k in memory<a name='97'></font>
+<font color=#447700>!-- its         start index for i in tile<a name='98'></font>
+<font color=#447700>!-- ite         end index for i in tile<a name='99'></font>
+<font color=#447700>!-- jts         start index for j in tile<a name='100'></font>
+<font color=#447700>!-- jte         end index for j in tile<a name='101'></font>
+<font color=#447700>!-- kts         start index for k in tile<a name='102'></font>
+<font color=#447700>!-- kte         end index for k in tile<a name='103'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='104'></font>
+<a name='105'>
+      INTEGER,  INTENT(IN   )   ::      ids,ide, jds,jde, kds,kde, &amp;<a name='106'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='107'>
+                                        its,ite, jts,jte, kts,kte, &amp;<a name='108'>
+                                        P_QI,P_FIRST_SCALAR<a name='109'>
+<a name='110'>
+<font color=#447700>!<a name='111'></font>
+      REAL,     INTENT(IN   )   ::      DT,DTMIN,CP,G,ROVCP,       &amp;<a name='112'>
+                                        ROVG,R,XLV,RV             <a name='113'>
+<a name='114'>
+      REAL,     INTENT(IN )     ::     SVP1,SVP2,SVP3,SVPT0 <a name='115'>
+      REAL,     INTENT(IN )     ::     EP1,EP2,KARMAN,EOMEG,STBOLT<a name='116'>
+<a name='117'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &amp;<a name='118'>
+                INTENT(IN   )   ::                           QV3D, &amp;<a name='119'>
+                                                             QC3D, &amp;<a name='120'>
+                                                             QI3D, &amp;<a name='121'>
+                                                              P3D, &amp;<a name='122'>
+                                                             PI3D, &amp;<a name='123'>
+                                                             TH3D, &amp;<a name='124'>
+                                                              T3D, &amp;<a name='125'>
+                                                             dz8w, &amp;<a name='126'>
+                                                                z   <a name='127'>
+<font color=#447700>!<a name='128'></font>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &amp;<a name='129'>
+                INTENT(INOUT)   ::                        RUBLTEN, &amp;<a name='130'>
+                                                          RVBLTEN, &amp;<a name='131'>
+                                                         RTHBLTEN, &amp;<a name='132'>
+                                                         RQVBLTEN, &amp;<a name='133'>
+                                                         RQCBLTEN, &amp;<a name='134'>
+                                                         RQIBLTEN<a name='135'>
+<a name='136'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='137'>
+                INTENT(IN   )   ::                          XLAND, &amp;<a name='138'>
+                                                              HFX, &amp;<a name='139'>
+                                                              QFX<a name='140'>
+ <a name='141'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='142'>
+                INTENT(INOUT)   ::                            HOL, &amp;<a name='143'>
+                                                              UST, &amp;<a name='144'>
+                                                              PBL, &amp;<a name='145'>
+                                                              ZNT, &amp;<a name='146'>
+                                                           REGIME<a name='147'>
+<font color=#447700>!<a name='148'></font>
+<font color=#447700>!m The following 5 variables are changed to memory size from tile size--<a name='149'></font>
+<font color=#447700>!<a name='150'></font>
+     REAL,     DIMENSION( ims:ime, jms:jme ), INTENT(IN   )  ::    &amp;<a name='151'>
+                                                             PSIM, &amp;<a name='152'>
+                                                             PSIH<a name='153'>
+<a name='154'>
+     REAL,     DIMENSION( ims:ime, jms:jme ), INTENT(INOUT)   ::   &amp;<a name='155'>
+                                                             WSPD<a name='156'>
+<a name='157'>
+     REAL,     DIMENSION( ims:ime, jms:jme ), INTENT(IN   )   ::   &amp;<a name='158'>
+                                                           GZ1OZ0, &amp;<a name='159'>
+                                                               BR<a name='160'>
+<a name='161'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='162'>
+                INTENT(IN   )               ::               PSFC<a name='163'>
+<a name='164'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='165'>
+                INTENT(IN   )   ::                            TSK<a name='166'>
+<a name='167'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='168'>
+                INTENT(INOUT)   ::                            ZOL<a name='169'>
+                                                                      <a name='170'>
+      INTEGER,  DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='171'>
+                INTENT(OUT  )   ::                         KPBL2D <a name='172'>
+<a name='173'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &amp;<a name='174'>
+                INTENT(IN   )   ::                            U3D, &amp;<a name='175'>
+                                                              V3D<a name='176'>
+<a name='177'>
+<font color=#447700>! LOCAL VARS<a name='178'></font>
+   REAL,       DIMENSION( its:ite, kts:kte )          ::   dz8w2d, &amp; <a name='179'>
+                                                              z2d<a name='180'>
+                                                           <a name='181'>
+<a name='182'>
+   INTEGER ::  I,J,K,NK<a name='183'>
+<a name='184'>
+<font color=#447700>!<a name='185'></font>
+   DO J=jts,jte<a name='186'>
+      DO k=kts,kte<a name='187'>
+      NK=kme-k<a name='188'>
+      DO i=its,ite<a name='189'>
+         dz8w2d(I,K) = dz8w(i,NK,j)<a name='190'>
+         z2d(I,K) = z(i,NK,j)<a name='191'>
+      ENDDO<a name='192'>
+      ENDDO<a name='193'>
+<a name='194'>
+<a name='195'>
+      CALL <A href='../../html_code/phys/module_bl_mrf.F.html#MRF2D'>MRF2D</A><A href='../../html_code/phys/module_bl_mrf.F.html#MRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MRF2D_1">(J,U3D(ims,kms,j),V3D(ims,kms,j),T3D(ims,kms,j),    &amp;<a name='196'>
+               QV3D(ims,kms,j),QC3D(ims,kms,j),QI3D(ims,kms,j),     &amp;<a name='197'>
+               P3D(ims,kms,j),RUBLTEN(ims,kms,j),RVBLTEN(ims,kms,j),&amp;<a name='198'>
+               RTHBLTEN(ims,kms,j),RQVBLTEN(ims,kms,j),             &amp;<a name='199'>
+               RQCBLTEN(ims,kms,j),RQIBLTEN(ims,kms,j),             &amp;<a name='200'>
+               CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,               &amp;<a name='201'>
+               dz8w2d,z2d,XLV,Rv,            &amp;<a name='202'>
+               PSFC(ims,j),ZNT(ims,j),UST(ims,j),ZOL(ims,j),        &amp;<a name='203'>
+               HOL(ims,j),PBL(ims,j),REGIME(ims,j),PSIM(ims,j),     &amp;<a name='204'>
+               PSIH(ims,j),XLAND(ims,j),HFX(ims,j),QFX(ims,j),      &amp;<a name='205'>
+               TSK(ims,j),GZ1OZ0(ims,j),WSPD(ims,j),BR(ims,j),      &amp;<a name='206'>
+               DT,DTMIN,KPBL2D(ims,j),                              &amp;<a name='207'>
+               SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,    &amp;<a name='208'>
+               ids,ide, jds,jde, kds,kde,                           &amp;<a name='209'>
+               ims,ime, jms,jme, kms,kme,                           &amp;<a name='210'>
+               its,ite, jts,jte, kts,kte                            )<a name='211'>
+<a name='212'>
+<a name='213'>
+      DO k=kts,kte<a name='214'>
+      DO i=its,ite<a name='215'>
+         RTHBLTEN(I,K,J)=RTHBLTEN(I,K,J)/PI3D(I,K,J)<a name='216'>
+      ENDDO<a name='217'>
+      ENDDO<a name='218'>
+<a name='219'>
+    ENDDO<a name='220'>
+<a name='221'>
+   END SUBROUTINE MRF<a name='222'>
+<a name='223'>
+<font color=#447700>!-------------------------------------------------------------------          <a name='224'></font>
+<A NAME='MRF2D'><A href='../../html_code/phys/module_bl_mrf.F.html#MRF2D' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='225'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>MRF2D</font>(J,U2D,V2D,T2D,QV2D,QC2D,QI2D,P2D,              &amp; <A href='../../call_to/MRF2D.html' TARGET='index'>1</A>,<A href='../../call_from/MRF2D.html' TARGET='index'>3</A><a name='226'>
+                  U2DTEN,V2DTEN,T2DTEN,                            &amp;<a name='227'>
+                  QV2DTEN,QC2DTEN,QI2DTEN,                         &amp; <a name='228'>
+                  CP,G,ROVCP,R,ROVG,P_QI,P_FIRST_SCALAR,           &amp;<a name='229'>
+                  dz8w2d,z2d,XLV,RV,PSFCPA, &amp;<a name='230'>
+                  ZNT,UST,ZOL,HOL,PBL,REGIME,PSIM,PSIH,            &amp;<a name='231'>
+                  XLAND,HFX,QFX,TSK,GZ1OZ0,WSPD,BR,                &amp;<a name='232'>
+                  DT,DTMIN,KPBL1D,                                 &amp;<a name='233'>
+                  SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,&amp;<a name='234'>
+                  ids,ide, jds,jde, kds,kde,                       &amp;<a name='235'>
+                  ims,ime, jms,jme, kms,kme,                       &amp;<a name='236'>
+                  its,ite, jts,jte, kts,kte                        )<a name='237'>
+<font color=#447700>!-------------------------------------------------------------------<a name='238'></font>
+      IMPLICIT NONE<a name='239'>
+<font color=#447700>!-------------------------------------------------------------------<a name='240'></font>
+<font color=#447700>!     BASED ON THE "COUNTERGRADIENT" TRANSPORT TERM OF TROEN                     <a name='241'></font>
+<font color=#447700>!     AND MAHRT (1986) FOR THE UNSTABLE PBL.                                     <a name='242'></font>
+<font color=#447700>!     THIS ROUTINE USES AN IMPLICIT APPROACH FOR VERTICAL FLUX                   <a name='243'></font>
+<font color=#447700>!     DIVERGENCE AND DOES NOT REQUIRE "MITER" TIMESTEPS.                         <a name='244'></font>
+<font color=#447700>!     IT INCLUDES VERTICAL DIFFUSION IN THE STABLE ATMOSPHERE                    <a name='245'></font>
+<font color=#447700>!     AND MOIST VERTICAL DIFFUSION IN CLOUDS.                                    <a name='246'></font>
+<font color=#447700>!     SURFACE FLUXES CALCULATED AS IN HIRPBL.                                    <a name='247'></font>
+<font color=#447700>!     5-LAYER SOIL MODEL OPTION REQUIRED IN SLAB DUE TO LONG TIMESTEP            <a name='248'></font>
+<font color=#447700>!                                                                                <a name='249'></font>
+<font color=#447700>!     CODED BY SONG-YOU HONG (NCEP), IMPLEMENTED BY JIMY DUDHIA (NCAR)           <a name='250'></font>
+<font color=#447700>!     FALL 1996                                                                  <a name='251'></font>
+<font color=#447700>!                                                                                <a name='252'></font>
+<font color=#447700>!     REFERENCES:                                                                <a name='253'></font>
+<font color=#447700>!                                                                                <a name='254'></font>
+<font color=#447700>!        HONG AND PAN (1996), MON. WEA. REV.                                     <a name='255'></font>
+<font color=#447700>!        TROEN AND MAHRT (1986), BOUNDARY LAYER MET.                             <a name='256'></font>
+<font color=#447700>!                                                                                <a name='257'></font>
+<font color=#447700>!     CHANGES:                                                                   <a name='258'></font>
+<font color=#447700>!        INCREASE RLAM FROM 30 TO 150, AND CHANGE FREE ATMOSPHERE                <a name='259'></font>
+<font color=#447700>!        STABILITY FUNCTION TO INCREASE VERTICAL DIFFUSION                       <a name='260'></font>
+<font color=#447700>!        (HONG, JUNE 1997)                                                       <a name='261'></font>
+<font color=#447700>!                                                                                <a name='262'></font>
+<font color=#447700>!        PUT LOWER LIMIT ON PSI FOR STABLE CONDITIONS. THIS WILL                 <a name='263'></font>
+<font color=#447700>!        PREVENT FLUXES FROM BECOMING TOO SMALL (DUDHIA, OCTOBER 1997)           <a name='264'></font>
+<font color=#447700>!                                                                                <a name='265'></font>
+<font color=#447700>!        CORRECTION TO REGIME CALCULATION. THIS WILL ALLOW POINTS IN             <a name='266'></font>
+<font color=#447700>!        REGIME 4 MUCH MORE FREQUENTLY GIVING LARGER SURFACE FLUXES              <a name='267'></font>
+<font color=#447700>!        REGIME 3 NO LONGER USES HOL &lt; 1.5 OR THVX LAPSE-RATE CHECK              <a name='268'></font>
+<font color=#447700>!        IN MRF SCHEME. THIS WILL MAKE REGIME 3 MUCH LESS FREQUENT.              <a name='269'></font>
+<font color=#447700>!                                                                                <a name='270'></font>
+<font color=#447700>!        ADD SURFACE PRESSURE, PS(I), ARRAY FOR EFFICIENCY                       <a name='271'></font>
+<font color=#447700>!                                                                                <a name='272'></font>
+<font color=#447700>!        FIX FOR PROBLEM WITH THIN LAYERS AND HIGH ROUGHNESS                     <a name='273'></font>
+<font color=#447700>!                                                                                <a name='274'></font>
+<font color=#447700>!        CHARNOCK CONSTANT NOW COMES FROM NAMELIST (DEFAULT SAME)                <a name='275'></font>
+<font color=#447700>!                                                                                <a name='276'></font>
+<font color=#447700>!-------------------------------------------------------------------          <a name='277'></font>
+<a name='278'>
+      REAL      RLAM,PRMIN,PRMAX,XKZMIN,XKZMAX,RIMIN,BRCR,         &amp;<a name='279'>
+                CFAC,PFAC,SFCFRAC,CKZ,ZFMIN,APHI5,APHI16,GAMCRT,   &amp;<a name='280'>
+                GAMCRQ,XKA,PRT<a name='281'>
+<a name='282'>
+      PARAMETER (RLAM=150.,PRMIN=0.5,PRMAX=4.)                       <a name='283'>
+      PARAMETER (XKZMIN=0.01,XKZMAX=1000.,RIMIN=-100.)                           <a name='284'>
+      PARAMETER (BRCR=0.5,CFAC=7.8,PFAC=2.0,SFCFRAC=0.1)                         <a name='285'>
+      PARAMETER (CKZ=0.001,ZFMIN=1.E-8,APHI5=5.,APHI16=16.)                      <a name='286'>
+      PARAMETER (GAMCRT=3.,GAMCRQ=2.E-3)                                         <a name='287'>
+      PARAMETER (XKA=2.4E-5)                                                     <a name='288'>
+      PARAMETER (PRT=1.)                                                         <a name='289'>
+<font color=#447700>!<a name='290'></font>
+      INTEGER,  INTENT(IN   )   ::      ids,ide, jds,jde, kds,kde, &amp;<a name='291'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='292'>
+                                        its,ite, jts,jte, kts,kte, &amp;<a name='293'>
+                                        P_QI,P_FIRST_SCALAR,J<a name='294'>
+<font color=#447700>!<a name='295'></font>
+      REAL,     INTENT(IN   )   ::      DT,DTMIN,CP,G,ROVCP,       &amp;<a name='296'>
+                                        ROVG,R,XLV,RV<a name='297'>
+<a name='298'>
+      REAL,     INTENT(IN )     ::     SVP1,SVP2,SVP3,SVPT0 <a name='299'>
+      REAL,     INTENT(IN )     ::     EP1,EP2,KARMAN,EOMEG,STBOLT<a name='300'>
+<a name='301'>
+      REAL,     DIMENSION( ims:ime, kms:kme )                    , &amp;<a name='302'>
+                INTENT(IN   )   ::                           QV2D, &amp;<a name='303'>
+                                                             QC2D, &amp;<a name='304'>
+                                                             QI2D, &amp;<a name='305'>
+                                                              P2D, &amp;<a name='306'>
+                                                              T2D<a name='307'>
+<font color=#447700>!<a name='308'></font>
+      REAL,     DIMENSION( ims:ime, kms:kme )                    , &amp;<a name='309'>
+                INTENT(INOUT)   ::                         U2DTEN, &amp;<a name='310'>
+                                                           V2DTEN, &amp;<a name='311'>
+                                                           T2DTEN, &amp;<a name='312'>
+                                                          QV2DTEN, &amp;<a name='313'>
+                                                          QC2DTEN, &amp;<a name='314'>
+                                                          QI2DTEN<a name='315'>
+                                                                  <a name='316'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='317'>
+                INTENT(INOUT)   ::                            HOL, &amp;<a name='318'>
+                                                              UST, &amp;<a name='319'>
+                                                              PBL, &amp;<a name='320'>
+                                                              ZNT, &amp;<a name='321'>
+                                                           REGIME<a name='322'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='323'>
+                INTENT(IN   )   ::                          XLAND, &amp;<a name='324'>
+                                                              HFX, &amp;<a name='325'>
+                                                              QFX<a name='326'>
+<font color=#447700>!<a name='327'></font>
+<font color=#447700>!m The following 5 are changed to memory size---<a name='328'></font>
+<font color=#447700>!<a name='329'></font>
+     REAL,     DIMENSION( ims:ime ), INTENT(IN   )   ::      PSIM, &amp;<a name='330'>
+                                                             PSIH<a name='331'>
+<a name='332'>
+     REAL,     DIMENSION( ims:ime ), INTENT(INOUT)   ::      WSPD<a name='333'>
+<a name='334'>
+     REAL,     DIMENSION( ims:ime ), INTENT(IN   )   ::    GZ1OZ0, &amp;<a name='335'>
+                                                               BR<a name='336'>
+<a name='337'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='338'>
+                INTENT(IN   )               ::             PSFCPA<a name='339'>
+<a name='340'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='341'>
+                INTENT(IN   )   ::                            TSK<a name='342'>
+<a name='343'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='344'>
+                INTENT(INOUT)   ::                            ZOL<a name='345'>
+<a name='346'>
+      INTEGER,  DIMENSION( ims:ime )                             , &amp;<a name='347'>
+                INTENT(OUT  )   ::                         KPBL1D<a name='348'>
+<a name='349'>
+      REAL,     DIMENSION( ims:ime, kms:kme )                    , &amp;<a name='350'>
+                INTENT(IN   )   ::                            U2D, &amp;<a name='351'>
+                                                              V2D<a name='352'>
+                                                                      <a name='353'>
+<font color=#447700>! MODULE-LOCAL VARIABLES (DEFINED IN SUBROUTINE MRF)<a name='354'></font>
+<font color=#447700>!<a name='355'></font>
+      REAL,     DIMENSION( its:ite, kts:kte ) ,                    &amp;<a name='356'>
+                INTENT(IN)      ::                         dz8w2d, &amp;<a name='357'>
+                                                              z2d<a name='358'>
+<font color=#447700>!                                                                                <a name='359'></font>
+    <a name='360'>
+<font color=#447700>! LOCAL VARS<a name='361'></font>
+<a name='362'>
+      REAL,     DIMENSION( its:ite, kts:kte+1 ) ::             ZQ<a name='363'>
+<a name='364'>
+      REAL,     DIMENSION( its:ite, kts:kte )   ::                 &amp;<a name='365'>
+                                                         UX,VX,QX, &amp;<a name='366'>
+                                                     QCX,THX,THVX, &amp; <a name='367'>
+                                                          DZQ,DZA, &amp; <a name='368'>
+                                                        TTNP,QTNP, &amp;<a name='369'>
+                                                         QCTNP,ZA, &amp;<a name='370'>
+                                                          UXS,VXS, &amp;<a name='371'>
+                                                         THXS,QXS, &amp;<a name='372'>
+                                                         QCXS,QIX, &amp;<a name='373'>
+                                                       QITNP,QIXS, &amp;<a name='374'>
+                                                        UTNP,VTNP<a name='375'>
+<font color=#447700>!<a name='376'></font>
+      REAL,    DIMENSION( its:ite )             ::     QIXSV,RHOX, &amp;<a name='377'>
+                                                     WSPD1,GOVRTH, &amp; <a name='378'>
+                                                       PBL0,THXSV, &amp;<a name='379'>
+                                                        UXSV,VXSV, &amp;             <a name='380'>
+                                                       QXSV,QCXSV, &amp; <a name='381'>
+                                                     QGH,TGDSA,PS<a name='382'>
+<a name='383'>
+      INTEGER                                   ::   ILXM,JLXM,KL, &amp;<a name='384'>
+                                                   KLM,KLP1,KLPBL<a name='385'>
+<font color=#447700>!<a name='386'></font>
+      INTEGER, DIMENSION( its:ite )             ::     KPBL,KPBL0<a name='387'>
+<font color=#447700>!<a name='388'></font>
+      REAL,    DIMENSION( its:ite, kts:kte )    ::      SCR3,SCR4<a name='389'>
+<font color=#447700>!<a name='390'></font>
+      REAL,    DIMENSION( its:ite )             ::           DUM1, &amp;<a name='391'>
+                                                           XKZMKL<a name='392'>
+<font color=#447700>!<a name='393'></font>
+      REAL,    DIMENSION( its:ite )             ::    ZL1,THERMAL, &amp;<a name='394'>
+                                                     WSCALE,HGAMT, &amp;<a name='395'>
+                                                       HGAMQ,BRDN, &amp;<a name='396'>
+                                                        BRUP,PHIM, &amp;<a name='397'>
+                                                         PHIH,CPM, &amp;<a name='398'>
+                                                      DUSFC,DVSFC, &amp;<a name='399'>
+                                                      DTSFC,DQSFC<a name='400'>
+                <a name='401'>
+<font color=#447700>!<a name='402'></font>
+      REAL,    DIMENSION( its:ite, kts:kte )    ::      XKZM,XKZH, &amp;<a name='403'>
+                                                            A1,A2, &amp;  <a name='404'>
+                                                            AD,AU, &amp;<a name='405'>
+                                                               TX<a name='406'>
+<font color=#447700>!<a name='407'></font>
+      REAL,    DIMENSION( its:ite, kts:kte )  ::               AL<a name='408'>
+<font color=#447700>!<a name='409'></font>
+      LOGICAL, DIMENSION( its:ite )             ::         PBLFLG, &amp;<a name='410'>
+                                                           SFCFLG, &amp;<a name='411'>
+                                                           STABLE<a name='412'>
+<font color=#447700>!                                                         <a name='413'></font>
+      REAL, DIMENSION( its:ite )                ::           THGB<a name='414'>
+<a name='415'>
+      INTEGER ::  N,I,K,KK,L,NZOL,IMVDIF<a name='416'>
+<a name='417'>
+      INTEGER ::  JBGN,JEND,IBGN,IEND,NK<a name='418'>
+<a name='419'>
+      REAL    ::  ZOLN,X,Y,CONT,CONQ,CONW,PL,THCON,TVCON,E1,DTSTEP<a name='420'>
+      REAL    ::  ZL,TSKV,DTHVDZ,DTHVM,VCONV,RZOL<a name='421'>
+      REAL    ::  DTTHX,PSIX,DTG,PSIQ,USTM<a name='422'>
+      REAL    ::  DT4,RDT,SPDK2,FM,FH,HOL1,GAMFAC,VPERT,PRNUM<a name='423'>
+      REAL    ::  ZFAC,XKZO,SS,RI,QMEAN,TMEAN,ALPH,CHI,ZK,RL2,DK,SRI<a name='424'>
+      REAL    ::  BRINT,DTODSD,DSIG,RDZ,DSDZT,DSDZQ,DSDZ2,TTEND,QTEND<a name='425'>
+      REAL    ::  UTEND,VTEND,QCTEND,QITEND,TGC,DTODSU<a name='426'>
+<a name='427'>
+<font color=#447700>!----------------------------------------------------------------------<a name='428'></font>
+<a name='429'>
+      KLPBL=1<a name='430'>
+      KL=kte<a name='431'>
+      ILXM=ite-1<a name='432'>
+      JLXM=jte-1<a name='433'>
+      KLM=kte-1<a name='434'>
+      KLP1=kte+1<a name='435'>
+<font color=#447700>!                                                                                <a name='436'></font>
+      CONT=1000.*CP/G                                                            <a name='437'>
+      CONQ=1000.*XLV/G                                                           <a name='438'>
+      CONW=1000./G                                                               <a name='439'>
+<a name='440'>
+<font color=#447700>!-- IMVDIF      imvdif=1 for moist adiabat vertical diffusion<a name='441'></font>
+<a name='442'>
+      IMVDIF=1<a name='443'>
+<a name='444'>
+<font color=#447700>!     DO i=its,ite<a name='445'></font>
+<font color=#447700>!!PS PSFC cmb<a name='446'></font>
+<font color=#447700>!        PSFC(I)=PSFCPA(I)/1000.<a name='447'></font>
+<font color=#447700>!     ENDDO<a name='448'></font>
+<a name='449'>
+<a name='450'>
+<font color=#447700>!                                                                                <a name='451'></font>
+<font color=#447700>!----CONVERT GROUND TEMPERATURE TO POTENTIAL TEMPERATURE:                        <a name='452'></font>
+<font color=#447700>!                                                                                <a name='453'></font>
+      DO 5 I=its,ite                                                       <a name='454'>
+        TGDSA(I)=TSK(I)                                                        <a name='455'>
+<font color=#447700>! PS PSFC cmb<a name='456'></font>
+        PS(I)=PSFCPA(I)/1000.<a name='457'>
+        THGB(I)=TSK(I)*(100./PS(I))**ROVCP   <a name='458'>
+    5 CONTINUE                                                                   <a name='459'>
+<font color=#447700>!                                                                                <a name='460'></font>
+<font color=#447700>!-----DECOUPLE FLUX-FORM VARIABLES TO GIVE U,V,T,THETA,THETA-VIR.,               <a name='461'></font>
+<font color=#447700>!     T-VIR., QV, AND QC AT CROSS POINTS AND AT KTAU-1.                          <a name='462'></font>
+<font color=#447700>!                                                                                <a name='463'></font>
+<font color=#447700>!     *** NOTE ***                                                               <a name='464'></font>
+<font color=#447700>!         THE BOUNDARY WINDS MAY NOT BE ADEQUATELY AFFECTED BY FRICTION,         <a name='465'></font>
+<font color=#447700>!         SO USE ONLY INTERIOR VALUES OF UX AND VX TO CALCULATE                  <a name='466'></font>
+<font color=#447700>!         TENDENCIES.                                                            <a name='467'></font>
+<font color=#447700>!                                                                                <a name='468'></font>
+      DO 24 K=kts,kte                                                      <a name='469'>
+        NK=kme-K<a name='470'>
+        DO 24 I=its,ite<a name='471'>
+          UX(I,K)=U2D(I,NK)<a name='472'>
+          VX(I,K)=V2D(I,NK)<a name='473'>
+   24 CONTINUE                                                                 <a name='474'>
+<font color=#447700>!                                                                                <a name='475'></font>
+<font color=#447700>!.....SCR3(I,K) STORE TEMPERATURE,                                               <a name='476'></font>
+<font color=#447700>!     SCR4(I,K) STORE VIRTUAL TEMPERATURE.                                       <a name='477'></font>
+<font color=#447700>!                                                                                <a name='478'></font>
+      DO 30 K=kts,kte<a name='479'>
+        NK=kme-K<a name='480'>
+        DO 30 I=its,ite<a name='481'>
+<font color=#447700>! PL cmb<a name='482'></font>
+          PL=P2D(I,NK)/1000.<a name='483'>
+          SCR3(I,K)=T2D(I,NK)<a name='484'>
+          THCON=(100./PL)**ROVCP                                                 <a name='485'>
+          THX(I,K)=SCR3(I,K)*THCON                                               <a name='486'>
+          TX(I,K)=SCR3(I,K)                                                      <a name='487'>
+          SCR4(I,K)=SCR3(I,K)                                                    <a name='488'>
+          THVX(I,K)=THX(I,K)                                                     <a name='489'>
+          QX(I,K)=0.                                                             <a name='490'>
+   30 CONTINUE                                                                 <a name='491'>
+<font color=#447700>!                                                                                <a name='492'></font>
+      DO I=its,ite<a name='493'>
+         QGH(i)=0.                                                                <a name='494'>
+         CPM(i)=CP                                                                <a name='495'>
+      ENDDO<a name='496'>
+<font color=#447700>!                                                                                <a name='497'></font>
+<font color=#447700>!     IF(IDRY.EQ.1)GOTO 80                                                   <a name='498'></font>
+      DO 50 K=kts,kte<a name='499'>
+        NK=kme-K<a name='500'>
+        DO 50 I=its,ite<a name='501'>
+          QX(I,K)=QV2D(I,NK)<a name='502'>
+          TVCON=(1.+EP1*QX(I,K))                                      <a name='503'>
+          THVX(I,K)=THX(I,K)*TVCON                                               <a name='504'>
+          SCR4(I,K)=SCR3(I,K)*TVCON                                              <a name='505'>
+   50 CONTINUE                                                                 <a name='506'>
+<font color=#447700>!                                                                                <a name='507'></font>
+      DO 60 I=its,ite<a name='508'>
+        E1=SVP1*EXP(SVP2*(TGDSA(I)-SVPT0)/(TGDSA(I)-SVP3))                       <a name='509'>
+        QGH(I)=EP2*E1/(PS(I)-E1)                                                 <a name='510'>
+        CPM(I)=CP*(1.+0.8*QX(I,KL))                                   <a name='511'>
+   60 CONTINUE                                                                   <a name='512'>
+<font color=#447700>!                                                                                <a name='513'></font>
+<font color=#447700>!     IF(IMOIST.EQ.1)GOTO 80<a name='514'></font>
+      DO 70 K=kts,kte<a name='515'>
+        NK=kme-K<a name='516'>
+        DO 70 I=its,ite<a name='517'>
+          QCX(I,K)=QC2D(I,NK)<a name='518'>
+   70 CONTINUE<a name='519'>
+<a name='520'>
+      IF (P_QI .ge. P_FIRST_SCALAR) THEN<a name='521'>
+         DO K=kts,kte<a name='522'>
+            NK=kme-K<a name='523'>
+            DO I=its,ite<a name='524'>
+               QIX(I,K)=QI2D(I,NK)<a name='525'>
+            ENDDO<a name='526'>
+         ENDDO<a name='527'>
+      ELSE<a name='528'>
+         DO K=kts,kte<a name='529'>
+            NK=kme-K<a name='530'>
+            DO I=its,ite<a name='531'>
+               QIX(I,K)=0.<a name='532'>
+            ENDDO<a name='533'>
+         ENDDO<a name='534'>
+      ENDIF<a name='535'>
+<a name='536'>
+   80 CONTINUE<a name='537'>
+<a name='538'>
+<font color=#447700>!                                                                                <a name='539'></font>
+<font color=#447700>!-----COMPUTE THE HEIGHT OF FULL- AND HALF-SIGMA LEVELS ABOVE GROUND             <a name='540'></font>
+<font color=#447700>!     LEVEL, AND THE LAYER THICKNESSES.                                          <a name='541'></font>
+<font color=#447700>!                                                                                <a name='542'></font>
+      DO 90 I=its,ite<a name='543'>
+        ZQ(I,KLP1)=0.                                                            <a name='544'>
+        RHOX(I)=PS(I)*1000./(R*SCR4(I,KL))                                       <a name='545'>
+   90 CONTINUE                                                                   <a name='546'>
+<font color=#447700>!                                                                                <a name='547'></font>
+      DO 110 KK=kts,kte<a name='548'>
+        K=kme-KK<a name='549'>
+        DO 100 I=its,ite                                                   <a name='550'>
+          DUM1(I)=ZQ(I,K+1)                                                      <a name='551'>
+  100   CONTINUE                                                                 <a name='552'>
+<font color=#447700>!                                                                                <a name='553'></font>
+        DO 110 I=its,ite                                                   <a name='554'>
+           ZQ(I,K)=dz8w2d(I,K)+DUM1(I)<a name='555'>
+  110   CONTINUE                                                                 <a name='556'>
+<font color=#447700>!                                                                                <a name='557'></font>
+      DO 120 K=kts,kte<a name='558'>
+        DO 120 I=its,ite<a name='559'>
+          ZA(I,K)=0.5*(ZQ(I,K)+ZQ(I,K+1))                                        <a name='560'>
+          DZQ(I,K)=ZQ(I,K)-ZQ(I,K+1)                                             <a name='561'>
+  120 CONTINUE                                                                 <a name='562'>
+<font color=#447700>!                                                                                <a name='563'></font>
+      DO 130 K=kts,kte-1<a name='564'>
+        DO 130 I=its,ite<a name='565'>
+          DZA(I,K)=ZA(I,K)-ZA(I,K+1)                                             <a name='566'>
+  130 CONTINUE                                                                 <a name='567'>
+               <a name='568'>
+      DTSTEP=DT                                                                  <a name='569'>
+<font color=#447700>!                                                                                <a name='570'></font>
+      DO 160 I=its,ite<a name='571'>
+        GOVRTH(I)=G/THX(I,KL)                                                    <a name='572'>
+  160 CONTINUE                                                                   <a name='573'>
+<font color=#447700>!                                                                                <a name='574'></font>
+<font color=#447700>!-----INITIALIZE VERTICAL TENDENCIES AND                                         <a name='575'></font>
+<font color=#447700>!                                                                                <a name='576'></font>
+      DO I=its,ite<a name='577'>
+      DO K=kts,kte<a name='578'>
+         UTNP(i,k)=0.                                                           <a name='579'>
+         VTNP(i,k)=0.                                                           <a name='580'>
+         TTNP(i,k)=0.                                                           <a name='581'>
+      ENDDO<a name='582'>
+      ENDDO<a name='583'>
+<font color=#447700>!                                                                                <a name='584'></font>
+<font color=#447700>!     IF(IDRY.EQ.1)GOTO 250                                                  <a name='585'></font>
+      DO 230 K=kts,kte<a name='586'>
+        DO 230 I=its,ite<a name='587'>
+          QTNP(I,K)=0.                                                           <a name='588'>
+  230 CONTINUE                                                                 <a name='589'>
+<font color=#447700>!                                                                                <a name='590'></font>
+<font color=#447700>!     IF(IMOIST.EQ.1)GOTO 250                                                <a name='591'></font>
+      DO 240 K=kts,kte<a name='592'>
+        DO 240 I=its,ite<a name='593'>
+          QCTNP(I,K)=0.                                                          <a name='594'>
+          QITNP(I,K)=0.                                                          <a name='595'>
+  240 CONTINUE                                                                 <a name='596'>
+                                                                                 <a name='597'>
+  250 CONTINUE                                                                   <a name='598'>
+<font color=#447700>!                                                                                <a name='599'></font>
+<font color=#447700>!-----CALCULATE BULK RICHARDSON NO. OF SURFACE LAYER, ACCORDING TO               <a name='600'></font>
+<font color=#447700>!     AKB(1976), EQ(12).                                                         <a name='601'></font>
+                                                                                 <a name='602'>
+<font color=#447700>!     DO 260 I=its,ite<a name='603'></font>
+<font color=#447700>!       GZ1OZ0(I)=ALOG(ZA(I,KL)/ZNT(I))                                        <a name='604'></font>
+<font color=#447700>!       IF((XLAND(I)-1.5).GE.0)THEN                                            <a name='605'></font>
+<font color=#447700>!         ZL=ZNT(I)                                                            <a name='606'></font>
+<font color=#447700>!       ELSE                                                                     <a name='607'></font>
+<font color=#447700>!         ZL=0.01                                                                <a name='608'></font>
+<font color=#447700>!       ENDIF                                                                    <a name='609'></font>
+<font color=#447700>!       WSPD(I)=SQRT(UX(I,KL)*UX(I,KL)+VX(I,KL)*VX(I,KL))                        <a name='610'></font>
+<font color=#447700>!       TSKV=THGB(I)*(1.+EP1*QGH(I)*MAVAIL(I))                     <a name='611'></font>
+<font color=#447700>!       DTHVDZ=(THVX(I,KL)-TSKV)                                                 <a name='612'></font>
+<font color=#447700>!       IF(-DTHVDZ.GE.0)THEN                                                     <a name='613'></font>
+<font color=#447700>!         DTHVM=-DTHVDZ                                                          <a name='614'></font>
+<font color=#447700>!       ELSE                                                                     <a name='615'></font>
+<font color=#447700>!         DTHVM=0.                                                               <a name='616'></font>
+<font color=#447700>!       ENDIF                                                                    <a name='617'></font>
+<font color=#447700>!       VCONV=VCONVC*SQRT(DTHVM)                                                 <a name='618'></font>
+<font color=#447700>!       WSPD(I)=SQRT(WSPD(I)*WSPD(I)+VCONV*VCONV)                                <a name='619'></font>
+<font color=#447700>!       WSPD(I)=AMAX1(WSPD(I),1.)                                                <a name='620'></font>
+<font color=#447700>!       BR(I)=GOVRTH(I)*ZA(I,KL)*DTHVDZ/(WSPD(I)*WSPD(I))                        <a name='621'></font>
+<font color=#447700>! 260 CONTINUE                                                                   <a name='622'></font>
+                                                                                 <a name='623'>
+<font color=#447700>!!-----DIAGNOSE BASIC PARAMETERS FOR THE APPROPRIATED STABILITY CLASS:            <a name='624'></font>
+<font color=#447700>!!                                                                                <a name='625'></font>
+<font color=#447700>!!     THE STABILITY CLASSES ARE DETERMINED BY BR (BULK RICHARDSON NO.)           <a name='626'></font>
+<font color=#447700>!!     AND HOL (HEIGHT OF PBL/MONIN-OBUKHOV LENGTH).                              <a name='627'></font>
+<font color=#447700>!!                                                                                <a name='628'></font>
+<font color=#447700>!!     CRITERIA FOR THE CLASSES ARE AS FOLLOWS:                                   <a name='629'></font>
+<font color=#447700>!!                                                                                <a name='630'></font>
+<font color=#447700>!!        1. BR .GE. 0.2;                                                         <a name='631'></font>
+<font color=#447700>!!               REPRESENTS NIGHTTIME STABLE CONDITIONS (REGIME=1),               <a name='632'></font>
+<font color=#447700>!!                                                                                <a name='633'></font>
+<font color=#447700>!!        2. BR .LT. 0.2 .AND. BR .GT. 0.0;                                       <a name='634'></font>
+<font color=#447700>!!               REPRESENTS DAMPED MECHANICAL TURBULENT CONDITIONS                <a name='635'></font>
+<font color=#447700>!!               (REGIME=2),                                                      <a name='636'></font>
+<font color=#447700>!!                                                                                <a name='637'></font>
+<font color=#447700>!!        3. BR .EQ. 0.0                                                          <a name='638'></font>
+<font color=#447700>!!               REPRESENTS FORCED CONVECTION CONDITIONS (REGIME=3),              <a name='639'></font>
+<font color=#447700>!!                                                                                <a name='640'></font>
+<font color=#447700>!!        4. BR .LT. 0.0                                                          <a name='641'></font>
+<font color=#447700>!!               REPRESENTS FREE CONVECTION CONDITIONS (REGIME=4).                <a name='642'></font>
+<font color=#447700>!!                                                                                <a name='643'></font>
+<font color=#447700>!!-----                                                                           <a name='644'></font>
+<font color=#447700>!<a name='645'></font>
+<font color=#447700>!      DO 320 I=its,ite<a name='646'></font>
+<font color=#447700>!!----                                                                            <a name='647'></font>
+<font color=#447700>!!--     REMOVE REGIME 3 DEPENDENCE ON PBL HEIGHT                                 <a name='648'></font>
+<font color=#447700>!!--          IF(BR(I).LT.0..AND.HOL(I).GT.1.5)GOTO 310                         <a name='649'></font>
+<font color=#447700>!<a name='650'></font>
+<font color=#447700>!        IF(BR(I).LT.0.)GOTO 310                                                  <a name='651'></font>
+<font color=#447700>!!                                                                                <a name='652'></font>
+<font color=#447700>!!-----CLASS 1; STABLE (NIGHTTIME) CONDITIONS:                                    <a name='653'></font>
+<font color=#447700>!!                                                                                <a name='654'></font>
+<font color=#447700>!        IF(BR(I).LT.0.2)GOTO 270                                                 <a name='655'></font>
+<font color=#447700>!        REGIME(I)=1.                                                           <a name='656'></font>
+<font color=#447700>!        PSIM(I)=-10.*GZ1OZ0(I)                                                   <a name='657'></font>
+<font color=#447700>!!    LOWER LIMIT ON PSI IN STABLE CONDITIONS                                     <a name='658'></font>
+<font color=#447700>!        PSIM(I)=AMAX1(PSIM(I),-10.)                                              <a name='659'></font>
+<font color=#447700>!        PSIH(I)=PSIM(I)                                                          <a name='660'></font>
+<font color=#447700>!        HOL(I)=0.0<a name='661'></font>
+<font color=#447700>!        PBL(I)=0.0                                                             <a name='662'></font>
+<font color=#447700>!        GOTO 320                                                                 <a name='663'></font>
+<font color=#447700>!!                                                                                <a name='664'></font>
+<font color=#447700>!!-----CLASS 2; DAMPED MECHANICAL TURBULENCE:                                     <a name='665'></font>
+<font color=#447700>!!                                                                                <a name='666'></font>
+<font color=#447700>!  270   IF(BR(I).EQ.0.0)GOTO 280                                                 <a name='667'></font>
+<font color=#447700>!        REGIME(I)=2.                                                           <a name='668'></font>
+<font color=#447700>!        PSIM(I)=-5.0*BR(I)*GZ1OZ0(I)/(1.1-5.0*BR(I))                             <a name='669'></font>
+<font color=#447700>!!    LOWER LIMIT ON PSI IN STABLE CONDITIONS                                     <a name='670'></font>
+<font color=#447700>!        PSIM(I)=AMAX1(PSIM(I),-10.)                                              <a name='671'></font>
+<font color=#447700>!!.....AKB(1976), EQ(16).                                                         <a name='672'></font>
+<font color=#447700>!        PSIH(I)=PSIM(I)                                                          <a name='673'></font>
+<font color=#447700>!        HOL(I)=0.0<a name='674'></font>
+<font color=#447700>!        PBL(I)=0.0                                                             <a name='675'></font>
+<font color=#447700>!        GOTO 320                                                                 <a name='676'></font>
+<font color=#447700>!!                                                                                <a name='677'></font>
+<font color=#447700>!!-----CLASS 3; FORCED CONVECTION:                                                <a name='678'></font>
+<font color=#447700>!!                                                                                <a name='679'></font>
+<font color=#447700>!  280   REGIME(I)=3.                                                           <a name='680'></font>
+<font color=#447700>!        PSIM(I)=0.0                                                              <a name='681'></font>
+<font color=#447700>!        PSIH(I)=PSIM(I)                                                          <a name='682'></font>
+<font color=#447700>!                                                                                 <a name='683'></font>
+<font color=#447700>!! special use kte instead of kme<a name='684'></font>
+<font color=#447700>!<a name='685'></font>
+<font color=#447700>!        DO 290 KK=kts,kte-1<a name='686'></font>
+<font color=#447700>!          K=kte-KK<a name='687'></font>
+<font color=#447700>!          IF(THVX(I,K).GT.THVX(I,KL))GOTO 300                                    <a name='688'></font>
+<font color=#447700>!  290   CONTINUE                                                                 <a name='689'></font>
+<font color=#447700>!        STOP 290                                                                 <a name='690'></font>
+<font color=#447700>!  300   PBL(I)=ZQ(I,K+1)                                                       <a name='691'></font>
+<font color=#447700>!        IF(UST(I).LT.0.01)THEN                                                 <a name='692'></font>
+<font color=#447700>!          ZOL(I)=BR(I)*GZ1OZ0(I)                                               <a name='693'></font>
+<font color=#447700>!        ELSE                                                                     <a name='694'></font>
+<font color=#447700>!          ZOL(I)=KARMAN*GOVRTH(I)*ZA(I,KL)*MOL(I,J)/(UST(I)*UST(I)) <a name='695'></font>
+<font color=#447700>!        ENDIF                                                                    <a name='696'></font>
+<font color=#447700>!        HOL(I)=-ZOL(I)*PBL(I)/ZA(I,KL)<a name='697'></font>
+<font color=#447700>!        GOTO 320                                                                 <a name='698'></font>
+<font color=#447700>!                                                                                 <a name='699'></font>
+<font color=#447700>!!-----CLASS 4; FREE CONVECTION:                                                  <a name='700'></font>
+<font color=#447700>!                                                                                 <a name='701'></font>
+<font color=#447700>!! 310     IF(THVX(I,KLM).GT.THVX(I,KL))GOTO 280                                  <a name='702'></font>
+<font color=#447700>!<a name='703'></font>
+<font color=#447700>!  310   CONTINUE                                                                 <a name='704'></font>
+<font color=#447700>!        REGIME(I)=4.                                                           <a name='705'></font>
+<font color=#447700>!        IF(UST(I).LT.0.01)THEN                                                 <a name='706'></font>
+<font color=#447700>!          ZOL(I)=BR(I)*GZ1OZ0(I)                                               <a name='707'></font>
+<font color=#447700>!        ELSE                                                                     <a name='708'></font>
+<font color=#447700>!          ZOL(I)=KARMAN*GOVRTH(I)*ZA(I,KL)*MOL(I,J)/(UST(I)*UST(I))<a name='709'></font>
+<font color=#447700>!        ENDIF                                                                    <a name='710'></font>
+<font color=#447700>!        ZOL(I)=AMIN1(ZOL(I),0.)                                              <a name='711'></font>
+<font color=#447700>!        ZOL(I)=AMAX1(ZOL(I),-9.9999)                                         <a name='712'></font>
+<font color=#447700>!        NZOL=INT(-ZOL(I)*100.)                                                 <a name='713'></font>
+<font color=#447700>!        RZOL=-ZOL(I)*100.-NZOL                                                 <a name='714'></font>
+<font color=#447700>!        PSIM(I)=PSIMTB(NZOL)+RZOL*(PSIMTB(NZOL+1)-PSIMTB(NZOL))                  <a name='715'></font>
+<font color=#447700>!        PSIH(I)=PSIHTB(NZOL)+RZOL*(PSIHTB(NZOL+1)-PSIHTB(NZOL))                  <a name='716'></font>
+<font color=#447700>!!---LIMIT PSIH AND PSIM IN THE CASE OF THIN LAYERS AND HIGH ROUGHNESS            <a name='717'></font>
+<font color=#447700>!!---  THIS PREVENTS DENOMINATOR IN FLUXES FROM GETTING TOO SMALL                 <a name='718'></font>
+<font color=#447700>!        PSIH(I)=AMIN1(PSIH(I),0.9*GZ1OZ0(I))                                     <a name='719'></font>
+<font color=#447700>!        PSIM(I)=AMIN1(PSIM(I),0.9*GZ1OZ0(I))                                     <a name='720'></font>
+<font color=#447700>!  320 CONTINUE                                                                   <a name='721'></font>
+<a name='722'>
+<font color=#447700>!-----COMPUTE THE FRICTIONAL VELOCITY:        <a name='723'></font>
+<font color=#447700>!     ZA(1982) EQS(2.60),(2.61).     <a name='724'></font>
+<a name='725'>
+      DO 330 I=its,ite<a name='726'>
+        DTG=THX(I,KL)-THGB(I)        <a name='727'>
+        PSIX=GZ1OZ0(I)-PSIM(I)        <a name='728'>
+        IF((XLAND(I)-1.5).GE.0)THEN        <a name='729'>
+          ZL=ZNT(I)        <a name='730'>
+        ELSE        <a name='731'>
+          ZL=0.01        <a name='732'>
+        ENDIF        <a name='733'>
+        PSIQ=ALOG(KARMAN*UST(I)*ZA(I,KL)/XKA+ZA(I,KL)/ZL)-PSIH(I)        <a name='734'>
+        UST(I)=KARMAN*WSPD(I)/PSIX        <a name='735'>
+<font color=#447700>!        <a name='736'></font>
+        USTM=AMAX1(UST(I),0.1)        <a name='737'>
+        IF((XLAND(I)-1.5).GE.0)THEN        <a name='738'>
+          UST(I)=UST(I)        <a name='739'>
+        ELSE                     <a name='740'>
+          UST(I)=USTM          <a name='741'>
+        ENDIF                    <a name='742'>
+<font color=#447700>!       MOL(I,J)=KARMAN*DTG/(GZ1OZ0(I)-PSIH(I))/PRT<a name='743'></font>
+  330 CONTINUE                   <a name='744'>
+<font color=#447700>!                                                                                <a name='745'></font>
+      DO 420 I=its,ite<a name='746'>
+        WSPD1(I)=SQRT(UX(I,KL)*UX(I,KL)+VX(I,KL)*VX(I,KL))+1.E-9                  <a name='747'>
+  420 CONTINUE                                                                   <a name='748'>
+<font color=#447700>!                                                                                <a name='749'></font>
+<font color=#447700>!---- COMPUTE VERTICAL DIFFUSION                                                 <a name='750'></font>
+<font color=#447700>!                                                                                <a name='751'></font>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -          <a name='752'></font>
+<font color=#447700>!     COMPUTE PRELIMINARY VARIABLES                                              <a name='753'></font>
+<font color=#447700>!                                                                                <a name='754'></font>
+<font color=#447700>!                                                                                <a name='755'></font>
+      DT4=2.*DTSTEP                                                              <a name='756'>
+      RDT=1./DT4                                                                 <a name='757'>
+<font color=#447700>!                                                                                <a name='758'></font>
+      DO I=its,ite<a name='759'>
+        HGAMT(I)=0.                                                              <a name='760'>
+        HGAMQ(I)=0.                                                              <a name='761'>
+        WSCALE(I)=0.                                                             <a name='762'>
+        KPBL(I)=KL                                                               <a name='763'>
+        PBL(I)=ZQ(I,KL)                                                        <a name='764'>
+        KPBL0(I)=KL                                                    <a name='765'>
+        PBL0(I)=ZQ(I,KL)                                              <a name='766'>
+        PBLFLG(I)=.TRUE.                                                         <a name='767'>
+        SFCFLG(I)=.TRUE.                                                         <a name='768'>
+        IF(BR(I).GT.0.0)SFCFLG(I)=.FALSE.                                        <a name='769'>
+        ZL1(I)=ZA(I,KL)                                                          <a name='770'>
+        THERMAL(I)=THVX(I,KL)                                                    <a name='771'>
+      ENDDO                                                                      <a name='772'>
+                                                                                 <a name='773'>
+<font color=#447700>!     COMPUTE THE FIRST GUESS OF PBL HEIGHT                                      <a name='774'></font>
+                                                                                 <a name='775'>
+      DO I=its,ite<a name='776'>
+        STABLE(I)=.FALSE.                                                        <a name='777'>
+        BRUP(I)=BR(I)                                                            <a name='778'>
+      ENDDO                                                                      <a name='779'>
+      DO K=KLM,KLPBL,-1                                                          <a name='780'>
+        DO I=its,ite<a name='781'>
+          IF(.NOT.STABLE(I))THEN                                                 <a name='782'>
+            BRDN(I)=BRUP(I)                                                      <a name='783'>
+            SPDK2=MAX(UX(I,K)**2+VX(I,K)**2,1.)                                  <a name='784'>
+            BRUP(I)=(THVX(I,K)-THERMAL(I))*(G*ZA(I,K)/THVX(I,KL))/SPDK2          <a name='785'>
+            KPBL(I)=K                                                            <a name='786'>
+            STABLE(I)=BRUP(I).GT.BRCR                                            <a name='787'>
+          ENDIF                                                                  <a name='788'>
+        ENDDO                                                                    <a name='789'>
+      ENDDO                                                                      <a name='790'>
+<font color=#447700>!                                                                                <a name='791'></font>
+      DO I=its,ite<a name='792'>
+        K=KPBL(I)                                                                <a name='793'>
+        IF(BRDN(I).GE.BRCR)THEN                                                  <a name='794'>
+          BRINT=0.                                                               <a name='795'>
+        ELSEIF(BRUP(I).LE.BRCR)THEN                                              <a name='796'>
+          BRINT=1.                                                               <a name='797'>
+        ELSE                                                                     <a name='798'>
+          BRINT=(BRCR-BRDN(I))/(BRUP(I)-BRDN(I))                                 <a name='799'>
+        ENDIF                                                                    <a name='800'>
+        PBL(I)=ZA(I,K+1)+BRINT*(ZA(I,K)-ZA(I,K+1))                             <a name='801'>
+        IF(PBL(I).LT.ZQ(I,KPBL(I)+1))KPBL(I)=KPBL(I)+1                         <a name='802'>
+      ENDDO                                                                      <a name='803'>
+<font color=#447700>!                                                                                <a name='804'></font>
+      DO I=its,ite<a name='805'>
+        FM=GZ1OZ0(I)-PSIM(I)                                                     <a name='806'>
+        FH=GZ1OZ0(I)-PSIH(I)                                                     <a name='807'>
+        HOL(I)=MAX(BR(I)*FM*FM/FH,RIMIN)                                       <a name='808'>
+        IF(SFCFLG(I))THEN                                                        <a name='809'>
+          HOL(I)=MIN(HOL(I),-ZFMIN)                                          <a name='810'>
+        ELSE                                                                     <a name='811'>
+          HOL(I)=MAX(HOL(I),ZFMIN)                                           <a name='812'>
+        ENDIF                                                                    <a name='813'>
+<font color=#447700>!                                                                                <a name='814'></font>
+        HOL1=HOL(I)*PBL(I)/ZL1(I)*SFCFRAC                                    <a name='815'>
+        HOL(I)=-HOL(I)*PBL(I)/ZL1(I)                                       <a name='816'>
+        IF(SFCFLG(I))THEN                                                        <a name='817'>
+          PHIM(I)=(1.-APHI16*HOL1)**(-1./4.)                                     <a name='818'>
+          PHIH(I)=(1.-APHI16*HOL1)**(-1./2.)                                     <a name='819'>
+        ELSE                                                                     <a name='820'>
+          PHIM(I)=(1.+APHI5*HOL1)                                                <a name='821'>
+          PHIH(I)=PHIM(I)                                                        <a name='822'>
+        ENDIF                                                                    <a name='823'>
+        WSCALE(I)=UST(I)/PHIM(I)                                               <a name='824'>
+        WSCALE(I)=MIN(WSCALE(I),UST(I)*APHI16)                                 <a name='825'>
+        WSCALE(I)=MAX(WSCALE(I),UST(I)/APHI5)                                  <a name='826'>
+      ENDDO                                                                      <a name='827'>
+                                                                                 <a name='828'>
+<font color=#447700>!     COMPUTE THE SURFACE VARIABLES FOR PBL HEIGHT ESTIMATION                    <a name='829'></font>
+<font color=#447700>!     UNDER UNSTABLE CONDITIONS                                                  <a name='830'></font>
+                                                                                 <a name='831'>
+      DO I=its,ite<a name='832'>
+        IF(SFCFLG(I))THEN                                                        <a name='833'>
+          GAMFAC=CFAC/RHOX(I)/WSCALE(I)                                          <a name='834'>
+          HGAMT(I)=MIN(GAMFAC*HFX(I)/CPM(I),GAMCRT)                            <a name='835'>
+          HGAMQ(I)=MIN(GAMFAC*QFX(I),GAMCRQ)                                   <a name='836'>
+          IF((XLAND(I)-1.5).GE.0)HGAMQ(I)=0.                                   <a name='837'>
+          VPERT=HGAMT(I)+EP1*THX(I,KL)*HGAMQ(I)                                  <a name='838'>
+          VPERT=MIN(VPERT,GAMCRT)                                                <a name='839'>
+          THERMAL(I)=THERMAL(I)+MAX(VPERT,0.)                                    <a name='840'>
+          HGAMT(I)=MAX(HGAMT(I),0.0)                                             <a name='841'>
+          HGAMQ(I)=MAX(HGAMQ(I),0.0)                                             <a name='842'>
+        ELSE                                                                     <a name='843'>
+          PBLFLG(I)=.FALSE.                                                      <a name='844'>
+        ENDIF                                                                    <a name='845'>
+      ENDDO                                                                      <a name='846'>
+<font color=#447700>!                                                                                <a name='847'></font>
+      DO I=its,ite<a name='848'>
+        IF(PBLFLG(I))THEN                                                        <a name='849'>
+          KPBL(I)=KL                                                             <a name='850'>
+          PBL(I)=ZQ(I,KL)                                                      <a name='851'>
+        ENDIF                                                                    <a name='852'>
+      ENDDO                                                                      <a name='853'>
+<font color=#447700>!                                                                                <a name='854'></font>
+<font color=#447700>!     ENHANCE THE PBL HEIGHT BY CONSIDERING THE THERMAL                          <a name='855'></font>
+<font color=#447700>!                                                                                <a name='856'></font>
+      DO I=its,ite<a name='857'>
+        IF(PBLFLG(I))THEN                                                        <a name='858'>
+          STABLE(I)=.FALSE.                                                      <a name='859'>
+          BRUP(I)=BR(I)                                                          <a name='860'>
+        ENDIF                                                                    <a name='861'>
+      ENDDO                                                                      <a name='862'>
+      DO K=KLM,KLPBL,-1                                                          <a name='863'>
+        DO I=its,ite<a name='864'>
+          IF(.NOT.STABLE(I).AND.PBLFLG(I))THEN                                   <a name='865'>
+            BRDN(I)=BRUP(I)                                                      <a name='866'>
+            SPDK2=MAX((UX(I,K)**2+VX(I,K)**2),1.)                                <a name='867'>
+            BRUP(I)=(THVX(I,K)-THERMAL(I))*(G*ZA(I,K)/THVX(I,KL))/SPDK2          <a name='868'>
+            KPBL(I)=K                                                            <a name='869'>
+            STABLE(I)=BRUP(I).GT.BRCR                                            <a name='870'>
+          ENDIF                                                                  <a name='871'>
+        ENDDO                                                                    <a name='872'>
+      ENDDO                                                                      <a name='873'>
+<font color=#447700>!                                                                                <a name='874'></font>
+      DO I=its,ite<a name='875'>
+        IF(PBLFLG(I))THEN                                                        <a name='876'>
+          K=KPBL(I)                                                              <a name='877'>
+          IF(BRDN(I).GE.BRCR)THEN                                                <a name='878'>
+            BRINT=0.                                                             <a name='879'>
+          ELSEIF(BRUP(I).LE.BRCR)THEN                                            <a name='880'>
+            BRINT=1.                                                             <a name='881'>
+          ELSE                                                                   <a name='882'>
+            BRINT=(BRCR-BRDN(I))/(BRUP(I)-BRDN(I))                               <a name='883'>
+          ENDIF                                                                  <a name='884'>
+          PBL(I)=ZA(I,K+1)+BRINT*(ZA(I,K)-ZA(I,K+1))                           <a name='885'>
+          IF(PBL(I).LT.ZQ(I,KPBL(I)+1))KPBL(I)=KPBL(I)+1                       <a name='886'>
+          IF(KPBL(I).LE.1)PBLFLG(I)=.FALSE.                                      <a name='887'>
+        ENDIF                                                                    <a name='888'>
+      ENDDO                                                                      <a name='889'>
+<font color=#447700>!                                                                                <a name='890'></font>
+<font color=#447700>!     DIAGNOSTIC PBL HEIGHT WITH BRCR EFFECTIVELY ZERO (PBL0)                    <a name='891'></font>
+<font color=#447700>!                                                                                <a name='892'></font>
+      DO I=its,ite<a name='893'>
+        IF(PBLFLG(I))THEN                                                        <a name='894'>
+          STABLE(I)=.FALSE.                                                      <a name='895'>
+          BRUP(I)=BR(I)                                                          <a name='896'>
+        ENDIF                                                                    <a name='897'>
+      ENDDO                                                                      <a name='898'>
+      DO K=KLM,KLPBL,-1                                                          <a name='899'>
+        DO I=its,ite<a name='900'>
+          IF(.NOT.STABLE(I).AND.PBLFLG(I))THEN                                   <a name='901'>
+            BRDN(I)=BRUP(I)                                                      <a name='902'>
+            SPDK2=MAX((UX(I,K)**2+VX(I,K)**2),1.)                                <a name='903'>
+            BRUP(I)=(THVX(I,K)-THERMAL(I))*(G*ZA(I,K)/THVX(I,KL))/SPDK2          <a name='904'>
+            KPBL0(I)=K                                                           <a name='905'>
+            STABLE(I)=BRUP(I).GT.0.0                                             <a name='906'>
+          ENDIF                                                                  <a name='907'>
+                                                                                 <a name='908'>
+        ENDDO                                                                    <a name='909'>
+      ENDDO                                                                      <a name='910'>
+<font color=#447700>!                                                                                <a name='911'></font>
+      DO I=its,ite<a name='912'>
+        IF(PBLFLG(I))THEN                                                        <a name='913'>
+          K=KPBL0(I)                                                             <a name='914'>
+          IF(BRDN(I).GE.0.0)THEN                                                 <a name='915'>
+            BRINT=0.                                                             <a name='916'>
+          ELSEIF(BRUP(I).LE.0.0)THEN                                             <a name='917'>
+            BRINT=1.                                                             <a name='918'>
+          ELSE                                                                   <a name='919'>
+            BRINT=(0.0-BRDN(I))/(BRUP(I)-BRDN(I))                                <a name='920'>
+          ENDIF                                                                  <a name='921'>
+          PBL0(I)=ZA(I,K+1)+BRINT*(ZA(I,K)-ZA(I,K+1))                            <a name='922'>
+          IF(PBL0(I).LT.ZQ(I,KPBL0(I)+1))KPBL0(I)=KPBL0(I)+1                     <a name='923'>
+          IF(KPBL0(I).LE.1)PBLFLG(I)=.FALSE.                                     <a name='924'>
+        ENDIF                                                                    <a name='925'>
+      ENDDO                                                                      <a name='926'>
+<a name='927'>
+<font color=#447700>!                                                                                <a name='928'></font>
+<font color=#447700>!     COMPUTE DIFFUSION COEFFICIENTS BELOW PBL                                   <a name='929'></font>
+<font color=#447700>!                                                                                <a name='930'></font>
+      DO K=kte,KLPBL,-1 <a name='931'>
+        DO I=its,ite<a name='932'>
+          IF(KPBL(I).LT.K)THEN                                                   <a name='933'>
+            PRNUM=(PHIH(I)/PHIM(I)+CFAC*KARMAN*SFCFRAC)                          <a name='934'>
+            PRNUM=MIN(PRNUM,PRMAX)                                               <a name='935'>
+            PRNUM=MAX(PRNUM,PRMIN)                                               <a name='936'>
+            ZFAC=MAX((1.-(ZQ(I,K)-ZL1(I))/(PBL(I)-ZL1(I))),ZFMIN)              <a name='937'>
+            XKZO=CKZ*DZA(I,K-1)                                                    <a name='938'>
+            XKZM(I,K)=XKZO+WSCALE(I)*KARMAN*ZQ(I,K)*ZFAC**PFAC                   <a name='939'>
+            XKZH(I,K)=XKZM(I,K)/PRNUM                                            <a name='940'>
+            XKZM(I,K)=MIN(XKZM(I,K),XKZMAX)                                      <a name='941'>
+            XKZM(I,K)=MAX(XKZM(I,K),XKZMIN)                                      <a name='942'>
+            XKZH(I,K)=MIN(XKZH(I,K),XKZMAX)                                      <a name='943'>
+            XKZH(I,K)=MAX(XKZH(I,K),XKZMIN)                                      <a name='944'>
+          ENDIF                                                                  <a name='945'>
+        ENDDO                                                                    <a name='946'>
+      ENDDO                                                                      <a name='947'>
+<font color=#447700>!                                                                                <a name='948'></font>
+<font color=#447700>!     COMPUTE DIFFUSION COEFFICIENTS OVER PBL (FREE ATMOSPHERE)                  <a name='949'></font>
+<font color=#447700>!                                                                                <a name='950'></font>
+      DO K=kts+1,kte<a name='951'>
+        DO I=its,ite<a name='952'>
+          XKZO=CKZ*DZA(I,K-1)                                                      <a name='953'>
+          IF(K.LE.KPBL(I))THEN                                                   <a name='954'>
+            SS=((UX(I,K-1)-UX(I,K))*(UX(I,K-1)-UX(I,K))+(VX(I,K-1)-   &amp; <a name='955'>
+               VX(I,K))*(VX(I,K-1)-VX(I,K)))/(DZA(I,K-1)*DZA(I,K-1))+ &amp;          <a name='956'>
+               1.E-9                                                             <a name='957'>
+            RI=GOVRTH(I)*(THVX(I,K-1)-THVX(I,K))/(SS*DZA(I,K-1))                 <a name='958'>
+            IF(IMVDIF.EQ.1)THEN                              <a name='959'>
+              IF((QCX(I,K)+QIX(I,K)).GT.0.01E-3.AND.(QCX(I,K-1)+      &amp; <a name='960'>
+                QIX(I,K-1)).GT.0.01E-3)THEN                                      <a name='961'>
+<font color=#447700>!      IN CLOUD                                                                  <a name='962'></font>
+                QMEAN=0.5*(QX(I,K)+QX(I,K-1))                                    <a name='963'>
+                TMEAN=0.5*(SCR3(I,K)+SCR3(I,K-1))                                <a name='964'>
+                ALPH=XLV*QMEAN/R/TMEAN                                           <a name='965'>
+                CHI=XLV*XLV*QMEAN/CP/RV/TMEAN/TMEAN                              <a name='966'>
+                RI=(1.+ALPH)*(RI-G*G/SS/TMEAN/CP*((CHI-ALPH)/(1.+CHI)))          <a name='967'>
+              ENDIF                                                              <a name='968'>
+            ENDIF                                                                <a name='969'>
+            ZK=KARMAN*ZQ(I,K)                                                    <a name='970'>
+            RL2=(ZK*RLAM/(RLAM+ZK))**2                                           <a name='971'>
+            DK=RL2*SQRT(SS)                                                      <a name='972'>
+            IF(RI.LT.0.)THEN                                                     <a name='973'>
+<font color=#447700>! UNSTABLE REGIME                                                                <a name='974'></font>
+              SRI=SQRT(-RI)                                                      <a name='975'>
+              XKZM(I,K)=XKZO+DK*(1+8.*(-RI)/(1+1.746*SRI))                       <a name='976'>
+              XKZH(I,K)=XKZO+DK*(1+8.*(-RI)/(1+1.286*SRI))                       <a name='977'>
+            ELSE                                                                 <a name='978'>
+<font color=#447700>! STABLE REGIME                                                                  <a name='979'></font>
+              XKZH(I,K)=XKZO+DK/(1+5.*RI)**2                                     <a name='980'>
+              PRNUM=1.0+2.1*RI                                                   <a name='981'>
+              PRNUM=MIN(PRNUM,PRMAX)                                             <a name='982'>
+              XKZM(I,K)=(XKZH(I,K)-XKZO)*PRNUM+XKZO                              <a name='983'>
+            ENDIF                                                                <a name='984'>
+<font color=#447700>!                                                                                <a name='985'></font>
+            XKZM(I,K)=MIN(XKZM(I,K),XKZMAX)                                      <a name='986'>
+            XKZM(I,K)=MAX(XKZM(I,K),XKZMIN)                                      <a name='987'>
+            XKZH(I,K)=MIN(XKZH(I,K),XKZMAX)                                      <a name='988'>
+            XKZH(I,K)=MAX(XKZH(I,K),XKZMIN)                                      <a name='989'>
+          ENDIF                                                                  <a name='990'>
+<font color=#447700>!                                                                                <a name='991'></font>
+        ENDDO                                                                    <a name='992'>
+      ENDDO                                                                      <a name='993'>
+                                                                                 <a name='994'>
+<font color=#447700>!     COMPUTE TRIDIAGONAL MATRIX ELEMENTS FOR HEAT AND MOISTURE                  <a name='995'></font>
+                                                                                 <a name='996'>
+      DO I=its,ite<a name='997'>
+      DO K=kts,kte<a name='998'>
+         AU(i,k)=0.<a name='999'>
+         AL(i,k)=0.<a name='1000'>
+         AD(i,k)=0.<a name='1001'>
+         A1(i,k)=0.<a name='1002'>
+         A2(i,k)=0.<a name='1003'>
+      ENDDO<a name='1004'>
+      ENDDO<a name='1005'>
+ <a name='1006'>
+      DO I=its,ite<a name='1007'>
+        AD(I,1)=1.                                                               <a name='1008'>
+        A1(I,1)=SCR3(I,KL)+HFX(I)/(RHOX(I)*CPM(I))/ZQ(I,KL)*DT4                <a name='1009'>
+        A2(I,1)=QX(I,KL)+QFX(I)/(RHOX(I))/ZQ(I,KL)*DT4                         <a name='1010'>
+      ENDDO                                                                      <a name='1011'>
+<font color=#447700>!                                                                                <a name='1012'></font>
+      DO K=kte,kts+1,-1<a name='1013'>
+        KK=kme-K                                                                <a name='1014'>
+        DO I=its,ite<a name='1015'>
+          DTODSD=DT4/dz8w2d(I,K)                                                   <a name='1016'>
+          DTODSU=DT4/dz8w2d(I,K-1)                                                 <a name='1017'>
+          DSIG=z2d(I,K)-z2d(I,K-1)                                                 <a name='1018'>
+          DSIG=-DSIG<a name='1019'>
+          RDZ=1./DZA(I,K-1)                                                      <a name='1020'>
+          IF(PBLFLG(I).AND.KPBL(I).LT.K)THEN                                     <a name='1021'>
+            DSDZT=DSIG*XKZH(I,K)*RDZ*(G/CP-HGAMT(I)/PBL(I))                    <a name='1022'>
+            DSDZQ=DSIG*XKZH(I,K)*RDZ*(-HGAMQ(I)/PBL(I))                        <a name='1023'>
+            A2(I,KK)=A2(I,KK)+DTODSD*DSDZQ                                       <a name='1024'>
+            A2(I,KK+1)=QX(I,K-1)-DTODSU*DSDZQ                                    <a name='1025'>
+          ELSE                                                                   <a name='1026'>
+            DSDZT=DSIG*XKZH(I,K)*RDZ*(G/CP)                                      <a name='1027'>
+            A2(I,KK+1)=QX(I,K-1)                                                 <a name='1028'>
+          ENDIF                                                                  <a name='1029'>
+          DSDZ2=DSIG*XKZH(I,K)*RDZ*RDZ                                           <a name='1030'>
+          AU(I,KK)=-DTODSD*DSDZ2                                                 <a name='1031'>
+          AL(I,KK)=-DTODSU*DSDZ2                                                 <a name='1032'>
+          AD(I,KK)=AD(I,KK)-AU(I,KK)                                             <a name='1033'>
+          AD(I,KK+1)=1.-AL(I,KK)                                                 <a name='1034'>
+          A1(I,KK)=A1(I,KK)+DTODSD*DSDZT                                         <a name='1035'>
+          A1(I,KK+1)=SCR3(I,K-1)-DTODSU*DSDZT                                    <a name='1036'>
+        ENDDO                                                                    <a name='1037'>
+      ENDDO                                                                      <a name='1038'>
+                                                                                 <a name='1039'>
+<font color=#447700>!     SOLVE TRIDIAGONAL PROBLEM FOR HEAT AND MOISTURE                            <a name='1040'></font>
+      <a name='1041'>
+      CALL <A href='../../html_code/phys/module_bl_mrf.F.html#TRIDI2'>TRIDI2</A><A href='../../html_code/phys/module_bl_mrf.F.html#MRF2D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRIDI2_2">(AL,AD,AU,A1,A2,AU,A1,A2,                 &amp;<a name='1042'>
+                  its,ite,kts,kte                          )<a name='1043'>
+<a name='1044'>
+<font color=#447700>!     RECOVER TENDENCIES OF HEAT AND MOISTURE                                    <a name='1045'></font>
+                                                                                 <a name='1046'>
+      DO K=kte,kts,-1<a name='1047'>
+        KK=kme-K<a name='1048'>
+        DO I=its,ite<a name='1049'>
+          TTEND=(A1(I,KK)-SCR3(I,K))*RDT                                         <a name='1050'>
+          QTEND=(A2(I,KK)-QX(I,K))*RDT                                           <a name='1051'>
+          TTNP(I,K)=TTNP(I,K)+TTEND                                              <a name='1052'>
+          QTNP(I,K)=QTNP(I,K)+QTEND                                              <a name='1053'>
+        ENDDO                                                                    <a name='1054'>
+      ENDDO                                                                      <a name='1055'>
+                                                                                 <a name='1056'>
+<font color=#447700>!     COMPUTE TRIDIAGONAL MATRIX ELEMENTS FOR MOMENTUM                           <a name='1057'></font>
+                                                                                 <a name='1058'>
+      DO I=its,ite<a name='1059'>
+      DO K=kts,kte<a name='1060'>
+         AU(i,k)=0.<a name='1061'>
+         AL(i,k)=0.<a name='1062'>
+         AD(i,k)=0.<a name='1063'>
+         A1(i,k)=0.<a name='1064'>
+         A2(i,k)=0.<a name='1065'>
+      ENDDO<a name='1066'>
+      ENDDO<a name='1067'>
+ <a name='1068'>
+      DO I=its,ite<a name='1069'>
+        AD(I,1)=1.                                                               <a name='1070'>
+        A1(I,1)=UX(I,KL)-UX(I,KL)/WSPD1(I)*UST(I)*UST(I)/ZQ(I,KL)  &amp;<a name='1071'>
+                *DT4*(WSPD1(I)/WSPD(I))**2                            <a name='1072'>
+        A2(I,1)=VX(I,KL)-VX(I,KL)/WSPD1(I)*UST(I)*UST(I)/ZQ(I,KL)  &amp;<a name='1073'>
+                *DT4*(WSPD1(I)/WSPD(I))**2                          <a name='1074'>
+      ENDDO                                                                      <a name='1075'>
+<font color=#447700>!                                                                                <a name='1076'></font>
+      DO K=kte,kts+1,-1<a name='1077'>
+        KK=kme-K<a name='1078'>
+        DO I=its,ite<a name='1079'>
+          DTODSD=DT4/dz8w2d(I,K)                                                   <a name='1080'>
+          DTODSU=DT4/dz8w2d(I,K-1)                                                 <a name='1081'>
+          DSIG=z2d(I,K)-z2d(I,K-1)                                                 <a name='1082'>
+          DSIG=-DSIG<a name='1083'>
+          RDZ=1./DZA(I,K-1)                                                      <a name='1084'>
+          DSDZ2=DSIG*XKZM(I,K)*RDZ*RDZ                                           <a name='1085'>
+          AU(I,KK)=-DTODSD*DSDZ2                                                 <a name='1086'>
+          AL(I,KK)=-DTODSU*DSDZ2                                                 <a name='1087'>
+          AD(I,KK)=AD(I,KK)-AU(I,KK)                                             <a name='1088'>
+          AD(I,KK+1)=1.-AL(I,KK)                                                 <a name='1089'>
+          A1(I,KK+1)=UX(I,K-1)                                                   <a name='1090'>
+          A2(I,KK+1)=VX(I,K-1)                                                   <a name='1091'>
+        ENDDO                                                                    <a name='1092'>
+      ENDDO                                                                      <a name='1093'>
+                                                                                 <a name='1094'>
+<font color=#447700>!     SOLVE TRIDIAGONAL PROBLEM FOR MOMENTUM                                     <a name='1095'></font>
+                                                                                 <a name='1096'>
+      CALL <A href='../../html_code/phys/module_bl_mrf.F.html#TRIDI2'>TRIDI2</A><A href='../../html_code/phys/module_bl_mrf.F.html#MRF2D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRIDI2_3">(AL,AD,AU,A1,A2,AU,A1,A2,                 &amp;<a name='1097'>
+                  its,ite,kts,kte                          )<a name='1098'>
+                                                                                 <a name='1099'>
+<font color=#447700>!     RECOVER TENDENCIES OF MOMENTUM                                             <a name='1100'></font>
+                                                                                 <a name='1101'>
+      DO K=kte,kts,-1 <a name='1102'>
+        KK=kme-K<a name='1103'>
+        DO I=its,ite<a name='1104'>
+          UTEND=(A1(I,KK)-UX(I,K))*RDT                                           <a name='1105'>
+          VTEND=(A2(I,KK)-VX(I,K))*RDT                                           <a name='1106'>
+          UTNP(I,K)=UTNP(I,K)+UTEND                                              <a name='1107'>
+          VTNP(I,K)=VTNP(I,K)+VTEND                                              <a name='1108'>
+        ENDDO                                                                    <a name='1109'>
+      ENDDO                                                                      <a name='1110'>
+                                                                                 <a name='1111'>
+<font color=#447700>!     COMPUTE TRIDIAGONAL MATRIX ELEMENTS FOR CLOUD                              <a name='1112'></font>
+                                                                                 <a name='1113'>
+      DO I=its,ite<a name='1114'>
+      DO K=kts,kte<a name='1115'>
+         AU(i,k)=0.<a name='1116'>
+         AL(i,k)=0.<a name='1117'>
+         AD(i,k)=0.<a name='1118'>
+         A1(i,k)=0.<a name='1119'>
+         A2(i,k)=0.<a name='1120'>
+      ENDDO<a name='1121'>
+      ENDDO<a name='1122'>
+ <a name='1123'>
+<font color=#447700>!     IF(IMOIST.EQ.1)GOTO 690                                                <a name='1124'></font>
+      DO I=its,ite<a name='1125'>
+        AD(I,1)=1.                                                               <a name='1126'>
+        A1(I,1)=QCX(I,KL)                                                        <a name='1127'>
+        A2(I,1)=QIX(I,KL)                                                        <a name='1128'>
+      ENDDO                                                                      <a name='1129'>
+<font color=#447700>!                                                                                <a name='1130'></font>
+      DO K=kte,kts+1,-1<a name='1131'>
+        KK=kme-K<a name='1132'>
+        DO I=its,ite<a name='1133'>
+          DTODSD=DT4/dz8w2d(I,K)                                                   <a name='1134'>
+          DTODSU=DT4/dz8w2d(I,K-1)                                                 <a name='1135'>
+          DSIG=z2d(I,K)-z2d(I,K-1)                                                 <a name='1136'>
+          DSIG=-DSIG<a name='1137'>
+          RDZ=1./DZA(I,K-1)                                                      <a name='1138'>
+          A1(I,KK+1)=QCX(I,K-1)                                                  <a name='1139'>
+          A2(I,KK+1)=QIX(I,K-1)                                                  <a name='1140'>
+          DSDZ2=DSIG*XKZH(I,K)*RDZ*RDZ                                           <a name='1141'>
+          AU(I,KK)=-DTODSD*DSDZ2                                                 <a name='1142'>
+          AL(I,KK)=-DTODSU*DSDZ2                                                 <a name='1143'>
+          AD(I,KK)=AD(I,KK)-AU(I,KK)                                             <a name='1144'>
+          AD(I,KK+1)=1.-AL(I,KK)                                                 <a name='1145'>
+        ENDDO                                                                    <a name='1146'>
+      ENDDO                                                                      <a name='1147'>
+                                                                                 <a name='1148'>
+<font color=#447700>!     SOLVE TRIDIAGONAL PROBLEM FOR CLOUD                                        <a name='1149'></font>
+                                                                                 <a name='1150'>
+      CALL <A href='../../html_code/phys/module_bl_mrf.F.html#TRIDI2'>TRIDI2</A><A href='../../html_code/phys/module_bl_mrf.F.html#MRF2D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRIDI2_4">(AL,AD,AU,A1,A2,AU,A1,A2,                 &amp;<a name='1151'>
+                  its,ite,kts,kte                          )<a name='1152'>
+<font color=#447700>!<a name='1153'></font>
+      DO K=kte,kts,-1<a name='1154'>
+        KK=kme-K                                                                <a name='1155'>
+        DO I=its,ite<a name='1156'>
+          QCTEND=(A1(I,KK)-QCX(I,K))*RDT                                         <a name='1157'>
+          QITEND=(A2(I,KK)-QIX(I,K))*RDT                                         <a name='1158'>
+          QCTNP(I,K)=QCTNP(I,K)+QCTEND                                           <a name='1159'>
+          QITNP(I,K)=QITNP(I,K)+QITEND                                           <a name='1160'>
+        ENDDO                                                                    <a name='1161'>
+      ENDDO                                                                      <a name='1162'>
+<font color=#447700>!                                                                                <a name='1163'></font>
+<font color=#447700>!---- END OF VERTICAL DIFFUSION                                                  <a name='1164'></font>
+<font color=#447700>!                                                                                <a name='1165'></font>
+  690 CONTINUE                                                                   <a name='1166'>
+<font color=#447700>!                                                                                <a name='1167'></font>
+<font color=#447700>!-----CALCULATION OF NEW VALUES DUE TO VERTICAL EXCHANGE PROCESSES IS            <a name='1168'></font>
+<font color=#447700>!     COMPLETED. THE FINAL STEP IS TO ADD THE TENDENCIES CALCULATED              <a name='1169'></font>
+<font color=#447700>!     IN HIRPBL TO THOSE OF MM4.                                                 <a name='1170'></font>
+                                                                                 <a name='1171'>
+      DO 820 K=kts,kte<a name='1172'>
+        NK=kme-K<a name='1173'>
+        DO 820 I=its,ite<a name='1174'>
+          U2DTEN(I,NK)=UTNP(I,K)<a name='1175'>
+          V2DTEN(I,NK)=VTNP(I,K)<a name='1176'>
+  820   CONTINUE                                                                 <a name='1177'>
+<font color=#447700>!                                                                                <a name='1178'></font>
+<font color=#447700>!     IF(J.EQ.1.AND.IN.GT.1)GOTO 860                                             <a name='1179'></font>
+<font color=#447700>!SUE  JBGN=3                                                                     <a name='1180'></font>
+<font color=#447700>!SUE  JEND=JLXM-1                                                                <a name='1181'></font>
+<a name='1182'>
+<font color=#447700>! change when nest<a name='1183'></font>
+<font color=#447700>!SUE  JBGN=2                                                                   <a name='1184'></font>
+<font color=#447700>!SUE  JEND=JLXM                                                                <a name='1185'></font>
+<a name='1186'>
+      JBGN=jts<a name='1187'>
+      JEND=jte<a name='1188'>
+      IBGN=its                                                                   <a name='1189'>
+      IEND=ite<a name='1190'>
+<a name='1191'>
+<font color=#447700>!     IF(J.LT.JBGN.OR.J.GT.JEND)GOTO 860                                         <a name='1192'></font>
+<font color=#447700>!SUE  IBGN=3                                                                     <a name='1193'></font>
+<font color=#447700>!SUE  IEND=ILXM-1                                                                <a name='1194'></font>
+<a name='1195'>
+<font color=#447700>! change when nest<a name='1196'></font>
+<font color=#447700>!SUE  IBGN=2                                                                   <a name='1197'></font>
+<font color=#447700>!SUE  IEND=ILXM                                                                <a name='1198'></font>
+<a name='1199'>
+      DO 830 K=kts,kte<a name='1200'>
+        NK=kme-K<a name='1201'>
+        DO 830 I=IBGN,IEND                                                       <a name='1202'>
+          T2DTEN(I,NK)=TTNP(I,K)<a name='1203'>
+  830   CONTINUE                                                                 <a name='1204'>
+<font color=#447700>!                                                                                <a name='1205'></font>
+<font color=#447700>!     IF(IDRY.EQ.1)GOTO 860                                                  <a name='1206'></font>
+      DO 840 K=kts,kte<a name='1207'>
+        NK=kme-K<a name='1208'>
+        DO 840 I=IBGN,IEND                                                       <a name='1209'>
+          QV2DTEN(I,NK)=QTNP(I,K) <a name='1210'>
+  840   CONTINUE                                                                 <a name='1211'>
+                                                                                 <a name='1212'>
+<font color=#447700>!     IF(IMOIST.EQ.1)GOTO 860<a name='1213'></font>
+      DO 850 K=kts,kte<a name='1214'>
+        NK=kme-K<a name='1215'>
+        DO 850 I=IBGN,IEND<a name='1216'>
+           QC2DTEN(I,NK)=QCTNP(I,K)<a name='1217'>
+  850   CONTINUE<a name='1218'>
+<a name='1219'>
+      IF(P_QI .ge. P_FIRST_SCALAR) THEN<a name='1220'>
+        DO K=kts,kte<a name='1221'>
+        NK=kme-K<a name='1222'>
+          DO I=IBGN,IEND<a name='1223'>
+             QI2DTEN(I,NK)=QITNP(I,K)<a name='1224'>
+          ENDDO<a name='1225'>
+        ENDDO<a name='1226'>
+      ENDIF<a name='1227'>
+<a name='1228'>
+  860 CONTINUE                                                                   <a name='1229'>
+<font color=#447700>!                                                                                <a name='1230'></font>
+<font color=#447700>!-----APPLY ASSELIN FILTER TO TGD FOR LARGE TIME STEP:                           <a name='1231'></font>
+<font color=#447700>!                                                                                <a name='1232'></font>
+<font color=#447700>!     DO 885 I=its,ite<a name='1233'></font>
+<font color=#447700>!       TSK(I)=TSK(I)*(PS(I)/100.)**ROVCP                                    <a name='1234'></font>
+<font color=#447700>! 885 CONTINUE                                                                   <a name='1235'></font>
+<font color=#447700>!                                                                                <a name='1236'></font>
+  940 CONTINUE                                                                   <a name='1237'>
+<font color=#447700>!                                                                                <a name='1238'></font>
+<font color=#447700>! KPBL IS NEEDED FOR THE FDDA, AND SINCE THERE IS NO LONGER JUST ONE             <a name='1239'></font>
+<font color=#447700>! LARGE "J LOOP" IT MUST BE STORED AS (I,J)...                                   <a name='1240'></font>
+<font color=#447700>!                                                                                <a name='1241'></font>
+<font color=#447700>! USE NEW DIAGNOSED PBL DEPTH (CALCULATED WITH brcr=0.0)<a name='1242'></font>
+<font color=#447700>! PBL IS USED FOR OUTPUT AND NEXT-TIME-STEP BELJAARS CALC IN SFCLAY<a name='1243'></font>
+      DO 950 I=its,ite<a name='1244'>
+        KPBL1D(I)=KPBL0(I)                                                      <a name='1245'>
+        PBL(I)=PBL0(I)<a name='1246'>
+  950 CONTINUE                                                                   <a name='1247'>
+<a name='1248'>
+   END SUBROUTINE MRF2D<a name='1249'>
+<a name='1250'>
+<font color=#447700>!================================================================          <a name='1251'></font>
+<A NAME='TRIDI2'><A href='../../html_code/phys/module_bl_mrf.F.html#TRIDI2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1252'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>TRIDI2</font>(CL,CM,CU,R1,R2,AU,A1,A2,                   &amp; <A href='../../call_to/TRIDI2.html' TARGET='index'>4</A>,<A href='../../call_from/TRIDI2.html' TARGET='index'>1</A><a name='1253'>
+                     its,ite,kts,kte                            )<a name='1254'>
+<font color=#447700>!----------------------------------------------------------------<a name='1255'></font>
+   IMPLICIT NONE<a name='1256'>
+<font color=#447700>!----------------------------------------------------------------<a name='1257'></font>
+<a name='1258'>
+   INTEGER, INTENT(IN )      ::     its,ite, kts,kte<a name='1259'>
+                                   <a name='1260'>
+   REAL, DIMENSION( its:ite, kts+1:kte+1 )                    , &amp;<a name='1261'>
+         INTENT(IN   )  ::                                  CL<a name='1262'>
+<a name='1263'>
+   REAL, DIMENSION( its:ite, kts:kte )                        , &amp;<a name='1264'>
+         INTENT(IN   )  ::                                  CM, &amp;<a name='1265'>
+                                                            R1, &amp;<a name='1266'>
+                                                            R2<a name='1267'>
+   REAL, DIMENSION( its:ite, kts:kte )                        , &amp;<a name='1268'>
+         INTENT(INOUT)  ::                                  AU, &amp;<a name='1269'>
+                                                            CU, &amp;<a name='1270'>
+                                                            A1, &amp;<a name='1271'>
+                                                            A2<a name='1272'>
+<a name='1273'>
+   REAL    :: FK<a name='1274'>
+   INTEGER :: I,K,L,N<a name='1275'>
+<a name='1276'>
+<font color=#447700>!----------------------------------------------------------------         <a name='1277'></font>
+<a name='1278'>
+   L=ite <a name='1279'>
+   N=kte<a name='1280'>
+<a name='1281'>
+   DO I=its,L<a name='1282'>
+     FK=1./CM(I,1)                                                            <a name='1283'>
+     AU(I,1)=FK*CU(I,1)                                                       <a name='1284'>
+     A1(I,1)=FK*R1(I,1)                                                       <a name='1285'>
+     A2(I,1)=FK*R2(I,1)                                                       <a name='1286'>
+   ENDDO                                                                      <a name='1287'>
+   DO K=2,N-1<a name='1288'>
+     DO I=its,L<a name='1289'>
+       FK=1./(CM(I,K)-CL(I,K)*AU(I,K-1))                                      <a name='1290'>
+       AU(I,K)=FK*CU(I,K)                                                     <a name='1291'>
+       A1(I,K)=FK*(R1(I,K)-CL(I,K)*A1(I,K-1))                                 <a name='1292'>
+       A2(I,K)=FK*(R2(I,K)-CL(I,K)*A2(I,K-1))                                 <a name='1293'>
+     ENDDO                                                                    <a name='1294'>
+   ENDDO                                                                      <a name='1295'>
+   DO I=its,L<a name='1296'>
+     FK=1./(CM(I,N)-CL(I,N)*AU(I,N-1))                                        <a name='1297'>
+     A1(I,N)=FK*(R1(I,N)-CL(I,N)*A1(I,N-1))                                   <a name='1298'>
+     A2(I,N)=FK*(R2(I,N)-CL(I,N)*A2(I,N-1))                                   <a name='1299'>
+<a name='1300'>
+   ENDDO                                                                      <a name='1301'>
+   DO K=N-1,kts,-1                                                              <a name='1302'>
+     DO I=its,L<a name='1303'>
+       A1(I,K)=A1(I,K)-AU(I,K)*A1(I,K+1)                                      <a name='1304'>
+       A2(I,K)=A2(I,K)-AU(I,K)*A2(I,K+1)                                      <a name='1305'>
+     ENDDO                                                                    <a name='1306'>
+   ENDDO                                                                      <a name='1307'>
+<a name='1308'>
+   END SUBROUTINE TRIDI2<a name='1309'>
+      <a name='1310'>
+<font color=#447700>!===================================================================<a name='1311'></font>
+<A NAME='MRFINIT'><A href='../../html_code/phys/module_bl_mrf.F.html#MRFINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1312'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>mrfinit</font>(RUBLTEN,RVBLTEN,RTHBLTEN,RQVBLTEN,           &amp; <A href='../../call_to/MRFINIT.html' TARGET='index'>1</A><a name='1313'>
+                      RQCBLTEN,RQIBLTEN,P_QI,P_FIRST_SCALAR,       &amp;<a name='1314'>
+                      restart, allowed_to_read ,                   &amp;<a name='1315'>
+                      ids, ide, jds, jde, kds, kde,                &amp;<a name='1316'>
+                      ims, ime, jms, jme, kms, kme,                &amp;<a name='1317'>
+                      its, ite, jts, jte, kts, kte                 )<a name='1318'>
+<font color=#447700>!-------------------------------------------------------------------          <a name='1319'></font>
+   IMPLICIT NONE<a name='1320'>
+<font color=#447700>!-------------------------------------------------------------------          <a name='1321'></font>
+   LOGICAL , INTENT(IN)          :: restart , allowed_to_read<a name='1322'>
+   INTEGER , INTENT(IN)          ::  ids, ide, jds, jde, kds, kde, &amp;<a name='1323'>
+                                     ims, ime, jms, jme, kms, kme, &amp;<a name='1324'>
+                                     its, ite, jts, jte, kts, kte<a name='1325'>
+   INTEGER , INTENT(IN)          ::  P_QI,P_FIRST_SCALAR<a name='1326'>
+<a name='1327'>
+   REAL , DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(OUT) ::         &amp;<a name='1328'>
+                                                         RUBLTEN, &amp;<a name='1329'>
+                                                         RVBLTEN, &amp;<a name='1330'>
+                                                         RTHBLTEN, &amp;<a name='1331'>
+                                                         RQVBLTEN, &amp;<a name='1332'>
+                                                         RQCBLTEN, &amp; <a name='1333'>
+                                                         RQIBLTEN<a name='1334'>
+   INTEGER :: i, j, k, itf, jtf, ktf<a name='1335'>
+<a name='1336'>
+   jtf=min0(jte,jde-1)<a name='1337'>
+   ktf=min0(kte,kde-1)<a name='1338'>
+   itf=min0(ite,ide-1)<a name='1339'>
+<a name='1340'>
+   IF(.not.restart)THEN<a name='1341'>
+     DO j=jts,jtf<a name='1342'>
+     DO k=kts,ktf<a name='1343'>
+     DO i=its,itf<a name='1344'>
+        RUBLTEN(i,k,j)=0.<a name='1345'>
+        RVBLTEN(i,k,j)=0.<a name='1346'>
+        RTHBLTEN(i,k,j)=0.<a name='1347'>
+        RQVBLTEN(i,k,j)=0.<a name='1348'>
+        RQCBLTEN(i,k,j)=0.<a name='1349'>
+     ENDDO<a name='1350'>
+     ENDDO<a name='1351'>
+     ENDDO<a name='1352'>
+   ENDIF<a name='1353'>
+<a name='1354'>
+   IF (P_QI .ge. P_FIRST_SCALAR .and. .not.restart) THEN<a name='1355'>
+      DO j=jts,jtf<a name='1356'>
+      DO k=kts,ktf<a name='1357'>
+      DO i=its,itf<a name='1358'>
+         RQIBLTEN(i,k,j)=0.<a name='1359'>
+      ENDDO<a name='1360'>
+      ENDDO<a name='1361'>
+      ENDDO<a name='1362'>
+   ENDIF<a name='1363'>
+<a name='1364'>
+   END SUBROUTINE mrfinit<a name='1365'>
+<a name='1366'>
+<font color=#447700>!-------------------------------------------------------------------          <a name='1367'></font>
+<a name='1368'>
+END MODULE module_bl_mrf<a name='1369'>
+<a name='1370'>
+</pre></body></html>

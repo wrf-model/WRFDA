@@ -1,0 +1,141 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:CONSTANTS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_MODEL_CONSTANTS'><A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+ <font color=#993300>MODULE </font><font color=#cc0000>module_model_constants</font> <A href='../../call_to/MODULE_MODEL_CONSTANTS.html' TARGET='index'>45</A><a name='6'>
+<a name='7'>
+   <font color=#447700>!  2. Following are constants for use in defining real number bounds.<a name='8'></font>
+<a name='9'>
+   <font color=#447700>!  A really small number.<a name='10'></font>
+<a name='11'>
+   REAL    , PARAMETER :: epsilon         = 1.E-15<a name='12'>
+<a name='13'>
+   <font color=#447700>!  4. Following is information related to the physical constants.<a name='14'></font>
+<a name='15'>
+   <font color=#447700>!  These are the physical constants used within the model.<a name='16'></font>
+<a name='17'>
+<font color=#447700>! JM NOTE -- can we name this grav instead?<a name='18'></font>
+   REAL    , PARAMETER :: g = 9.81  <font color=#447700>! acceleration due to gravity (m {s}^-2)<a name='19'></font>
+<a name='20'>
+#if ( NMM_CORE == 1 )<a name='21'>
+   REAL    , PARAMETER :: r_d          = 287.04<a name='22'>
+   REAL    , PARAMETER :: cp           = 1004.6<a name='23'>
+#else<a name='24'>
+   REAL    , PARAMETER :: r_d          = 287.<a name='25'>
+   REAL    , PARAMETER :: cp           = 7.*r_d/2.<a name='26'>
+#endif<a name='27'>
+<a name='28'>
+   REAL    , PARAMETER :: r_v          = 461.6<a name='29'>
+   REAL    , PARAMETER :: cv           = cp-r_d<a name='30'>
+   REAL    , PARAMETER :: cpv          = 4.*r_v<a name='31'>
+   REAL    , PARAMETER :: cvv          = cpv-r_v<a name='32'>
+   REAL    , PARAMETER :: cvpm         = -cv/cp<a name='33'>
+   REAL    , PARAMETER :: cliq         = 4190.<a name='34'>
+   REAL    , PARAMETER :: cice         = 2106.<a name='35'>
+   REAL    , PARAMETER :: psat         = 610.78<a name='36'>
+   REAL    , PARAMETER :: rcv          = r_d/cv<a name='37'>
+   REAL    , PARAMETER :: rcp          = r_d/cp<a name='38'>
+   REAL    , PARAMETER :: rovg         = r_d/g<a name='39'>
+   REAL    , PARAMETER :: c2           = cp * rcv<a name='40'>
+<a name='41'>
+   REAL    , PARAMETER :: p1000mb      = 100000.<a name='42'>
+   REAL    , PARAMETER :: t0           = 300.<a name='43'>
+   REAL    , PARAMETER :: p0           = p1000mb<a name='44'>
+   REAL    , PARAMETER :: cpovcv       = cp/(cp-r_d)<a name='45'>
+   REAL    , PARAMETER :: cvovcp       = 1./cpovcv<a name='46'>
+   REAL    , PARAMETER :: rvovrd       = r_v/r_d<a name='47'>
+<a name='48'>
+   REAL    , PARAMETER :: reradius     = 1./6370.e03 <a name='49'>
+<a name='50'>
+   REAL    , PARAMETER :: asselin      = .025<a name='51'>
+<font color=#447700>!   REAL    , PARAMETER :: asselin      = .0<a name='52'></font>
+   REAL    , PARAMETER :: cb           = 25.<a name='53'>
+<a name='54'>
+   REAL    , PARAMETER :: XLV0         = 3.15E6<a name='55'>
+   REAL    , PARAMETER :: XLV1         = 2370.<a name='56'>
+   REAL    , PARAMETER :: XLS0         = 2.905E6<a name='57'>
+   REAL    , PARAMETER :: XLS1         = 259.532<a name='58'>
+<a name='59'>
+   REAL    , PARAMETER :: XLS          = 2.85E6<a name='60'>
+   REAL    , PARAMETER :: XLV          = 2.5E6<a name='61'>
+   REAL    , PARAMETER :: XLF          = 3.50E5<a name='62'>
+<a name='63'>
+   REAL    , PARAMETER :: rhowater     = 1000.<a name='64'>
+   REAL    , PARAMETER :: rhosnow      = 100.<a name='65'>
+   REAL    , PARAMETER :: rhoair0      = 1.28<a name='66'>
+<a name='67'>
+   REAL    , PARAMETER :: DEGRAD       = 3.1415926/180.<a name='68'>
+   REAL    , PARAMETER :: DPD          = 360./365.<a name='69'>
+<a name='70'>
+   REAL    , PARAMETER ::  SVP1=0.6112<a name='71'>
+   REAL    , PARAMETER ::  SVP2=17.67<a name='72'>
+   REAL    , PARAMETER ::  SVP3=29.65<a name='73'>
+   REAL    , PARAMETER ::  SVPT0=273.15<a name='74'>
+   REAL    , PARAMETER ::  EP_1=R_v/R_d-1.<a name='75'>
+   REAL    , PARAMETER ::  EP_2=R_d/R_v<a name='76'>
+   REAL    , PARAMETER ::  KARMAN=0.4<a name='77'>
+   REAL    , PARAMETER ::  EOMEG=7.2921E-5<a name='78'>
+   REAL    , PARAMETER ::  STBOLT=5.67051E-8<a name='79'>
+<a name='80'>
+                                      <font color=#447700>! proportionality constants for eddy viscosity coefficient calc<a name='81'></font>
+   REAL    , PARAMETER ::  c_s = .25  <font color=#447700>! turbulence parameterization constant, for smagorinsky<a name='82'></font>
+   REAL    , PARAMETER ::  c_k = .15  <font color=#447700>! turbulence parameterization constant, for TKE<a name='83'></font>
+   REAL    , PARAMETER ::  prandtl = 1./3.0<a name='84'>
+                                         <font color=#447700>! constants for w-damping option<a name='85'></font>
+   REAL    , PARAMETER ::  w_alpha = 0.3 <font color=#447700>! strength m/s/s<a name='86'></font>
+   REAL    , PARAMETER ::  w_beta  = 1.0 <font color=#447700>! activation cfl number<a name='87'></font>
+<a name='88'>
+       REAL , PARAMETER ::  pq0=379.90516<a name='89'>
+<font color=#447700>!      REAL , PARAMETER ::  epsq2=0.2<a name='90'></font>
+       REAL , PARAMETER ::  epsq2=0.02<a name='91'>
+       REAL , PARAMETER ::  a2=17.2693882<a name='92'>
+       REAL , PARAMETER ::  a3=273.16<a name='93'>
+       REAL , PARAMETER ::  a4=35.86<a name='94'>
+       REAL , PARAMETER ::  epsq=1.e-12<a name='95'>
+       REAL , PARAMETER ::  p608=rvovrd-1.<a name='96'>
+<font color=#447700>!#if ( NMM_CORE == 1 )<a name='97'></font>
+       REAL , PARAMETER ::  climit=1.e-20<a name='98'>
+       REAL , PARAMETER ::  cm1=2937.4<a name='99'>
+       REAL , PARAMETER ::  cm2=4.9283<a name='100'>
+       REAL , PARAMETER ::  cm3=23.5518<a name='101'>
+<font color=#447700>!       REAL , PARAMETER ::  defc=8.0<a name='102'></font>
+<font color=#447700>!       REAL , PARAMETER ::  defm=32.0<a name='103'></font>
+       REAL , PARAMETER ::  defc=0.0<a name='104'>
+       REAL , PARAMETER ::  defm=99999.0<a name='105'>
+       REAL , PARAMETER ::  epsfc=1./1.05<a name='106'>
+       REAL , PARAMETER ::  epswet=0.0<a name='107'>
+       REAL , PARAMETER ::  fcdif=1./3.<a name='108'>
+<font color=#447700>!       REAL , PARAMETER ::  fcm=0.003<a name='109'></font>
+       REAL , PARAMETER ::  fcm=0.0<a name='110'>
+       REAL , PARAMETER ::  gma=-r_d*(1.-rcp)*0.5<a name='111'>
+       REAL , PARAMETER ::  p400=40000.0<a name='112'>
+       REAL , PARAMETER ::  phitp=15000.0<a name='113'>
+       REAL , PARAMETER ::  pi2=2.*3.1415926<a name='114'>
+       REAL , PARAMETER ::  plbtm=105000.0<a name='115'>
+       REAL , PARAMETER ::  plomd=64200.0<a name='116'>
+       REAL , PARAMETER ::  pmdhi=35000.0<a name='117'>
+       REAL , PARAMETER ::  q2ini=0.50<a name='118'>
+       REAL , PARAMETER ::  rfcp=0.25/cp<a name='119'>
+       REAL , PARAMETER ::  rhcrit_land=0.75<a name='120'>
+       REAL , PARAMETER ::  rhcrit_sea=0.80<a name='121'>
+       REAL , PARAMETER ::  rlag=14.8125<a name='122'>
+       REAL , PARAMETER ::  rlx=0.90<a name='123'>
+       REAL , PARAMETER ::  scq2=50.0<a name='124'>
+       REAL , PARAMETER ::  slopht=0.001<a name='125'>
+       REAL , PARAMETER ::  tlc=2.*0.703972477<a name='126'>
+       REAL , PARAMETER ::  wa=0.15<a name='127'>
+       REAL , PARAMETER ::  wght=0.35<a name='128'>
+       REAL , PARAMETER ::  wpc=0.075<a name='129'>
+       REAL , PARAMETER ::  z0land=0.10<a name='130'>
+       REAL , PARAMETER ::  z0max=0.01<a name='131'>
+       REAL , PARAMETER ::  z0sea=0.001<a name='132'>
+<font color=#447700>!#endif<a name='133'></font>
+<a name='134'>
+<a name='135'>
+ CONTAINS<a name='136'>
+<A NAME='INIT_MODULE_MODEL_CONSTANTS'><A href='../../html_code/share/module_model_constants.F.html#INIT_MODULE_MODEL_CONSTANTS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='137'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_model_constants</font> <A href='../../call_to/INIT_MODULE_MODEL_CONSTANTS.html' TARGET='index'>2</A><a name='138'>
+   END SUBROUTINE init_module_model_constants<a name='139'>
+ END MODULE module_model_constants<a name='140'>
+</pre></body></html>

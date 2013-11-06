@@ -1,0 +1,69 @@
+<HTML> <BODY BGCOLOR=#ccccdd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A href='../../html_code/include/bench_solve_em_def.h.html' TARGET='top_target'><IMG SRC="../../gif/bar_grey.gif" border=0></A><a name='bench_solve_em_def.h'><a name='2'>
+<font color=#993300>include file: </font><font color=#cc0000>bench_solve_em_def.h</font> <A href='../../call_to/bench_solve_em_def.h.html' TARGET='index'>4</A>,<A href='../../call_from/bench_solve_em_def.h.html' TARGET='index'>3</A><a name='3'>
+#ifdef BENCH<a name='4'>
+   INTEGER, EXTERNAL :: rsl_internal_microclock<a name='5'>
+   INTEGER btimex, solve_tim<a name='6'>
+#define SOLVE_START     solve_tim = <A href='../../html_code/dyn_em/module_4dvaropt.F.html#RSL_INTERNAL_MICROCLOCK'>rsl_internal_microclock</A><A href='../../html_code/include/bench_solve_em_def.h.html#bench_solve_em_def.h' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RSL_INTERNAL_MICROCLOCK_4">()<a name='7'>
+#define SOLVE_END       solve_tim = <A href='../../html_code/dyn_em/module_4dvaropt.F.html#RSL_INTERNAL_MICROCLOCK'>rsl_internal_microclock</A><A href='../../html_code/include/bench_solve_em_def.h.html#bench_solve_em_def.h' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RSL_INTERNAL_MICROCLOCK_5">() - solve_tim<a name='8'>
+#define BENCH_DECL(A)   integer A<a name='9'>
+#define BENCH_INIT(A)   A=0<a name='10'>
+#define BENCH_START(A)  btimex=<A href='../../html_code/dyn_em/module_4dvaropt.F.html#RSL_INTERNAL_MICROCLOCK'>rsl_internal_microclock</A><A href='../../html_code/include/bench_solve_em_def.h.html#bench_solve_em_def.h' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RSL_INTERNAL_MICROCLOCK_6">()<a name='11'>
+#define BENCH_END(A)    A=A+rsl_internal_microclock()-btimex<a name='12'>
+#define BENCH_REPORT(A) write(0,*)'A= ',A<a name='13'>
+BENCH_DECL(step_prep_tim)<a name='14'>
+BENCH_DECL(set_phys_bc_tim)<a name='15'>
+BENCH_DECL(init_zero_tend_tim)<a name='16'>
+BENCH_DECL(phy_prep_tim)<a name='17'>
+BENCH_DECL(rad_driver_tim)<a name='18'>
+BENCH_DECL(surf_driver_tim)<a name='19'>
+BENCH_DECL(pbl_driver_tim)<a name='20'>
+BENCH_DECL(cu_driver_tim)<a name='21'>
+BENCH_DECL(cal_phy_tend)<a name='22'>
+BENCH_DECL(comp_diff_metrics_tim)<a name='23'>
+BENCH_DECL(tke_diff_bc_tim)<a name='24'>
+BENCH_DECL(deform_div_tim)<a name='25'>
+BENCH_DECL(calc_tke_tim)<a name='26'>
+BENCH_DECL(phy_bc_tim)<a name='27'>
+BENCH_DECL(update_phy_ten_tim)<a name='28'>
+BENCH_DECL(tke_rhs_tim)<a name='29'>
+BENCH_DECL(vert_diff_tim)<a name='30'>
+BENCH_DECL(hor_diff_tim)<a name='31'>
+BENCH_DECL(rk_tend_tim)<a name='32'>
+BENCH_DECL(relax_bdy_dry_tim)<a name='33'>
+BENCH_DECL(small_step_prep_tim)<a name='34'>
+BENCH_DECL(set_phys_bc2_tim)<a name='35'>
+BENCH_DECL(advance_uv_tim)<a name='36'>
+BENCH_DECL(spec_bdy_uv_tim)<a name='37'>
+BENCH_DECL(advance_mu_t_tim)<a name='38'>
+BENCH_DECL(spec_bdy_t_tim)<a name='39'>
+BENCH_DECL(sumflux_tim)<a name='40'>
+BENCH_DECL(advance_w_tim)<a name='41'>
+BENCH_DECL(spec_bdynhyd_tim)<a name='42'>
+BENCH_DECL(cald_p_rho_tim)<a name='43'>
+BENCH_DECL(phys_bc_tim)<a name='44'>
+BENCH_DECL(calc_mu_uv_tim)<a name='45'>
+BENCH_DECL(small_step_finish_tim)<a name='46'>
+BENCH_DECL(rk_scalar_tend_tim)<a name='47'>
+BENCH_DECL(rlx_bdy_scalar_tim)<a name='48'>
+BENCH_DECL(update_scal_tim)<a name='49'>
+BENCH_DECL(flow_depbdy_tim)<a name='50'>
+BENCH_DECL(tke_adv_tim)<a name='51'>
+BENCH_DECL(calc_p_rho_tim)<a name='52'>
+BENCH_DECL(diag_w_tim)<a name='53'>
+BENCH_DECL(bc_end_tim)<a name='54'>
+BENCH_DECL(advance_ppt_tim)<a name='55'>
+BENCH_DECL(moist_physics_prep_tim)<a name='56'>
+BENCH_DECL(micro_driver_tim)<a name='57'>
+BENCH_DECL(moist_phys_end_tim)<a name='58'>
+BENCH_DECL(time_filt_tim)<a name='59'>
+BENCH_DECL(bc_2d_tim)<a name='60'>
+#else<a name='61'>
+#define SOLVE_START<a name='62'>
+#define SOLVE_END<a name='63'>
+#define BENCH_INIT(A)<a name='64'>
+#define BENCH_START(A)<a name='65'>
+#define BENCH_END(A)<a name='66'>
+#define BENCH_REPORT(A)<a name='67'>
+#endif<a name='68'>
+</pre></body></html>

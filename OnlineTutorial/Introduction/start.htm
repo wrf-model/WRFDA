@@ -1,0 +1,207 @@
+<html>
+
+<head>
+
+<title>ARW OnLine Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users OnLineTutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style6 {font-style: italic}
+.style7 {
+	font-family: "Courier New", Courier, mono;
+	font-size: 11pt;
+}
+.style10 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+	font-weight: bold;
+}
+.style11 {
+	color: #990000;
+	font-weight: bold;
+}
+.style12 {color: #990000}
+.style13 {color: #0066FF}
+-->
+</style></head>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#6A9EFF"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#FFFFFF"><img src="../images/MainImage.jpg" width="1000" height="56" border="0" usemap="#Map"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#6A9EFF">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edge.gif">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+      <p class="headingtext" id="Font18">Let's get Started </p>
+      <p class="bodytext"><strong id="Font14">Program flow for real data cases: </strong></p>
+      <blockquote>
+        <p class="bodytext"><img src="../images/WRF-flow1.png" width="371" height="50"> </p>
+        <p class="bodytext"><strong>BUT</strong>, the successful compilation of the WPS program <strong>DEPENDS</strong> on the successful compilation of the WRF ARW Model. The reason for  this, is that the two programs share common routines, like the WRF I/O API. Therefore, once we have the source code, we will first compile WRF ARW, and then WPS. </p>
+      </blockquote>
+      <p class="bodytext"><strong id="Font14">Program flow for idealized cases:</strong></p>
+      <blockquote>
+        <p class="bodytext"><img src="../images/WRF-flow2.png" width="233" height="50"> </p>
+      </blockquote>
+      <p class="bodytext">&nbsp;</p>
+      <p class="headingtext" id="Font14">GET Source Code </p>
+      <p class="bodytext">The source code for the WRF ARW model is available from the download page:</p>
+      <blockquote>
+        <p class="bodytext"><a href="http://www.mmm.ucar.edu/wrf/users/download/get_source.html">http://www.mmm.ucar.edu/wrf/users/download/get_source.html</a></p>
+        <p class="bodytext"><em> <strong>NOTE</strong>: From the above page, go to <span class="style11">New Users</span> (users will be asked to register - it is free), or <span class="style11">Returning Users</span> (users must supply their email address before they can download the code again). </em></p>
+        <blockquote>
+		<table width="600" border="0" cellspacing="5">
+          <tr>
+            <td width="45" valign="top"><img src="../images/wrf-tip.gif" width="31" height="30"></td>
+            <td width="536" bgcolor="#B4D3F4"><p class="bodytext">Also look at the &quot;Known Problems and Fixes&quot; pages for the latest information regarding bug fixes that have not yet been included in the released code:<br>
+                &nbsp;&nbsp;&nbsp;<a href="http://www.mmm.ucar.edu/wrf/users/wrfv3/known-prob.html">WRF Known Problems</a> ; <a href="http://www.mmm.ucar.edu/wrf/users/wpsv3/known-prob.html">WPS Known Problems </a></p></td>
+          </tr>
+        </table>
+		</blockquote>
+        <p class="bodytext">&nbsp;</p>
+      </blockquote>
+      <p class="bodytext"><strong id="Font14">Download</strong> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-      the latest WRF ARW tar  file, and<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- the latest WPS tar file <em>(if you plan on running real data cases) </em></p>
+      <p class="bodytext"><strong id="Font14">Working Directory</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;- Create a working directory <strong>WRF/</strong><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="style7">mkdir WRF</span> <br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-      Place the tar files you downloaded in your working directory</p>
+      <p class="bodytext">&nbsp;</p>
+      <p class="headingtext" id="Font14">Unpack the Code</p>
+      <table width="650" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td width="50">&nbsp;</td>
+          <td width="300"><span class="style10">For Real   Data cases:</span></td>
+          <td width="300"><span class="style10">For   Idealized Data cases:</span></td>
+        </tr>
+        <tr>
+          <td>&nbsp;</td>
+          <td valign="top"><p class="bodytext"><span class="style7">gunzip  WRFV3.TAR.gz</span><br>
+            <span class="style7">tar -xf WRFV3.TAR</span><br>
+          <span class="style7">gunzip  WPS.TAR.gz</span><br>
+<span class="style7">tar -xf WPS.TAR</span></p>
+            <p class="bodytext">This will create     directories:</p>
+            <p class="unixtext"><strong>WRFV3/</strong><br>
+          <strong>WPS/</strong></p></td>
+          <td valign="top"><p class="bodytext"><span class="style7">gunzip  WRFV3.TAR.gz</span><br>
+              <span class="style7">tar -xf WRFV3.TAR</span><br>
+          &nbsp;<br>
+          &nbsp;</p>
+          <p class="bodytext">This will create the   directory:</p>            
+          <p class="unixtext"><strong>WRFV3/</strong></p></td>
+        </tr>
+      </table>
+      <p class="bodytext"><span class="style6"><strong>NOTE</strong>: The tar file names will contain the latest version number (not shown here)</span><br>
+      &nbsp;</p>
+      <p class="bodytext style13"><strong id="Font14">Regardless of whether you are interested in Real or Idealized cases, WRF must be configured and compiled first, so let's examine the WRF code first. </strong></p>
+      <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style12">WRF Code</span><span class="style11"> &nbsp;</span>&nbsp;&nbsp;<a href="../Compile/index.html"><img src="../images/wrf_forward_arrow.jpg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+      </table>      
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#6A9EFF">
+		<p align="right" class="detailtextRed"> 
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+      </p></td>
+  </tr>
+
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="12,1,409,55" href="../index.htm">
+</map>
+</body>
+
+</html>
+

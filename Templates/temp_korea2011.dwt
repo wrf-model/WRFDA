@@ -1,0 +1,59 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>WRFDA 2011 Korea Practical</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../Tutorials/2011_Korea/assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../Tutorials/2011_Korea/assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+<link href="../Tutorials/2011_Korea/assets/zengarden.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="190" align="left" bgcolor="#FFFFFF"><img src="../Tutorials/2011_Korea/images/hands_on.jpg" width="190" height="125" border="0" align="right"></td>
+    <td width="1485" colspan="3" bgcolor="#FFFFFF"><div align="center">
+      <a href="../Tutorials/2011_Korea/index.html"><img src="../Tutorials/2011_Korea/images/header.gif" alt="page header" width="750" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#0000FF">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#FFFFFF"> <table width="70%" border="0" align="center" cellpadding="0" cellspacing="40">
+        <tr> 
+          <td valign="middle" bgcolor="#F5FBEF"><!-- TemplateBeginEditable name="maincontent" -->maincontent<!-- TemplateEndEditable --><br>
+            
+          </td>
+        </tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#0000FF">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../index.html" alt="practical_page_header">
+</map>
+</body>
+</html>

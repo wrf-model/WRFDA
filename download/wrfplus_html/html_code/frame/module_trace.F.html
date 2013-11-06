@@ -1,0 +1,1527 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='MODULE_TRACE'><A href='../../html_code/frame/module_trace.F.html#MODULE_TRACE' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>module </font><font color=#cc0000>module_trace</font> <A href='../../call_to/MODULE_TRACE.html' TARGET='index'>20</A><a name='3'>
+<a name='4'>
+<font color=#447700>!#ifdef DM_PARALLEL<a name='5'></font>
+<font color=#447700>!   use mpi, only : mpi_character, mpi_integer, mpi_sum, mpi_real8<a name='6'></font>
+<font color=#447700>!#endif<a name='7'></font>
+<a name='8'>
+<a name='9'>
+   use <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_trace.F.html#module_trace.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_27">, only : max_domains, max_moves<a name='10'>
+<a name='11'>
+   interface<a name='12'>
+      <font color=#447700>! c code<a name='13'></font>
+      subroutine memory_info(memory_used)<a name='14'>
+         integer, intent(out) :: memory_used<a name='15'>
+      end subroutine memory_info<a name='16'>
+   end interface<a name='17'>
+<a name='18'>
+#ifdef DM_PARALLEL<a name='19'>
+   INCLUDE 'mpif.h'<a name='20'>
+#endif<a name='21'>
+<a name='22'>
+   integer, parameter :: TraceIndentAmount      = 2   <font color=#447700>! default indent<a name='23'></font>
+   integer, parameter :: MaxNoRoutines          = 440 <font color=#447700>! maxium number of subroutines<a name='24'></font>
+   integer, parameter :: TraceNameLen           = 31  <font color=#447700>! Length of trace name<a name='25'></font>
+   integer, parameter :: trace_csv_unit = 8<a name='26'>
+   integer :: trace_start_points=0   <font color=#447700>! Number of routines to initiate trace<a name='27'></font>
+<a name='28'>
+   character (LEN=*), parameter :: &amp;<a name='29'>
+      pad = "                                                                "<a name='30'>
+<a name='31'>
+<a name='32'>
+   <font color=#447700>! Variables<a name='33'></font>
+<a name='34'>
+   integer :: TraceDepth                   <font color=#447700>! Current depth of trace<a name='35'></font>
+   integer :: NoRoutines                   <font color=#447700>! Number of routines so far<a name='36'></font>
+   integer :: NoCalls(MaxNoRoutines)       <font color=#447700>! Number of calls to each routine<a name='37'></font>
+   integer :: NoCallsBody(MaxNoRoutines)   <font color=#447700>! Number of calls in body of each routine<a name='38'></font>
+   integer :: CalledBy(MaxNoRoutines)<a name='39'>
+   integer :: MaxHeap(MaxNoRoutines)<a name='40'>
+   integer :: EntryHeap(MaxNoRoutines)<a name='41'>
+   integer :: Pointer                      <font color=#447700>! pointer to routine arrays in TIMER.<a name='42'></font>
+   integer :: BaseElapsedTime<a name='43'>
+   real :: BaseCPUTime<a name='44'>
+   integer :: LastSpace<a name='45'>
+<a name='46'>
+   <font color=#447700>! All CPU times in seconds<a name='47'></font>
+<a name='48'>
+   real    :: CPUTimeStart(MaxNoRoutines)<a name='49'>
+   real    :: CPUTimeLocalStart<a name='50'>
+   real    :: CPUTime(MaxNoRoutines)<a name='51'>
+   real    :: CPUTimeLocal(MaxNoRoutines)<a name='52'>
+   real    :: CPUTimeThisCall(MaxNoRoutines)<a name='53'>
+<a name='54'>
+   <font color=#447700>! All Elapsed times based on wall clock in seconds<a name='55'></font>
+<a name='56'>
+   real    :: ElapsedTimeStart(MaxNoRoutines)<a name='57'>
+   real    :: ElapsedTimeLocalStart<a name='58'>
+   real    :: ElapsedTime(MaxNoRoutines)<a name='59'>
+   real    :: ElapsedTimeLocal(MaxNoRoutines)<a name='60'>
+   real    :: ElapsedTimeThisCall(MaxNoRoutines)<a name='61'>
+<a name='62'>
+   logical :: TraceActive = .false.        <font color=#447700>! Is it active in this routine?<a name='63'></font>
+<a name='64'>
+   character (LEN=TraceNameLen) :: TraceStartedBy  <font color=#447700>! Subroutine name <a name='65'></font>
+                                                   <font color=#447700>! that activated trace<a name='66'></font>
+   character (LEN=TraceNameLen) :: TimerNames(MaxNoRoutines) <font color=#447700>! Subroutine names<a name='67'></font>
+   character (LEN=TraceNameLen) :: TraceNames(MaxNoRoutines) <font color=#447700>! for timing and tracing<a name='68'></font>
+<a name='69'>
+   logical :: trace_write = .false.<a name='70'>
+   logical, external :: rootproc<a name='71'>
+   integer :: local_communicator, mytask, ntasks, ierr, root<a name='72'>
+<a name='73'>
+<font color=#447700>! define as temporaries<a name='74'></font>
+#include &lt;<A href='../../html_code/include/namelist_defines.inc.html'>namelist_defines.inc</A>&gt;<A NAME="namelist_defines.inc_1"><A href='../../html_code/frame/module_trace.F.html#module_trace.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='75'>
+<a name='76'>
+contains<a name='77'>
+<a name='78'>
+<A NAME='TRACE_INIT'><A href='../../html_code/frame/module_trace.F.html#TRACE_INIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='79'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_init</font> <A href='../../call_to/TRACE_INIT.html' TARGET='index'>1</A>,<A href='../../call_from/TRACE_INIT.html' TARGET='index'>3</A><a name='80'>
+<a name='81'>
+   implicit none<a name='82'>
+#ifdef DM_PARALLEL<a name='83'>
+   include 'mpif.h'<a name='84'>
+#endif<a name='85'>
+<a name='86'>
+   <font color=#447700>!--------------------------------------------------------------------<a name='87'></font>
+   <font color=#447700>! Purpose: Initialise tracing<a name='88'></font>
+   <font color=#447700>!--------------------------------------------------------------------<a name='89'></font>
+<a name='90'>
+   integer :: IOStatus             <font color=#447700>! I/O return code<a name='91'></font>
+   integer :: Loop1<a name='92'>
+   character (len=200) :: TraceFile<a name='93'>
+   character(len=200) :: csvname<a name='94'>
+   character (len=10)  :: temp<a name='95'>
+<a name='96'>
+#ifdef DM_PARALLEL<a name='97'>
+   CALL mpi_comm_rank( mpi_comm_world, mytask, ierr )<a name='98'>
+   if (rootproc()) then<a name='99'>
+      root = mytask<a name='100'>
+   endif<a name='101'>
+#else<a name='102'>
+   root = 0<a name='103'>
+#endif<a name='104'>
+<a name='105'>
+<font color=#447700>! Statements that set the namelist vars to default vals<a name='106'></font>
+#  include &lt;<A href='../../html_code/include/namelist_defaults.inc.html'>namelist_defaults.inc</A>&gt;<A NAME="namelist_defaults.inc_2"><A href='../../html_code/frame/module_trace.F.html#TRACE_INIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='107'>
+<a name='108'>
+   IOStatus = 0<a name='109'>
+<a name='110'>
+   if (trace_all_pes .OR. mytask == root) then<a name='111'>
+     trace_write = .true.  <a name='112'>
+   end if<a name='113'>
+<a name='114'>
+   <font color=#447700>!-----------------------------------------------------------------<a name='115'></font>
+   <font color=#447700>! Open trace output file. <a name='116'></font>
+   <font color=#447700>!-----------------------------------------------------------------<a name='117'></font>
+<a name='118'>
+   if (trace_write .AND. trace_unit /= 0) then<a name='119'>
+      if (use_html) then<a name='120'>
+         write(unit=temp,fmt='(I10)') mytask<a name='121'>
+         TraceFile="trace/"//trim(adjustl(temp))//".html"<a name='122'>
+         open (&amp;<a name='123'>
+            unit=trace_unit, &amp;   <font color=#447700>! i:<a name='124'></font>
+            file=trim(tracefile), &amp;   <font color=#447700>! i:<a name='125'></font>
+            status="replace", &amp; <font color=#447700>! i:<a name='126'></font>
+            action="write", &amp;   <font color=#447700>! i:<a name='127'></font>
+            iostat=iostatus)    <font color=#447700>! o:<a name='128'></font>
+      else   <a name='129'>
+         write(unit=temp,fmt='(i10)') mytask<a name='130'>
+         tracefile="trace/"//trim(adjustl(temp))//".txt"<a name='131'>
+         open (&amp;<a name='132'>
+            unit=trace_unit, &amp;   <font color=#447700>! i:<a name='133'></font>
+            file=trim(tracefile), &amp;   <font color=#447700>! i:<a name='134'></font>
+            status="replace", &amp; <font color=#447700>! i:<a name='135'></font>
+            action="write", &amp;   <font color=#447700>! i:<a name='136'></font>
+            iostat=IOStatus)    <font color=#447700>! O:<a name='137'></font>
+      end if<a name='138'>
+<a name='139'>
+      if (IOStatus /= 0) then<a name='140'>
+         call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_INIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_1">("da_tracing/trace_init.inc",47, &amp;<a name='141'>
+            (/"Cannot open trace file "//TraceFile/))<a name='142'>
+      end if<a name='143'>
+   end if<a name='144'>
+<a name='145'>
+#ifdef DM_PARALLEL<a name='146'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_GET_DM_COMMUNICATOR'>wrf_get_dm_communicator</A><A href='../../html_code/frame/module_trace.F.html#TRACE_INIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_GET_DM_COMMUNICATOR_6"> (local_communicator)<a name='147'>
+   CALL mpi_comm_size( local_communicator, ntasks, ierr )<a name='148'>
+   CALL mpi_comm_rank( local_communicator, mytask, ierr )<a name='149'>
+#else<a name='150'>
+   ntasks = 1<a name='151'>
+   mytask = 0<a name='152'>
+#endif<a name='153'>
+   root = 0<a name='154'>
+<a name='155'>
+   if (trace_csv .and. rootproc()) then<a name='156'>
+         write(unit=csvname,fmt='(I10,A)') mytask,'.csv'<a name='157'>
+      open(unit=trace_csv_unit,file="trace/"//trim(adjustl(csvname)), &amp;<a name='158'>
+         status="replace",iostat=IOStatus)<a name='159'>
+      if (IOStatus /= 0) then<a name='160'>
+         call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_INIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_2">("da_tracing/trace_init.inc",57,(/"Cannot open "//csvname/))<a name='161'>
+      end if<a name='162'>
+   end if<a name='163'>
+<a name='164'>
+   <font color=#447700>!-----------------------------------------------------------------<a name='165'></font>
+   <font color=#447700>! Find out whether to trace memory usage. The Cray routine to check<a name='166'></font>
+   <font color=#447700>! memory usage is very slow, so it is best to only switch on memory<a name='167'></font>
+   <font color=#447700>! checking if actively required.<a name='168'></font>
+   <font color=#447700>!-----------------------------------------------------------------<a name='169'></font>
+<a name='170'>
+   <font color=#447700>!-----------------------------------------------------------------<a name='171'></font>
+   <font color=#447700>! Set up timing and memory usage<a name='172'></font>
+   <font color=#447700>!-----------------------------------------------------------------<a name='173'></font>
+<a name='174'>
+   do Loop1=1,MaxNoRoutines<a name='175'>
+      CPUTimeStart(Loop1)     = 0.0<a name='176'>
+      ElapsedTimeStart(Loop1) = 0.0<a name='177'>
+      ElapsedTime(Loop1)      = 0.0<a name='178'>
+      ElapsedTimeLocal(Loop1) = 0.0<a name='179'>
+      CPUTime(Loop1)          = 0.0<a name='180'>
+      CPUTimeLocal(Loop1)     = 0.0<a name='181'>
+      NoCalls(Loop1)          = 0<a name='182'>
+      NoCallsBody(Loop1)      = 0<a name='183'>
+      CalledBy(Loop1)         = 0<a name='184'>
+      MaxHeap(Loop1)          = 0<a name='185'>
+      TimerNames(Loop1)       = ""<a name='186'>
+   end do<a name='187'>
+<a name='188'>
+   Pointer     = 0<a name='189'>
+   NoRoutines  = 0<a name='190'>
+<a name='191'>
+   call system_clock(&amp;<a name='192'>
+      COUNT=BaseElapsedTime)<a name='193'>
+<a name='194'>
+   call cpu_time(BaseCPUTime)<a name='195'>
+<a name='196'>
+   <font color=#447700>! start trace output here so memory calculations are not distorted<a name='197'></font>
+   <font color=#447700>! by IO buffer being grabbed later<a name='198'></font>
+<a name='199'>
+   TraceDepth = 0<a name='200'>
+<a name='201'>
+   if (trace_write) then<a name='202'>
+      if (use_html) then<a name='203'>
+         write (unit=trace_unit,fmt='(A)') "&lt;html&gt;&lt;head&gt;&lt;title&gt;Tracing&lt;/title&gt;&lt;/head&gt;"<a name='204'>
+         write (unit=trace_unit,fmt='(A)') "&lt;body&gt;&lt;h1&gt;Trace Output&lt;/h1&gt;"<a name='205'>
+         write (unit=trace_unit,fmt='(A)') "&lt;ul&gt;"<a name='206'>
+         write (unit=trace_unit,fmt='(A)') "&lt;li&gt;&lt;a href=#tree&gt;Calling Tree&lt;/a&gt;"<a name='207'>
+         write (unit=trace_unit,fmt='(A)') "&lt;li&gt;&lt;a href=#local&gt;Local routine timings&lt;/a&gt;"<a name='208'>
+         write (unit=trace_unit,fmt='(A)') "&lt;li&gt;&lt;a href=#overall&gt;Overall routine timings&lt;/a&gt;"<a name='209'>
+         write (unit=trace_unit,fmt='(A)') "&lt;li&gt;&lt;a href=#memory&gt;Memory usage&lt;/a&gt;"<a name='210'>
+         write (unit=trace_unit,fmt='(A)') "&lt;/ul&gt;"<a name='211'>
+         write (unit=trace_unit,fmt='(A)') "&lt;a name=tree&gt;&lt;h2&gt;Calling Tree&lt;/h2&gt;&lt;/a&gt;&lt;pre&gt;"<a name='212'>
+      else<a name='213'>
+         write (unit=trace_unit,fmt='(A)') "Trace Output"<a name='214'>
+         write (unit=trace_unit,fmt='(A)') ""<a name='215'>
+      end if<a name='216'>
+   end if<a name='217'>
+<a name='218'>
+end subroutine trace_init<a name='219'>
+<a name='220'>
+<a name='221'>
+<A NAME='TRACE_ENTRY'><A href='../../html_code/frame/module_trace.F.html#TRACE_ENTRY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='222'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_entry</font>(&amp; <A href='../../call_to/TRACE_ENTRY.html' TARGET='index'>112</A>,<A href='../../call_from/TRACE_ENTRY.html' TARGET='index'>4</A><a name='223'>
+   Name, &amp;                       <font color=#447700>! in<a name='224'></font>
+   Message, &amp;                    <font color=#447700>! in, optional<a name='225'></font>
+   Messages, &amp;                   <font color=#447700>! in, optional<a name='226'></font>
+   MaxNoCalls)                   <font color=#447700>! in, optional<a name='227'></font>
+<a name='228'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='229'></font>
+   <font color=#447700>! Purpose: Trace entry point to subroutine<a name='230'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='231'></font>
+<a name='232'>
+   implicit none<a name='233'>
+<a name='234'>
+   character (len=*),           intent(in) :: Name         <font color=#447700>! Routine name<a name='235'></font>
+   character (len=*), optional, intent(in) :: Message      <font color=#447700>! message<a name='236'></font>
+   character (len=*), optional, intent(in) :: Messages(:)  <font color=#447700>! message array<a name='237'></font>
+   integer, optional,           intent(in) :: MaxNoCalls   <font color=#447700>! max no calls to show<a name='238'></font>
+<a name='239'>
+<a name='240'>
+   integer           :: IOStatus        <font color=#447700>! I-O return code<a name='241'></font>
+   integer           :: Loop            <font color=#447700>! General loop counter<a name='242'></font>
+   integer           :: Count<a name='243'>
+   integer           :: OldPointer<a name='244'>
+   integer           :: TotalSpace<a name='245'>
+   integer           :: LocalMaxNoCalls<a name='246'>
+   real              :: CPUTime1<a name='247'>
+   real              :: temp1<a name='248'>
+   real              :: temp2<a name='249'>
+   logical           :: NewRoutine<a name='250'>
+<a name='251'>
+   call cpu_time(CPUTime1)<a name='252'>
+<a name='253'>
+   call system_clock(&amp;<a name='254'>
+      COUNT=Count)<a name='255'>
+<a name='256'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='257'></font>
+   <font color=#447700>! check if tracing active. If not check whether to switch it on<a name='258'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='259'></font>
+<a name='260'>
+   if (.NOT. TraceActive) then<a name='261'>
+      if (trace_start_points == 0) then<a name='262'>
+         <font color=#447700>! start with first call<a name='263'></font>
+         TraceActive = .true.<a name='264'>
+      else<a name='265'>
+         do Loop=1,trace_start_points<a name='266'>
+            if (Name == TraceNames(Loop)(1:LEN(Name))) then<a name='267'>
+               TraceActive    = .true.<a name='268'>
+               TraceDepth     = 0<a name='269'>
+               TraceStartedBy = Name<a name='270'>
+               exit<a name='271'>
+            end if<a name='272'>
+         end do<a name='273'>
+      end if<a name='274'>
+      if (.NOT. TraceActive) then<a name='275'>
+         <font color=#447700>! did not want to start trace, so leave<a name='276'></font>
+         return<a name='277'>
+      end if<a name='278'>
+   end if<a name='279'>
+<a name='280'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='281'></font>
+   <font color=#447700>! timing and maximum heap usage<a name='282'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='283'></font>
+<a name='284'>
+   <font color=#447700>! Increment the local elapsed time and local CPU time since the<a name='285'></font>
+   <font color=#447700>! last trace entry, if any<a name='286'></font>
+<a name='287'>
+   if (Pointer /= 0) then<a name='288'>
+      temp1 = real(Count - BaseElapsedTime) - ElapsedTimeLocalStart<a name='289'>
+      temp2 = CPUTime1 - CPUTimeLocalStart<a name='290'>
+      ElapsedTimeLocal(Pointer)    = ElapsedTimeLocal(Pointer) + temp1<a name='291'>
+      ElapsedTimeThisCall(Pointer) = ElapsedTimeThisCall(Pointer) + temp1<a name='292'>
+      CPUTimeLocal(Pointer)        = CPUTimeLocal(Pointer) + temp2<a name='293'>
+      CPUTimeThisCall(Pointer)     = CPUTimeThisCall(Pointer) + temp2<a name='294'>
+   end if<a name='295'>
+<a name='296'>
+   OldPointer=Pointer<a name='297'>
+<a name='298'>
+   <font color=#447700>! Check subroutine name <a name='299'></font>
+<a name='300'>
+   NewRoutine = .true.<a name='301'>
+   do Pointer=1,NoRoutines     <a name='302'>
+      if (TimerNames(Pointer) == Name) then<a name='303'>
+         NewRoutine=.false.<a name='304'>
+         exit<a name='305'>
+      end if<a name='306'>
+   end do<a name='307'>
+<a name='308'>
+   if (NewRoutine) then<a name='309'>
+      <font color=#447700>! New subroutine entered<a name='310'></font>
+      if (NoRoutines &gt;= MaxNoRoutines)then <font color=#447700>! too many to trace<a name='311'></font>
+          call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ENTRY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_3">("da_tracing/trace_entry.inc",90, &amp;<a name='312'>
+             (/"Too many routines. Not timing " // Name/))<a name='313'>
+<a name='314'>
+         <font color=#447700>!All the timings etc are put instead to the calling routine,<a name='315'></font>
+         <font color=#447700>! which therefore may have incorrect summaries.<a name='316'></font>
+         <font color=#447700>!The best solution is to increase MaxNoRoutines.<a name='317'></font>
+         Pointer = OldPointer<a name='318'>
+         <font color=#447700>! Fix to get the correct NoCalls(OldPointer) despite the +1 later<a name='319'></font>
+         NoCalls(Pointer)=NoCalls(Pointer)-1<a name='320'>
+<a name='321'>
+      else <font color=#447700>! Pointer=NoRoutines+1 (from the end of earlier do loop)<a name='322'></font>
+         NoRoutines=NoRoutines+1<a name='323'>
+         TimerNames(NoRoutines)=Name<a name='324'>
+      end if<a name='325'>
+   end if<a name='326'>
+<a name='327'>
+   NoCalls(Pointer)=NoCalls(Pointer)+1<a name='328'>
+<a name='329'>
+   CPUTimeThisCall(Pointer)     = 0.0<a name='330'>
+   ElapsedTimeThisCall(Pointer) = 0.0<a name='331'>
+<a name='332'>
+   CalledBy(Pointer)=OldPointer<a name='333'>
+<a name='334'>
+   if (trace_memory) then<a name='335'>
+      call memory_info(&amp;<a name='336'>
+         TotalSpace)<a name='337'>
+      EntryHeap(Pointer) = TotalSpace<a name='338'>
+      LastSpace = TotalSpace<a name='339'>
+      if (MaxHeap(Pointer) &lt; TotalSpace) then<a name='340'>
+         MaxHeap(Pointer) = TotalSpace<a name='341'>
+      end if<a name='342'>
+   else<a name='343'>
+      TotalSpace = 0<a name='344'>
+   end if<a name='345'>
+<a name='346'>
+   if (trace_write .AND. TraceDepth &lt;= trace_max_depth) then<a name='347'>
+<a name='348'>
+      if (present(MaxNoCalls)) then<a name='349'>
+         LocalMaxNoCalls = MaxNoCalls<a name='350'>
+      else<a name='351'>
+         LocalMaxNoCalls = trace_repeat_head<a name='352'>
+      end if<a name='353'>
+<a name='354'>
+      if (NoCalls(Pointer) &lt;= LocalMaxNoCalls) then<a name='355'>
+         if (trace_memory) then<a name='356'>
+            if (use_html) then<a name='357'>
+               write (unit=trace_unit, &amp;<a name='358'>
+                  fmt='(A,"&amp;gt; &lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;",I11)', &amp;<a name='359'>
+                  iostat=IOStatus) &amp;<a name='360'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(documentation_url), &amp;<a name='361'>
+                  trim(Name),trim(Name), TotalSpace<a name='362'>
+            else<a name='363'>
+               write (unit=trace_unit, &amp;<a name='364'>
+                  fmt='(A,"&gt; ",A,I11)', &amp;<a name='365'>
+                  iostat=IOStatus) &amp;<a name='366'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name), TotalSpace<a name='367'>
+           end if<a name='368'>
+         else<a name='369'>
+            if (use_html) then<a name='370'>
+               write (unit=trace_unit, &amp;<a name='371'>
+                  fmt='(A,"&amp;gt; &lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;")', &amp;<a name='372'>
+                  iostat=IOStatus) &amp;<a name='373'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &amp;<a name='374'>
+                  trim(Name),trim(Name)<a name='375'>
+            else<a name='376'>
+               write (unit=trace_unit, fmt='(A,"&gt; ",A)', iostat=IOStatus) &amp;<a name='377'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name)<a name='378'>
+            end if<a name='379'>
+         end if<a name='380'>
+         if (IOStatus /= 0) then<a name='381'>
+            call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ENTRY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_4">("da_tracing/trace_entry.inc",160, &amp;<a name='382'>
+               (/"Cannot write to trace file for "/))<a name='383'>
+         end if<a name='384'>
+<a name='385'>
+         if (present(Message)) then<a name='386'>
+            write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &amp;<a name='387'>
+               pad(1:TraceDepth*TraceIndentAmount),trim(Message)<a name='388'>
+            if (IOStatus .NE. 0) then<a name='389'>
+               call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ENTRY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_5">("da_tracing/trace_entry.inc",168, &amp;<a name='390'>
+                  (/"Cannot write to trace file for "/))<a name='391'>
+            end if<a name='392'>
+         end if<a name='393'>
+<a name='394'>
+         if (present(Messages)) then<a name='395'>
+            do Loop = 1, size(Messages)<a name='396'>
+               write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &amp;<a name='397'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))<a name='398'>
+               if (IOStatus .NE. 0) then<a name='399'>
+                  call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ENTRY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_6">("da_tracing/trace_entry.inc",178, &amp;<a name='400'>
+                     (/"Cannot write to trace file for "/))<a name='401'>
+               end if<a name='402'>
+            end do <font color=#447700>! Loop<a name='403'></font>
+         end if<a name='404'>
+      end if<a name='405'>
+<a name='406'>
+   end if <font color=#447700>! trace_write<a name='407'></font>
+<a name='408'>
+   TraceDepth=TraceDepth+1<a name='409'>
+<a name='410'>
+   call system_clock(&amp;<a name='411'>
+      COUNT=Count)<a name='412'>
+<a name='413'>
+   call cpu_time(CPUTime1)<a name='414'>
+<a name='415'>
+   <font color=#447700>! set the start elapsed and CPU time both locally and generally<a name='416'></font>
+<a name='417'>
+   ElapsedTimeStart(Pointer) = real(Count-BaseElapsedTime)<a name='418'>
+   ElapsedTimeLocalStart     = real(Count-BaseElapsedTime)<a name='419'>
+<a name='420'>
+   CPUTimeStart(Pointer) = CPUTime1<a name='421'>
+   CPUTimeLocalStart     = CPUTime1<a name='422'>
+<a name='423'>
+   <font color=#447700>! call flush(trace_unit)<a name='424'></font>
+<a name='425'>
+   return<a name='426'>
+end subroutine trace_entry<a name='427'>
+<a name='428'>
+<a name='429'>
+<A NAME='TRACE'><A href='../../html_code/frame/module_trace.F.html#TRACE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='430'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace</font>(&amp;,<A href='../../call_from/TRACE.html' TARGET='index'>4</A><a name='431'>
+   Name,     &amp;           <font color=#447700>! in<a name='432'></font>
+   Message,  &amp;           <font color=#447700>! in, optional<a name='433'></font>
+   Messages,  &amp;          <font color=#447700>! in, optional<a name='434'></font>
+   MaxNoCalls)           <font color=#447700>! in, optional<a name='435'></font>
+<a name='436'>
+   implicit none<a name='437'>
+<a name='438'>
+   <font color=#447700>!--------------------------------------------------------------------<a name='439'></font>
+   <font color=#447700>! Purpose: General trace within a subroutine<a name='440'></font>
+   <font color=#447700>!--------------------------------------------------------------------<a name='441'></font>
+<a name='442'>
+   character (len=*), intent(in)           :: Name         <font color=#447700>! Subroutine name<a name='443'></font>
+   character (len=*), optional, intent(in) :: Message      <font color=#447700>! Text to trace<a name='444'></font>
+   character (len=*), optional, intent(in) :: Messages(:)  <font color=#447700>! Text to trace<a name='445'></font>
+   integer, optional, intent(in)           :: MaxNoCalls   <font color=#447700>! max no calls to show<a name='446'></font>
+<a name='447'>
+   integer           :: IOStatus     <font color=#447700>! I-O return code<a name='448'></font>
+   integer           :: Loop         <font color=#447700>! General loop counter<a name='449'></font>
+   integer           :: TotalSpace<a name='450'>
+   integer           :: LocalMaxNoCalls<a name='451'>
+   character(len=25) :: Change<a name='452'>
+<a name='453'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='454'></font>
+   <font color=#447700>! Check whether trace active and depth of trace<a name='455'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='456'></font>
+<a name='457'>
+   if (.NOT. TraceActive) then<a name='458'>
+      return<a name='459'>
+   end if<a name='460'>
+<a name='461'>
+   if (TraceDepth &gt;= trace_max_depth) then<a name='462'>
+      <font color=#447700>! already at maximum depth, so return<a name='463'></font>
+      return<a name='464'>
+   end if<a name='465'>
+<a name='466'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='467'></font>
+   <font color=#447700>! Note memory usage<a name='468'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='469'></font>
+<a name='470'>
+   Change = ""<a name='471'>
+<a name='472'>
+   if (trace_memory) then<a name='473'>
+      call memory_info(&amp;<a name='474'>
+         TotalSpace)<a name='475'>
+      if (LastSpace &lt; TotalSpace) then<a name='476'>
+         write(Change,"(A9,I12)")", bigger", TotalSpace - LastSpace<a name='477'>
+      else if (LastSpace &gt; TotalSpace) then<a name='478'>
+         write(Change,"(A9,I12)")", smaller", TotalSpace - LastSpace<a name='479'>
+      end if<a name='480'>
+      if (MaxHeap(Pointer) &lt; TotalSpace) then<a name='481'>
+         MaxHeap(Pointer) = TotalSpace<a name='482'>
+      end if<a name='483'>
+      LastSpace = TotalSpace<a name='484'>
+   else<a name='485'>
+      TotalSpace = 0<a name='486'>
+   end if<a name='487'>
+<a name='488'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='489'></font>
+   <font color=#447700>! Perform the trace if not done too many times before. only on PE 0<a name='490'></font>
+   <font color=#447700>!-----------------------------------------------------------------------  <a name='491'></font>
+<a name='492'>
+   if (trace_write) then<a name='493'>
+<a name='494'>
+      if (present(MaxNoCalls)) then<a name='495'>
+         LocalMaxNoCalls = MaxNoCalls<a name='496'>
+      else<a name='497'>
+         LocalMaxNoCalls = trace_repeat_body<a name='498'>
+      end if<a name='499'>
+<a name='500'>
+      NoCallsBody(Pointer) = NoCallsBody(Pointer)+1<a name='501'>
+<a name='502'>
+      if (NoCallsBody(Pointer) &lt;= LocalMaxNoCalls) then<a name='503'>
+         if (trace_memory) then<a name='504'>
+             if (use_html) then<a name='505'>
+                write (unit=trace_unit, &amp;<a name='506'>
+                   fmt='(A, "| &lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;",I11,A)', &amp;<a name='507'>
+                   iostat=IOStatus) &amp;<a name='508'>
+                   pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &amp;<a name='509'>
+                   trim(Name), trim(Name), TotalSpace, Change<a name='510'>
+             else<a name='511'>
+                write (unit=trace_unit, &amp;<a name='512'>
+                   fmt='(A, "| ",A,I11,A)', &amp;<a name='513'>
+                   iostat=IOStatus) &amp;<a name='514'>
+                   pad(1:TraceDepth*TraceIndentAmount),trim(Name), TotalSpace, Change<a name='515'>
+            end if<a name='516'>
+         else<a name='517'>
+            if (use_html) then<a name='518'>
+               write (unit=trace_unit, &amp;<a name='519'>
+                  fmt='(A, "| &lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;")', &amp;<a name='520'>
+                  iostat=IOStatus) &amp;<a name='521'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &amp;<a name='522'>
+                  trim(Name), trim(Name)  <a name='523'>
+            else <a name='524'>
+               write (unit=trace_unit, &amp;<a name='525'>
+                  fmt='(A, "| ",A)', &amp;<a name='526'>
+                  iostat=IOStatus) &amp;<a name='527'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name)<a name='528'>
+            end if<a name='529'>
+         end if<a name='530'>
+         if (IOStatus /= 0) then<a name='531'>
+            call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_7">("da_tracing/trace.inc",102, &amp;<a name='532'>
+               (/"Cannot write to trace file for "/))<a name='533'>
+         end if<a name='534'>
+<a name='535'>
+         if (present(Message)) then<a name='536'>
+            write (unit=trace_unit, fmt='(A,"  ",A)', iostat=IOStatus) &amp;<a name='537'>
+               pad(1:TraceDepth*TraceIndentAmount),trim(Message)<a name='538'>
+            if (IOStatus .NE. 0) then<a name='539'>
+               call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_8">("da_tracing/trace.inc",110, &amp;<a name='540'>
+                  (/"Cannot write to trace file for "/))<a name='541'>
+            end if<a name='542'>
+         end if<a name='543'>
+<a name='544'>
+         if (present(Messages)) then<a name='545'>
+            do Loop = 1, size(Messages)<a name='546'>
+               write (unit=trace_unit, fmt='(A,"  ",A)', iostat=IOStatus) &amp;<a name='547'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))<a name='548'>
+               if (IOStatus .NE. 0) then<a name='549'>
+                  call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_9">("da_tracing/trace.inc",120, &amp;<a name='550'>
+                     (/"Cannot write to trace file for "/))<a name='551'>
+               end if<a name='552'>
+            end do <font color=#447700>! Loop<a name='553'></font>
+         end if<a name='554'>
+      end if<a name='555'>
+<a name='556'>
+      if (NoCallsBody(Pointer) == trace_repeat_body) then<a name='557'>
+         write (unit=trace_unit, fmt='(A,"  Called enough, going quiet")', iostat=IOStatus) &amp;<a name='558'>
+            pad(1:TraceDepth*TraceIndentAmount)<a name='559'>
+         if (IOStatus .NE. 0) then<a name='560'>
+            call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_10">("da_tracing/trace.inc",131, &amp;<a name='561'>
+              (/"Cannot write to trace file for "/))<a name='562'>
+         end if<a name='563'>
+      end if<a name='564'>
+   end if <font color=#447700>! trace_write<a name='565'></font>
+<a name='566'>
+end subroutine trace<a name='567'>
+<a name='568'>
+<a name='569'>
+<A NAME='TRACE_EXIT'><A href='../../html_code/frame/module_trace.F.html#TRACE_EXIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='570'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_exit</font>(&amp; <A href='../../call_to/TRACE_EXIT.html' TARGET='index'>112</A>,<A href='../../call_from/TRACE_EXIT.html' TARGET='index'>4</A><a name='571'>
+   Name, &amp;               <font color=#447700>! in<a name='572'></font>
+   Message, &amp;            <font color=#447700>! in, optional<a name='573'></font>
+   Messages, &amp;           <font color=#447700>! in, optional<a name='574'></font>
+   MaxNoCalls)           <font color=#447700>! in, optional<a name='575'></font>
+<a name='576'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='577'></font>
+   <font color=#447700>! Purpose: Trace exit from subroutine<a name='578'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='579'></font>
+<a name='580'>
+   implicit none<a name='581'>
+<a name='582'>
+   character (len=*), intent(in)           :: Name         <font color=#447700>! subroutine name<a name='583'></font>
+   character (len=*), optional, intent(in) :: Message      <font color=#447700>! text to trace<a name='584'></font>
+   character (len=*), optional, intent(in) :: Messages(:)  <font color=#447700>! text to trace<a name='585'></font>
+   integer, optional, intent(in)           :: MaxNoCalls   <font color=#447700>! max no calls to show<a name='586'></font>
+<a name='587'>
+   integer                         :: IOStatus        <font color=#447700>! I-O return code <a name='588'></font>
+   integer                         :: Loop            <font color=#447700>! General loop counter<a name='589'></font>
+   integer                         :: Count<a name='590'>
+   integer                         :: TotalSpace<a name='591'>
+   integer                         :: LocalMaxNoCalls<a name='592'>
+   integer                         :: Caller<a name='593'>
+   real                            :: temp_CPUTime<a name='594'>
+   real                            :: temp1<a name='595'>
+   real                            :: temp2<a name='596'>
+   character(len=25)               :: Change<a name='597'>
+<a name='598'>
+   call cpu_time(temp_CPUTime)<a name='599'>
+<a name='600'>
+   call system_clock(&amp;<a name='601'>
+      COUNT=Count)<a name='602'>
+<a name='603'>
+   <font color=#447700>!======================================================================<a name='604'></font>
+   <font color=#447700>! check whether trace active and whether depth exceeded<a name='605'></font>
+   <font color=#447700>!======================================================================<a name='606'></font>
+<a name='607'>
+   if (.NOT. TraceActive) then<a name='608'>
+      return<a name='609'>
+   end if<a name='610'>
+<a name='611'>
+   if (TraceActive) then<a name='612'>
+      <font color=#447700>! was tracing enabled by this routine? If it was, disable it, to<a name='613'></font>
+      <font color=#447700>! take affect after the trace line has been written<a name='614'></font>
+      if (Name == TraceStartedBy(1:LEN(Name))) then<a name='615'>
+         TraceActive = .false.<a name='616'>
+      end if<a name='617'>
+   end if<a name='618'>
+<a name='619'>
+   temp1 = real(Count - BaseElapsedTime) - ElapsedTimeLocalStart<a name='620'>
+   temp2 = temp_CPUTime - CPUTimeLocalStart<a name='621'>
+<a name='622'>
+   TraceDepth=TraceDepth-1<a name='623'>
+<a name='624'>
+   if (TraceDepth &lt; 0) then<a name='625'>
+      TraceDepth = 0<a name='626'>
+   end if<a name='627'>
+<a name='628'>
+   <font color=#447700>!=======================================================================<a name='629'></font>
+   <font color=#447700>! Check timing and maximum heap memory usage<a name='630'></font>
+   <font color=#447700>!=======================================================================<a name='631'></font>
+<a name='632'>
+   ElapsedTimeLocal(Pointer)    = ElapsedTimeLocal(Pointer) + temp1<a name='633'>
+   ElapsedTimeThisCall(Pointer) = ElapsedTimeThisCall(Pointer) + temp1<a name='634'>
+   ElapsedTime(Pointer)         = ElapsedTime(Pointer) + &amp;<a name='635'>
+      ElapsedTimeThisCall(Pointer)<a name='636'>
+<a name='637'>
+   CPUTimeLocal(Pointer)        = CPUTimeLocal(Pointer) + temp2<a name='638'>
+   CPUTimeThisCall(Pointer)     = CPUTimeThisCall(Pointer) + temp2<a name='639'>
+   CPUTime(Pointer)             = CPUTime(Pointer) + CPUTimeThisCall(Pointer)<a name='640'>
+<a name='641'>
+   Caller=CalledBy(Pointer)<a name='642'>
+   if (Caller /= 0) then<a name='643'>
+      ElapsedTimeThisCall(Caller) = ElapsedTimeThisCall(Caller) + &amp;<a name='644'>
+         ElapsedTimeThisCall(Pointer)<a name='645'>
+      CPUTimeThisCall(Caller) = CPUTimeThisCall(Caller) + CPUTimeThisCall(Pointer)<a name='646'>
+   end if<a name='647'>
+<a name='648'>
+   Change = ""<a name='649'>
+<a name='650'>
+   if (trace_memory) then<a name='651'>
+      call memory_info(&amp;<a name='652'>
+         TotalSpace)<a name='653'>
+      if (EntryHeap(Pointer) &lt; TotalSpace) then<a name='654'>
+         write(Change,"(A9,I12)")", BIGGER", TotalSpace - EntryHeap(Pointer)<a name='655'>
+      else if (EntryHeap(Pointer) &gt; TotalSpace) then<a name='656'>
+         write(Change,"(A9,I12)")", SMALLER", TotalSpace - EntryHeap(Pointer)<a name='657'>
+      end if<a name='658'>
+      if (MaxHeap(Pointer) &lt; TotalSpace) then<a name='659'>
+         MaxHeap(Pointer) = TotalSpace<a name='660'>
+      end if<a name='661'>
+   else<a name='662'>
+      TotalSpace = 0<a name='663'>
+   end if<a name='664'>
+<a name='665'>
+   if (trace_write .AND. TraceDepth &lt;= trace_max_depth) then<a name='666'>
+<a name='667'>
+      if (present(MaxNoCalls)) then<a name='668'>
+         LocalMaxNoCalls = MaxNoCalls<a name='669'>
+      else<a name='670'>
+         LocalMaxNoCalls = trace_repeat_head<a name='671'>
+      end if<a name='672'>
+<a name='673'>
+      IOStatus=0<a name='674'>
+<a name='675'>
+      if (NoCalls(Pointer) &lt;= LocalMaxNoCalls) then<a name='676'>
+         if (trace_memory) then<a name='677'>
+            if (use_html) then<a name='678'>
+               write (unit=trace_unit, &amp;<a name='679'>
+                  fmt='(A, "&amp;lt; &lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;",I11,A)', &amp;<a name='680'>
+                  iostat=IOStatus) &amp;<a name='681'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &amp;<a name='682'>
+                  trim(Name),trim(Name), TotalSpace, Change<a name='683'>
+            else<a name='684'>
+               write (unit=trace_unit, &amp;<a name='685'>
+                  fmt='(A, "&lt; ",A,I11,A)', &amp;<a name='686'>
+                  iostat=IOStatus) &amp;<a name='687'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name), TotalSpace, Change<a name='688'>
+            end if<a name='689'>
+         else<a name='690'>
+            if (use_html) then<a name='691'>
+               write (unit=trace_unit, &amp;<a name='692'>
+                  fmt='(A, "&amp;lt; &lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;")', &amp;<a name='693'>
+                  iostat=IOStatus) &amp;<a name='694'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Documentation_url), &amp;<a name='695'>
+                  trim(Name),trim(Name)<a name='696'>
+            else<a name='697'>
+               write (unit=trace_unit, fmt='(A, "&lt; ",A)', iostat=IOStatus) &amp;<a name='698'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Name)<a name='699'>
+            end if<a name='700'>
+         end if<a name='701'>
+<a name='702'>
+         if (IOStatus /= 0) then<a name='703'>
+            call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_EXIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_11">("da_tracing/trace_exit.inc",134, &amp;<a name='704'>
+              (/"Cannot write to trace file for "/))<a name='705'>
+         end if<a name='706'>
+<a name='707'>
+         if (present(Message)) then<a name='708'>
+            write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &amp;<a name='709'>
+               pad(1:TraceDepth*TraceIndentAmount),trim(Message)<a name='710'>
+            if (IOStatus .NE. 0) then<a name='711'>
+               call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_EXIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_12">("da_tracing/trace_exit.inc",142, &amp;<a name='712'>
+                  (/"Cannot write to trace file for "/))<a name='713'>
+            end if<a name='714'>
+         end if<a name='715'>
+<a name='716'>
+         if (present(Messages)) then<a name='717'>
+            do Loop = 1, size(Messages)<a name='718'>
+               write (unit=trace_unit, fmt='(A," ",A)', iostat=IOStatus) &amp;<a name='719'>
+                  pad(1:TraceDepth*TraceIndentAmount),trim(Messages(Loop))<a name='720'>
+               if (IOStatus .NE. 0) then<a name='721'>
+                  call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_EXIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_13">("da_tracing/trace_exit.inc",152, &amp;<a name='722'>
+                     (/"Cannot write to trace file for "/))<a name='723'>
+               end if<a name='724'>
+            end do <font color=#447700>! Loop<a name='725'></font>
+         end if<a name='726'>
+      end if<a name='727'>
+<a name='728'>
+      if (NoCalls(Pointer) == trace_repeat_head) then<a name='729'>
+         write(unit=trace_unit,fmt='(A,"  Called enough, going quiet")', &amp;<a name='730'>
+            iostat=IOStatus)&amp;<a name='731'>
+            pad(1:TraceDepth*TraceIndentAmount)<a name='732'>
+         if (IOStatus .NE. 0) then<a name='733'>
+            call <A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR'>trace_error</A><A href='../../html_code/frame/module_trace.F.html#TRACE_EXIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_ERROR_14">("da_tracing/trace_exit.inc",164, &amp;<a name='734'>
+               (/"Cannot write to trace file for "/))<a name='735'>
+         end if<a name='736'>
+      end if<a name='737'>
+   end if <font color=#447700>! trace_write<a name='738'></font>
+<a name='739'>
+   <font color=#447700>! Restore pointer<a name='740'></font>
+   Pointer = CalledBy(Pointer)<a name='741'>
+<a name='742'>
+   <font color=#447700>! note local time<a name='743'></font>
+<a name='744'>
+   call system_clock(&amp;<a name='745'>
+     count=count)<a name='746'>
+<a name='747'>
+   elapsedtimelocalstart = real(count-baseelapsedtime)<a name='748'>
+   call cpu_time(cputimelocalstart)<a name='749'>
+<a name='750'>
+   <font color=#447700>! call flush(trace_unit)<a name='751'></font>
+<a name='752'>
+end subroutine trace_exit<a name='753'>
+<a name='754'>
+<a name='755'>
+<A NAME='TRACE_INT_SORT'><A href='../../html_code/frame/module_trace.F.html#TRACE_INT_SORT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='756'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_int_sort</font>(&amp; <A href='../../call_to/TRACE_INT_SORT.html' TARGET='index'>1</A><a name='757'>
+   key, &amp;<a name='758'>
+   n, &amp;<a name='759'>
+   index)<a name='760'>
+<a name='761'>
+   <font color=#447700>!----------------------------------------------------------------------<a name='762'></font>
+   <font color=#447700>! Purpose: sort integers for tracing<a name='763'></font>
+   <font color=#447700>!----------------------------------------------------------------------<a name='764'></font>
+<a name='765'>
+   implicit none<a name='766'>
+<a name='767'>
+   integer, intent(in)          :: n      <font color=#447700>! The number of items to be sorted. <a name='768'></font>
+   integer, intent(in)          :: key(:)<a name='769'>
+   integer, intent(out) :: index(:)<a name='770'>
+<a name='771'>
+   integer :: head       <font color=#447700>! heaps are tree structures: head and child refer<a name='772'></font>
+   integer :: child      <font color=#447700>! to related items within the tree <a name='773'></font>
+   integer :: i          <a name='774'>
+   integer :: dum        <font color=#447700>! used to swap index items<a name='775'></font>
+<a name='776'>
+<a name='777'>
+   <font color=#447700>! initialise index:<a name='778'></font>
+   do i=1,n<a name='779'>
+      index(i)=i<a name='780'>
+   end do <a name='781'>
+<a name='782'>
+   <font color=#447700>! Do heapsort: Create the heap...<a name='783'></font>
+   makeheap : do i=n/2,1,-1<a name='784'>
+      head=i<a name='785'>
+      sift1 : do<a name='786'>
+         <font color=#447700>! find the largest out of the head and its two children...<a name='787'></font>
+         child=head*2<a name='788'>
+         if (child&gt;n) exit sift1<a name='789'>
+         if (child&lt;n) then<a name='790'>
+            if (key(index(child+1))&gt;key(index(child))) child=child+1<a name='791'>
+         end if<a name='792'>
+         <font color=#447700>! if the head is the largest, then sift is done...<a name='793'></font>
+         if (key(index(head))&gt;=key(index(child))) exit sift1<a name='794'>
+         <font color=#447700>! otherwise swap to put the largest child at the head,<a name='795'></font>
+         <font color=#447700>! and prepare to repeat the procedure for the head in its new<a name='796'></font>
+         <font color=#447700>! subordinate position.<a name='797'></font>
+         dum=index(child)<a name='798'>
+         index(child)=index(head)<a name='799'>
+         index(head)=dum<a name='800'>
+         head=child<a name='801'>
+      end do sift1<a name='802'>
+   end do makeheap<a name='803'>
+<a name='804'>
+   <font color=#447700>! Retire heads of the heap, which are the largest, and<a name='805'></font>
+   <font color=#447700>! stack them at the end of the array.<a name='806'></font>
+   retire : do i=n,2,-1<a name='807'>
+      dum=index(1)<a name='808'>
+      index(1)=index(i)<a name='809'>
+      index(i)=dum<a name='810'>
+      head=1<a name='811'>
+         <font color=#447700>! second sift is similar to first...<a name='812'></font>
+      sift2: do<a name='813'>
+         child=head*2<a name='814'>
+         if (child&gt;(i-1)) exit sift2<a name='815'>
+         if (child&lt;(i-1)) then<a name='816'>
+            if (key(index(child+1))&gt;key(index(child))) child=child+1<a name='817'>
+         end if<a name='818'>
+         if (key(index(head))&gt;=key(index(child))) exit sift2<a name='819'>
+         dum=index(child)<a name='820'>
+         index(child)=index(head)<a name='821'>
+         index(head)=dum<a name='822'>
+         head=child<a name='823'>
+      end do sift2  <a name='824'>
+   end do retire<a name='825'>
+<a name='826'>
+end subroutine trace_int_sort<a name='827'>
+<a name='828'>
+<a name='829'>
+<A NAME='TRACE_REAL_SORT'><A href='../../html_code/frame/module_trace.F.html#TRACE_REAL_SORT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='830'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_real_sort</font>(&amp; <A href='../../call_to/TRACE_REAL_SORT.html' TARGET='index'>2</A><a name='831'>
+   key, &amp;<a name='832'>
+   n, &amp;<a name='833'>
+   index)<a name='834'>
+<a name='835'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='836'></font>
+   <font color=#447700>! Purpose: Sort reals for tracing<a name='837'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='838'></font>
+<a name='839'>
+   implicit none<a name='840'>
+<a name='841'>
+   integer, intent(in)  :: n      <font color=#447700>! The number of items to be sorted. <a name='842'></font>
+   real,    intent(in)  :: key(:)<a name='843'>
+   integer, intent(out) :: index(:)<a name='844'>
+<a name='845'>
+   integer :: head       <font color=#447700>! heaps are tree structures: head and child refer<a name='846'></font>
+   integer :: child      <font color=#447700>! to related items within the tree <a name='847'></font>
+   integer :: i          <a name='848'>
+   integer :: dum        <font color=#447700>! used to swap index items<a name='849'></font>
+<a name='850'>
+   <font color=#447700>! initialise index:<a name='851'></font>
+   do i=1,n<a name='852'>
+      index(i)=i<a name='853'>
+   end do<a name='854'>
+<a name='855'>
+   <font color=#447700>! Do heapsort: Create the heap...<a name='856'></font>
+   makeheap : do i=n/2,1,-1<a name='857'>
+      head=i<a name='858'>
+      sift1 : do<a name='859'>
+         <font color=#447700>! find the largest out of the head and its two children...<a name='860'></font>
+         child=head*2<a name='861'>
+         if (child&gt;n) exit sift1<a name='862'>
+         if (child&lt;n) then<a name='863'>
+            if (key(index(child+1))&gt;key(index(child))) child=child+1<a name='864'>
+         end if<a name='865'>
+         <font color=#447700>! if the head is the largest, then sift is done...<a name='866'></font>
+         if (key(index(head))&gt;=key(index(child))) exit sift1<a name='867'>
+         <font color=#447700>! otherwise swap to put the largest child at the head,<a name='868'></font>
+         <font color=#447700>! and prepare to repeat the procedure for the head in its new<a name='869'></font>
+         <font color=#447700>! subordinate position.<a name='870'></font>
+         dum=index(child)<a name='871'>
+         index(child)=index(head)<a name='872'>
+         index(head)=dum<a name='873'>
+         head=child<a name='874'>
+      end do sift1<a name='875'>
+   end do makeheap<a name='876'>
+<a name='877'>
+   <font color=#447700>! Retire heads of the heap, which are the largest, and<a name='878'></font>
+   <font color=#447700>! stack them at the end of the array.<a name='879'></font>
+<a name='880'>
+   retire : do i=n,2,-1<a name='881'>
+      dum=index(1)<a name='882'>
+      index(1)=index(i)<a name='883'>
+      index(i)=dum<a name='884'>
+      head=1<a name='885'>
+      <font color=#447700>! second sift is similar to first...<a name='886'></font>
+      sift2: do<a name='887'>
+         child=head*2<a name='888'>
+         if (child&gt;(i-1)) exit sift2<a name='889'>
+         if (child&lt;(i-1)) then<a name='890'>
+            if (key(index(child+1))&gt;key(index(child))) child=child+1<a name='891'>
+         end if<a name='892'>
+         if (key(index(head))&gt;=key(index(child))) exit sift2<a name='893'>
+         dum=index(child)  <a name='894'>
+         index(child)=index(head)<a name='895'>
+         index(head)=dum<a name='896'>
+         head=child<a name='897'>
+      end do sift2  <a name='898'>
+   end do retire<a name='899'>
+<a name='900'>
+end subroutine trace_real_sort<a name='901'>
+<a name='902'>
+<a name='903'>
+<A NAME='TRACE_REPORT'><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='904'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_report</font> <A href='../../call_to/TRACE_REPORT.html' TARGET='index'>1</A>,<A href='../../call_from/TRACE_REPORT.html' TARGET='index'>11</A><a name='905'>
+<a name='906'>
+   <font color=#447700>!--------------------------------------------------------------------<a name='907'></font>
+   <font color=#447700>! Purpose: Produce a trace report<a name='908'></font>
+   <font color=#447700>!--------------------------------------------------------------------<a name='909'></font>
+<a name='910'>
+   implicit none<a name='911'>
+<a name='912'>
+   integer :: i                        <font color=#447700>! loop counter<a name='913'></font>
+   integer :: j                        <font color=#447700>! loop counter<a name='914'></font>
+   integer :: CountRate<a name='915'>
+   integer :: MasterNoRoutines<a name='916'>
+   integer :: temp<a name='917'>
+   integer :: MinElapsedPos<a name='918'>
+   integer :: MaxElapsedPos<a name='919'>
+   integer :: MinCPUPos<a name='920'>
+   integer :: MaxCPUPos<a name='921'>
+   integer :: itemp1(MaxNoRoutines)<a name='922'>
+   integer :: MasterMaxHeap(0:ntasks-1,MaxNoRoutines)<a name='923'>
+   integer :: MasterNoCalls(0:ntasks-1,MaxNoRoutines)<a name='924'>
+   integer :: OverallNoCalls(MaxNoRoutines)<a name='925'>
+   integer, allocatable :: Index(:)<a name='926'>
+<a name='927'>
+   real    :: TempCpuTime<a name='928'>
+   real    :: TotalElapsedTime             <font color=#447700>!<a name='929'></font>
+   real    :: TotalCPUTime(1)              <font color=#447700>!<a name='930'></font>
+   real    :: SpeedUp                      <font color=#447700>! speed up factor<a name='931'></font>
+   real    :: PercentCPUTime               <font color=#447700>! percentage in CPU time<a name='932'></font>
+   real    :: PercentElapsedTime           <font color=#447700>! percentage in elapsed time<a name='933'></font>
+   real    :: rtemp1(MaxNoRoutines)<a name='934'>
+   real    :: MasterElapsedTime(0:ntasks-1,MaxNoRoutines)<a name='935'>
+   real    :: MasterElapsedTimeLocal(0:ntasks-1,MaxNoRoutines)<a name='936'>
+   real    :: MasterCPUTime(0:ntasks-1,MaxNoRoutines)<a name='937'>
+   real    :: MasterCPUTimeLocal(0:ntasks-1,MaxNoRoutines)<a name='938'>
+   real    :: OverallElapsedTime(MaxNoRoutines)<a name='939'>
+   real    :: OverallCPUTime(MaxNoRoutines)<a name='940'>
+<a name='941'>
+   character (len=TraceNameLen) :: MasterTimerNames(MaxNoRoutines)<a name='942'>
+<a name='943'>
+   if (.not. use_html) then<a name='944'>
+      write (unit=trace_unit, fmt='(A)') &amp;<a name='945'>
+         "Report only available if use_html is true"<a name='946'>
+      return<a name='947'>
+   end if<a name='948'>
+<a name='949'>
+   call system_clock (COUNT=temp)<a name='950'>
+<a name='951'>
+   TotalElapsedTime=temp-BaseElapsedTime <font color=#447700>! on PE 0<a name='952'></font>
+<a name='953'>
+   call cpu_time(TempCpuTime)<a name='954'>
+<a name='955'>
+   TotalCPUTime(1) = TempCpuTime - BaseCPUTime<a name='956'>
+<a name='957'>
+   call system_clock(&amp;<a name='958'>
+      COUNT_RATE=CountRate)<a name='959'>
+<a name='960'>
+   <font color=#447700>! Ensure the lists from each PE match. use the routine list from the <a name='961'></font>
+   <font color=#447700>! traced PE as the master copy<a name='962'></font>
+<a name='963'>
+   MasterTimerNames(:)=TimerNames(:)<a name='964'>
+<a name='965'>
+   if (mytask == trace_pe) then<a name='966'>
+      MasterNoRoutines=NoRoutines<a name='967'>
+   else<a name='968'>
+      MasterNoRoutines=0<a name='969'>
+   end if<a name='970'>
+<a name='971'>
+   call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_INT'>da_proc_sum_int</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_INT_1">(MasterNoRoutines)<a name='972'>
+   <font color=#447700>! only PE 0 knows the result<a name='973'></font>
+<a name='974'>
+#ifdef DM_PARALLEL<a name='975'>
+   call mpi_bcast(MasterTimerNames(1:MaxNoRoutines), &amp;<a name='976'>
+                  TraceNameLen*MaxNoRoutines, &amp;<a name='977'>
+                  MPI_character,trace_pe, local_communicator,ierr)<a name='978'>
+#endif<a name='979'>
+<a name='980'>
+   MasterElapsedTime(:,:)=0.0<a name='981'>
+   MasterCPUTime(:,:)=0.0<a name='982'>
+   MasterElapsedTimeLocal(:,:)=0.0<a name='983'>
+   MasterCPUTimeLocal(:,:)=0.0<a name='984'>
+   MasterNoCalls(:,:)=0<a name='985'>
+   MasterMaxHeap(:,:)=0<a name='986'>
+<a name='987'>
+   do i=1,MaxNoRoutines<a name='988'>
+      do j=1,NoRoutines<a name='989'>
+         if (TimerNames(j) == MasterTimerNames(i)) then<a name='990'>
+            MasterElapsedTime(mytask,i)=ElapsedTime(j)<a name='991'>
+            MasterCPUTime(mytask,i)=CPUTime(j)<a name='992'>
+            MasterElapsedTimeLocal(mytask,i)=ElapsedTimeLocal(j)<a name='993'>
+            MasterCPUTimeLocal(mytask,i)=CPUTimeLocal(j)<a name='994'>
+            MasterNoCalls(mytask,i)=NoCalls(j)<a name='995'>
+            MasterMaxHeap(mytask,i)=MaxHeap(j)<a name='996'>
+            cycle<a name='997'>
+         end if<a name='998'>
+      end do<a name='999'>
+   end do<a name='1000'>
+<a name='1001'>
+   do i=0,ntasks-1<a name='1002'>
+      call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_REAL'>da_proc_sum_real</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_REAL_1">(MasterElapsedTime(i,:))<a name='1003'>
+      call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_REAL'>da_proc_sum_real</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_REAL_2">(MasterCPUTime(i,:))<a name='1004'>
+      call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_REAL'>da_proc_sum_real</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_REAL_3">(MasterElapsedTimeLocal(i,:))<a name='1005'>
+      call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_REAL'>da_proc_sum_real</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_REAL_4">(MasterCPUTimeLocal(i,:))<a name='1006'>
+      call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_INTS'>da_proc_sum_ints</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_INTS_1">(MasterNoCalls(i,:))<a name='1007'>
+      call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_INTS'>da_proc_sum_ints</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_INTS_2">(MasterMaxHeap(i,:))<a name='1008'>
+   end do<a name='1009'>
+<a name='1010'>
+   if (rootproc()) then<a name='1011'>
+<a name='1012'>
+      do j=1,MasterNoRoutines<a name='1013'>
+         rtemp1(j)=sum(MasterElapsedTimeLocal(:,j))<a name='1014'>
+      end do<a name='1015'>
+      <font color=#447700>!==========================================================================<a name='1016'></font>
+      <font color=#447700>! Sort subroutines into time order based on local Elapsed Time.<a name='1017'></font>
+      <font color=#447700>! All PEs should have the same sort order after the sum.<a name='1018'></font>
+      <font color=#447700>!==========================================================================<a name='1019'></font>
+<a name='1020'>
+      allocate (Index(MasterNoRoutines))<a name='1021'>
+<a name='1022'>
+      call <A href='../../html_code/frame/module_trace.F.html#TRACE_REAL_SORT'>trace_real_sort</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_REAL_SORT_1">(rtemp1,MasterNoRoutines,index)<a name='1023'>
+<a name='1024'>
+      do j=1,MasterNoRoutines<a name='1025'>
+         OverallElapsedTime(j)=sum(MasterElapsedTimeLocal(:,j))<a name='1026'>
+         OverallCPUTime(j)=sum(MasterCPUTimeLocal(:,j))<a name='1027'>
+         OverallNoCalls(j)=sum(MasterNoCalls(:,j))<a name='1028'>
+      end do<a name='1029'>
+<a name='1030'>
+      write(unit=trace_unit, fmt='(A,I4,A)') &amp;<a name='1031'>
+         "&lt;/pre&gt;&lt;hr&gt;&lt;H1&gt;For PE",trace_pe,"&lt;/H1&gt;"<a name='1032'>
+<a name='1033'>
+      <font color=#447700>! Output timing information<a name='1034'></font>
+<a name='1035'>
+      write(unit=trace_unit, &amp;<a name='1036'>
+         fmt='("&lt;a name=local&gt;&lt;h2&gt;Local Timing Summary&lt;/h2&gt;&lt;/a&gt;")')<a name='1037'>
+<a name='1038'>
+      if (ntasks == 1) then<a name='1039'>
+         <font color=#447700>! needs changing to work MPP<a name='1040'></font>
+         write (unit=trace_unit, &amp;<a name='1041'>
+            fmt='("(Tracing itself took ",F8.1,"s CPU Time, and ",F8.1,a)') &amp;<a name='1042'>
+            (CPUTimeLocalStart-CPUTimeStart(1)-TotalCPUTime(1)), &amp;<a name='1043'>
+            (ElapsedTimeLocalStart-ElapsedTimeStart(1)-TotalElapsedTime) / &amp;<a name='1044'>
+            real(CountRate), &amp;<a name='1045'>
+            "s elapsed time during the run. This is not included in the times below.)&lt;p&gt;"<a name='1046'>
+      else<a name='1047'>
+         write (unit=trace_unit,fmt='(A)') &amp;<a name='1048'>
+            "No estimate can be made of time in trace itself.&lt;p&gt;"<a name='1049'>
+      end if<a name='1050'>
+<a name='1051'>
+      write(unit=trace_unit, &amp;<a name='1052'>
+         fmt='("&lt;TABLE BORDER&gt;")')<a name='1053'>
+      write(unit=trace_unit, &amp;<a name='1054'>
+         fmt='("&lt;TR&gt;&lt;TH&gt;Routine Name&lt;TH&gt;Calls&lt;TH COLSPAN=4&gt;Elapsed Time (seconds)&lt;TH COLSPAN=4&gt;")')<a name='1055'>
+      write(unit=trace_unit, &amp;<a name='1056'>
+         fmt='("CPU Time (seconds)&lt;TH&gt;Speed up")')<a name='1057'>
+      write(unit=trace_unit, &amp;<a name='1058'>
+         fmt='("&lt;TR&gt;&lt;TH&gt;&lt;/TH&gt;&lt;TH&gt;per PE&lt;/TH&gt;&lt;TH&gt;Average per PE&lt;TH&gt;%&lt;TH&gt;Minimum&lt;TH&gt;Maximum &lt;TH&gt;Total&lt;TH&gt;%&lt;TH&gt;Minimum&lt;TH&gt;Maximum")')<a name='1059'>
+      write(unit=trace_unit, &amp;<a name='1060'>
+         fmt='("&lt;TH&gt;",I4," PE")') ntasks<a name='1061'>
+<a name='1062'>
+      do i=MasterNoRoutines,1,-1<a name='1063'>
+         Pointer=index(i)    <a name='1064'>
+<a name='1065'>
+         if (TotalCPUTime(1) &gt; 0.0) then<a name='1066'>
+            PercentCPUTime=100.0 * OverallCPUTime(Pointer)/TotalCPUTime(1)<a name='1067'>
+         else<a name='1068'>
+           PercentCPUTime=100.0<a name='1069'>
+         end if<a name='1070'>
+<a name='1071'>
+         if (TotalElapsedTime &gt; 0.0) then<a name='1072'>
+            PercentElapsedTime=100.0*OverallElapsedTime(Pointer)/(real(ntasks) * TotalElapsedTime)<a name='1073'>
+         else<a name='1074'>
+            PercentElapsedTime=100.0<a name='1075'>
+         end if<a name='1076'>
+<a name='1077'>
+         if (OverallElapsedTime(Pointer) &gt; 0.0) then<a name='1078'>
+            SpeedUp = OverallCPUTime(Pointer) / (OverallElapsedTime(Pointer)/real(CountRate*ntasks))<a name='1079'>
+         else<a name='1080'>
+            SpeedUp = 0.0<a name='1081'>
+         end if<a name='1082'>
+<a name='1083'>
+         <font color=#447700>! This horrible solution as MinLOC does not take a DIM argument, so sum<a name='1084'></font>
+         <font color=#447700>! is needed to convert the array to an integer<a name='1085'></font>
+<a name='1086'>
+         MinElapsedPos = sum(MinLOC(MasterElapsedTimeLocal(:,Pointer)))-1<a name='1087'>
+         MaxElapsedPos = sum(MAXLOC(MasterElapsedTimeLocal(:,Pointer)))-1<a name='1088'>
+         MinCPUPos     = sum(MinLOC(MasterCPUTimeLocal(:,Pointer)))-1<a name='1089'>
+         MaxCPUPos     = sum(MAXLOC(MasterCPUTimeLocal(:,Pointer)))-1<a name='1090'>
+<a name='1091'>
+         <font color=#447700>!----------------------------------------------------------------------<a name='1092'></font>
+         <font color=#447700>! Write out results. Note the abnormally long format line is needed as<a name='1093'></font>
+         <font color=#447700>! the NAG compiler complains if a quoted line is split.<a name='1094'></font>
+         <font color=#447700>!----------------------------------------------------------------------<a name='1095'></font>
+<a name='1096'>
+         write (unit=trace_unit, fmt='(7A)') &amp;<a name='1097'>
+            "&lt;TR&gt;&lt;TD&gt;&lt;a href=", &amp;<a name='1098'>
+            trim(Documentation_url), &amp;<a name='1099'>
+            "/", &amp;<a name='1100'>
+            trim(MasterTimerNames(Pointer)), &amp; <font color=#447700>! Subroutine name<a name='1101'></font>
+            ".html&gt;", &amp;<a name='1102'>
+            trim(MasterTimerNames(Pointer)), &amp; <font color=#447700>! Subroutine name<a name='1103'></font>
+            "&lt;/a&gt;"<a name='1104'>
+         write (unit=trace_unit, &amp;<a name='1105'>
+            fmt='("&lt;TD&gt;",F10.1,2("&lt;TD&gt;",F10.2,"&lt;TD&gt;",F10.1,2("&lt;TD&gt;",F10.1," on",I3)),"&lt;TD&gt;",F5.2)') &amp;<a name='1106'>
+            real(OverallNoCalls(Pointer))/real(ntasks),                       &amp; <font color=#447700>! Average number of calls per PE<a name='1107'></font>
+            OverallElapsedTime(Pointer)/(ntasks*real(CountRate)),             &amp; <font color=#447700>! Average Elapsed Time<a name='1108'></font>
+            PercentElapsedTime,                                              &amp; <font color=#447700>! Percent Elapsed Time<a name='1109'></font>
+            MasterElapsedTimeLocal(MinElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Min average Elapsed Time<a name='1110'></font>
+            MinElapsedPos,                                                   &amp; <font color=#447700>! Which PE<a name='1111'></font>
+            MasterElapsedTimeLocal(MaxElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Max average Elapsed Time<a name='1112'></font>
+            MaxElapsedPos,                                                   &amp; <font color=#447700>! Which PE<a name='1113'></font>
+            OverallCPUTime(Pointer),                                         &amp; <font color=#447700>! CPU time<a name='1114'></font>
+            PercentCPUTime,                                                  &amp; <font color=#447700>! Percent CPU time<a name='1115'></font>
+            MasterCPUTimeLocal(MinCPUPos,Pointer),                           &amp; <font color=#447700>! Min average CPU Time<a name='1116'></font>
+            MinCPUPos,                                                       &amp; <font color=#447700>! Which PE<a name='1117'></font>
+            MasterCPUTimeLocal(MaxCPUPos,Pointer),                           &amp; <font color=#447700>! Max average CPU Time<a name='1118'></font>
+            MaxCPUPos,                                                       &amp; <font color=#447700>! Which PE<a name='1119'></font>
+            SpeedUp                                                            <font color=#447700>! Speedup<a name='1120'></font>
+         if (trace_csv) then<a name='1121'>
+            write(unit=trace_csv_unit,  &amp;<a name='1122'>
+               fmt='(2A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &amp;<a name='1123'>
+               '"local",', &amp;<a name='1124'>
+               '"'//trim(MasterTimerNames(Pointer))//'",', &amp;<a name='1125'>
+               real(OverallNoCalls(Pointer))/real(ntasks),                       &amp; <font color=#447700>! Average number of calls per PE<a name='1126'></font>
+               OverallElapsedTime(Pointer)/(ntasks*real(CountRate)),             &amp; <font color=#447700>! Average Elapsed Time<a name='1127'></font>
+               PercentElapsedTime,                                              &amp; <font color=#447700>! Percent Elapsed Time<a name='1128'></font>
+               MasterElapsedTimeLocal(MinElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Min average Elapsed Time<a name='1129'></font>
+               MinElapsedPos,                                                   &amp; <font color=#447700>! Which PE<a name='1130'></font>
+               MasterElapsedTimeLocal(MaxElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Max average Elapsed Time<a name='1131'></font>
+               MaxElapsedPos,                                                   &amp; <font color=#447700>! Which PE<a name='1132'></font>
+               OverallCPUTime(Pointer),                                         &amp; <font color=#447700>! CPU time<a name='1133'></font>
+               PercentCPUTime,                                                  &amp; <font color=#447700>! Percent CPU time<a name='1134'></font>
+               MasterCPUTimeLocal(MinCPUPos,Pointer),                           &amp; <font color=#447700>! Min average CPU Time<a name='1135'></font>
+               MinCPUPos,                                                       &amp; <font color=#447700>! Which PE<a name='1136'></font>
+               MasterCPUTimeLocal(MaxCPUPos,Pointer),                           &amp; <font color=#447700>! Max average CPU Time<a name='1137'></font>
+               MaxCPUPos,                                                       &amp; <font color=#447700>! Which PE<a name='1138'></font>
+               SpeedUp                                                            <font color=#447700>! Speedup<a name='1139'></font>
+         end if<a name='1140'>
+      end do<a name='1141'>
+<a name='1142'>
+      write (unit=trace_unit, &amp;<a name='1143'>
+         fmt='(A,I4,A,F8.1,A,F8.1,A)') &amp;<a name='1144'>
+         "&lt;TR&gt;&lt;TD&gt;&lt;B&gt;Total&lt;/B&gt;",MasterNoRoutines, "&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;B&gt;", &amp;<a name='1145'>
+         TotalElapsedTime/real(CountRate), &amp;<a name='1146'>
+         "&lt;/B&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;B&gt;", &amp;<a name='1147'>
+         TotalCPUTime(1),"&lt;/B&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;"<a name='1148'>
+      if (TotalElapsedTime &gt; 0.0) then<a name='1149'>
+         write (unit=trace_unit, fmt='("&lt;TD&gt;&lt;B&gt;",F8.1,"&lt;/B&gt;")') &amp;<a name='1150'>
+            (TotalCPUTime(1))/(TotalElapsedTime/real(CountRate))<a name='1151'>
+      end if<a name='1152'>
+      write(unit=trace_unit, &amp;<a name='1153'>
+         fmt='("&lt;/TABLE&gt;&lt;p&gt;&lt;p&gt;")')<a name='1154'>
+<a name='1155'>
+      if (trace_csv) then<a name='1156'>
+         write(unit=trace_csv_unit,fmt=*) " "<a name='1157'>
+      end if<a name='1158'>
+<a name='1159'>
+      <font color=#447700>!===================================================================================<a name='1160'></font>
+      <font color=#447700>! Sort subroutines into time order based on overall Elapsed Time.<a name='1161'></font>
+      <font color=#447700>! All PEs should have the same sort order after the sum. <a name='1162'></font>
+      <font color=#447700>!===================================================================================<a name='1163'></font>
+<a name='1164'>
+      do j=1,MasterNoRoutines<a name='1165'>
+         rtemp1(j)=sum(MasterElapsedTime(:,j))<a name='1166'>
+      end do<a name='1167'>
+<a name='1168'>
+      call <A href='../../html_code/frame/module_trace.F.html#TRACE_REAL_SORT'>trace_real_sort</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_REAL_SORT_2">(rtemp1,MasterNoRoutines,index)<a name='1169'>
+<a name='1170'>
+      do j=1,MasterNoRoutines<a name='1171'>
+         OverallElapsedTime(j)=sum(MasterElapsedTime(:,j))<a name='1172'>
+         OverallCPUTime(j)=sum(MasterCPUTime(:,j))<a name='1173'>
+      end do<a name='1174'>
+<a name='1175'>
+      <font color=#447700>! Output timing information<a name='1176'></font>
+<a name='1177'>
+      write(unit=trace_unit, &amp;<a name='1178'>
+         fmt='("&lt;/pre&gt;&lt;hr&gt;&lt;a name=overall&gt;&lt;h2&gt;Overall Timing Summary&lt;/h2&gt;&lt;/a&gt;")')<a name='1179'>
+<a name='1180'>
+      write(unit=trace_unit, &amp;<a name='1181'>
+         fmt='("&lt;TABLE BORDER&gt;")')<a name='1182'>
+      write(unit=trace_unit, &amp;<a name='1183'>
+         fmt='("&lt;TR&gt;&lt;TH&gt;Routine Name&lt;TH&gt;Calls&lt;TH COLSPAN=4&gt;Elapsed Time (seconds)&lt;TH COLSPAN=4&gt;")')<a name='1184'>
+      write(unit=trace_unit, &amp;<a name='1185'>
+         fmt='("CPU Time (seconds)&lt;TH&gt;Speed up")')<a name='1186'>
+      write(unit=trace_unit, &amp;<a name='1187'>
+         fmt='("&lt;TR&gt;&lt;TH&gt;&lt;/TH&gt;&lt;TH&gt;per PE&lt;/TH&gt;&lt;TH&gt;Average per PE&lt;TH&gt;%&lt;TH&gt;Minimum&lt;TH&gt;Maximum&lt;TH&gt;Total&lt;TH&gt;%&lt;TH&gt;Minimum&lt;TH&gt;Maximum")')<a name='1188'>
+      write(unit=trace_unit, &amp;<a name='1189'>
+         fmt='("&lt;TH&gt;",I4," PE")') ntasks<a name='1190'>
+<a name='1191'>
+      do i=MasterNoRoutines,1,-1<a name='1192'>
+         Pointer=index(i)    <a name='1193'>
+<a name='1194'>
+         if (TotalCPUTime(1) &gt; 0.0) then<a name='1195'>
+            PercentCPUTime=100.0 * OverallCPUTime(Pointer)/TotalCPUTime(1)<a name='1196'>
+         else<a name='1197'>
+            PercentCPUTime=100.0<a name='1198'>
+         end if<a name='1199'>
+<a name='1200'>
+         if (TotalElapsedTime &gt; 0.0) then<a name='1201'>
+            PercentElapsedTime=100.0 * OverallElapsedTime(Pointer)/(real(ntasks) * TotalElapsedTime)<a name='1202'>
+         else<a name='1203'>
+            PercentElapsedTime=100.0<a name='1204'>
+         end if<a name='1205'>
+<a name='1206'>
+         if (OverallElapsedTime(Pointer) &gt; 0.0) then<a name='1207'>
+            SpeedUp = OverallCPUTime(Pointer) / (OverallElapsedTime(Pointer)/real(ntasks*CountRate))<a name='1208'>
+         else<a name='1209'>
+            SpeedUp = 0.0<a name='1210'>
+         end if<a name='1211'>
+<a name='1212'>
+         <font color=#447700>! This horrible solution as MinLOC does not take a DIM argument, so <a name='1213'></font>
+         <font color=#447700>! sum is needed to convert the array to an integer<a name='1214'></font>
+<a name='1215'>
+         MinElapsedPos = sum(MinLOC(MasterElapsedTime(:,Pointer)))-1<a name='1216'>
+         MaxElapsedPos = sum(MAXLOC(MasterElapsedTime(:,Pointer)))-1<a name='1217'>
+         MinCPUPos     = sum(MinLOC(MasterCPUTime(:,Pointer)))-1<a name='1218'>
+         MaxCPUPos     = sum(MaxLOC(MasterCPUTime(:,Pointer)))-1<a name='1219'>
+<a name='1220'>
+         <font color=#447700>!----------------------------------------------------------------------<a name='1221'></font>
+         <font color=#447700>! Write out results. Note the abnormally long format line is needed as<a name='1222'></font>
+         <font color=#447700>! the NAG compiler complains if a quoted line is split.<a name='1223'></font>
+         <font color=#447700>!----------------------------------------------------------------------<a name='1224'></font>
+<a name='1225'>
+         write (unit=trace_unit, fmt='(7A)') &amp;<a name='1226'>
+            "&lt;TR&gt;&lt;TD&gt;&lt;a href=", &amp;<a name='1227'>
+            trim(Documentation_url), &amp;<a name='1228'>
+            "/", &amp;<a name='1229'>
+            trim(MasterTimerNames(Pointer)), &amp;    <font color=#447700>! Subroutine name<a name='1230'></font>
+            ".html&gt;", &amp;<a name='1231'>
+            trim(MasterTimerNames(Pointer)), &amp;    <font color=#447700>! Subroutine name<a name='1232'></font>
+            "&lt;/a&gt;"<a name='1233'>
+         write (unit=trace_unit, &amp;<a name='1234'>
+            fmt='("&lt;TD&gt;",F10.1,2("&lt;TD&gt;",F10.2,"&lt;TD&gt;",F10.1,2("&lt;TD&gt;",F10.1," on",I3)),"&lt;TD&gt;",F5.2)') &amp;<a name='1235'>
+            real(OverallNoCalls(Pointer))/real(ntasks),                  &amp; <font color=#447700>! Number of calls per PE<a name='1236'></font>
+            OverallElapsedTime(Pointer)/(real(ntasks*CountRate)),        &amp; <font color=#447700>! Average Elapsed Time<a name='1237'></font>
+            PercentElapsedTime,                                         &amp; <font color=#447700>! Percent Elapsed Time<a name='1238'></font>
+            MasterElapsedTime(MinElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Min average Elapsed Time<a name='1239'></font>
+            MinElapsedPos,                                              &amp; <font color=#447700>! Which PE<a name='1240'></font>
+            MasterElapsedTime(MaxElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Max average Elapsed Time<a name='1241'></font>
+            MaxElapsedPos,                                              &amp; <font color=#447700>! Which PE<a name='1242'></font>
+            OverallCPUTime(Pointer),                                    &amp; <font color=#447700>! CPU time<a name='1243'></font>
+            PercentCPUTime,                                             &amp; <font color=#447700>! Percent CPU time<a name='1244'></font>
+            MasterCPUTime(MinCPUPos,Pointer),                           &amp; <font color=#447700>! Min average CPU Time<a name='1245'></font>
+            MinCPUPos,                                                  &amp; <font color=#447700>! Which PE<a name='1246'></font>
+            MasterCPUTime(MaxCPUPos,Pointer),                           &amp; <font color=#447700>! Max average CPU Time<a name='1247'></font>
+            MaxCPUPos,                                                  &amp; <font color=#447700>! Which PE<a name='1248'></font>
+            SpeedUp                                                       <font color=#447700>! SpeedUp<a name='1249'></font>
+         if (trace_csv) then<a name='1250'>
+            write (unit=trace_csv_unit, &amp;<a name='1251'>
+               fmt='(2A,F10.1,2(",",F10.2,",",F10.1,2(",",F10.1,",",I3)),",",F5.2)') &amp;<a name='1252'>
+               '"overall",', &amp;<a name='1253'>
+               '"'//trim(MasterTimerNames(Pointer))//'",', &amp;<a name='1254'>
+               real(OverallNoCalls(Pointer))/real(ntasks),                  &amp; <font color=#447700>! Number of calls per PE<a name='1255'></font>
+               OverallElapsedTime(Pointer)/(real(ntasks*CountRate)),        &amp; <font color=#447700>! Average Elapsed Time<a name='1256'></font>
+               PercentElapsedTime,                                         &amp; <font color=#447700>! Percent Elapsed Time<a name='1257'></font>
+               MasterElapsedTime(MinElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Min average Elapsed Time<a name='1258'></font>
+               MinElapsedPos,                                              &amp; <font color=#447700>! Which PE<a name='1259'></font>
+               MasterElapsedTime(MaxElapsedPos,Pointer)/real(CountRate),   &amp; <font color=#447700>! Max average Elapsed Time<a name='1260'></font>
+               MaxElapsedPos,                                              &amp; <font color=#447700>! Which PE<a name='1261'></font>
+               OverallCPUTime(Pointer),                                    &amp; <font color=#447700>! CPU time<a name='1262'></font>
+               PercentCPUTime,                                             &amp; <font color=#447700>! Percent CPU time<a name='1263'></font>
+               MasterCPUTime(MinCPUPos,Pointer),                           &amp; <font color=#447700>! Min average CPU Time<a name='1264'></font>
+               MinCPUPos,                                                  &amp; <font color=#447700>! Which PE<a name='1265'></font>
+               MasterCPUTime(MaxCPUPos,Pointer),                           &amp; <font color=#447700>! Max average CPU Time<a name='1266'></font>
+               MaxCPUPos,                                                  &amp; <font color=#447700>! Which PE<a name='1267'></font>
+               SpeedUp                                                       <font color=#447700>! SpeedUp<a name='1268'></font>
+         end if<a name='1269'>
+      end do<a name='1270'>
+<a name='1271'>
+      write (unit=trace_unit, &amp;<a name='1272'>
+         fmt='(A,I4,A,F8.1,A,F8.1,A)') &amp;<a name='1273'>
+         "&lt;TR&gt;&lt;TD&gt;&lt;B&gt;Total&lt;/B&gt;",MasterNoRoutines, "&lt;/TD&gt;&lt;TD&gt;&lt;TD&gt;&lt;B&gt;", &amp;<a name='1274'>
+         TotalElapsedTime/real(CountRate), &amp;<a name='1275'>
+         "&lt;/B&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;B&gt;",TotalCPUTime(1), &amp;<a name='1276'>
+         "&lt;/B&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;&lt;TD&gt;&lt;/TD&gt;"<a name='1277'>
+      if (TotalElapsedTime &gt; 0.0) then<a name='1278'>
+         write (unit=trace_unit, fmt='("&lt;TD&gt;&lt;B&gt;",F8.1,"&lt;/B&gt;")') &amp;<a name='1279'>
+            TotalCPUTime(1)/(TotalElapsedTime/real(CountRate))<a name='1280'>
+      end if<a name='1281'>
+<a name='1282'>
+      write(unit=trace_unit, &amp;<a name='1283'>
+         fmt='("&lt;/TABLE&gt;")')<a name='1284'>
+<a name='1285'>
+      if (trace_csv) then<a name='1286'>
+         write(unit=trace_csv_unit,fmt=*) " "<a name='1287'>
+      end if<a name='1288'>
+<a name='1289'>
+   end if <font color=#447700>! rootproc<a name='1290'></font>
+<a name='1291'>
+   <font color=#447700>!============================================================================<a name='1292'></font>
+   <font color=#447700>! Sort subroutines into memory use order by max memory on one PE<a name='1293'></font>
+   <font color=#447700>!============================================================================<a name='1294'></font>
+<a name='1295'>
+   if (trace_memory) then<a name='1296'>
+<a name='1297'>
+      do j=1,MaxNoRoutines<a name='1298'>
+         call <A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_INTS'>da_proc_sum_ints</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DA_PROC_SUM_INTS_3">(MasterMaxHeap(:,j))<a name='1299'>
+      end do<a name='1300'>
+<a name='1301'>
+      if (rootproc()) then<a name='1302'>
+         do j=1,MasterNoRoutines<a name='1303'>
+            itemp1(j)=MAXVAL(MasterMaxHeap(:,j))<a name='1304'>
+         end do<a name='1305'>
+<a name='1306'>
+         call <A href='../../html_code/frame/module_trace.F.html#TRACE_INT_SORT'>trace_int_sort</A><A href='../../html_code/frame/module_trace.F.html#TRACE_REPORT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRACE_INT_SORT_1">(itemp1,MasterNoRoutines,index)<a name='1307'>
+<a name='1308'>
+         write (unit=trace_unit,fmt='("&lt;hr&gt;&lt;a name=memory&gt;&lt;h2&gt;Maximum memory usage for routines&lt;/h2&gt;&lt;/a&gt;")')<a name='1309'>
+         write (unit=trace_unit,fmt='("&lt;TABLE BORDER&gt;")')<a name='1310'>
+         write (unit=trace_unit,fmt='("&lt;TR&gt;&lt;TH&gt;Routine&lt;TH&gt;Max in any PE (kbytes)")')<a name='1311'>
+         write (unit=trace_unit,fmt='("&lt;TH&gt;Overall (kbytes)&lt;TH&gt;Average per PE (kbytes)")')<a name='1312'>
+<a name='1313'>
+         do i=MasterNoRoutines,1,-1<a name='1314'>
+            Pointer=index(i)<a name='1315'>
+            write (unit=trace_unit, &amp;<a name='1316'>
+               fmt='("&lt;TR&gt;&lt;TD&gt;&lt;a href=",A,"/",A,".html&gt;",A,"&lt;/a&gt;&lt;TD&gt;",I15,"&lt;TD&gt;",I15,"&lt;TD&gt;",I15)') &amp;<a name='1317'>
+               trim(Documentation_url),trim(TimerNames(Pointer)),trim(TimerNames(Pointer)), &amp;<a name='1318'>
+               MAXVAL(MasterMaxHeap(:,Pointer)),sum(MasterMaxHeap(:,Pointer)), &amp;<a name='1319'>
+               sum(MasterMaxHeap(:,Pointer))/ntasks<a name='1320'>
+            if (trace_csv) then<a name='1321'>
+               write (unit=trace_csv_unit, &amp;<a name='1322'>
+                  fmt='(2A,I15,",",I15,",",I15)') &amp;<a name='1323'>
+                  '"memory",', &amp;<a name='1324'>
+                  '"'//trim(TimerNames(Pointer))//'",', &amp;<a name='1325'>
+                  MAXVAL(MasterMaxHeap(:,Pointer)),sum(MasterMaxHeap(:,Pointer)), &amp;<a name='1326'>
+                  sum(MasterMaxHeap(:,Pointer))/ntasks<a name='1327'>
+            end if        <a name='1328'>
+         end do<a name='1329'>
+         write (unit=trace_unit,fmt='("&lt;/table&gt;&lt;/body&gt;&lt;/html&gt;")')<a name='1330'>
+<a name='1331'>
+         if (trace_csv) then<a name='1332'>
+            write(unit=trace_csv_unit,fmt=*)<a name='1333'>
+         end if<a name='1334'>
+      end if<a name='1335'>
+   end if<a name='1336'>
+<a name='1337'>
+   if (trace_write .AND. trace_unit /= 0) then<a name='1338'>
+      close(trace_unit)<a name='1339'>
+   end if<a name='1340'>
+  <a name='1341'>
+   if (trace_csv .and. rootproc()) then<a name='1342'>
+      close(trace_csv_unit)<a name='1343'>
+   end if<a name='1344'>
+<a name='1345'>
+   if (mytask == trace_pe) then<a name='1346'>
+      deallocate(index)<a name='1347'>
+   end if<a name='1348'>
+<a name='1349'>
+end subroutine trace_report<a name='1350'>
+<a name='1351'>
+<a name='1352'>
+<A NAME='TRACE_ERROR'><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1353'>
+<font color=#993300>subroutine </font><font color=#cc0000>trace_error</font>( file_str, line, errors ) <A href='../../call_to/TRACE_ERROR.html' TARGET='index'>14</A>,<A href='../../call_from/TRACE_ERROR.html' TARGET='index'>6</A><a name='1354'>
+<a name='1355'>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='1356'></font>
+   <font color=#447700>! Purpose: Standardised error reporting<a name='1357'></font>
+   <font color=#447700>!-----------------------------------------------------------------------<a name='1358'></font>
+<a name='1359'>
+   implicit none<a name='1360'>
+<a name='1361'>
+   character(len=*), intent(in) :: file_str<a name='1362'>
+   integer ,         intent(in) :: line  <font color=#447700>! only print file and line if line &gt; 0<a name='1363'></font>
+   character(len=*), intent(in) :: errors(:)<a name='1364'>
+<a name='1365'>
+   character(len=256) :: line_str, html_file<a name='1366'>
+<a name='1367'>
+   integer       :: i<a name='1368'>
+<a name='1369'>
+   write(line_str,'(i6)') line<a name='1370'>
+<a name='1371'>
+   html_file=file_str(1:LEN_trim(file_str)-4)//'.html'<a name='1372'>
+   <a name='1373'>
+   call <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_24">( &amp;<a name='1374'>
+      '---------------------------- FATAL ERROR -----------------------' )<a name='1375'>
+<a name='1376'>
+<font color=#447700>!--only print file and line if line is positive<a name='1377'></font>
+   if ( line &gt; 0 ) then<a name='1378'>
+      if (use_html) then<a name='1379'>
+         call <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_25">( 'Fatal error in file: &lt;A HREF="'// &amp;<a name='1380'>
+            trim(documentation_url)//'/'//trim(html_file)//'"&gt;'// &amp;<a name='1381'>
+            trim(file_str)//'&lt;/a&gt;  LINE:  '//trim(line_str) )<a name='1382'>
+      else<a name='1383'>
+         call <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_26">( 'Fatal error in file:  '//trim(file_str)// &amp;<a name='1384'>
+            '  LINE:  '//trim(line_str) )<a name='1385'>
+      end if<a name='1386'>
+   end if<a name='1387'>
+<a name='1388'>
+   do i=1,size(errors)<a name='1389'>
+      call <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_27">(errors(i))<a name='1390'>
+   end do<a name='1391'>
+<a name='1392'>
+   call <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_28">( &amp;<a name='1393'>
+      '----------------------------------------------------------------' )<a name='1394'>
+<a name='1395'>
+   call <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_ABORT'>wrf_abort</A><A href='../../html_code/frame/module_trace.F.html#TRACE_ERROR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ABORT_1"><a name='1396'>
+<a name='1397'>
+end subroutine trace_error<a name='1398'>
+<a name='1399'>
+<a name='1400'>
+<A NAME='DA_PROC_SUM_INT'><A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_INT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1401'>
+<font color=#993300>subroutine </font><font color=#cc0000>da_proc_sum_int</font> (value) <A href='../../call_to/DA_PROC_SUM_INT.html' TARGET='index'>1</A><a name='1402'>
+<a name='1403'>
+   <font color=#447700>!---------------------------------------------------------------------------<a name='1404'></font>
+   <font color=#447700>!  Purpose: Do MPI sum operation across processors to get the global sum of<a name='1405'></font>
+   <font color=#447700>!           an integer value. The sum is returned only on the root processor,<a name='1406'></font>
+   <font color=#447700>!           i.e., processor 0. (In this way, we do not have to do all-to-all <a name='1407'></font>
+   <font color=#447700>!           communication, unlike wrf_dm_sum_int, which does)<a name='1408'></font>
+   <font color=#447700>!<a name='1409'></font>
+   <font color=#447700>! The routine generates a MPI barrier<a name='1410'></font>
+   <font color=#447700>!---------------------------------------------------------------------------<a name='1411'></font>
+<a name='1412'>
+   implicit none<a name='1413'>
+<a name='1414'>
+   integer, intent(inout) :: value     <font color=#447700>! Value on processor.<a name='1415'></font>
+<a name='1416'>
+#ifdef DM_PARALLEL<a name='1417'>
+   integer :: sum                   <font color=#447700>! Sum across processors.<a name='1418'></font>
+<a name='1419'>
+   <font color=#447700>! Don't trace, as called within trace routines<a name='1420'></font>
+   <font color=#447700>! if (trace_use_frequent) call trace_entry("da_proc_sum_int")<a name='1421'></font>
+<a name='1422'>
+   sum=0<a name='1423'>
+   call mpi_reduce(value, sum, 1, mpi_integer, mpi_sum, root, &amp;<a name='1424'>
+      local_communicator, ierr)<a name='1425'>
+<a name='1426'>
+   if (rootproc()) value = sum<a name='1427'>
+<a name='1428'>
+   <font color=#447700>! if (trace_use_frequent) call trace_exit("da_proc_sum_int")<a name='1429'></font>
+#endif<a name='1430'>
+<a name='1431'>
+end subroutine da_proc_sum_int<a name='1432'>
+<a name='1433'>
+<a name='1434'>
+<A NAME='DA_PROC_SUM_INTS'><A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_INTS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1435'>
+<font color=#993300>subroutine </font><font color=#cc0000>da_proc_sum_ints</font> (values) <A href='../../call_to/DA_PROC_SUM_INTS.html' TARGET='index'>3</A><a name='1436'>
+<a name='1437'>
+   <font color=#447700>!---------------------------------------------------------------------------<a name='1438'></font>
+   <font color=#447700>!  Purpose: Do MPI sum operation across processors to get the global sum of<a name='1439'></font>
+   <font color=#447700>!           an integer array. The sum is returned only on the root processor,<a name='1440'></font>
+   <font color=#447700>!           i.e., processor 0. (In this way, we do not have to do all-to-all <a name='1441'></font>
+   <font color=#447700>!           communication, unlike wrf_dm_sum_ints, which does)<a name='1442'></font>
+   <font color=#447700>!<a name='1443'></font>
+   <font color=#447700>! The routine generates a MPI barrier<a name='1444'></font>
+   <font color=#447700>!---------------------------------------------------------------------------<a name='1445'></font>
+<a name='1446'>
+   implicit none<a name='1447'>
+<a name='1448'>
+   integer, intent(inout) :: values(:) <font color=#447700>! Values<a name='1449'></font>
+<a name='1450'>
+#ifdef DM_PARALLEL<a name='1451'>
+   integer, allocatable :: sums(:) <font color=#447700>! Sum across processors.<a name='1452'></font>
+<a name='1453'>
+<a name='1454'>
+   <font color=#447700>! Don't trace, as called within trace routines<a name='1455'></font>
+   <font color=#447700>! if (trace_use_frequent) call trace_entry("da_proc_sum_ints")<a name='1456'></font>
+<a name='1457'>
+   allocate (sums(size(values)))<a name='1458'>
+   sums(:)=0<a name='1459'>
+   call mpi_reduce(values(:), sums(:), size(values), mpi_integer, mpi_sum, &amp;<a name='1460'>
+      root, local_communicator, ierr)<a name='1461'>
+<a name='1462'>
+   if (rootproc()) values(:) = sums(:)<a name='1463'>
+   deallocate(sums)<a name='1464'>
+<a name='1465'>
+   <font color=#447700>! if (trace_use_frequent) call trace_exit("da_proc_sum_ints")<a name='1466'></font>
+#endif<a name='1467'>
+<a name='1468'>
+end subroutine da_proc_sum_ints<a name='1469'>
+<a name='1470'>
+<a name='1471'>
+<A NAME='DA_PROC_SUM_REAL'><A href='../../html_code/frame/module_trace.F.html#DA_PROC_SUM_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1472'>
+<font color=#993300>subroutine </font><font color=#cc0000>da_proc_sum_real</font> (value) <A href='../../call_to/DA_PROC_SUM_REAL.html' TARGET='index'>4</A><a name='1473'>
+<a name='1474'>
+   <font color=#447700>!---------------------------------------------------------------------------<a name='1475'></font>
+   <font color=#447700>! Purpose: Do MPI reduction operation across processors to sum a real <a name='1476'></font>
+   <font color=#447700>! vector.  <a name='1477'></font>
+   <font color=#447700>! On return, each of the N components of the vector "value" represents<a name='1478'></font>
+   <font color=#447700>! the sum of parts from each processor. The result is stored only on <a name='1479'></font>
+   <font color=#447700>! the root processor, i.e., processor 0. (In this way, we do not have <a name='1480'></font>
+   <font color=#447700>! to do all-to-all communication, unlike wrf_dm_sum_real, which does)<a name='1481'></font>
+   <font color=#447700>!<a name='1482'></font>
+   <font color=#447700>! The routine generates a MPI barrier<a name='1483'></font>
+   <font color=#447700>!---------------------------------------------------------------------------<a name='1484'></font>
+<a name='1485'>
+   implicit none<a name='1486'>
+<a name='1487'>
+   real, intent(inout) :: value(:) <font color=#447700>! Array to be summed componentwise.<a name='1488'></font>
+<a name='1489'>
+#ifdef DM_PARALLEL<a name='1490'>
+   real              :: apsum(size(value))             <font color=#447700>! Sum across processors.<a name='1491'></font>
+<a name='1492'>
+   <font color=#447700>! Don't trace, as called within trace routines<a name='1493'></font>
+   <font color=#447700>!if (trace_use_frequent) call trace_entry("da_proc_sum_real")<a name='1494'></font>
+<a name='1495'>
+   apsum(:)=0<a name='1496'>
+   call mpi_reduce(value, apsum, SIZE(value), mpi_real8, mpi_sum, root, &amp;<a name='1497'>
+      local_communicator, ierr)<a name='1498'>
+<a name='1499'>
+   if (rootproc()) value = apsum<a name='1500'>
+<a name='1501'>
+   <font color=#447700>!if (trace_use_frequent) call trace_exit("da_proc_sum_real")<a name='1502'></font>
+#endif<a name='1503'>
+<a name='1504'>
+end subroutine da_proc_sum_real<a name='1505'>
+<a name='1506'>
+end module module_trace<a name='1507'>
+<a name='1508'>
+<A NAME='ROOTPROC'><A href='../../html_code/frame/module_trace.F.html#ROOTPROC' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='1509'>
+LOGICAL <font color=#993300>FUNCTION </font><font color=#cc0000>rootproc</font>(),<A href='../../call_from/ROOTPROC.html' TARGET='index'>2</A><a name='1510'>
+   USE <A href='../../html_code/frame/module_dm_stubs.F.html#MODULE_DM'>module_dm</A><A href='../../html_code/frame/module_trace.F.html#ROOTPROC' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DM_19"><a name='1511'>
+   IMPLICIT NONE<a name='1512'>
+#ifdef DM_PARALLEL<a name='1513'>
+   INCLUDE 'mpif.h'<a name='1514'>
+#endif<a name='1515'>
+   INTEGER tsk, ierr, mpi_comm_local<a name='1516'>
+#ifdef DM_PARALLEL<a name='1517'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_GET_DM_COMMUNICATOR'>wrf_get_dm_communicator</A><A href='../../html_code/frame/module_trace.F.html#ROOTPROC' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_GET_DM_COMMUNICATOR_7">( mpi_comm_local )<a name='1518'>
+   CALL mpi_comm_rank ( mpi_comm_local, tsk , ierr )<a name='1519'>
+   rootproc = tsk .EQ. 0<a name='1520'>
+#else<a name='1521'>
+   tsk = 0<a name='1522'>
+   rootproc = tsk .EQ. 0<a name='1523'>
+#endif<a name='1524'>
+   RETURN<a name='1525'>
+END FUNCTION rootproc<a name='1526'>
+</pre></body></html>

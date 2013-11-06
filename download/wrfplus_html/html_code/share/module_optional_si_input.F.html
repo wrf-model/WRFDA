@@ -1,0 +1,807 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='MODULE_OPTIONAL_SI_INPUT'><A href='../../html_code/share/module_optional_si_input.F.html#MODULE_OPTIONAL_SI_INPUT' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_optional_si_input</font> <A href='../../call_to/MODULE_OPTIONAL_SI_INPUT.html' TARGET='index'>4</A><a name='3'>
+<a name='4'>
+   INTEGER :: flag_qc       , flag_qr       , flag_qi       , flag_qs       , flag_qg<a name='5'>
+<a name='6'>
+   INTEGER :: flag_st000010 , flag_st010040 , flag_st040100 , flag_st100200 , flag_st010200 , &amp;<a name='7'>
+              flag_sm000010 , flag_sm010040 , flag_sm040100 , flag_sm100200 , flag_sm010200 , &amp;<a name='8'>
+              flag_sw000010 , flag_sw010040 , flag_sw040100 , flag_sw100200 , flag_sw010200<a name='9'>
+<a name='10'>
+   INTEGER :: flag_soilt000 , flag_soilt005 , flag_soilt020 , flag_soilt040 , flag_soilt160 , flag_soilt300 , &amp;<a name='11'>
+              flag_soilm000 , flag_soilm005 , flag_soilm020 , flag_soilm040 , flag_soilm160 , flag_soilm300 , &amp;<a name='12'>
+              flag_soilw000 , flag_soilw005 , flag_soilw020 , flag_soilw040 , flag_soilw160 , flag_soilw300<a name='13'>
+<a name='14'>
+   INTEGER :: flag_sst      , flag_toposoil , flag_snowh<a name='15'>
+<a name='16'>
+   INTEGER                  :: num_st_levels_input , num_sm_levels_input , num_sw_levels_input<a name='17'>
+   INTEGER                  :: num_st_levels_alloc , num_sm_levels_alloc , num_sw_levels_alloc<a name='18'>
+   INTEGER , DIMENSION(100) ::     st_levels_input ,     sm_levels_input ,     sw_levels_input<a name='19'>
+   REAL , ALLOCATABLE , DIMENSION(:,:,:) :: st_input , sm_input , sw_input<a name='20'>
+<a name='21'>
+   CHARACTER (LEN=8) , PRIVATE :: flag_name<a name='22'>
+ <a name='23'>
+   LOGICAL , PRIVATE :: already_been_here = .FALSE.<a name='24'>
+<a name='25'>
+CONTAINS<a name='26'>
+<a name='27'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='28'></font>
+<a name='29'>
+<A NAME='INIT_MODULE_OPTIONAL_SI_INPUT'><A href='../../html_code/share/module_optional_si_input.F.html#INIT_MODULE_OPTIONAL_SI_INPUT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='30'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_optional_si_input</font> ( grid , config_flags )  <A href='../../call_to/INIT_MODULE_OPTIONAL_SI_INPUT.html' TARGET='index'>2</A>,<A href='../../call_from/INIT_MODULE_OPTIONAL_SI_INPUT.html' TARGET='index'>2</A><a name='31'>
+<a name='32'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#INIT_MODULE_OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_165"><a name='33'>
+      USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#INIT_MODULE_OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_178"><a name='34'>
+<a name='35'>
+      IMPLICIT NONE <a name='36'>
+<a name='37'>
+      TYPE ( domain ) :: grid<a name='38'>
+      TYPE (grid_config_rec_type) :: config_flags<a name='39'>
+<a name='40'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='41'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='42'>
+                 its, ite, jts, jte, kts, kte<a name='43'>
+<a name='44'>
+      <font color=#447700>!  Get the various indices, assume XZY ordering.<a name='45'></font>
+<a name='46'>
+      ids = grid%sd31 ; ide = grid%ed31 ;<a name='47'>
+      kds = grid%sd32 ; kde = grid%ed32 ;<a name='48'>
+      jds = grid%sd33 ; jde = grid%ed33 ;<a name='49'>
+<a name='50'>
+      ims = grid%sm31 ; ime = grid%em31 ;<a name='51'>
+      kms = grid%sm32 ; kme = grid%em32 ;<a name='52'>
+      jms = grid%sm33 ; jme = grid%em33 ;<a name='53'>
+<a name='54'>
+      its = grid%sp31 ; ite = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='55'></font>
+      kts = grid%sp32 ; kte = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='56'></font>
+      jts = grid%sp33 ; jte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='57'></font>
+<a name='58'>
+      IF ( .NOT. already_been_here ) THEN<a name='59'>
+<a name='60'>
+         num_st_levels_alloc = config_flags%num_soil_layers * 2<a name='61'>
+         num_sm_levels_alloc = config_flags%num_soil_layers * 2<a name='62'>
+         num_sw_levels_alloc = config_flags%num_soil_layers * 2<a name='63'>
+   <a name='64'>
+         ALLOCATE ( st_input(ims:ime,num_st_levels_alloc,jms:jme) )<a name='65'>
+         ALLOCATE ( sm_input(ims:ime,num_sm_levels_alloc,jms:jme) )<a name='66'>
+         ALLOCATE ( sw_input(ims:ime,num_sw_levels_alloc,jms:jme) )<a name='67'>
+<a name='68'>
+      END IF<a name='69'>
+<a name='70'>
+      already_been_here = .TRUE.<a name='71'>
+<a name='72'>
+   END SUBROUTINE init_module_optional_si_input<a name='73'>
+<a name='74'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='75'></font>
+<a name='76'>
+<A NAME='OPTIONAL_SI_INPUT'><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='77'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>optional_si_input</font> ( grid , fid ) <A href='../../call_to/OPTIONAL_SI_INPUT.html' TARGET='index'>2</A>,<A href='../../call_from/OPTIONAL_SI_INPUT.html' TARGET='index'>7</A><a name='78'>
+<a name='79'>
+      USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_179">      <a name='80'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_166"><a name='81'>
+<a name='82'>
+      IMPLICIT NONE <a name='83'>
+<a name='84'>
+      TYPE ( domain ) :: grid<a name='85'>
+      INTEGER , INTENT(IN) :: fid<a name='86'>
+<a name='87'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='88'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='89'>
+                 its, ite, jts, jte, kts, kte<a name='90'>
+<a name='91'>
+      <font color=#447700>!  Get the various indices, assume XZY ordering.<a name='92'></font>
+<a name='93'>
+      ids = grid%sd31 ; ide = grid%ed31 ;<a name='94'>
+      kds = grid%sd32 ; kde = grid%ed32 ;<a name='95'>
+      jds = grid%sd33 ; jde = grid%ed33 ;<a name='96'>
+<a name='97'>
+      ims = grid%sm31 ; ime = grid%em31 ;<a name='98'>
+      kms = grid%sm32 ; kme = grid%em32 ;<a name='99'>
+      jms = grid%sm33 ; jme = grid%em33 ;<a name='100'>
+<a name='101'>
+      its = grid%sp31 ; ite = grid%ep31 ;   <font color=#447700>! note that tile is entire patch<a name='102'></font>
+      kts = grid%sp32 ; kte = grid%ep32 ;   <font color=#447700>! note that tile is entire patch<a name='103'></font>
+      jts = grid%sp33 ; jte = grid%ep33 ;   <font color=#447700>! note that tile is entire patch<a name='104'></font>
+<a name='105'>
+<a name='106'>
+      CALL <A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_MOIST'>optional_moist</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPTIONAL_MOIST_1">      ( grid , fid , &amp;<a name='107'>
+                                 ids, ide, jds, jde, kds, kde, &amp;<a name='108'>
+                                 ims, ime, jms, jme, kms, kme, &amp;<a name='109'>
+                                 its, ite, jts, jte, kts, kte  )<a name='110'>
+<a name='111'>
+      CALL <A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SST'>optional_sst</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPTIONAL_SST_1">        ( grid , fid , &amp;<a name='112'>
+                                 ids, ide, jds, jde, kds, kde, &amp;<a name='113'>
+                                 ims, ime, jms, jme, kms, kme, &amp;<a name='114'>
+                                 its, ite, jts, jte, kts, kte  )<a name='115'>
+<a name='116'>
+      CALL <A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SNOWH'>optional_snowh</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPTIONAL_SNOWH_1">      ( grid , fid , &amp;<a name='117'>
+                                 ids, ide, jds, jde, kds, kde, &amp;<a name='118'>
+                                 ims, ime, jms, jme, kms, kme, &amp;<a name='119'>
+                                 its, ite, jts, jte, kts, kte  )<a name='120'>
+<a name='121'>
+      IF (  ( model_config_rec%sf_surface_physics(grid%id) .EQ. 1 ) .OR. &amp;<a name='122'>
+            ( model_config_rec%sf_surface_physics(grid%id) .EQ. 2 ) .OR. &amp;<a name='123'>
+            ( model_config_rec%sf_surface_physics(grid%id) .EQ. 3 ) .OR. &amp;<a name='124'>
+            ( model_config_rec%sf_surface_physics(grid%id) .EQ. 99 ) ) THEN<a name='125'>
+<a name='126'>
+         CALL <A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM'>optional_lsm</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPTIONAL_LSM_1">        ( grid , fid , &amp;<a name='127'>
+                                    ids, ide, jds, jde, kds, kde, &amp;<a name='128'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='129'>
+                                    its, ite, jts, jte, kts, kte  )<a name='130'>
+   <a name='131'>
+         CALL <A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS'>optional_lsm_levels</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SI_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPTIONAL_LSM_LEVELS_1"> ( grid , fid , &amp;<a name='132'>
+                                    ids, ide, jds, jde, kds, kde, &amp;<a name='133'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='134'>
+                                    its, ite, jts, jte, kts, kte  )<a name='135'>
+      END IF<a name='136'>
+     <a name='137'>
+   END SUBROUTINE optional_si_input<a name='138'>
+<a name='139'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='140'></font>
+<a name='141'>
+<A NAME='OPTIONAL_MOIST'><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_MOIST' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='142'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>optional_moist</font> ( grid , fid , &amp; <A href='../../call_to/OPTIONAL_MOIST.html' TARGET='index'>1</A>,<A href='../../call_from/OPTIONAL_MOIST.html' TARGET='index'>4</A><a name='143'>
+                               ids, ide, jds, jde, kds, kde, &amp;<a name='144'>
+                               ims, ime, jms, jme, kms, kme, &amp;<a name='145'>
+                               its, ite, jts, jte, kts, kte  )<a name='146'>
+<a name='147'>
+      USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_MOIST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_5"><a name='148'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_MOIST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_167"><a name='149'>
+<a name='150'>
+USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_MOIST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_180"><a name='151'>
+USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_MOIST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_31"><a name='152'>
+<a name='153'>
+      IMPLICIT NONE <a name='154'>
+<a name='155'>
+      TYPE ( domain ) :: grid<a name='156'>
+      INTEGER , INTENT(IN) :: fid<a name='157'>
+<a name='158'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='159'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='160'>
+                 its, ite, jts, jte, kts, kte<a name='161'>
+<a name='162'>
+      INTEGER :: itmp , icnt , ierr<a name='163'>
+<a name='164'>
+      flag_qc       = 0<a name='165'>
+      flag_qr       = 0<a name='166'>
+      flag_qi       = 0<a name='167'>
+      flag_qs       = 0<a name='168'>
+      flag_qg       = 0<a name='169'>
+<a name='170'>
+      flag_name(1:8) = 'QC      '<a name='171'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='172'>
+      IF ( ierr .EQ. 0 ) THEN<a name='173'>
+         flag_qc       = itmp<a name='174'>
+      END IF<a name='175'>
+      flag_name(1:8) = 'QR      '<a name='176'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='177'>
+      IF ( ierr .EQ. 0 ) THEN<a name='178'>
+         flag_qr       = itmp<a name='179'>
+      END IF<a name='180'>
+      flag_name(1:8) = 'QI      '<a name='181'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='182'>
+      IF ( ierr .EQ. 0 ) THEN<a name='183'>
+         flag_qi       = itmp<a name='184'>
+      END IF<a name='185'>
+      flag_name(1:8) = 'QS      '<a name='186'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='187'>
+      IF ( ierr .EQ. 0 ) THEN<a name='188'>
+         flag_qs       = itmp<a name='189'>
+      END IF<a name='190'>
+      flag_name(1:8) = 'QG      '<a name='191'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='192'>
+      IF ( ierr .EQ. 0 ) THEN<a name='193'>
+         flag_qg       = itmp<a name='194'>
+      END IF<a name='195'>
+    <a name='196'>
+   END SUBROUTINE optional_moist<a name='197'>
+<a name='198'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='199'></font>
+<a name='200'>
+<A NAME='OPTIONAL_SST'><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SST' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='201'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>optional_sst</font> ( grid , fid , &amp; <A href='../../call_to/OPTIONAL_SST.html' TARGET='index'>1</A>,<A href='../../call_from/OPTIONAL_SST.html' TARGET='index'>4</A><a name='202'>
+                             ids, ide, jds, jde, kds, kde, &amp;<a name='203'>
+                             ims, ime, jms, jme, kms, kme, &amp;<a name='204'>
+                             its, ite, jts, jte, kts, kte  )<a name='205'>
+<a name='206'>
+      USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_6"><a name='207'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_168"><a name='208'>
+USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_181"><a name='209'>
+USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_32"><a name='210'>
+<a name='211'>
+      IMPLICIT NONE <a name='212'>
+<a name='213'>
+      TYPE ( domain ) :: grid<a name='214'>
+      INTEGER , INTENT(IN) :: fid<a name='215'>
+<a name='216'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='217'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='218'>
+                 its, ite, jts, jte, kts, kte<a name='219'>
+<a name='220'>
+      INTEGER :: itmp , icnt , ierr<a name='221'>
+<a name='222'>
+      flag_sst      = 0 <a name='223'>
+<a name='224'>
+      flag_name(1:8) = 'SST     '<a name='225'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='226'>
+      IF ( ierr .EQ. 0 ) THEN<a name='227'>
+         flag_sst      = itmp<a name='228'>
+      END IF<a name='229'>
+    <a name='230'>
+   END SUBROUTINE optional_sst<a name='231'>
+<a name='232'>
+<a name='233'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='234'></font>
+<a name='235'>
+<A NAME='OPTIONAL_SNOWH'><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SNOWH' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='236'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>optional_snowh</font> ( grid , fid , &amp; <A href='../../call_to/OPTIONAL_SNOWH.html' TARGET='index'>1</A>,<A href='../../call_from/OPTIONAL_SNOWH.html' TARGET='index'>4</A><a name='237'>
+                               ids, ide, jds, jde, kds, kde, &amp;<a name='238'>
+                               ims, ime, jms, jme, kms, kme, &amp;<a name='239'>
+                               its, ite, jts, jte, kts, kte  )<a name='240'>
+<a name='241'>
+      USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SNOWH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_7"><a name='242'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SNOWH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_169"><a name='243'>
+USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SNOWH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_182"><a name='244'>
+USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_SNOWH' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_33"><a name='245'>
+<a name='246'>
+      IMPLICIT NONE <a name='247'>
+<a name='248'>
+      TYPE ( domain ) :: grid<a name='249'>
+      INTEGER , INTENT(IN) :: fid<a name='250'>
+<a name='251'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='252'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='253'>
+                 its, ite, jts, jte, kts, kte<a name='254'>
+<a name='255'>
+      INTEGER :: itmp , icnt , ierr<a name='256'>
+<a name='257'>
+      flag_snowh    = 0 <a name='258'>
+<a name='259'>
+      flag_name(1:8) = 'SNOWH   '<a name='260'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='261'>
+      IF ( ierr .EQ. 0 ) THEN<a name='262'>
+         flag_snowh    = itmp<a name='263'>
+      END IF<a name='264'>
+    <a name='265'>
+   END SUBROUTINE optional_snowh<a name='266'>
+<a name='267'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='268'></font>
+<a name='269'>
+<A NAME='OPTIONAL_LSM'><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='270'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>optional_lsm</font> ( grid , fid , &amp; <A href='../../call_to/OPTIONAL_LSM.html' TARGET='index'>1</A>,<A href='../../call_from/OPTIONAL_LSM.html' TARGET='index'>4</A><a name='271'>
+                             ids, ide, jds, jde, kds, kde, &amp;<a name='272'>
+                             ims, ime, jms, jme, kms, kme, &amp;<a name='273'>
+                             its, ite, jts, jte, kts, kte  )<a name='274'>
+<a name='275'>
+      USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_8"><a name='276'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_170"><a name='277'>
+USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_183"><a name='278'>
+USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_34"><a name='279'>
+<a name='280'>
+      IMPLICIT NONE <a name='281'>
+<a name='282'>
+      TYPE ( domain ) :: grid<a name='283'>
+      INTEGER , INTENT(IN) :: fid<a name='284'>
+<a name='285'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='286'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='287'>
+                 its, ite, jts, jte, kts, kte<a name='288'>
+<a name='289'>
+      INTEGER :: itmp , icnt , ierr<a name='290'>
+<a name='291'>
+      flag_toposoil = 0 <a name='292'>
+<a name='293'>
+      flag_name(1:8) = 'TOPOSOIL'<a name='294'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='295'>
+      IF ( ierr .EQ. 0 ) THEN<a name='296'>
+         flag_toposoil = itmp<a name='297'>
+      END IF<a name='298'>
+    <a name='299'>
+   END SUBROUTINE optional_lsm<a name='300'>
+<a name='301'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='302'></font>
+<a name='303'>
+<A NAME='OPTIONAL_LSM_LEVELS'><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='304'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>optional_lsm_levels</font> ( grid , fid , &amp; <A href='../../call_to/OPTIONAL_LSM_LEVELS.html' TARGET='index'>1</A>,<A href='../../call_from/OPTIONAL_LSM_LEVELS.html' TARGET='index'>38</A><a name='305'>
+                                    ids, ide, jds, jde, kds, kde, &amp;<a name='306'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='307'>
+                                    its, ite, jts, jte, kts, kte  )<a name='308'>
+<a name='309'>
+      USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_9"><a name='310'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_171"><a name='311'>
+USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_184"><a name='312'>
+USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_35"><a name='313'>
+<a name='314'>
+      IMPLICIT NONE <a name='315'>
+<a name='316'>
+      TYPE ( domain ) :: grid<a name='317'>
+      INTEGER , INTENT(IN) :: fid<a name='318'>
+<a name='319'>
+      INTEGER :: ids, ide, jds, jde, kds, kde, &amp;<a name='320'>
+                 ims, ime, jms, jme, kms, kme, &amp;<a name='321'>
+                 its, ite, jts, jte, kts, kte<a name='322'>
+<a name='323'>
+      INTEGER :: itmp , icnt , ierr , i , j<a name='324'>
+    <a name='325'>
+      <font color=#447700>!  Initialize the soil temp and moisture flags to "field not found".<a name='326'></font>
+<a name='327'>
+      flag_st000010 = 0 <a name='328'>
+      flag_st010040 = 0<a name='329'>
+      flag_st040100 = 0<a name='330'>
+      flag_st100200 = 0<a name='331'>
+      flag_st010200 = 0<a name='332'>
+<a name='333'>
+      flag_sm000010 = 0<a name='334'>
+      flag_sm010040 = 0<a name='335'>
+      flag_sm040100 = 0<a name='336'>
+      flag_sm100200 = 0<a name='337'>
+      flag_sm010200 = 0<a name='338'>
+<a name='339'>
+      flag_sw000010 = 0<a name='340'>
+      flag_sw010040 = 0<a name='341'>
+      flag_sw040100 = 0<a name='342'>
+      flag_sw100200 = 0<a name='343'>
+      flag_sw010200 = 0<a name='344'>
+<a name='345'>
+      flag_soilt000 = 0 <a name='346'>
+      flag_soilt005 = 0 <a name='347'>
+      flag_soilt020 = 0 <a name='348'>
+      flag_soilt040 = 0 <a name='349'>
+      flag_soilt160 = 0 <a name='350'>
+      flag_soilt300 = 0 <a name='351'>
+<a name='352'>
+      flag_soilm000 = 0 <a name='353'>
+      flag_soilm005 = 0 <a name='354'>
+      flag_soilm020 = 0 <a name='355'>
+      flag_soilm040 = 0 <a name='356'>
+      flag_soilm160 = 0 <a name='357'>
+      flag_soilm300 = 0 <a name='358'>
+<a name='359'>
+      flag_soilw000 = 0 <a name='360'>
+      flag_soilw005 = 0 <a name='361'>
+      flag_soilw020 = 0 <a name='362'>
+      flag_soilw040 = 0 <a name='363'>
+      flag_soilw160 = 0 <a name='364'>
+      flag_soilw300 = 0 <a name='365'>
+<a name='366'>
+      <font color=#447700>!  How many soil levels have we found?  Well, right now, none.<a name='367'></font>
+<a name='368'>
+      num_st_levels_input = 0<a name='369'>
+      num_sm_levels_input = 0<a name='370'>
+      num_sw_levels_input = 0<a name='371'>
+      st_levels_input = -1<a name='372'>
+      sm_levels_input = -1<a name='373'>
+      sw_levels_input = -1<a name='374'>
+<a name='375'>
+      flag_name(1:8) = 'ST000010'<a name='376'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='377'>
+      IF ( ierr .EQ. 0 ) THEN<a name='378'>
+         flag_st000010 = itmp<a name='379'>
+         num_st_levels_input = num_st_levels_input + 1<a name='380'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_1">(flag_name(3:8))<a name='381'>
+         DO j = jts , MIN(jde-1,jte)<a name='382'>
+            DO i = its , MIN(ide-1,ite)<a name='383'>
+               st_input(i,num_st_levels_input + 1,j) = grid%st000010(i,j)<a name='384'>
+            END DO<a name='385'>
+         END DO<a name='386'>
+      END IF<a name='387'>
+      flag_name(1:8) = 'ST010040'<a name='388'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='389'>
+      IF ( ierr .EQ. 0 ) THEN<a name='390'>
+         flag_st010040 = itmp<a name='391'>
+         num_st_levels_input = num_st_levels_input + 1<a name='392'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_2">(flag_name(3:8))<a name='393'>
+         DO j = jts , MIN(jde-1,jte)<a name='394'>
+            DO i = its , MIN(ide-1,ite)<a name='395'>
+               st_input(i,num_st_levels_input + 1,j) = grid%st010040(i,j)<a name='396'>
+            END DO<a name='397'>
+         END DO<a name='398'>
+      END IF<a name='399'>
+      flag_name(1:8) = 'ST040100'<a name='400'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='401'>
+      IF ( ierr .EQ. 0 ) THEN<a name='402'>
+         flag_st040100 = itmp<a name='403'>
+         num_st_levels_input = num_st_levels_input + 1<a name='404'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_3">(flag_name(3:8))<a name='405'>
+         DO j = jts , MIN(jde-1,jte)<a name='406'>
+            DO i = its , MIN(ide-1,ite)<a name='407'>
+               st_input(i,num_st_levels_input + 1,j) = grid%st040100(i,j)<a name='408'>
+            END DO<a name='409'>
+         END DO<a name='410'>
+      END IF<a name='411'>
+      flag_name(1:8) = 'ST100200'<a name='412'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='413'>
+      IF ( ierr .EQ. 0 ) THEN<a name='414'>
+         flag_st100200 = itmp<a name='415'>
+         num_st_levels_input = num_st_levels_input + 1<a name='416'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_4">(flag_name(3:8))<a name='417'>
+         DO j = jts , MIN(jde-1,jte)<a name='418'>
+            DO i = its , MIN(ide-1,ite)<a name='419'>
+               st_input(i,num_st_levels_input + 1,j) = grid%st100200(i,j)<a name='420'>
+            END DO<a name='421'>
+         END DO<a name='422'>
+      END IF<a name='423'>
+      flag_name(1:8) = 'ST010200'<a name='424'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='425'>
+      IF ( ierr .EQ. 0 ) THEN<a name='426'>
+         flag_st010200 = itmp<a name='427'>
+         num_st_levels_input = num_st_levels_input + 1<a name='428'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_5">(flag_name(3:8))<a name='429'>
+         DO j = jts , MIN(jde-1,jte)<a name='430'>
+            DO i = its , MIN(ide-1,ite)<a name='431'>
+               st_input(i,num_st_levels_input + 1,j) = grid%st010200(i,j)<a name='432'>
+            END DO<a name='433'>
+         END DO<a name='434'>
+      END IF<a name='435'>
+      flag_name(1:8) = 'SM000010'<a name='436'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='437'>
+      IF ( ierr .EQ. 0 ) THEN<a name='438'>
+         flag_sm000010 = itmp<a name='439'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='440'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_6">(flag_name(3:8))<a name='441'>
+         DO j = jts , MIN(jde-1,jte)<a name='442'>
+            DO i = its , MIN(ide-1,ite)<a name='443'>
+               sm_input(i,num_sm_levels_input + 1,j) = grid%sm000010(i,j)<a name='444'>
+            END DO<a name='445'>
+         END DO<a name='446'>
+      END IF<a name='447'>
+      flag_name(1:8) = 'SM010040'<a name='448'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='449'>
+      IF ( ierr .EQ. 0 ) THEN<a name='450'>
+         flag_sm010040 = itmp<a name='451'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='452'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_7">(flag_name(3:8))<a name='453'>
+         DO j = jts , MIN(jde-1,jte)<a name='454'>
+            DO i = its , MIN(ide-1,ite)<a name='455'>
+               sm_input(i,num_sm_levels_input + 1,j) = grid%sm010040(i,j)<a name='456'>
+            END DO<a name='457'>
+         END DO<a name='458'>
+      END IF<a name='459'>
+      flag_name(1:8) = 'SM040100'<a name='460'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='461'>
+      IF ( ierr .EQ. 0 ) THEN<a name='462'>
+         flag_sm040100 = itmp<a name='463'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='464'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_8">(flag_name(3:8))<a name='465'>
+         DO j = jts , MIN(jde-1,jte)<a name='466'>
+            DO i = its , MIN(ide-1,ite)<a name='467'>
+               sm_input(i,num_sm_levels_input + 1,j) = grid%sm040100(i,j)<a name='468'>
+            END DO<a name='469'>
+         END DO<a name='470'>
+      END IF<a name='471'>
+      flag_name(1:8) = 'SM100200'<a name='472'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='473'>
+      IF ( ierr .EQ. 0 ) THEN<a name='474'>
+         flag_sm100200 = itmp<a name='475'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='476'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_9">(flag_name(3:8))<a name='477'>
+         DO j = jts , MIN(jde-1,jte)<a name='478'>
+            DO i = its , MIN(ide-1,ite)<a name='479'>
+               sm_input(i,num_sm_levels_input + 1,j) = grid%sm100200(i,j)<a name='480'>
+            END DO<a name='481'>
+         END DO<a name='482'>
+      END IF<a name='483'>
+      flag_name(1:8) = 'SM010200'<a name='484'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='485'>
+      IF ( ierr .EQ. 0 ) THEN<a name='486'>
+         flag_sm010200 = itmp<a name='487'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='488'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_10">(flag_name(3:8))<a name='489'>
+         DO j = jts , MIN(jde-1,jte)<a name='490'>
+            DO i = its , MIN(ide-1,ite)<a name='491'>
+               sm_input(i,num_sm_levels_input + 1,j) = grid%sm010200(i,j)<a name='492'>
+            END DO<a name='493'>
+         END DO<a name='494'>
+      END IF<a name='495'>
+      flag_name(1:8) = 'SW000010'<a name='496'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='497'>
+      IF ( ierr .EQ. 0 ) THEN<a name='498'>
+         flag_sw000010 = itmp<a name='499'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='500'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_11">(flag_name(3:8))<a name='501'>
+         DO j = jts , MIN(jde-1,jte)<a name='502'>
+            DO i = its , MIN(ide-1,ite)<a name='503'>
+               sw_input(i,num_sw_levels_input + 1,j) = grid%sw000010(i,j)<a name='504'>
+            END DO<a name='505'>
+         END DO<a name='506'>
+      END IF<a name='507'>
+      flag_name(1:8) = 'SW010040'<a name='508'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='509'>
+      IF ( ierr .EQ. 0 ) THEN<a name='510'>
+         flag_sw010040 = itmp<a name='511'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='512'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_12">(flag_name(3:8))<a name='513'>
+         DO j = jts , MIN(jde-1,jte)<a name='514'>
+            DO i = its , MIN(ide-1,ite)<a name='515'>
+               sw_input(i,num_sw_levels_input + 1,j) = grid%sw010040(i,j)<a name='516'>
+            END DO<a name='517'>
+         END DO<a name='518'>
+      END IF<a name='519'>
+      flag_name(1:8) = 'SW040100'<a name='520'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='521'>
+      IF ( ierr .EQ. 0 ) THEN<a name='522'>
+         flag_sw040100 = itmp<a name='523'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='524'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_13">(flag_name(3:8))<a name='525'>
+         DO j = jts , MIN(jde-1,jte)<a name='526'>
+            DO i = its , MIN(ide-1,ite)<a name='527'>
+               sw_input(i,num_sw_levels_input + 1,j) = grid%sw040100(i,j)<a name='528'>
+            END DO<a name='529'>
+         END DO<a name='530'>
+      END IF<a name='531'>
+      flag_name(1:8) = 'SW100200'<a name='532'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='533'>
+      IF ( ierr .EQ. 0 ) THEN<a name='534'>
+         flag_sw100200 = itmp<a name='535'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='536'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_14">(flag_name(3:8))<a name='537'>
+         DO j = jts , MIN(jde-1,jte)<a name='538'>
+            DO i = its , MIN(ide-1,ite)<a name='539'>
+               sw_input(i,num_sw_levels_input + 1,j) = grid%sw100200(i,j)<a name='540'>
+            END DO<a name='541'>
+         END DO<a name='542'>
+      END IF<a name='543'>
+      flag_name(1:8) = 'SW010200'<a name='544'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='545'>
+      IF ( ierr .EQ. 0 ) THEN<a name='546'>
+         flag_sw010200 = itmp<a name='547'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='548'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2'>char2int2</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT2_15">(flag_name(3:8))<a name='549'>
+         DO j = jts , MIN(jde-1,jte)<a name='550'>
+            DO i = its , MIN(ide-1,ite)<a name='551'>
+               sw_input(i,num_sw_levels_input + 1,j) = grid%sw010200(i,j)<a name='552'>
+            END DO<a name='553'>
+         END DO<a name='554'>
+      END IF<a name='555'>
+      flag_name(1:8) = 'SOILT000'<a name='556'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='557'>
+      IF ( ierr .EQ. 0 ) THEN<a name='558'>
+         flag_soilt000 = itmp<a name='559'>
+         num_st_levels_input = num_st_levels_input + 1<a name='560'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_1">(flag_name(6:8))<a name='561'>
+         DO j = jts , MIN(jde-1,jte)<a name='562'>
+            DO i = its , MIN(ide-1,ite)<a name='563'>
+               st_input(i,num_st_levels_input ,j) = grid%soilt000(i,j)<a name='564'>
+            END DO<a name='565'>
+         END DO<a name='566'>
+      END IF<a name='567'>
+      flag_name(1:8) = 'SOILT005'<a name='568'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='569'>
+      IF ( ierr .EQ. 0 ) THEN<a name='570'>
+         flag_soilt005 = itmp<a name='571'>
+         num_st_levels_input = num_st_levels_input + 1<a name='572'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_2">(flag_name(6:8))<a name='573'>
+         DO j = jts , MIN(jde-1,jte)<a name='574'>
+            DO i = its , MIN(ide-1,ite)<a name='575'>
+               st_input(i,num_st_levels_input ,j) = grid%soilt005(i,j)<a name='576'>
+            END DO<a name='577'>
+         END DO<a name='578'>
+      END IF<a name='579'>
+      flag_name(1:8) = 'SOILT020'<a name='580'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='581'>
+      IF ( ierr .EQ. 0 ) THEN<a name='582'>
+         flag_soilt020 = itmp<a name='583'>
+         num_st_levels_input = num_st_levels_input + 1<a name='584'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_3">(flag_name(6:8))<a name='585'>
+         DO j = jts , MIN(jde-1,jte)<a name='586'>
+            DO i = its , MIN(ide-1,ite)<a name='587'>
+               st_input(i,num_st_levels_input ,j) = grid%soilt020(i,j)<a name='588'>
+            END DO<a name='589'>
+         END DO<a name='590'>
+      END IF<a name='591'>
+      flag_name(1:8) = 'SOILT040'<a name='592'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='593'>
+      IF ( ierr .EQ. 0 ) THEN<a name='594'>
+         flag_soilt040 = itmp<a name='595'>
+         num_st_levels_input = num_st_levels_input + 1<a name='596'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_4">(flag_name(6:8))<a name='597'>
+         DO j = jts , MIN(jde-1,jte)<a name='598'>
+            DO i = its , MIN(ide-1,ite)<a name='599'>
+               st_input(i,num_st_levels_input ,j) = grid%soilt040(i,j)<a name='600'>
+            END DO<a name='601'>
+         END DO<a name='602'>
+      END IF<a name='603'>
+      flag_name(1:8) = 'SOILT160'<a name='604'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='605'>
+      IF ( ierr .EQ. 0 ) THEN<a name='606'>
+         flag_soilt160 = itmp<a name='607'>
+         num_st_levels_input = num_st_levels_input + 1<a name='608'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_5">(flag_name(6:8))<a name='609'>
+         DO j = jts , MIN(jde-1,jte)<a name='610'>
+            DO i = its , MIN(ide-1,ite)<a name='611'>
+               st_input(i,num_st_levels_input ,j) = grid%soilt160(i,j)<a name='612'>
+            END DO<a name='613'>
+         END DO<a name='614'>
+      END IF<a name='615'>
+      flag_name(1:8) = 'SOILT300'<a name='616'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='617'>
+      IF ( ierr .EQ. 0 ) THEN<a name='618'>
+         flag_soilt300 = itmp<a name='619'>
+         num_st_levels_input = num_st_levels_input + 1<a name='620'>
+         st_levels_input(num_st_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_6">(flag_name(6:8))<a name='621'>
+         DO j = jts , MIN(jde-1,jte)<a name='622'>
+            DO i = its , MIN(ide-1,ite)<a name='623'>
+               st_input(i,num_st_levels_input ,j) = grid%soilt300(i,j)<a name='624'>
+            END DO<a name='625'>
+         END DO<a name='626'>
+      END IF<a name='627'>
+      flag_name(1:8) = 'SOILM000'<a name='628'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='629'>
+      IF ( ierr .EQ. 0 ) THEN<a name='630'>
+         flag_soilm000 = itmp<a name='631'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='632'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_7">(flag_name(6:8))<a name='633'>
+         DO j = jts , MIN(jde-1,jte)<a name='634'>
+            DO i = its , MIN(ide-1,ite)<a name='635'>
+               sm_input(i,num_sm_levels_input ,j) = grid%soilm000(i,j)<a name='636'>
+            END DO<a name='637'>
+         END DO<a name='638'>
+      END IF<a name='639'>
+      flag_name(1:8) = 'SOILM005'<a name='640'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='641'>
+      IF ( ierr .EQ. 0 ) THEN<a name='642'>
+         flag_soilm005 = itmp<a name='643'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='644'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_8">(flag_name(6:8))<a name='645'>
+         DO j = jts , MIN(jde-1,jte)<a name='646'>
+            DO i = its , MIN(ide-1,ite)<a name='647'>
+               sm_input(i,num_sm_levels_input ,j) = grid%soilm005(i,j)<a name='648'>
+            END DO<a name='649'>
+         END DO<a name='650'>
+      END IF<a name='651'>
+      flag_name(1:8) = 'SOILM020'<a name='652'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='653'>
+      IF ( ierr .EQ. 0 ) THEN<a name='654'>
+         flag_soilm020 = itmp<a name='655'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='656'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_9">(flag_name(6:8))<a name='657'>
+         DO j = jts , MIN(jde-1,jte)<a name='658'>
+            DO i = its , MIN(ide-1,ite)<a name='659'>
+               sm_input(i,num_sm_levels_input ,j) = grid%soilm020(i,j)<a name='660'>
+            END DO<a name='661'>
+         END DO<a name='662'>
+      END IF<a name='663'>
+      flag_name(1:8) = 'SOILM040'<a name='664'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='665'>
+      IF ( ierr .EQ. 0 ) THEN<a name='666'>
+         flag_soilm040 = itmp<a name='667'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='668'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_10">(flag_name(6:8))<a name='669'>
+         DO j = jts , MIN(jde-1,jte)<a name='670'>
+            DO i = its , MIN(ide-1,ite)<a name='671'>
+               sm_input(i,num_sm_levels_input ,j) = grid%soilm040(i,j)<a name='672'>
+            END DO<a name='673'>
+         END DO<a name='674'>
+      END IF<a name='675'>
+      flag_name(1:8) = 'SOILM160'<a name='676'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='677'>
+      IF ( ierr .EQ. 0 ) THEN<a name='678'>
+         flag_soilm160 = itmp<a name='679'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='680'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_11">(flag_name(6:8))<a name='681'>
+         DO j = jts , MIN(jde-1,jte)<a name='682'>
+            DO i = its , MIN(ide-1,ite)<a name='683'>
+               sm_input(i,num_sm_levels_input ,j) = grid%soilm160(i,j)<a name='684'>
+            END DO<a name='685'>
+         END DO<a name='686'>
+      END IF<a name='687'>
+      flag_name(1:8) = 'SOILM300'<a name='688'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='689'>
+      IF ( ierr .EQ. 0 ) THEN<a name='690'>
+         flag_soilm300 = itmp<a name='691'>
+         num_sm_levels_input = num_sm_levels_input + 1<a name='692'>
+         sm_levels_input(num_sm_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_12">(flag_name(6:8))<a name='693'>
+         DO j = jts , MIN(jde-1,jte)<a name='694'>
+            DO i = its , MIN(ide-1,ite)<a name='695'>
+               sm_input(i,num_sm_levels_input ,j) = grid%soilm300(i,j)<a name='696'>
+            END DO<a name='697'>
+         END DO<a name='698'>
+      END IF<a name='699'>
+      flag_name(1:8) = 'SOILW000'<a name='700'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='701'>
+      IF ( ierr .EQ. 0 ) THEN<a name='702'>
+         flag_soilw000 = itmp<a name='703'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='704'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_13">(flag_name(6:8))<a name='705'>
+         DO j = jts , MIN(jde-1,jte)<a name='706'>
+            DO i = its , MIN(ide-1,ite)<a name='707'>
+               sw_input(i,num_sw_levels_input ,j) = grid%soilw000(i,j)<a name='708'>
+            END DO<a name='709'>
+         END DO<a name='710'>
+      END IF<a name='711'>
+      flag_name(1:8) = 'SOILW005'<a name='712'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='713'>
+      IF ( ierr .EQ. 0 ) THEN<a name='714'>
+         flag_soilw005 = itmp<a name='715'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='716'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_14">(flag_name(6:8))<a name='717'>
+         DO j = jts , MIN(jde-1,jte)<a name='718'>
+            DO i = its , MIN(ide-1,ite)<a name='719'>
+               sw_input(i,num_sw_levels_input ,j) = grid%soilw005(i,j)<a name='720'>
+            END DO<a name='721'>
+         END DO<a name='722'>
+      END IF<a name='723'>
+      flag_name(1:8) = 'SOILW020'<a name='724'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='725'>
+      IF ( ierr .EQ. 0 ) THEN<a name='726'>
+         flag_soilw020 = itmp<a name='727'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='728'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_15">(flag_name(6:8))<a name='729'>
+         DO j = jts , MIN(jde-1,jte)<a name='730'>
+            DO i = its , MIN(ide-1,ite)<a name='731'>
+               sw_input(i,num_sw_levels_input ,j) = grid%soilw020(i,j)<a name='732'>
+            END DO<a name='733'>
+         END DO<a name='734'>
+      END IF<a name='735'>
+      flag_name(1:8) = 'SOILW040'<a name='736'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='737'>
+      IF ( ierr .EQ. 0 ) THEN<a name='738'>
+         flag_soilw040 = itmp<a name='739'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='740'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_16">(flag_name(6:8))<a name='741'>
+         DO j = jts , MIN(jde-1,jte)<a name='742'>
+            DO i = its , MIN(ide-1,ite)<a name='743'>
+               sw_input(i,num_sw_levels_input ,j) = grid%soilw040(i,j)<a name='744'>
+            END DO<a name='745'>
+         END DO<a name='746'>
+      END IF<a name='747'>
+      flag_name(1:8) = 'SOILW160'<a name='748'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='749'>
+      IF ( ierr .EQ. 0 ) THEN<a name='750'>
+         flag_soilw160 = itmp<a name='751'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='752'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_17">(flag_name(6:8))<a name='753'>
+         DO j = jts , MIN(jde-1,jte)<a name='754'>
+            DO i = its , MIN(ide-1,ite)<a name='755'>
+               sw_input(i,num_sw_levels_input ,j) = grid%soilw160(i,j)<a name='756'>
+            END DO<a name='757'>
+         END DO<a name='758'>
+      END IF<a name='759'>
+      flag_name(1:8) = 'SOILW300'<a name='760'>
+      CALL wrf_get_dom_ti_integer ( fid, 'FLAG_' // flag_name, itmp, 1, icnt, ierr ) <a name='761'>
+      IF ( ierr .EQ. 0 ) THEN<a name='762'>
+         flag_soilw300 = itmp<a name='763'>
+         num_sw_levels_input = num_sw_levels_input + 1<a name='764'>
+         sw_levels_input(num_sw_levels_input) = <A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1'>char2int1</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHAR2INT1_18">(flag_name(6:8))<a name='765'>
+         DO j = jts , MIN(jde-1,jte)<a name='766'>
+            DO i = its , MIN(ide-1,ite)<a name='767'>
+               sw_input(i,num_sw_levels_input ,j) = grid%soilw300(i,j)<a name='768'>
+            END DO<a name='769'>
+         END DO<a name='770'>
+      END IF<a name='771'>
+<a name='772'>
+      <font color=#447700>!  OK, let's do a quick sanity check.<a name='773'></font>
+ <a name='774'>
+      IF ( ( num_st_levels_input .GT. num_st_levels_alloc ) .OR. &amp;<a name='775'>
+           ( num_sm_levels_input .GT. num_sm_levels_alloc ) .OR. &amp;<a name='776'>
+           ( num_sw_levels_input .GT. num_sw_levels_alloc ) ) THEN<a name='777'>
+         print *,'pain and woe, the soil level allocation is too small'<a name='778'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/share/module_optional_si_input.F.html#OPTIONAL_LSM_LEVELS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_237"> ( 'soil_levels_too_few' )<a name='779'>
+      END IF<a name='780'>
+<a name='781'>
+   END SUBROUTINE optional_lsm_levels<a name='782'>
+<a name='783'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='784'></font>
+<a name='785'>
+<A NAME='CHAR2INT1'><A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT1' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='786'>
+   <font color=#993300>FUNCTION </font><font color=#cc0000>char2int1</font>( string3 ) RESULT ( int1 ) <A href='../../call_to/CHAR2INT1.html' TARGET='index'>18</A><a name='787'>
+      CHARACTER (LEN=3) , INTENT(IN) :: string3<a name='788'>
+      INTEGER :: i1 , int1<a name='789'>
+      READ(string3,fmt='(I3)') i1<a name='790'>
+      int1 = i1<a name='791'>
+   END FUNCTION char2int1<a name='792'>
+<a name='793'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='794'></font>
+<a name='795'>
+<A NAME='CHAR2INT2'><A href='../../html_code/share/module_optional_si_input.F.html#CHAR2INT2' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='796'>
+   <font color=#993300>FUNCTION </font><font color=#cc0000>char2int2</font>( string6 ) RESULT ( int1 ) <A href='../../call_to/CHAR2INT2.html' TARGET='index'>15</A><a name='797'>
+      CHARACTER (LEN=6) , INTENT(IN) :: string6<a name='798'>
+      INTEGER :: i2 , i1 , int1<a name='799'>
+      READ(string6,fmt='(I3,I3)') i1,i2<a name='800'>
+      int1 = ( i2 + i1 ) / 2<a name='801'>
+   END FUNCTION char2int2<a name='802'>
+<a name='803'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='804'></font>
+<a name='805'>
+END MODULE module_optional_si_input<a name='806'>
+</pre></body></html>

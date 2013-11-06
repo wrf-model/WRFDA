@@ -1,0 +1,206 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+
+      <p class="headingtext" id="Font14">3DVAR: The basics</p>
+
+      <p class="bodytext"><strong id="Font14">Step 1: Download the source code</strong> </p>
+      <p class="bodytext">The first step in the installation process is an obvious one: before all else, you must download the WRFDA source code. The WRFDA source code can be found at the download page:</p>
+      <blockquote>
+        <p class="bodytext"><a href="http://www.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html">http://www.mmm
+.ucar.edu/wrf/users/wrfda/download/get_source.html</a></p>
+      </blockquote>
+      <p class="bodytext"><em> <strong>NOTE</strong>: Before downloading the code, you will be required to register (this is free). Click on <span class="style11">New Users</span>, or <span class="style11">Returning Users</span> if you have previously downloaded WRF software (you can download after providing your email address).</em></p>
+
+      <p class="bodytext">After verifying your registration, click the "click here" link to proceed to the download page. On this page will be a list of a number of different WRF products (WRF, WPS, WRFCHEM, and WRFDA); scroll down until you see "WRF-DA Code and Test Data". As of April 2013, the most recent version is V3.5.</p>
+      <p class="bodytext">Click the link labeled "WRF-DA source code tar file" to download WRFDA. You can download this to any folder, but we recommend you create a directory specifically for WRFDA, to keep things organized.</p>
+
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="5%" valign="top"><img src="../images/check.svg" alt="Tip" width="50" height="50"></td
+>
+          <td width="95%" bgcolor="#AADDAA">
+            <p class="bodytext">Before proceeding any further, it is a good idea to check the "<a href="http://www.mmm.ucar.edu/wrf/users/wrfda/known-prob.html">Known Problems and Fixes</a>" page to see if the version you have downloaded has any known bugs that should be patched.</p>
+          </td>
+        </tr>
+      </table>
+
+      <p class="bodytext">To simplify procedures, create an environment variable WRFDA_DIR to point to this directory.</p>
+      <p class="code">> setenv WRFDA_DIR <em>whatever_directory_you_choose</em><br>
+                      > cd $WRFDA_DIR</p>
+      <p class="bodytext"> The reason for this is that a lot of the procedures involved in installing and running WRFDA will need to reference different directory trees, so this will ensure that you can type exactly what you see here and not run into any problems.</p>
+
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td
+>
+          <td width="95%" bgcolor="#DDAA55" class="bodytext">
+            <span class="style5">When typing the "setenv" command, I receive a "not found" or similar error</span><br>
+            You are using a shell other than csh or tcsh. Please see the "<a href="../Help/shells.html">Shells Help Page</a>" for solutions.
+          </td>
+        </tr>
+      </table>
+
+      <p class="bodytext"><strong id="Font14">Step 2: Unpack the source code</strong> <br>
+      <p class="bodytext">The WRFDA package is made available as a <em>zipped tarball</em>. To unpack it into a regular directory tree, use the <span style="font-family:Courier;">gunzip</span> and <span style="font-family:Courier;">tar</span> commands:</p>
+      <p class="code">> gunzip WRFDA_V3.5.tar.gz<br>
+      > tar -xvf WRFDA_V3.5.tar</p>
+      <p class="bodytext">The file name will, of course, be different for other WRFDA release versions.</p>
+
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><a href="../3dvar/configure.html" style="text-decoration:none;"><span class="style7"> NEXT: Configuring for 3DVAR </span>&nbsp;&nbsp;&nbsp;<img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+        <tr>
+          <td><div align="right"><a href="../Help/index.html"><img src="../images/help.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;<a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote><br>
+      <p class="bodytext"><strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> or wrfhelp@ucar.edu so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

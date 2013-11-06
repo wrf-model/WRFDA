@@ -1,0 +1,372 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:DRIVER_LAYER:CONFIGURATION<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_CONFIGURE'><A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_configure</font> <A href='../../call_to/MODULE_CONFIGURE.html' TARGET='index'>220</A><a name='5'>
+<a name='6'>
+   USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_configure.F.html#module_configure.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_9"><a name='7'>
+   USE module_state_description<a name='8'>
+   USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/frame/module_configure.F.html#module_configure.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_12"><a name='9'>
+<a name='10'>
+   TYPE model_config_rec_type<a name='11'>
+      SEQUENCE<a name='12'>
+<font color=#447700>! Statements that declare namelist variables are in this file<a name='13'></font>
+<font color=#447700>! Note that the namelist is SEQUENCE and generated such that the first item is an<a name='14'></font>
+<font color=#447700>! integer, first_item_in_struct and the last is an integer last_item_in_struct<a name='15'></font>
+<font color=#447700>! this provides a way of converting this to a buffer for passing to and from<a name='16'></font>
+<font color=#447700>! the driver.<a name='17'></font>
+#include &lt;<A href='../../html_code/include/namelist_defines.inc.html'>namelist_defines.inc</A>&gt;<A NAME="namelist_defines.inc_1"><A href='../../html_code/frame/module_configure.F.html#module_configure.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='18'>
+   END TYPE model_config_rec_type<a name='19'>
+<a name='20'>
+   TYPE grid_config_rec_type<a name='21'>
+#include &lt;<A href='../../html_code/include/namelist_defines2.inc.html'>namelist_defines2.inc</A>&gt;<A NAME="namelist_defines2.inc_2"><A href='../../html_code/frame/module_configure.F.html#module_configure.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='22'>
+   END TYPE grid_config_rec_type<a name='23'>
+<a name='24'>
+   TYPE(model_config_rec_type) :: model_config_rec<a name='25'>
+<a name='26'>
+#include &lt;<A href='../../html_code/include/scalar_tables.inc.html'>scalar_tables.inc</A>&gt;<A NAME="scalar_tables.inc_3"><A href='../../html_code/frame/module_configure.F.html#module_configure.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='27'>
+<a name='28'>
+<font color=#447700>! special entries (put here but not enshrined in Registry for one reason or other)<a name='29'></font>
+<a name='30'>
+   CHARACTER (LEN=4) :: mminlu = '    '         <font color=#447700>! character string for landuse table<a name='31'></font>
+<a name='32'>
+CONTAINS<a name='33'>
+<a name='34'>
+<a name='35'>
+<font color=#447700>! Model layer, even though it does I/O -- special case of namelist I/O.<a name='36'></font>
+<a name='37'>
+<A NAME='INITIAL_CONFIG'><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='38'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>initial_config</font> <A href='../../call_to/INITIAL_CONFIG.html' TARGET='index'>18</A>,<A href='../../call_from/INITIAL_CONFIG.html' TARGET='index'>4</A><a name='39'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='40'></font>
+<font color=#447700>! This routine reads in the namelist.input file and sets<a name='41'></font>
+<font color=#447700>! module_config_rec, a structure of TYPE(model_config_rec_type), which is is seen via USE association by any<a name='42'></font>
+<font color=#447700>! subprogram that uses module_configure.  The module_config_rec structure<a name='43'></font>
+<font color=#447700>! contains all namelist settings for all domains.  Variables that apply<a name='44'></font>
+<font color=#447700>! to the entire run and have only one value regardless of domain are<a name='45'></font>
+<font color=#447700>! scalars.  Variables that allow different settings for each domain are<a name='46'></font>
+<font color=#447700>! defined as arrays of dimension max_domains (defined in<a name='47'></font>
+<font color=#447700>! frame/module_driver_constants.F, from a setting passed in from<a name='48'></font>
+<font color=#447700>! configure.wrf). There is another type in WRF, TYPE(grid_config_rec_type), in which<a name='49'></font>
+<font color=#447700>! all fields pertain only to a single domain (and are all scalars). The subroutine<a name='50'></font>
+<font color=#447700>! model_to_grid_config_rec(), also in frame/module_configure.F, is used to retrieve<a name='51'></font>
+<font color=#447700>! the settings for a given domain from a TYPE(module_config_rec_type) and put them into<a name='52'></font>
+<font color=#447700>! a TYPE(grid_config_rec_type), variables of which type are often called &lt;em&gt;config_flags&lt;/em&gt;<a name='53'></font>
+<font color=#447700>! in the WRF code.<a name='54'></font>
+<font color=#447700>! <a name='55'></font>
+<font color=#447700>! Most of the code in this routine is generated from the Registry file<a name='56'></font>
+<font color=#447700>! rconfig entries and included from the following files (found in the inc directory):<a name='57'></font>
+<font color=#447700>! <a name='58'></font>
+<font color=#447700>! &lt;pre&gt;<a name='59'></font>
+<font color=#447700>! namelist_defines.inc	declarations of namelist variables (local to this routine)<a name='60'></font>
+<font color=#447700>! namelist_statements.inc	NAMELIST statements for each variable<a name='61'></font>
+<font color=#447700>! namelist_defaults.inc	assignment to default values if specified in Registry<a name='62'></font>
+<font color=#447700>! config_reads.inc		read statements for each namelist record<a name='63'></font>
+<font color=#447700>! config_assigns.inc	assign each variable to field in module_config_rec<a name='64'></font>
+<font color=#447700>! &lt;/pre&gt;<a name='65'></font>
+<font color=#447700>!<a name='66'></font>
+<font color=#447700>!NOTE: generated subroutines from Registry file rconfig entries are renamed nl_<a name='67'></font>
+<font color=#447700>! instead of rconfig_ due to length limits for subroutine names.<a name='68'></font>
+<font color=#447700>!<a name='69'></font>
+<font color=#447700>! Note for version WRF 2.0: there is code here to force all domains to<a name='70'></font>
+<font color=#447700>! have the same mp_physics setting. This is because different mp_physics<a name='71'></font>
+<font color=#447700>! packages have different numbers of tracers but the nest forcing and<a name='72'></font>
+<font color=#447700>! feedback code relies on the parent and nest having the same number and<a name='73'></font>
+<font color=#447700>! kind of tracers. This means that the microphysics option<a name='74'></font>
+<font color=#447700>! specified on the highest numbered domain is the microphysics<a name='75'></font>
+<font color=#447700>! option for &lt;em&gt;all&lt;/em&gt; domains in the run. This will be revisited.<a name='76'></font>
+<font color=#447700>! <a name='77'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='78'></font>
+      IMPLICIT NONE<a name='79'>
+<a name='80'>
+      INTEGER              :: io_status<a name='81'>
+      INTEGER              :: i<a name='82'>
+<a name='83'>
+      INTEGER, PARAMETER :: nml_write_unit= 9<a name='84'>
+      INTEGER, PARAMETER :: nml_read_unit = 10<a name='85'>
+<a name='86'>
+<font color=#447700>! define as temporaries<a name='87'></font>
+#include &lt;<A href='../../html_code/include/namelist_defines.inc.html'>namelist_defines.inc</A>&gt;<A NAME="namelist_defines.inc_4"><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='88'>
+<a name='89'>
+<font color=#447700>! Statements that specify the namelists<a name='90'></font>
+#include &lt;<A href='../../html_code/include/namelist_statements.inc.html'>namelist_statements.inc</A>&gt;<A NAME="namelist_statements.inc_5"><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='91'>
+<a name='92'>
+      OPEN ( UNIT   = nml_read_unit    ,      &amp;<a name='93'>
+             FILE   = "namelist.input" ,      &amp;<a name='94'>
+             FORM   = "FORMATTED"      ,      &amp;<a name='95'>
+             STATUS = "OLD"            ,      &amp;<a name='96'>
+             IOSTAT = io_status         )<a name='97'>
+<a name='98'>
+      IF ( io_status .NE. 0 ) THEN<a name='99'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>WRF_ERROR_FATAL</A><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_76"> ( 'ERROR OPENING namelist.input' )<a name='100'>
+      ENDIF<a name='101'>
+<a name='102'>
+      OPEN ( UNIT   = nml_write_unit    ,      &amp;<a name='103'>
+             FILE   = "namelist.output" ,      &amp;<a name='104'>
+             FORM   = "FORMATTED"      ,      &amp;<a name='105'>
+             STATUS = "REPLACE"        ,      &amp;<a name='106'>
+             IOSTAT = io_status         )<a name='107'>
+<a name='108'>
+      IF ( io_status .NE. 0 ) THEN<a name='109'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>WRF_ERROR_FATAL</A><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_77"> ( 'ERROR OPENING namelist.output' )<a name='110'>
+      ENDIF<a name='111'>
+<a name='112'>
+<font color=#447700>! Statements that set the namelist vars to default vals<a name='113'></font>
+#  include &lt;<A href='../../html_code/include/namelist_defaults.inc.html'>namelist_defaults.inc</A>&gt;<A NAME="namelist_defaults.inc_6"><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='114'>
+<a name='115'>
+<font color=#447700>! Statements that read the namelist are in this file<a name='116'></font>
+#  include &lt;<A href='../../html_code/include/config_reads.inc.html'>config_reads.inc</A>&gt;<A NAME="config_reads.inc_7"><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='117'>
+<a name='118'>
+<font color=#447700>! 2004/04/28  JM (with consensus by the group of developers)<a name='119'></font>
+<font color=#447700>! This is needed to ensure that nesting will work, since<a name='120'></font>
+<font color=#447700>! different mp_physics packages have different numbers of <a name='121'></font>
+<font color=#447700>! tracers. Basically, this says that the microphysics option<a name='122'></font>
+<font color=#447700>! specified on the highest numbered domain *is* the microphysics<a name='123'></font>
+<font color=#447700>! option for the run. Not the best solution but okay for 2.0.<a name='124'></font>
+<font color=#447700>!<a name='125'></font>
+<a name='126'>
+      DO i = 1, max_dom<a name='127'>
+         mp_physics(i) = mp_physics(max_dom)<a name='128'>
+      ENDDO<a name='129'>
+<a name='130'>
+<font color=#447700>! Statements that assign the variables to the cfg record are in this file<a name='131'></font>
+<font color=#447700>! except the namelist_derived variables where are assigned below<a name='132'></font>
+#undef SOURCE_RECORD<a name='133'>
+#undef DEST_RECORD<a name='134'>
+#undef SOURCE_REC_DEX<a name='135'>
+#define SOURCE_RECORD <a name='136'>
+#define DEST_RECORD model_config_rec %<a name='137'>
+#define SOURCE_REC_DEX<a name='138'>
+#include &lt;<A href='../../html_code/include/config_assigns.inc.html'>config_assigns.inc</A>&gt;<A NAME="config_assigns.inc_8"><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='139'>
+<a name='140'>
+      CLOSE ( UNIT = nml_read_unit , IOSTAT = io_status )<a name='141'>
+<a name='142'>
+      IF ( io_status .NE. 0 ) THEN<a name='143'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>WRF_ERROR_FATAL</A><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_78"> ( 'ERROR CLOSING namelist.input' )<a name='144'>
+      ENDIF<a name='145'>
+<a name='146'>
+      CLOSE ( UNIT = nml_write_unit , IOSTAT = io_status )<a name='147'>
+<a name='148'>
+      IF ( io_status .NE. 0 ) THEN<a name='149'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>WRF_ERROR_FATAL</A><A href='../../html_code/frame/module_configure.F.html#INITIAL_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_79"> ( 'ERROR CLOSING namelist.output' )<a name='150'>
+      ENDIF<a name='151'>
+<a name='152'>
+      RETURN<a name='153'>
+<a name='154'>
+   END SUBROUTINE initial_config<a name='155'>
+<a name='156'>
+#if 1<a name='157'>
+<A NAME='GET_CONFIG_AS_BUFFER'><A href='../../html_code/frame/module_configure.F.html#GET_CONFIG_AS_BUFFER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='158'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>get_config_as_buffer</font>( buffer, buflen, ncopied ) <A href='../../call_to/GET_CONFIG_AS_BUFFER.html' TARGET='index'>17</A>,<A href='../../call_from/GET_CONFIG_AS_BUFFER.html' TARGET='index'>2</A><a name='159'>
+<font color=#447700>! note that model_config_rec_type must be defined as a sequence derived type<a name='160'></font>
+      INTEGER,   INTENT(INOUT) ::  buffer(*)<a name='161'>
+      INTEGER,   INTENT(IN)    ::  buflen<a name='162'>
+      INTEGER,   INTENT(OUT)   ::  ncopied<a name='163'>
+<font color=#447700>!      TYPE(model_config_rec_type) :: model_config_rec<a name='164'></font>
+      INTEGER :: nbytes<a name='165'>
+      CALL wrf_num_bytes_between ( model_config_rec%last_item_in_struct ,   &amp;<a name='166'>
+                                   model_config_rec%first_item_in_struct ,  &amp;<a name='167'>
+                                   nbytes )<a name='168'>
+<font color=#447700>!      nbytes = loc(model_config_rec%last_item_in_struct) - &amp;<a name='169'></font>
+<font color=#447700>!               loc(model_config_rec%first_item_in_struct)<a name='170'></font>
+      IF ( nbytes .gt. buflen ) THEN<a name='171'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_configure.F.html#GET_CONFIG_AS_BUFFER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_80">( &amp;<a name='172'>
+        "get_config_rec_as_buffer: buffer size to small for config_rec" )<a name='173'>
+      ENDIF<a name='174'>
+      CALL wrf_mem_copy( model_config_rec, buffer, nbytes )<a name='175'>
+      ncopied = nbytes<a name='176'>
+      RETURN<a name='177'>
+   END SUBROUTINE get_config_as_buffer<a name='178'>
+<a name='179'>
+<A NAME='SET_CONFIG_AS_BUFFER'><A href='../../html_code/frame/module_configure.F.html#SET_CONFIG_AS_BUFFER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='180'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_config_as_buffer</font>( buffer, buflen ) <A href='../../call_to/SET_CONFIG_AS_BUFFER.html' TARGET='index'>17</A>,<A href='../../call_from/SET_CONFIG_AS_BUFFER.html' TARGET='index'>2</A><a name='181'>
+<font color=#447700>! note that model_config_rec_type must be defined as a sequence derived type<a name='182'></font>
+      INTEGER,   INTENT(INOUT) ::  buffer(*)<a name='183'>
+      INTEGER,   INTENT(IN)    ::  buflen<a name='184'>
+<font color=#447700>!      TYPE(model_config_rec_type) :: model_config_rec<a name='185'></font>
+      INTEGER :: nbytes<a name='186'>
+      CALL wrf_num_bytes_between ( model_config_rec%last_item_in_struct ,  &amp;<a name='187'>
+                                   model_config_rec%first_item_in_struct , &amp;<a name='188'>
+                                   nbytes )<a name='189'>
+<font color=#447700>!      nbytes = loc(model_config_rec%last_item_in_struct) - &amp;<a name='190'></font>
+<font color=#447700>!               loc(model_config_rec%first_item_in_struct)<a name='191'></font>
+      IF ( nbytes .gt. buflen ) THEN<a name='192'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_configure.F.html#SET_CONFIG_AS_BUFFER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_81">( &amp;<a name='193'>
+        "set_config_rec_as_buffer: buffer length too small to fill model config record" )<a name='194'>
+      ENDIF<a name='195'>
+      CALL wrf_mem_copy( buffer, model_config_rec, nbytes )<a name='196'>
+      RETURN<a name='197'>
+   END SUBROUTINE set_config_as_buffer<a name='198'>
+#else<a name='199'>
+<A NAME='GET_CONFIG_AS_BUFFER'><A href='../../html_code/frame/module_configure.F.html#GET_CONFIG_AS_BUFFER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='200'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>get_config_as_buffer</font>( buffer, buflen, ncopied ) <A href='../../call_to/GET_CONFIG_AS_BUFFER.html' TARGET='index'>17</A>,<A href='../../call_from/GET_CONFIG_AS_BUFFER.html' TARGET='index'>2</A><a name='201'>
+<font color=#447700>! note that model_config_rec_type must be defined as a sequence derived type<a name='202'></font>
+      INTEGER*1, INTENT(INOUT) ::  buffer(*)<a name='203'>
+      INTEGER,   INTENT(IN)    ::  buflen<a name='204'>
+      INTEGER,   INTENT(OUT)   ::  ncopied<a name='205'>
+<font color=#447700>!      TYPE(model_config_rec_type) :: model_config_rec<a name='206'></font>
+      INTEGER :: nbytes<a name='207'>
+      nbytes = loc(model_config_rec%last_item_in_struct) - &amp;<a name='208'>
+               loc(model_config_rec%first_item_in_struct)<a name='209'>
+      IF ( nbytes .gt. buflen ) THEN<a name='210'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_configure.F.html#GET_CONFIG_AS_BUFFER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_82">( &amp;<a name='211'>
+        "get_config_rec_as_buffer: buffer size to small for config_rec" )<a name='212'>
+      ENDIF<a name='213'>
+      CALL wrf_mem_copy( model_config_rec, buffer, nbytes )<a name='214'>
+      ncopied = nbytes<a name='215'>
+      RETURN<a name='216'>
+   END SUBROUTINE get_config_as_buffer<a name='217'>
+<a name='218'>
+<A NAME='SET_CONFIG_AS_BUFFER'><A href='../../html_code/frame/module_configure.F.html#SET_CONFIG_AS_BUFFER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='219'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_config_as_buffer</font>( buffer, buflen ) <A href='../../call_to/SET_CONFIG_AS_BUFFER.html' TARGET='index'>17</A>,<A href='../../call_from/SET_CONFIG_AS_BUFFER.html' TARGET='index'>2</A><a name='220'>
+<font color=#447700>! note that model_config_rec_type must be defined as a sequence derived type<a name='221'></font>
+      INTEGER*1, INTENT(INOUT) ::  buffer(*)<a name='222'>
+      INTEGER,   INTENT(IN)    ::  buflen<a name='223'>
+<font color=#447700>!      TYPE(model_config_rec_type) :: model_config_rec<a name='224'></font>
+      INTEGER :: nbytes<a name='225'>
+      nbytes = loc(model_config_rec%last_item_in_struct) - &amp;<a name='226'>
+               loc(model_config_rec%first_item_in_struct)<a name='227'>
+      IF ( nbytes .gt. buflen ) THEN<a name='228'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_configure.F.html#SET_CONFIG_AS_BUFFER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_83">( &amp;<a name='229'>
+        "set_config_rec_as_buffer: buffer length too small to fill model config record" )<a name='230'>
+      ENDIF<a name='231'>
+      CALL wrf_mem_copy( buffer, model_config_rec, nbytes )<a name='232'>
+      RETURN<a name='233'>
+   END SUBROUTINE set_config_as_buffer<a name='234'>
+#endif<a name='235'>
+<a name='236'>
+<A NAME='MODEL_TO_GRID_CONFIG_REC'><A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='237'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>model_to_grid_config_rec</font> ( id_id , model_config_rec , grid_config_rec ) <A href='../../call_to/MODEL_TO_GRID_CONFIG_REC.html' TARGET='index'>46</A><a name='238'>
+      INTEGER , INTENT(IN)                         ::  id_id<a name='239'>
+      TYPE ( model_config_rec_type ) , INTENT(IN)  ::  model_config_rec<a name='240'>
+      TYPE ( grid_config_rec_type  ) , INTENT(OUT) ::  grid_config_rec<a name='241'>
+<font color=#447700>! &lt;DESCRIPTION&gt;<a name='242'></font>
+<font color=#447700>! This routine is called to populate a domain specific configuration<a name='243'></font>
+<font color=#447700>! record of TYPE(grid_config_rec_type) with the configuration information<a name='244'></font>
+<font color=#447700>! for that domain that is stored in TYPE(model_config_rec). Both types<a name='245'></font>
+<font color=#447700>! are defined in frame/module_configure.F.  The input argument is the<a name='246'></font>
+<font color=#447700>! record of type model_config_rec_type contains the model-wide<a name='247'></font>
+<font color=#447700>! configuration information (that is, settings that apply to the model in<a name='248'></font>
+<font color=#447700>! general) and configuration information for each individual domain.  The<a name='249'></font>
+<font color=#447700>! output argument is the record of type grid_config_rec_type which<a name='250'></font>
+<font color=#447700>! contains the model-wide configuration information and the<a name='251'></font>
+<font color=#447700>! domain-specific information for this domain only.  In the<a name='252'></font>
+<font color=#447700>! model_config_rec, the domain specific information is arrays, indexed by<a name='253'></font>
+<font color=#447700>! the grid id's.  In the grid_config_rec the domain-specific information<a name='254'></font>
+<font color=#447700>! is scalar and for the specific domain.  The first argument to this<a name='255'></font>
+<font color=#447700>! routine is the grid id (top-most domain is always 1) as specified in<a name='256'></font>
+<font color=#447700>! the domain-specific namelist variable grid_id.<a name='257'></font>
+<font color=#447700>! <a name='258'></font>
+<font color=#447700>! The actual assignments form the model_config_rec_type to the<a name='259'></font>
+<font color=#447700>! grid_config_rec_type are generate from the rconfig entries in the<a name='260'></font>
+<font color=#447700>! Registry file and included by this routine from the file<a name='261'></font>
+<font color=#447700>! inc/config_assigns.inc.<a name='262'></font>
+<font color=#447700>!<a name='263'></font>
+<font color=#447700>!NOTE: generated subroutines from Registry file rconfig entries are renamed nl_<a name='264'></font>
+<font color=#447700>! instead of rconfig_ due to length limits for subroutine names.<a name='265'></font>
+<font color=#447700>!<a name='266'></font>
+<font color=#447700>! <a name='267'></font>
+<font color=#447700>! &lt;/DESCRIPTION&gt;<a name='268'></font>
+#undef SOURCE_RECORD<a name='269'>
+#undef SOURCE_REC_DEX<a name='270'>
+#undef DEST_RECORD<a name='271'>
+#define SOURCE_RECORD model_config_rec %<a name='272'>
+#define SOURCE_REC_DEX (id_id)<a name='273'>
+#define DEST_RECORD   grid_config_rec %<a name='274'>
+#include &lt;<A href='../../html_code/include/config_assigns.inc.html'>config_assigns.inc</A>&gt;<A NAME="config_assigns.inc_9"><A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='275'>
+   END SUBROUTINE model_to_grid_config_rec<a name='276'>
+<a name='277'>
+<font color=#447700>! Include the definitions of all the routines that return a namelist values<a name='278'></font>
+<font color=#447700>! back to the driver. These are generated by the registry<a name='279'></font>
+<a name='280'>
+<A NAME='INIT_MODULE_CONFIGURE'><A href='../../html_code/frame/module_configure.F.html#INIT_MODULE_CONFIGURE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='281'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_configure</font> <A href='../../call_to/INIT_MODULE_CONFIGURE.html' TARGET='index'>2</A><a name='282'>
+     IMPLICIT NONE<a name='283'>
+     <font color=#447700>! Local vars<a name='284'></font>
+<a name='285'>
+     INTEGER i , j<a name='286'>
+<a name='287'>
+     DO j = 1, max_domains<a name='288'>
+#include &lt;<A href='../../html_code/include/scalar_tables_init.inc.html'>scalar_tables_init.inc</A>&gt;<A NAME="scalar_tables_init.inc_10"><A href='../../html_code/frame/module_configure.F.html#INIT_MODULE_CONFIGURE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='289'>
+     END DO<a name='290'>
+   END SUBROUTINE init_module_configure<a name='291'>
+<a name='292'>
+<font color=#447700>! When the compiler has Intel Inside (TM) (that is, ifort), the large<a name='293'></font>
+<font color=#447700>! number of nl_get and nl_set routines inside the module causes the<a name='294'></font>
+<font color=#447700>! compiler to never finish with this routine. For ifort, move the<a name='295'></font>
+<font color=#447700>! routines outside the module. Note, the registry generates a <a name='296'></font>
+<font color=#447700>! USE module_configure for all the nl_get and nl_set routines<a name='297'></font>
+<font color=#447700>! if IFORT_KLUDGE is in effect.<a name='298'></font>
+#ifdef IFORT_KLUDGE<a name='299'>
+<a name='300'>
+END MODULE module_configure<a name='301'>
+<a name='302'>
+# include &lt;<A href='../../html_code/include/get_nl_config.inc.html'>get_nl_config.inc</A>&gt;<A NAME="get_nl_config.inc_11"><A href='../../html_code/frame/module_configure.F.html#INIT_MODULE_CONFIGURE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='303'>
+<a name='304'>
+#else<a name='305'>
+<a name='306'>
+# include &lt;<A href='../../html_code/include/get_nl_config.inc.html'>get_nl_config.inc</A>&gt;<A NAME="get_nl_config.inc_12"><A href='../../html_code/frame/module_configure.F.html#INIT_MODULE_CONFIGURE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='307'>
+<a name='308'>
+END MODULE module_configure<a name='309'>
+<a name='310'>
+#endif<a name='311'>
+<a name='312'>
+<font color=#447700>! Special (outside registry)<a name='313'></font>
+<A NAME='NL_GET_MMINLU'><A href='../../html_code/frame/module_configure.F.html#NL_GET_MMINLU' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='314'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>nl_get_mminlu</font> ( idum , retval ) <A href='../../call_to/NL_GET_MMINLU.html' TARGET='index'>4</A>,<A href='../../call_from/NL_GET_MMINLU.html' TARGET='index'>1</A><a name='315'>
+  USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_configure.F.html#NL_GET_MMINLU' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_36"><a name='316'>
+  CHARACTER(LEN=4)  :: retval<a name='317'>
+  INTEGER idum<a name='318'>
+  retval(1:4) = mminlu(1:4)   <font color=#447700>! mminlu is defined in module_configure<a name='319'></font>
+  RETURN<a name='320'>
+END SUBROUTINE nl_get_mminlu<a name='321'>
+<A NAME='NL_SET_MMINLU'><A href='../../html_code/frame/module_configure.F.html#NL_SET_MMINLU' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='322'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>nl_set_mminlu</font> ( idum, inval ) <A href='../../call_to/NL_SET_MMINLU.html' TARGET='index'>7</A>,<A href='../../call_from/NL_SET_MMINLU.html' TARGET='index'>1</A><a name='323'>
+  USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_configure.F.html#NL_SET_MMINLU' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_37"><a name='324'>
+  CHARACTER(LEN=4) :: inval<a name='325'>
+  INTEGER idum<a name='326'>
+  mminlu(1:4) = inval(1:4)    <font color=#447700>! mminlu is defined in module_configure<a name='327'></font>
+  RETURN<a name='328'>
+END SUBROUTINE nl_set_mminlu<a name='329'>
+<a name='330'>
+<a name='331'>
+<A NAME='SET_SCALAR_INDICES_FROM_CONFIG'><A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='332'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>set_scalar_indices_from_config</font> ( idomain , dummy2, dummy1 ) <A href='../../call_to/SET_SCALAR_INDICES_FROM_CONFIG.html' TARGET='index'>26</A>,<A href='../../call_from/SET_SCALAR_INDICES_FROM_CONFIG.html' TARGET='index'>3</A><a name='333'>
+  USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_10"><a name='334'>
+  USE module_state_description<a name='335'>
+  USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_13"><a name='336'>
+  USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_38"><a name='337'>
+  IMPLICIT NONE<a name='338'>
+  INTEGER , INTENT(IN)  :: idomain<a name='339'>
+  INTEGER               :: dummy1<a name='340'>
+  INTEGER               :: dummy2<a name='341'>
+<a name='342'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='343'></font>
+<font color=#447700>!This routine is called to adjust the integer variables that are defined<a name='344'></font>
+<font color=#447700>!in frame/module_state_description.F (Registry-generated) and that serve<a name='345'></font>
+<font color=#447700>!as indices into 4D tracer arrays for moisture, chemistry, etc.<a name='346'></font>
+<font color=#447700>!Different domains (different grid data structures) are allowed to have<a name='347'></font>
+<font color=#447700>!different sets of tracers so these indices can vary from domain to<a name='348'></font>
+<font color=#447700>!domain. However, since the indices are defined globally in<a name='349'></font>
+<font color=#447700>!module_state_description (a shortcoming in the current software), it is<a name='350'></font>
+<font color=#447700>!necessary that these indices be reset each time a different grid is to<a name='351'></font>
+<font color=#447700>!be computed on.<a name='352'></font>
+<font color=#447700>!<a name='353'></font>
+<font color=#447700>!The scalar idices are set according to the particular physics<a name='354'></font>
+<font color=#447700>!packages -- more specifically in the case of the moisture tracers, microphysics<a name='355'></font>
+<font color=#447700>!packages -- that are stored for each domain in model_config_rec and<a name='356'></font>
+<font color=#447700>!indexed by the grid id, passed in as an argument to this routine.  (The<a name='357'></font>
+<font color=#447700>!initial_config() routine in module_configure is what reads the<a name='358'></font>
+<font color=#447700>!namelist.input file and sets model_config_rec.)<a name='359'></font>
+<font color=#447700>!<a name='360'></font>
+<font color=#447700>!The actual code for calculating the scalar indices on a particular<a name='361'></font>
+<font color=#447700>!domain is generated from the Registry state array definitions for the<a name='362'></font>
+<font color=#447700>!4d tracers and from the package definitions that indicate which physics<a name='363'></font>
+<font color=#447700>!packages use which tracers.<a name='364'></font>
+<font color=#447700>!<a name='365'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='366'></font>
+<a name='367'>
+#include &lt;<A href='../../html_code/include/scalar_indices.inc.html'>scalar_indices.inc</A>&gt;<A NAME="scalar_indices.inc_13"><A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='368'>
+#include &lt;<A href='../../html_code/include/scalar_indices_init.inc.html'>scalar_indices_init.inc</A>&gt;<A NAME="scalar_indices_init.inc_14"><A href='../../html_code/frame/module_configure.F.html#SET_SCALAR_INDICES_FROM_CONFIG' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='369'>
+  RETURN<a name='370'>
+END SUBROUTINE set_scalar_indices_from_config<a name='371'>
+</pre></body></html>

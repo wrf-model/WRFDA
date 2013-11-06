@@ -1,0 +1,330 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION:IO<a name='2'></font>
+<font color=#447700>!  ---principal wrf output routine (called from routines in module_io_domain ) <a name='3'></font>
+<A NAME='OUTPUT_WRF'><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='4'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_wrf</font> ( fid , grid , config_flags, switch , ierr ) <A href='../../call_to/OUTPUT_WRF.html' TARGET='index'>14</A>,<A href='../../call_from/OUTPUT_WRF.html' TARGET='index'>32</A><a name='5'>
+    USE <A href='../../html_code/frame/module_io.F.html#MODULE_IO'>module_io</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_8"><a name='6'>
+    USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_54"><a name='7'>
+    USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_10"><a name='8'>
+    USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_174"><a name='9'>
+    USE module_state_description<a name='10'>
+    USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_186"><a name='11'>
+<font color=#447700>!    USE module_date_time<a name='12'></font>
+    USE WRF_ESMF_MOD<a name='13'>
+    IMPLICIT NONE<a name='14'>
+#include &lt;<A href='../../html_code/include/wrf_io_flags.h.html'>wrf_io_flags.h</A>&gt;<A NAME="wrf_io_flags.h_1"><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='15'>
+#include &lt;<A href='../../html_code/include/wrf_status_codes.h.html'>wrf_status_codes.h</A>&gt;<A NAME="wrf_status_codes.h_2"><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='16'>
+    TYPE(domain) :: grid<a name='17'>
+    TYPE(grid_config_rec_type),  INTENT(INOUT)    :: config_flags<a name='18'>
+    INTEGER, INTENT(IN) :: fid, switch<a name='19'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='20'>
+<a name='21'>
+    <font color=#447700>! Local data<a name='22'></font>
+    INTEGER ids , ide , jds , jde , kds , kde , &amp;<a name='23'>
+            ims , ime , jms , jme , kms , kme , &amp;<a name='24'>
+            ips , ipe , jps , jpe , kps , kpe<a name='25'>
+      <a name='26'>
+    INTEGER , DIMENSION(3) :: domain_start , domain_end<a name='27'>
+    INTEGER , DIMENSION(3) :: memory_start , memory_end<a name='28'>
+    INTEGER , DIMENSION(3) :: patch_start , patch_end<a name='29'>
+    INTEGER i,j<a name='30'>
+    INTEGER julyr, julday, idt, iswater , map_proj<a name='31'>
+    INTEGER filestate<a name='32'>
+    LOGICAL dryrun<a name='33'>
+    REAL    gmt, cen_lat, cen_lon, bdyfrq , truelat1 , truelat2 , moad_cen_lat , stand_lon<a name='34'>
+    INTEGER dyn_opt, diff_opt, km_opt, damp_opt,  &amp;<a name='35'>
+            mp_physics, ra_lw_physics, ra_sw_physics, sf_sfclay_physics, &amp;<a name='36'>
+            sf_surface_physics, bl_pbl_physics, cu_physics<a name='37'>
+    REAL    khdif, kvdif<a name='38'>
+    CHARACTER (len=19) simulation_start_date<a name='39'>
+    INTEGER rc<a name='40'>
+<a name='41'>
+    CHARACTER*256 message<a name='42'>
+    CHARACTER*80  fname<a name='43'>
+    CHARACTER*80  char_junk<a name='44'>
+    INTEGER    ibuf(1)<a name='45'>
+    REAL       rbuf(1)<a name='46'>
+    TYPE(ESMF_TimeInterval) :: bdy_increment<a name='47'>
+    TYPE(ESMF_Time)         :: next_time, current_time<a name='48'>
+    CHARACTER*40            :: next_datestr<a name='49'>
+    INTEGER :: start_year , start_month , start_day , start_hour , start_minute , start_second<a name='50'>
+<a name='51'>
+    CALL <A href='../../html_code/frame/module_io.F.html#WRF_INQUIRE_FILENAME'>wrf_inquire_filename</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_INQUIRE_FILENAME_2"> ( fid , fname , filestate , ierr )<a name='52'>
+    IF ( ierr /= 0 ) THEN<a name='53'>
+      WRITE(wrf_err_message,*)'module_io_wrf: output_wrf: wrf_inquire_filename Status = ',ierr<a name='54'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_254">( wrf_err_message )<a name='55'>
+    ENDIF<a name='56'>
+<a name='57'>
+    dryrun       = ( filestate .EQ. WRF_FILE_OPENED_NOT_COMMITTED )<a name='58'>
+<a name='59'>
+    WRITE(wrf_err_message,*)'output_wrf: dryrun = ',dryrun<a name='60'>
+    CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_271">( 300 , wrf_err_message )<a name='61'>
+<a name='62'>
+    CALL <A href='../../html_code/frame/module_domain.F.html#GET_IJK_FROM_GRID'>get_ijk_from_grid</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GET_IJK_FROM_GRID_19"> (  grid ,                        &amp;<a name='63'>
+                              ids, ide, jds, jde, kds, kde,    &amp;<a name='64'>
+                              ims, ime, jms, jme, kms, kme,    &amp;<a name='65'>
+                              ips, ipe, jps, jpe, kps, kpe    )<a name='66'>
+<a name='67'>
+    call nl_get_dyn_opt       ( 1, dyn_opt                       )<a name='68'>
+    call nl_get_diff_opt      ( 1, diff_opt                      )<a name='69'>
+    call nl_get_km_opt        ( 1, km_opt                        )<a name='70'>
+    call nl_get_damp_opt      ( 1, damp_opt                      )<a name='71'>
+    call nl_get_khdif         ( grid%id,  khdif               )<a name='72'>
+    call nl_get_kvdif         ( grid%id,  kvdif               )<a name='73'>
+    call nl_get_mp_physics    ( grid%id,  mp_physics          )<a name='74'>
+    call nl_get_ra_lw_physics ( grid%id,  ra_lw_physics       )<a name='75'>
+    call nl_get_ra_sw_physics ( grid%id,  ra_sw_physics           )<a name='76'>
+    call nl_get_sf_sfclay_physics  ( grid%id,  sf_sfclay_physics  )<a name='77'>
+    call nl_get_sf_surface_physics ( grid%id,  sf_surface_physics )<a name='78'>
+    call nl_get_bl_pbl_physics     ( grid%id,  bl_pbl_physics     )<a name='79'>
+    call nl_get_cu_physics         ( grid%id,  cu_physics         )<a name='80'>
+<a name='81'>
+<font color=#447700>! julday and gmt can be set in namelist_03 for ideal.exe run<a name='82'></font>
+    CALL nl_get_gmt (grid%id, gmt)<a name='83'>
+    CALL nl_get_julyr (grid%id, julyr)<a name='84'>
+    CALL nl_get_julday (grid%id, julday)<a name='85'>
+    CALL <A href='../../html_code/frame/module_configure.F.html#NL_GET_MMINLU'>nl_get_mminlu</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NL_GET_MMINLU_4"> ( 1, char_junk(1:4) )<a name='86'>
+    CALL nl_get_iswater (grid%id, iswater )<a name='87'>
+    CALL nl_get_cen_lat ( grid%id , cen_lat )<a name='88'>
+    CALL nl_get_cen_lon ( grid%id , cen_lon )<a name='89'>
+    CALL nl_get_truelat1 ( grid%id , truelat1 )<a name='90'>
+    CALL nl_get_truelat2 ( grid%id , truelat2 )<a name='91'>
+    CALL nl_get_moad_cen_lat ( grid%id , moad_cen_lat )<a name='92'>
+    CALL nl_get_stand_lon ( grid%id , stand_lon )<a name='93'>
+    CALL nl_get_map_proj ( grid%id , map_proj )<a name='94'>
+<a name='95'>
+    CALL <A href='../../html_code/share/module_date_time.F.html#WRF_CLOCKPRINT'>wrf_clockprint</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CLOCKPRINT_31">(150, grid%domain_clock, &amp;<a name='96'>
+                        'DEBUG output_wrf():  before call to ESMF_ClockGet,')<a name='97'>
+    CALL ESMF_ClockGet( grid%domain_clock, currTime=current_time, rc=rc )<a name='98'>
+    CALL <A href='../../html_code/share/module_date_time.F.html#WRF_TIMETOA'>wrf_timetoa</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_TIMETOA_32"> ( current_time, current_date )<a name='99'>
+    WRITE ( wrf_err_message , * ) 'output_wrf: begin, current_date=',current_date<a name='100'>
+    CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_272"> ( 300 , wrf_err_message )<a name='101'>
+<a name='102'>
+      WRITE( message , * ) "OUTPUT FROM " , TRIM(program_name)<a name='103'>
+      CALL wrf_put_dom_ti_char ( fid , 'TITLE' , TRIM(message) , ierr )<a name='104'>
+      CALL nl_get_start_year(grid%id,start_year)<a name='105'>
+      CALL nl_get_start_month(grid%id,start_month)<a name='106'>
+      CALL nl_get_start_day(grid%id,start_day)<a name='107'>
+      CALL nl_get_start_hour(grid%id,start_hour)<a name='108'>
+      CALL nl_get_start_minute(grid%id,start_minute)<a name='109'>
+      CALL nl_get_start_second(grid%id,start_second)<a name='110'>
+      WRITE ( start_date , FMT = '(I4.4,"-",I2.2,"-",I2.2,"_",I2.2,":",I2.2,":",I2.2)' ) &amp;<a name='111'>
+              start_year,start_month,start_day,start_hour,start_minute,start_second<a name='112'>
+      CALL wrf_put_dom_ti_char ( fid , 'START_DATE', TRIM(start_date) , ierr )<a name='113'>
+      IF ( switch .EQ. model_input_only .or. switch .EQ. aux_hist3_only ) THEN<a name='114'>
+         CALL wrf_put_dom_ti_char ( fid , 'SIMULATION_START_DATE', TRIM(start_date) , ierr )<a name='115'>
+      END IF<a name='116'>
+<a name='117'>
+#ifdef D3VAR_IRY_KLUDGE<a name='118'>
+      ibuf(1) = config_flags%e_sn - config_flags%s_sn + 1<a name='119'>
+#else<a name='120'>
+      ibuf(1) = config_flags%e_we - config_flags%s_we + 1<a name='121'>
+#endif<a name='122'>
+      CALL wrf_put_dom_ti_integer ( fid , 'WEST-EAST_GRID_DIMENSION' ,  ibuf , 1 , ierr )<a name='123'>
+<a name='124'>
+#ifdef D3VAR_IRY_KLUDGE<a name='125'>
+      ibuf(1) = config_flags%e_we - config_flags%s_we + 1<a name='126'>
+#else<a name='127'>
+      ibuf(1) = config_flags%e_sn - config_flags%s_sn + 1<a name='128'>
+#endif<a name='129'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SOUTH-NORTH_GRID_DIMENSION' , ibuf , 1 , ierr )<a name='130'>
+<a name='131'>
+      ibuf(1) = config_flags%e_vert - config_flags%s_vert + 1<a name='132'>
+      CALL wrf_put_dom_ti_integer ( fid , 'BOTTOM-TOP_GRID_DIMENSION' , ibuf , 1 , ierr )<a name='133'>
+<a name='134'>
+<font color=#447700>! added this metadatum for H. Chuan, NCEP, 030417, JM<a name='135'></font>
+      SELECT CASE ( dyn_opt )<a name='136'>
+#if (NMM_CORE == 1)<a name='137'>
+        CASE ( dyn_nmm )<a name='138'>
+          CALL wrf_put_dom_ti_char ( fid , 'GRIDTYPE',  'E' , ierr )<a name='139'>
+#endif<a name='140'>
+#if (EM_CORE == 1)<a name='141'>
+        CASE ( dyn_em )<a name='142'>
+          CALL wrf_put_dom_ti_char ( fid , 'GRIDTYPE',  'C' , ierr )<a name='143'>
+#endif<a name='144'>
+#if (COAMPS_CORE == 1 )<a name='145'>
+        CASE ( dyn_coamps )<a name='146'>
+          CALL wrf_put_dom_ti_char ( fid , 'GRIDTYPE',  'B' , ierr )<a name='147'>
+#endif<a name='148'>
+        CASE DEFAULT<a name='149'>
+          <font color=#447700>! we don't know; don't put anything in the file<a name='150'></font>
+      END SELECT<a name='151'>
+<a name='152'>
+<font color=#447700>! added these fields for W. Skamarock, 020402, JM<a name='153'></font>
+      ibuf(1) = dyn_opt<a name='154'>
+      CALL wrf_put_dom_ti_integer ( fid , 'DYN_OPT' ,  ibuf , 1 , ierr )<a name='155'>
+      ibuf(1) = diff_opt<a name='156'>
+      CALL wrf_put_dom_ti_integer ( fid , 'DIFF_OPT' ,  ibuf , 1 , ierr )<a name='157'>
+      ibuf(1) = km_opt<a name='158'>
+      CALL wrf_put_dom_ti_integer ( fid , 'KM_OPT' ,  ibuf , 1 , ierr )<a name='159'>
+      ibuf(1) = damp_opt<a name='160'>
+      CALL wrf_put_dom_ti_integer ( fid , 'DAMP_OPT' ,  ibuf , 1 , ierr )<a name='161'>
+      rbuf(1) = khdif<a name='162'>
+      CALL wrf_put_dom_ti_real    ( fid , 'KHDIF' ,  rbuf , 1 , ierr )<a name='163'>
+      rbuf(1) = kvdif<a name='164'>
+      CALL wrf_put_dom_ti_real    ( fid , 'KVDIF' ,  rbuf , 1 , ierr )<a name='165'>
+      ibuf(1) = mp_physics<a name='166'>
+      CALL wrf_put_dom_ti_integer ( fid , 'MP_PHYSICS' ,  ibuf , 1 , ierr )<a name='167'>
+      ibuf(1) = ra_lw_physics<a name='168'>
+      CALL wrf_put_dom_ti_integer ( fid , 'RA_LW_PHYSICS' ,  ibuf , 1 , ierr )<a name='169'>
+      ibuf(1) = ra_sw_physics<a name='170'>
+      CALL wrf_put_dom_ti_integer ( fid , 'RA_SW_PHYSICS' ,  ibuf , 1 , ierr )<a name='171'>
+      ibuf(1) = sf_sfclay_physics<a name='172'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SF_SFCLAY_PHYSICS' ,  ibuf , 1 , ierr )<a name='173'>
+      ibuf(1) = sf_surface_physics<a name='174'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SF_SURFACE_PHYSICS' ,  ibuf , 1 , ierr )<a name='175'>
+      ibuf(1) = bl_pbl_physics<a name='176'>
+      CALL wrf_put_dom_ti_integer ( fid , 'BL_PBL_PHYSICS' ,  ibuf , 1 , ierr )<a name='177'>
+      ibuf(1) = cu_physics<a name='178'>
+      CALL wrf_put_dom_ti_integer ( fid , 'CU_PHYSICS' ,  ibuf , 1 , ierr )<a name='179'>
+<a name='180'>
+<font color=#447700>! added these fields for use by reassembly programs , 010831, JM<a name='181'></font>
+<a name='182'>
+#ifdef D3VAR_IRY_KLUDGE<a name='183'>
+      ibuf(1) = MAX(jps,jds)<a name='184'>
+#else<a name='185'>
+      ibuf(1) = MAX(ips,ids)<a name='186'>
+#endif<a name='187'>
+      CALL wrf_put_dom_ti_integer ( fid , 'WEST-EAST_PATCH_START_UNSTAG' ,  ibuf , 1 , ierr )<a name='188'>
+#ifdef D3VAR_IRY_KLUDGE<a name='189'>
+      ibuf(1) = MIN(jpe,jde-1)<a name='190'>
+#else<a name='191'>
+      ibuf(1) = MIN(ipe,ide-1)<a name='192'>
+#endif<a name='193'>
+      CALL wrf_put_dom_ti_integer ( fid , 'WEST-EAST_PATCH_END_UNSTAG' ,  ibuf , 1 , ierr )<a name='194'>
+#ifdef D3VAR_IRY_KLUDGE<a name='195'>
+      ibuf(1) = MAX(jps,jds)<a name='196'>
+#else<a name='197'>
+      ibuf(1) = MAX(ips,ids)<a name='198'>
+#endif<a name='199'>
+      CALL wrf_put_dom_ti_integer ( fid , 'WEST-EAST_PATCH_START_STAG' ,  ibuf , 1 , ierr )<a name='200'>
+#ifdef D3VAR_IRY_KLUDGE<a name='201'>
+      ibuf(1) = MIN(jpe,jde)<a name='202'>
+#else<a name='203'>
+      ibuf(1) = MIN(ipe,ide)<a name='204'>
+#endif<a name='205'>
+      CALL wrf_put_dom_ti_integer ( fid , 'WEST-EAST_PATCH_END_STAG' ,  ibuf , 1 , ierr )<a name='206'>
+#ifdef D3VAR_IRY_KLUDGE<a name='207'>
+      ibuf(1) = MAX(ips,ids)<a name='208'>
+#else<a name='209'>
+      ibuf(1) = MAX(jps,jds)<a name='210'>
+#endif<a name='211'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SOUTH-NORTH_PATCH_START_UNSTAG' ,  ibuf , 1 , ierr )<a name='212'>
+#ifdef D3VAR_IRY_KLUDGE<a name='213'>
+      ibuf(1) = MIN(ipe,ide-1)<a name='214'>
+#else<a name='215'>
+      ibuf(1) = MIN(jpe,jde-1)<a name='216'>
+#endif<a name='217'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SOUTH-NORTH_PATCH_END_UNSTAG' ,  ibuf , 1 , ierr )<a name='218'>
+#ifdef D3VAR_IRY_KLUDGE<a name='219'>
+      ibuf(1) = MAX(ips,ids)<a name='220'>
+#else<a name='221'>
+      ibuf(1) = MAX(jps,jds)<a name='222'>
+#endif<a name='223'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SOUTH-NORTH_PATCH_START_STAG' ,  ibuf , 1 , ierr )<a name='224'>
+#ifdef D3VAR_IRY_KLUDGE<a name='225'>
+      ibuf(1) = MIN(ipe,ide)<a name='226'>
+#else<a name='227'>
+      ibuf(1) = MIN(jpe,jde)<a name='228'>
+#endif<a name='229'>
+      CALL wrf_put_dom_ti_integer ( fid , 'SOUTH-NORTH_PATCH_END_STAG' ,  ibuf , 1 , ierr )<a name='230'>
+<a name='231'>
+      ibuf(1) = MAX(kps,kds)<a name='232'>
+      CALL wrf_put_dom_ti_integer ( fid , 'BOTTOM-TOP_PATCH_START_UNSTAG' ,  ibuf , 1 , ierr )<a name='233'>
+      ibuf(1) = MIN(kpe,kde-1)<a name='234'>
+      CALL wrf_put_dom_ti_integer ( fid , 'BOTTOM-TOP_PATCH_END_UNSTAG' ,  ibuf , 1 , ierr )<a name='235'>
+      ibuf(1) = MAX(kps,kds)<a name='236'>
+      CALL wrf_put_dom_ti_integer ( fid , 'BOTTOM-TOP_PATCH_START_STAG' ,  ibuf , 1 , ierr )<a name='237'>
+      ibuf(1) = MIN(kpe,kde)<a name='238'>
+      CALL wrf_put_dom_ti_integer ( fid , 'BOTTOM-TOP_PATCH_END_STAG' ,  ibuf , 1 , ierr )<a name='239'>
+<a name='240'>
+<font color=#447700>! end add 010831 JM<a name='241'></font>
+<a name='242'>
+      CALL wrf_put_dom_ti_real ( fid , 'DX' ,  config_flags%dx , 1 , ierr )<a name='243'>
+      CALL wrf_put_dom_ti_real ( fid , 'DY' ,  config_flags%dy , 1 , ierr )<a name='244'>
+      CALL wrf_put_dom_ti_real ( fid , 'DT' ,  config_flags%dt , 1 , ierr )<a name='245'>
+      CALL wrf_put_dom_ti_real ( fid , 'CEN_LAT' ,  config_flags%cen_lat , 1 , ierr )<a name='246'>
+      CALL wrf_put_dom_ti_real ( fid , 'CEN_LON' ,  config_flags%cen_lon , 1 , ierr )<a name='247'>
+      CALL wrf_put_dom_ti_real ( fid , 'TRUELAT1',  config_flags%truelat1, 1 , ierr )<a name='248'>
+      CALL wrf_put_dom_ti_real ( fid , 'TRUELAT2',  config_flags%truelat2, 1 , ierr )<a name='249'>
+      CALL wrf_put_dom_ti_real ( fid , 'MOAD_CEN_LAT',  config_flags%moad_cen_lat, 1 , ierr )<a name='250'>
+      CALL wrf_put_dom_ti_real ( fid , 'STAND_LON',  config_flags%stand_lon, 1 , ierr )<a name='251'>
+    IF ( switch .NE. boundary_only ) THEN<a name='252'>
+      CALL wrf_put_dom_ti_real ( fid , 'GMT' ,  config_flags%gmt , 1 , ierr )<a name='253'>
+      CALL wrf_put_dom_ti_integer ( fid , 'JULYR' ,  config_flags%julyr , 1 , ierr )<a name='254'>
+      CALL wrf_put_dom_ti_integer ( fid , 'JULDAY' ,  config_flags%julday , 1 , ierr )<a name='255'>
+    ENDIF<a name='256'>
+      CALL wrf_put_dom_ti_integer ( fid , 'MAP_PROJ' ,  config_flags%map_proj , 1 , ierr )<a name='257'>
+      CALL wrf_put_dom_ti_char ( fid , 'MMINLU',  mminlu(1:4) , ierr )<a name='258'>
+      CALL wrf_put_dom_ti_integer ( fid , 'ISWATER' ,  config_flags%iswater , 1 , ierr )<a name='259'>
+      CALL wrf_put_dom_ti_integer ( fid , 'ISICE' ,  config_flags%isice , 1 , ierr )<a name='260'>
+      CALL wrf_put_dom_ti_integer ( fid , 'ISURBAN' ,  config_flags%isurban , 1 , ierr )<a name='261'>
+      CALL wrf_put_dom_ti_integer ( fid , 'ISOILWATER' ,  config_flags%isoilwater , 1 , ierr )<a name='262'>
+<a name='263'>
+<a name='264'>
+    IF ( switch .EQ. boundary_only ) THEN<a name='265'>
+        CALL ESMF_TimeIntervalSet( bdy_increment, S=NINT(config_flags%bdyfrq),rc=rc)<a name='266'>
+        next_time = current_time + bdy_increment<a name='267'>
+        CALL <A href='../../html_code/share/module_date_time.F.html#WRF_TIMETOA'>wrf_timetoa</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_TIMETOA_33"> ( next_time, next_datestr )<a name='268'>
+        CALL wrf_put_dom_td_char ( fid , 'THISBDYTIME' ,  current_date(1:19), current_date(1:19), ierr )<a name='269'>
+        CALL wrf_put_dom_td_char ( fid , 'NEXTBDYTIME' ,  current_date(1:19), next_datestr(1:19), ierr )<a name='270'>
+    ENDIF<a name='271'>
+<a name='272'>
+#if 1<a name='273'>
+    IF ( switch .EQ. model_input_only ) THEN<a name='274'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_inputout.inc' )<a name='275'>
+      CALL <A href='../../html_code/share/wrf_inputout.F.html#WRF_INPUTOUT'>wrf_inputout</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_INPUTOUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='276'>
+    ELSE IF ( switch .EQ. aux_model_input1_only ) THEN<a name='277'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput1out.inc' )<a name='278'>
+      CALL <A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT'>wrf_auxinput1out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXINPUT1OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='279'>
+    ELSE IF ( switch .EQ. aux_model_input2_only ) THEN<a name='280'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput2out.inc' )<a name='281'>
+      CALL <A href='../../html_code/share/wrf_auxinput2out.F.html#WRF_AUXINPUT2OUT'>wrf_auxinput2out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXINPUT2OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='282'>
+    ELSE IF ( switch .EQ. aux_model_input3_only ) THEN<a name='283'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput3out.inc' )<a name='284'>
+      CALL <A href='../../html_code/share/wrf_auxinput3out.F.html#WRF_AUXINPUT3OUT'>wrf_auxinput3out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXINPUT3OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='285'>
+    ELSE IF ( switch .EQ. aux_model_input4_only ) THEN<a name='286'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput4out.inc' )<a name='287'>
+      CALL <A href='../../html_code/share/wrf_auxinput4out.F.html#WRF_AUXINPUT4OUT'>wrf_auxinput4out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXINPUT4OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='288'>
+    ELSE IF ( switch .EQ. aux_model_input5_only ) THEN<a name='289'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxinput5out.inc' )<a name='290'>
+      CALL <A href='../../html_code/share/wrf_auxinput5out.F.html#WRF_AUXINPUT5OUT'>wrf_auxinput5out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXINPUT5OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='291'>
+    ELSE IF ( switch .EQ. history_only ) THEN<a name='292'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_histout.inc' )<a name='293'>
+      CALL <A href='../../html_code/share/wrf_histout.F.html#WRF_HISTOUT'>wrf_histout</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_HISTOUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='294'>
+    ELSE IF ( switch .EQ. aux_hist1_only ) THEN<a name='295'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling wrf_auxhist1out' )<a name='296'>
+      CALL <A href='../../html_code/share/wrf_auxhist1out.F.html#WRF_AUXHIST1OUT'>wrf_auxhist1out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXHIST1OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='297'>
+    ELSE IF ( switch .EQ. aux_hist2_only ) THEN<a name='298'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist2out.inc' )<a name='299'>
+      CALL <A href='../../html_code/share/wrf_auxhist2out.F.html#WRF_AUXHIST2OUT'>wrf_auxhist2out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXHIST2OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='300'>
+    ELSE IF ( switch .EQ. aux_hist3_only ) THEN<a name='301'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist3out.inc' )<a name='302'>
+      CALL <A href='../../html_code/share/wrf_auxhist3out.F.html#WRF_AUXHIST3OUT'>wrf_auxhist3out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXHIST3OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='303'>
+    ELSE IF ( switch .EQ. aux_hist4_only ) THEN<a name='304'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist1out.inc' )<a name='305'>
+      CALL <A href='../../html_code/share/wrf_auxhist4out.F.html#WRF_AUXHIST4OUT'>wrf_auxhist4out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXHIST4OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='306'>
+    ELSE IF ( switch .EQ. aux_hist5_only ) THEN<a name='307'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_auxhist4out.inc' )<a name='308'>
+      CALL <A href='../../html_code/share/wrf_auxhist5out.F.html#WRF_AUXHIST5OUT'>wrf_auxhist5out</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_AUXHIST5OUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='309'>
+    ELSE IF ( switch .EQ. restart_only ) THEN<a name='310'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_restartout.inc' )<a name='311'>
+      CALL <A href='../../html_code/share/wrf_restartout.F.html#WRF_RESTARTOUT'>wrf_restartout</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_RESTARTOUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='312'>
+    ELSE IF ( switch .EQ. boundary_only ) THEN<a name='313'>
+      CALL wrf_debug ( 300 , 'output_wrf: calling code in wrf_bdyout.inc' )<a name='314'>
+      CALL <A href='../../html_code/share/wrf_bdyout.F.html#WRF_BDYOUT'>wrf_bdyout</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_BDYOUT_1">( fid , grid , config_flags, switch, dryrun,  ierr )<a name='315'>
+    ENDIF<a name='316'>
+#else<a name='317'>
+    CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_133"> ( "ALL I/O DISABLED IN share/module_io_wrf.F")<a name='318'>
+#endif<a name='319'>
+<a name='320'>
+    IF ( .NOT. dryrun ) THEN<a name='321'>
+       CALL wrf_debug ( 300 , 'output_wrf: calling wrf_iosync ' )<a name='322'>
+       CALL <A href='../../html_code/frame/module_io.F.html#WRF_IOSYNC'>wrf_iosync</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_IOSYNC_1"> ( fid , ierr )<a name='323'>
+       CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_273"> ( 300 , 'output_wrf: back from wrf_iosync ' )<a name='324'>
+    ENDIF<a name='325'>
+<a name='326'>
+    CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_274"> ( 300 , 'output_wrf: returning from ' )<a name='327'>
+    RETURN<a name='328'>
+  END SUBROUTINE output_wrf<a name='329'>
+</pre></body></html>

@@ -1,0 +1,138 @@
+<html>
+
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>WRFDA Users Site</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<meta name="KEYWORDS" content="meteorology, data assimilation, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+<meta name="DESCRIPTION" content="WRFDA Mesoscale Model Users homepage">
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+<meta name="resource-type" content="document">
+<meta http-equiv="expires" content="0">
+<meta name="author" content="MMM Webmaster">
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+<meta name="revisit-after" content="1 days">
+<meta name="distribution" content="Global">
+<meta name="rating" content="General">
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+<link href="../new/images/wrfdastyle.css" rel="stylesheet" type="text/css">
+<!-- TemplateParam name="OptionalRegion1" type="boolean" value="true" -->
+</head>
+
+<body>
+<h1>Hierarchical dynamic menu with CSS</h1>
+
+<p>
+The menu is made by several nested UL lists. Only (X)HTML and CSS are used for it, no scripts are needed.<br />
+<strong>Warning: it doesn't work in MS Internet Explorer (yet?).</strong>
+</p>
+
+<hr />
+
+<p>
+The menu consists of three different parts: First level LIs are formated horizontaly as absolutely positioned blocks, they are always visible. Their parent UL is formated as single line, 1.2em hight; the em-unit is good, for we can set its exact height depending on actual font size (LI heights and paddings are set by ems, too). All &lt;A&gt; elemements are formated as blocks to fit all menu item's width.
+</p>
+
+<p>
+The second-level ULs are verticaly oriented, each bellow its parent LI. They aren't positioned at all, they just flow under top-level menu items. They are hidden due to LIs height and overflow:hidden. In CSS, I set for these LIs:hover higher height and overflow:visible - this makes the nested UL visible until we move out of the (now larger) top-level LI's box.
+</p>
+
+<p>
+The third-level ULs are absolutely positioned next to their parent LI, having display:none. The trigger is on their parent LI:hover - it sets them display:block. These 3rd-level ULs may be repeated as may times as we need (the behaviour above 3rd level stays the same). Just look at items 1.2, 1.2.2, and 1.2.2.2 to see the formating.
+</p>
+
+<ul id="menu">
+
+	<li class="menuitem" id="mi01"><a href="/">Item 1</a>
+	<ul class="submenu">
+		<li><a href="/">Subitem 1.1</a></li>
+
+		<li><a href="/">Subitem 1.2</a>
+		<ul class="subsubmenu">
+			<li><a href="/">Subitem 1.2.1</a></li>
+			<li><a href="/">Subitem 1.2.2</a>
+			<ul class="subsubmenu">
+				<li><a href="/">Subitem 1.2.2.1</a></li>
+				<li><a href="/">Subitem 1.2.2.2</a>
+
+				<ul class="subsubmenu">
+					<li><a href="/">Subitem 1.2.2.2.1</a></li>
+					<li><a href="/">Subitem 1.2.2.2.2</a></li>
+					<li><a href="/">Subitem 1.2.2.2.3</a></li>
+					<li><a href="/">Subitem 1.2.2.2.4</a></li>
+				</ul></li>
+				<li><a href="/">Subitem 1.2.2.3</a></li>
+
+				<li><a href="/">Subitem 1.2.2.4</a></li>
+			</ul></li>
+			<li><a href="/">Subitem 1.2.3</a></li>
+			<li><a href="/">Subitem 1.2.4</a></li>
+		</ul></li>
+		<li><a href="/">Subitem 1.3</a></li>
+		<li><a href="/">Subitem 1.4</a></li>
+
+	</ul></li>
+	<li class="menuitem" id="mi02"><a href="/">Item 2</a>
+	<ul class="submenu">
+		<li><a href="/">Subitem 2.1</a></li>
+		<li><a href="/">Subitem 2.2</a></li>
+		<li><a href="/">Subitem 2.3</a></li>
+	</ul></li>
+
+	<li class="menuitem" id="mi03"><a href="/">Item 3</a>
+	<ul class="submenu">
+		<li><a href="/">Subitem 3.1</a></li>
+		<li><a href="/">Subitem 3.2</a></li>
+		<li><a href="/">Subitem 3.3</a></li>
+		<li><a href="/">Subitem 3.4</a></li>
+
+	</ul></li>
+
+</ul>
+
+<p>
+The style is made to put the menu anywhere in the document's normal flow, even it can be positioned. Due to sizes beeing set strictly by em-units, any font-resize is possible without breaking the menu (actually, it resizes with the font size). Try smaller/larger font size in this document.<br />
+See the code for details (CSS is part of this document).
+</p>
+
+<p>
+Correct links should be set on every &lt;a href&gt; (on each level) to be sure every user can use the navigation.
+</p>
+
+<h2>Why not MSIE?</h2>
+
+<p>
+This construction works in Gecko-based browsers (tested in Mozilla, Camino), in Opera 7, and Safari (maybe Konqueror, too?). Microsoft decided to implement the :hover pseudo-class for A elements only. That's the reason the menu won't work in any IE browser (there is missing the LI:hover trigger to start the action). However, some Javascript (hopefuly a simple one) may be added to allow this menu in IE as well. Maybe I'll publish it here later...
+</p>
+
+<hr />
+
+<p>
+<a href="mailto:pixy@pixy.cz">Petr Stanicek</a> [aka -pixy-] - (c) 2003-05-16, 15:00<br />
+<a href="http://www.pixy.cz/">http://www.pixy.cz/</a>
+
+</p>
+
+<div id="statistiky">
+	<img src="http://www.toplist.cz/count.asp?id=45236&amp;logo=2" alt="TOPlist" width="1" height="1" />
+
+<!-- NAVRCHOLU.cz -->
+<script type="text/javascript">
+<!--
+pxDepth = screen.pixelDepth; if (!(pxDepth>0)) pxDepth = screen.colorDepth; if (!(pxDepth>0)) pxDepth = 0; 
+document.write("<img src=\"http://hit.navrcholu.cz/hit?id=00057521;n=1;screenx=" + screen.width + ";screeny=" + screen.height + ";cdepth=" + pxDepth + ";ref=" + escape(top.document.referrer) + "\" width=\"1\" height=\"1\" alt=\"\" />");
+// -->
+</script>
+<noscript>
+<p><img src="http://hit.navrcholu.cz/hit?id=00057521;n=1" width="1" height="1" alt="" /></p>
+</noscript>
+<!-- NAVRCHOLU.cz - konec -->
+</div>
+
+
+</body>
+
+</html>
+

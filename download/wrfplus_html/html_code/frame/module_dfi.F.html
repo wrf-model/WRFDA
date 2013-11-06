@@ -1,0 +1,995 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='MODULE_DFI'><A href='../../html_code/frame/module_dfi.F.html#MODULE_DFI' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_dfi</font> <A href='../../call_to/MODULE_DFI.html' TARGET='index'>2</A><a name='3'>
+<a name='4'>
+      USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_dfi.F.html#module_dfi.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_24"><a name='5'>
+      USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_dfi.F.html#module_dfi.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_39"><a name='6'>
+      USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/frame/module_dfi.F.html#module_dfi.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_14"><a name='7'>
+<a name='8'>
+      implicit none<a name='9'>
+<a name='10'>
+      real, allocatable,dimension(:),public :: H<a name='11'>
+<a name='12'>
+      real, private :: da_dot<a name='13'>
+<a name='14'>
+CONTAINS<a name='15'>
+<a name='16'>
+<A NAME='JCDFI_INIT_COEF'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_INIT_COEF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='17'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_init_coef</font> ( grid , config_flags ) <A href='../../call_to/JCDFI_INIT_COEF.html' TARGET='index'>2</A>,<A href='../../call_from/JCDFI_INIT_COEF.html' TARGET='index'>2</A><a name='18'>
+ <a name='19'>
+  IMPLICIT NONE<a name='20'>
+ <a name='21'>
+  <font color=#447700>!  Input data.<a name='22'></font>
+<a name='23'>
+  TYPE(domain) , intent(in) :: grid<a name='24'>
+  TYPE (grid_config_rec_type), intent(in) :: config_flags<a name='25'>
+  integer :: nsteps<a name='26'>
+ <a name='27'>
+   if (mod ( INT(grid%jcdfi_tauc / config_flags%dt) , 2 ).ne.0) &amp;<a name='28'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_INIT_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_84">( 'Total # of time steps should be EVEN' )<a name='29'>
+<a name='30'>
+   nsteps = grid%jcdfi_tauc / config_flags%dt / 2 <a name='31'>
+<a name='32'>
+   CALL <A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF'>JCDFI_COEF</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_INIT_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="JCDFI_COEF_1"> ( 0 , NSTEPS , config_flags%dt , grid%jcdfi_tauc , 7 )<a name='33'>
+<a name='34'>
+ END SUBROUTINE jcdfi_init_coef<a name='35'>
+<font color=#447700>!<a name='36'></font>
+<font color=#447700>!<a name='37'></font>
+<font color=#447700>!<a name='38'></font>
+<A NAME='JCDFI_ZERO_AD'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_ZERO_AD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='39'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_zero_ad</font> ( grid ) <A href='../../call_to/JCDFI_ZERO_AD.html' TARGET='index'>1</A><a name='40'>
+<a name='41'>
+  IMPLICIT NONE<a name='42'>
+<a name='43'>
+  <font color=#447700>!  Input data.<a name='44'></font>
+<a name='45'>
+  TYPE(domain) , intent(inout) :: grid<a name='46'>
+ <a name='47'>
+   grid%em_a_u_2  = 0.0<a name='48'>
+   grid%em_a_v_2  = 0.0<a name='49'>
+   grid%em_a_t_2  = 0.0<a name='50'>
+   grid%em_a_mu_2 = 0.0<a name='51'>
+<a name='52'>
+END SUBROUTINE jcdfi_zero_ad<a name='53'>
+<font color=#447700>!<a name='54'></font>
+<font color=#447700>!<a name='55'></font>
+<font color=#447700>!<a name='56'></font>
+<A NAME='JCDFI_TL'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_TL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='57'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_tl</font> ( grid ,i) <A href='../../call_to/JCDFI_TL.html' TARGET='index'>2</A><a name='58'>
+<a name='59'>
+  IMPLICIT NONE<a name='60'>
+<a name='61'>
+  <font color=#447700>!  Input data.<a name='62'></font>
+<a name='63'>
+  TYPE(domain) , intent(inout) :: grid<a name='64'>
+ <a name='65'>
+  integer, intent(in) :: i<a name='66'>
+  <a name='67'>
+   grid%em_a_u_2  = grid%em_a_u_2  + h(i)*grid%em_g_u_2<a name='68'>
+   grid%em_a_v_2  = grid%em_a_v_2  + h(i)*grid%em_g_v_2<a name='69'>
+   grid%em_a_t_2  = grid%em_a_t_2  + h(i)*grid%em_g_t_2<a name='70'>
+   grid%em_a_mu_2 = grid%em_a_mu_2 + h(i)*grid%em_g_mu_2<a name='71'>
+<a name='72'>
+END SUBROUTINE jcdfi_tl<a name='73'>
+<font color=#447700>!<a name='74'></font>
+<font color=#447700>!<a name='75'></font>
+<font color=#447700>! <a name='76'></font>
+<A NAME='JCDFI_OUTPUT_FORCING'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_OUTPUT_FORCING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='77'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_output_forcing</font> ( grid , config_flags ) <A href='../../call_to/JCDFI_OUTPUT_FORCING.html' TARGET='index'>1</A>,<A href='../../call_from/JCDFI_OUTPUT_FORCING.html' TARGET='index'>1</A><a name='78'>
+<a name='79'>
+  IMPLICIT NONE<a name='80'>
+<a name='81'>
+  TYPE ( domain ) , intent(inout) :: grid<a name='82'>
+  type(grid_config_rec_type) , intent(in) :: config_flags<a name='83'>
+  real :: jc<a name='84'>
+<a name='85'>
+   grid%em_g_u_1  = grid%em_g_u_2<a name='86'>
+   grid%em_g_u_2  = 1.0/grid%jcdfi_error_wind * grid%em_a_u_2<a name='87'>
+<a name='88'>
+   grid%em_g_v_1  = grid%em_g_v_2<a name='89'>
+   grid%em_g_v_2  = 1.0/grid%jcdfi_error_wind * grid%em_a_v_2<a name='90'>
+<a name='91'>
+   grid%em_g_t_1  = grid%em_g_t_2<a name='92'>
+   grid%em_g_t_2  = 1.0/grid%jcdfi_error_t * grid%em_a_t_2<a name='93'>
+<a name='94'>
+   grid%em_g_mu_1 = grid%em_g_mu_2<a name='95'>
+   grid%em_g_mu_2 = 1.0/grid%jcdfi_error_mu * grid%em_a_mu_2<a name='96'>
+<a name='97'>
+<a name='98'>
+   call <A href='../../html_code/share/mediation_integrate.F.html#MED_HIST_OUT'>med_hist_out</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_OUTPUT_FORCING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_HIST_OUT_1"> ( grid , 3, config_flags )<a name='99'>
+<a name='100'>
+   grid%em_g_u_2  = grid%em_g_u_1<a name='101'>
+   grid%em_g_v_2  = grid%em_g_v_1<a name='102'>
+   grid%em_g_t_2  = grid%em_g_t_1<a name='103'>
+   grid%em_g_mu_2 = grid%em_g_mu_1<a name='104'>
+<a name='105'>
+ END SUBROUTINE jcdfi_output_forcing<a name='106'>
+<font color=#447700>!<a name='107'></font>
+<font color=#447700>!<a name='108'></font>
+<font color=#447700>!<a name='109'></font>
+<A NAME='JCDFI_ADD_FORCING'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_ADD_FORCING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='110'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_add_forcing</font> ( grid ,i ) <A href='../../call_to/JCDFI_ADD_FORCING.html' TARGET='index'>2</A><a name='111'>
+<a name='112'>
+  IMPLICIT NONE<a name='113'>
+<a name='114'>
+  TYPE ( domain ) , intent(inout) :: grid<a name='115'>
+  integer , intent(in) :: i<a name='116'>
+  integer :: jcdfi_flag<a name='117'>
+<a name='118'>
+   jcdfi_flag = 0<a name='119'>
+   if ( grid%jcdfi_io ) jcdfi_flag = 1<a name='120'>
+   grid%em_a_u_2  = grid%em_a_u_2  + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_wind * h(i) * grid%em_g_u_1 <a name='121'>
+   grid%em_a_v_2  = grid%em_a_v_2  + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_wind * h(i) * grid%em_g_v_1<a name='122'>
+   grid%em_a_t_2  = grid%em_a_t_2  + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_t * h(i) * grid%em_g_t_1 <a name='123'>
+   grid%em_a_mu_2 = grid%em_a_mu_2 + jcdfi_flag * grid%jcdfi_gama * 1.0/grid%jcdfi_error_mu * h(i) * grid%em_g_mu_1 <a name='124'>
+<a name='125'>
+<a name='126'>
+ END SUBROUTINE jcdfi_add_forcing<a name='127'>
+<font color=#447700>!<a name='128'></font>
+<font color=#447700>!<a name='129'></font>
+<font color=#447700>!<a name='130'></font>
+<A NAME='JCDFI_INPUT_FORCING'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_INPUT_FORCING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='131'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_input_forcing</font> ( grid ,config_flags ) <A href='../../call_to/JCDFI_INPUT_FORCING.html' TARGET='index'>1</A>,<A href='../../call_from/JCDFI_INPUT_FORCING.html' TARGET='index'>1</A><a name='132'>
+<a name='133'>
+  IMPLICIT NONE<a name='134'>
+<a name='135'>
+  TYPE ( domain ) , intent(inout) :: grid<a name='136'>
+  type(grid_config_rec_type) , intent(in) :: config_flags<a name='137'>
+<a name='138'>
+   call <A href='../../html_code/share/mediation_integrate.F.html#MED_AUXINPUT3DFI_IN'>med_auxinput3dfi_in</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_INPUT_FORCING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_AUXINPUT3DFI_IN_1"> ( grid , config_flags )<a name='139'>
+<a name='140'>
+   grid%em_g_u_1  = grid%em_g_u_2<a name='141'>
+   grid%em_g_v_1  = grid%em_g_v_2<a name='142'>
+   grid%em_g_t_1  = grid%em_g_t_2<a name='143'>
+   grid%em_g_mu_1 = grid%em_g_mu_2<a name='144'>
+<a name='145'>
+<a name='146'>
+<font color=#447700>!  grid%em_g_u_2  = 0.0<a name='147'></font>
+<font color=#447700>!  grid%em_g_v_2  = 0.0<a name='148'></font>
+<font color=#447700>!  grid%em_g_t_2  = 0.0<a name='149'></font>
+<font color=#447700>!  grid%em_g_mu_2 = 0.0<a name='150'></font>
+<a name='151'>
+ END SUBROUTINE jcdfi_input_forcing<a name='152'>
+<font color=#447700>!<a name='153'></font>
+<font color=#447700>!<a name='154'></font>
+<A NAME='JCDFI_FINALIZE'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_FINALIZE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='155'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>jcdfi_finalize</font> <A href='../../call_to/JCDFI_FINALIZE.html' TARGET='index'>2</A><a name='156'>
+     deallocate (H)<a name='157'>
+ END SUBROUTINE jcdfi_finalize<a name='158'>
+<font color=#447700>!<a name='159'></font>
+<A NAME='JCDFI_COEF'><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='160'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>JCDFI_COEF</font> (MYPE,NSTEPS,DT,TAUC,NFILT) <A href='../../call_to/JCDFI_COEF.html' TARGET='index'>1</A>,<A href='../../call_from/JCDFI_COEF.html' TARGET='index'>11</A><a name='161'>
+<font color=#447700>!min---C<a name='162'></font>
+<font color=#447700>!min---C     calculate filter weights with selected window.<a name='163'></font>
+<font color=#447700>!min---C<a name='164'></font>
+<font color=#447700>!min---C       peter lynch and xiang-yu huang<a name='165'></font>
+<font color=#447700>!min---C<a name='166'></font>
+<font color=#447700>!min---C       ref: see hamming, r.w., 1989: digital filters,<a name='167'></font>
+<font color=#447700>!min---C                prentice-hall international. 3rd edition.<a name='168'></font>
+<font color=#447700>!min---C<a name='169'></font>
+<font color=#447700>!min---C       input:      nsteps  -  number of timesteps<a name='170'></font>
+<font color=#447700>!min---C                              forward or backward.<a name='171'></font>
+<font color=#447700>!min---C                   dt      -  time step in seconds.<a name='172'></font>
+<font color=#447700>!min---C                   tauc    -  cut-off period in seconds.<a name='173'></font>
+<font color=#447700>!min---C                   nfilt   -  indicator for selected filter.<a name='174'></font>
+<font color=#447700>!min---C<a name='175'></font>
+<font color=#447700>!min---C       output:     h       -  array(0:nsteps) with the<a name='176'></font>
+<font color=#447700>!min---C                              required filter weights<a name='177'></font>
+<font color=#447700>!min---C<a name='178'></font>
+<font color=#447700>!min---C------------------------------------------------------------<a name='179'></font>
+<font color=#447700>!min---C<a name='180'></font>
+ <a name='181'>
+      implicit none<a name='182'>
+<a name='183'>
+      integer, intent(in)   :: mype, nsteps, nfilt<a name='184'>
+      real   , intent(in)   :: dt, tauc<a name='185'>
+      <a name='186'>
+<font color=#447700>!min--- Local data<a name='187'></font>
+<a name='188'>
+      integer               :: n<a name='189'>
+      real                  :: pi, omegac, x, window, deltat<a name='190'>
+      real                  :: hh(0:nsteps)<a name='191'>
+<a name='192'>
+      allocate ( h(0:nsteps*2) )<a name='193'>
+<font color=#447700>!min---<a name='194'></font>
+<a name='195'>
+      pi=4*ATAN(1.)<a name='196'>
+      deltat=ABS(dt)<a name='197'>
+<font color=#447700>!min---<a name='198'></font>
+<font color=#447700>!min---------------------------------------------------------------<a name='199'></font>
+<font color=#447700>!min---<a name='200'></font>
+<font color=#447700>!min---     windows are defined by a call and held in hh.<a name='201'></font>
+<font color=#447700>!min---<a name='202'></font>
+      if ( nfilt .eq. -1) call <A href='../../html_code/frame/module_dfi.F.html#DEBUG'>debug</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DEBUG_1">    (nsteps,h)<a name='203'>
+<a name='204'>
+      IF ( NFILT .EQ. 0 ) CALL <A href='../../html_code/frame/module_dfi.F.html#UNIFORM'>UNIFORM</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="UNIFORM_1">  (NSTEPS,HH)<a name='205'>
+      IF ( NFILT .EQ. 1 ) CALL <A href='../../html_code/frame/module_dfi.F.html#LANCZOS'>LANCZOS</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LANCZOS_1">  (NSTEPS,HH)<a name='206'>
+      IF ( NFILT .EQ. 2 ) CALL <A href='../../html_code/frame/module_dfi.F.html#HAMMING'>HAMMING</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HAMMING_1">  (NSTEPS,HH)<a name='207'>
+      IF ( NFILT .EQ. 3 ) CALL <A href='../../html_code/frame/module_dfi.F.html#BLACKMAN'>BLACKMAN</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="BLACKMAN_1"> (NSTEPS,HH)<a name='208'>
+      IF ( NFILT .EQ. 4 ) CALL <A href='../../html_code/frame/module_dfi.F.html#KAISER'>KAISER</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KAISER_1">   (NSTEPS,HH)<a name='209'>
+      IF ( NFILT .EQ. 5 ) CALL <A href='../../html_code/frame/module_dfi.F.html#POTTER2'>POTTER2</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="POTTER2_1">  (NSTEPS,HH)<a name='210'>
+      IF ( NFILT .EQ. 6 ) CALL <A href='../../html_code/frame/module_dfi.F.html#DOLPHWIN'>DOLPHWIN</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DOLPHWIN_1"> (NSTEPS,HH)<a name='211'>
+<font color=#447700>!min---<a name='212'></font>
+<font color=#447700>!min---------------------------------------------------------------<a name='213'></font>
+<font color=#447700>!min---<a name='214'></font>
+      IF ( NFILT .LE. 6 ) THEN     <font color=#447700>! sinc-windowed filters<a name='215'></font>
+<font color=#447700>!min---<a name='216'></font>
+<font color=#447700>!min---        calculate the cutoff frequency<a name='217'></font>
+         OMEGAC = 2.*PI/TAUC<a name='218'>
+<font color=#447700>!min---<a name='219'></font>
+         DO N=0,NSTEPS<a name='220'>
+            WINDOW = HH(N)<a name='221'>
+            IF ( N .EQ. 0 ) THEN<a name='222'>
+              X = (OMEGAC*DELTAT/PI)<a name='223'>
+            ELSE<a name='224'>
+              X = SIN(N*OMEGAC*DELTAT)/(N*PI)<a name='225'>
+            ENDIF<a name='226'>
+            HH(N) = X*WINDOW<a name='227'>
+         ENDDO<a name='228'>
+<a name='229'>
+<font color=#447700>!min---        <a name='230'></font>
+<font color=#447700>!min---        normalize the sums to be unity<a name='231'></font>
+         CALL <A href='../../html_code/frame/module_dfi.F.html#NORMLZ'>NORMLZ</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NORMLZ_1">(HH,NSTEPS)<a name='232'>
+<a name='233'>
+         DO N=0,NSTEPS<a name='234'>
+            H(NSTEPS+N) = HH(N)<a name='235'>
+            H(NSTEPS-N) = HH(N)<a name='236'>
+         ENDDO<a name='237'>
+<font color=#447700>!        IF(MYPE.EQ.0) THEN<a name='238'></font>
+<font color=#447700>!           DO N=0,NSTEPS*2<a name='239'></font>
+<font color=#447700>!              WRITE(6,'(A,I3,1X,F10.7)') 'DF COEF: N, H =',N,H(N)<a name='240'></font>
+<font color=#447700>!           ENDDO<a name='241'></font>
+<font color=#447700>!        ENDIF<a name='242'></font>
+<a name='243'>
+      ELSEIF ( NFILT .EQ. 7 ) THEN     <font color=#447700>! dolph filter<a name='244'></font>
+<a name='245'>
+         CALL <A href='../../html_code/frame/module_dfi.F.html#DOLPH'>DOLPH</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DOLPH_1">(MYPE,DT,TAUC,NSTEPS,H)<a name='246'>
+<a name='247'>
+      ELSEIF ( NFILT .EQ. 8 ) THEN     <font color=#447700>! 2nd order, 2nd type quick start filter (RHO)<a name='248'></font>
+<a name='249'>
+         CALL <A href='../../html_code/frame/module_dfi.F.html#RHOFIL'>RHOFIL</A><A href='../../html_code/frame/module_dfi.F.html#JCDFI_COEF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RHOFIL_1">(DT,TAUC,2,NSTEPS*2,2,H,NSTEPS*2)<a name='250'>
+         IF(MYPE.EQ.0) THEN <a name='251'>
+            DO N=0,NSTEPS*2 <a name='252'>
+               WRITE(6,'(A,I3,1X,F10.7)') 'RHO COEF: N, H =',N,H(N)<a name='253'>
+            ENDDO<a name='254'>
+         ENDIF<a name='255'>
+      ENDIF<a name='256'>
+<a name='257'>
+      DO N=0,NSTEPS*2<a name='258'>
+         H(N) = -1.0*H(N)<a name='259'>
+         IF (N.EQ.NSTEPS) H(N) = 1.0 + H(N)<a name='260'>
+      ENDDO<a name='261'>
+<a name='262'>
+      RETURN<a name='263'>
+      END subroutine jcdfi_coef <a name='264'>
+<a name='265'>
+<font color=#447700>!min---<a name='266'></font>
+<A NAME='NORMLZ'><A href='../../html_code/frame/module_dfi.F.html#NORMLZ' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='267'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>NORMLZ</font>(HH,NMAX) <A href='../../call_to/NORMLZ.html' TARGET='index'>1</A><a name='268'>
+<font color=#447700>!min---<a name='269'></font>
+<font color=#447700>!min---     normalize the sum of hh to be unity<a name='270'></font>
+      implicit none<a name='271'>
+	  <a name='272'>
+	  integer, intent(in)                       :: nmax<a name='273'>
+	  real   , dimension(0:nmax), intent(out)   :: hh<a name='274'>
+<a name='275'>
+<font color=#447700>!min--- local data<a name='276'></font>
+          real     :: sumhh<a name='277'>
+          integer  :: n<a name='278'>
+<a name='279'>
+      SUMHH = HH(0)<a name='280'>
+      DO N=1,NMAX<a name='281'>
+        SUMHH = SUMHH + 2*HH(N)<a name='282'>
+      ENDDO<a name='283'>
+      DO N=0,NMAX<a name='284'>
+        HH(N)  = HH(N)/SUMHH<a name='285'>
+      ENDDO<a name='286'>
+<font color=#447700>!min---<a name='287'></font>
+      RETURN<a name='288'>
+      END subroutine normlz<a name='289'>
+<a name='290'>
+<a name='291'>
+<a name='292'>
+<A NAME='DEBUG'><A href='../../html_code/frame/module_dfi.F.html#DEBUG' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='293'>
+      <font color=#993300>subroutine </font><font color=#cc0000>debug</font>(nsteps, ww) <A href='../../call_to/DEBUG.html' TARGET='index'>1</A><a name='294'>
+<a name='295'>
+      implicit none<a name='296'>
+<a name='297'>
+      integer, intent(in)                        :: nsteps<a name='298'>
+      real   , dimension(0:nsteps), intent(out)  :: ww<a name='299'>
+      integer :: n<a name='300'>
+<a name='301'>
+      do n=0,nsteps<a name='302'>
+      ww(n)=0<a name='303'>
+      enddo<a name='304'>
+<a name='305'>
+      ww(int(nsteps/2))=1<a name='306'>
+<a name='307'>
+      return<a name='308'>
+      end subroutine debug<a name='309'>
+<a name='310'>
+<a name='311'>
+<A NAME='UNIFORM'><A href='../../html_code/frame/module_dfi.F.html#UNIFORM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='312'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>UNIFORM</font>(NSTEPS,WW) <A href='../../call_to/UNIFORM.html' TARGET='index'>1</A><a name='313'>
+<font color=#447700>!min---<a name='314'></font>
+<font color=#447700>!min---     define uniform or rectangular window function.<a name='315'></font>
+<font color=#447700>!min---<a name='316'></font>
+      implicit none<a name='317'>
+<a name='318'>
+	  integer, intent(in)                        :: nsteps<a name='319'>
+	  real   , dimension(0:nsteps), intent(out)  :: ww<a name='320'>
+          <a name='321'>
+          integer          :: n<a name='322'>
+<a name='323'>
+      DO N=0,NSTEPS<a name='324'>
+        WW(N) = 1.<a name='325'>
+      ENDDO<a name='326'>
+      RETURN<a name='327'>
+      END subroutine uniform<a name='328'>
+<a name='329'>
+<a name='330'>
+<a name='331'>
+<a name='332'>
+<A NAME='LANCZOS'><A href='../../html_code/frame/module_dfi.F.html#LANCZOS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='333'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>LANCZOS</font>(NSTEPS,WW) <A href='../../call_to/LANCZOS.html' TARGET='index'>1</A><a name='334'>
+<font color=#447700>!min---<a name='335'></font>
+<font color=#447700>!min---     define (genaralised) lanczos window function.<a name='336'></font>
+<font color=#447700>!min---<a name='337'></font>
+      implicit none <a name='338'>
+<a name='339'>
+      integer,  parameter                      :: nmax = 1000<a name='340'>
+      integer,  intent(in)                     :: nsteps<a name='341'>
+      real   ,  dimension(0:nmax), intent(out) :: ww<a name='342'>
+      integer  ::  n<a name='343'>
+      real     :: power, pi, w<a name='344'>
+<a name='345'>
+<font color=#447700>!min---<a name='346'></font>
+<font color=#447700>!min---     (for the usual lanczos window, power = 1 )<a name='347'></font>
+      POWER = 1<a name='348'>
+<font color=#447700>!min---<a name='349'></font>
+      PI=4*ATAN(1.)<a name='350'>
+      DO N=0,NSTEPS<a name='351'>
+         IF ( N .EQ. 0 ) THEN<a name='352'>
+            W = 1.0<a name='353'>
+         ELSE<a name='354'>
+            W = SIN(N*PI/(NSTEPS+1)) / ( N*PI/(NSTEPS+1))<a name='355'>
+         ENDIF<a name='356'>
+         WW(N) = W**POWER<a name='357'>
+      ENDDO<a name='358'>
+      RETURN<a name='359'>
+      END  subroutine lanczos<a name='360'>
+<a name='361'>
+<a name='362'>
+<a name='363'>
+<a name='364'>
+<A NAME='HAMMING'><A href='../../html_code/frame/module_dfi.F.html#HAMMING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='365'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>HAMMING</font>(NSTEPS,WW) <A href='../../call_to/HAMMING.html' TARGET='index'>1</A><a name='366'>
+<font color=#447700>!min---<a name='367'></font>
+<font color=#447700>!min---     define (genaralised) hamming window function.<a name='368'></font>
+<font color=#447700>!min---<a name='369'></font>
+      implicit none<a name='370'>
+<a name='371'>
+      integer, intent(in)           :: nsteps<a name='372'>
+      real, dimension(0:nsteps)    :: ww<a name='373'>
+      integer   ::   n<a name='374'>
+      real      :: alpha, pi, w<a name='375'>
+	  <a name='376'>
+<font color=#447700>!min---<a name='377'></font>
+<font color=#447700>!min---     (for the usual hamming window, alpha=0.54,<a name='378'></font>
+<font color=#447700>!min---          for the hann window, alpha=0.50).<a name='379'></font>
+      ALPHA=0.54<a name='380'>
+<font color=#447700>!min---<a name='381'></font>
+      PI=4*ATAN(1.)<a name='382'>
+      DO N=0,NSTEPS<a name='383'>
+         IF ( N .EQ. 0 ) THEN<a name='384'>
+            W = 1.0<a name='385'>
+         ELSE<a name='386'>
+            W = ALPHA + (1-ALPHA)*COS(N*PI/(NSTEPS))<a name='387'>
+         ENDIF<a name='388'>
+         WW(N) = W<a name='389'>
+      ENDDO<a name='390'>
+      RETURN<a name='391'>
+      END  subroutine hamming<a name='392'>
+  <a name='393'>
+  <a name='394'>
+  <a name='395'>
+  <a name='396'>
+<A NAME='BLACKMAN'><A href='../../html_code/frame/module_dfi.F.html#BLACKMAN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='397'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>BLACKMAN</font>(NSTEPS,WW) <A href='../../call_to/BLACKMAN.html' TARGET='index'>1</A><a name='398'>
+<font color=#447700>!min---<a name='399'></font>
+<font color=#447700>!min---     define blackman window function.<a name='400'></font>
+<font color=#447700>!min---<a name='401'></font>
+      implicit none<a name='402'>
+<a name='403'>
+      integer, intent(in)           :: nsteps<a name='404'>
+       real, dimension(0:nsteps)    :: ww<a name='405'>
+       integer  :: n<a name='406'>
+<font color=#447700>!min---<a name='407'></font>
+      real :: pi, w<a name='408'>
+<a name='409'>
+      PI=4*ATAN(1.)<a name='410'>
+      DO N=0,NSTEPS<a name='411'>
+         IF ( N .EQ. 0 ) THEN<a name='412'>
+            W = 1.0<a name='413'>
+         ELSE<a name='414'>
+            W = 0.42 + 0.50*COS(  N*PI/(NSTEPS))   &amp;<a name='415'>
+                     + 0.08*COS(2*N*PI/(NSTEPS))<a name='416'>
+         ENDIF<a name='417'>
+         WW(N) = W<a name='418'>
+      ENDDO<a name='419'>
+      RETURN<a name='420'>
+      END  subroutine blackman<a name='421'>
+<a name='422'>
+<a name='423'>
+<a name='424'>
+<a name='425'>
+<a name='426'>
+<A NAME='KAISER'><A href='../../html_code/frame/module_dfi.F.html#KAISER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='427'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>KAISER</font>(NSTEPS,WW) <A href='../../call_to/KAISER.html' TARGET='index'>1</A>,<A href='../../call_from/KAISER.html' TARGET='index'>2</A><a name='428'>
+<font color=#447700>!min---<a name='429'></font>
+<font color=#447700>!min---     define kaiser window function.<a name='430'></font>
+<font color=#447700>!min---<a name='431'></font>
+      implicit none<a name='432'>
+<a name='433'>
+      integer, intent(in)           :: nsteps<a name='434'>
+      real, dimension(0:nsteps)    :: ww<a name='435'>
+      integer   :: n<a name='436'>
+      real      :: alpha, xi0a, xn, as<a name='437'>
+      real, external :: bessi0<a name='438'>
+<a name='439'>
+      ALPHA = 1<a name='440'>
+<font color=#447700>!min---<a name='441'></font>
+      XI0A =  <A href='../../html_code/frame/module_dfi.F.html#BESSI0'>BESSI0</A><A href='../../html_code/frame/module_dfi.F.html#KAISER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="BESSI0_1">(ALPHA)<a name='442'>
+      DO N=0,NSTEPS<a name='443'>
+         XN = N<a name='444'>
+         AS = ALPHA*SQRT(1.-(XN/NSTEPS)**2)<a name='445'>
+         WW(N) = <A href='../../html_code/frame/module_dfi.F.html#BESSI0'>BESSI0</A><A href='../../html_code/frame/module_dfi.F.html#KAISER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="BESSI0_2">(AS) / XI0A<a name='446'>
+      ENDDO<a name='447'>
+      RETURN<a name='448'>
+      END  subroutine kaiser<a name='449'>
+<a name='450'>
+<a name='451'>
+<a name='452'>
+<a name='453'>
+<A NAME='POTTER2'><A href='../../html_code/frame/module_dfi.F.html#POTTER2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='454'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>POTTER2</font>(NSTEPS,WW) <A href='../../call_to/POTTER2.html' TARGET='index'>1</A>,<A href='../../call_from/POTTER2.html' TARGET='index'>2</A><a name='455'>
+<font color=#447700>!min---<a name='456'></font>
+<font color=#447700>!min---     define potter window function.<a name='457'></font>
+<font color=#447700>!min---     modified (by me) to fall off over twice the range.<a name='458'></font>
+<font color=#447700>!min---<a name='459'></font>
+      implicit none<a name='460'>
+      integer, intent(in)                       :: nsteps<a name='461'>
+	  real, dimension(0:nsteps),intent(out)     ::  ww<a name='462'>
+      integer  :: n<a name='463'>
+      real     :: ck, sum, arg<a name='464'>
+<font color=#447700>!min---     local data<a name='465'></font>
+<a name='466'>
+      real, dimension(0:3)   :: d <a name='467'>
+      real                   :: pi<a name='468'>
+      integer                :: ip<a name='469'>
+<a name='470'>
+      d(0) = 0.35577019<a name='471'>
+	  d(1) = 0.2436983<a name='472'>
+	  d(2) = 0.07211497<a name='473'>
+	  d(3) = 0.00630165<a name='474'>
+ <a name='475'>
+      PI=4*ATAN(1.)<a name='476'>
+<font color=#447700>!min---<a name='477'></font>
+      CK = 1.0<a name='478'>
+      DO N=0,NSTEPS<a name='479'>
+         IF(N.EQ.NSTEPS) CK = 0.5<a name='480'>
+         ARG = PI*FLOAT(N)/FLOAT(NSTEPS)<a name='481'>
+<font color=#447700>!min---        modification in next statement<a name='482'></font>
+         ARG = ARG/2.<a name='483'>
+<font color=#447700>!min---        end of modification<a name='484'></font>
+         SUM = D(0)<a name='485'>
+         DO IP=1,3<a name='486'>
+            SUM = SUM + 2.*D(IP)*COS(ARG*FLOAT(IP))<a name='487'>
+         ENDDO<a name='488'>
+         WW(N) = CK*SUM<a name='489'>
+      ENDDO<a name='490'>
+      RETURN<a name='491'>
+      END SUBROUTINE POTTER2<a name='492'>
+<a name='493'>
+<a name='494'>
+<A NAME='DOLPHWIN'><A href='../../html_code/frame/module_dfi.F.html#DOLPHWIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='495'>
+      <font color=#993300>SUBROUTINE  </font><font color=#cc0000>DOLPHWIN</font>(M,WINDOW) <A href='../../call_to/DOLPHWIN.html' TARGET='index'>1</A><a name='496'>
+<font color=#447700>!min---<a name='497'></font>
+<font color=#447700>!min---     calculation of dolph-chebyshev window or, for short,<a name='498'></font>
+<font color=#447700>!min---     dolph window, using the expression in the reference:<a name='499'></font>
+<font color=#447700>!min---<a name='500'></font>
+<font color=#447700>!min----     antoniou, andreas, 1993: digital filters: analysis,<a name='501'></font>
+<font color=#447700>!min----     design and applications. mcgraw-hill, inc., 689pp.<a name='502'></font>
+<font color=#447700>!min----<a name='503'></font>
+<font color=#447700>!min----     the dolph window is optimal in the following sense:<a name='504'></font>
+<font color=#447700>!min----     for a given main-lobe width, the stop-band attenuation<a name='505'></font>
+<font color=#447700>!min----     is minimal; for a given stop-band level, the main-lobe<a name='506'></font>
+<font color=#447700>!min----     width is minimal.<a name='507'></font>
+<font color=#447700>!min----<a name='508'></font>
+<font color=#447700>!min----     it is possible to specify either the ripple-ratio r<a name='509'></font>
+<font color=#447700>!min----     or the stop-band edge thetas.<a name='510'></font>
+<font color=#447700>!min----<a name='511'></font>
+      implicit none<a name='512'>
+      integer, intent(in)                  ::  m<a name='513'>
+      real, dimension(0:m),intent(out)     ::  window<a name='514'>
+<a name='515'>
+<font color=#447700>!min---- local data<a name='516'></font>
+      real, dimension(0:2*m)               :: t<a name='517'>
+      real, dimension(0:m)                 :: w, time<a name='518'>
+      real  :: pi, thetas, x0, term1, term2, rr, r, db, sum, arg<a name='519'>
+      integer :: n, nm1, nt, i<a name='520'>
+<a name='521'>
+<font color=#447700>!min----<a name='522'></font>
+      PI = 4*ATAN(1.D0)<a name='523'>
+<font color=#447700>!min----<a name='524'></font>
+      THETAS = 2*PI/(M)<a name='525'>
+<a name='526'>
+<font color=#447700>!min----<a name='527'></font>
+      N = 2*M+1<a name='528'>
+      NM1 = N-1<a name='529'>
+      X0 = 1/COS(THETAS/2)<a name='530'>
+<font color=#447700>!min----<a name='531'></font>
+      TERM1 = (X0 + SQRT(X0**2-1))**(FLOAT(N-1))<a name='532'>
+      TERM2 = (X0 - SQRT(X0**2-1))**(FLOAT(N-1))<a name='533'>
+      RR = 0.5*(TERM1+TERM2)<a name='534'>
+      R = 1/RR<a name='535'>
+      DB = 20*LOG10(R)<a name='536'>
+      WRITE(*,'(1X,''DOLPH: M,N='',2I8)')M,N<a name='537'>
+<font color=#447700>!CIVY---      CALL MESAGE(MYPE,NPRPE,MES)<a name='538'></font>
+      WRITE(*,'(1X,''DOLPH: THETAS (STOP-BAND EDGE)='',F10.3)')THETAS<a name='539'>
+<font color=#447700>!CIVY---      CALL MESAGE(MYPE,NPRPE,MES)<a name='540'></font>
+      WRITE(*,'(1X,''DOLPH: R,DB='',2F10.3)')R, DB<a name='541'>
+<font color=#447700>!min----<a name='542'></font>
+      DO NT=0,M<a name='543'>
+        SUM = RR<a name='544'>
+        DO I=1,M<a name='545'>
+          ARG = X0*COS(I*PI/N)<a name='546'>
+          CALL <A href='../../html_code/frame/module_dfi.F.html#CHEBY'>CHEBY</A><A href='../../html_code/frame/module_dfi.F.html#POTTER2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHEBY_1">(T,NM1,ARG)<a name='547'>
+          TERM1 = T(NM1)<a name='548'>
+          TERM2 = COS(2*NT*PI*I/N)<a name='549'>
+          SUM = SUM + 2*TERM1*TERM2<a name='550'>
+        ENDDO<a name='551'>
+        W(NT) = SUM/N<a name='552'>
+        TIME(NT) = NT<a name='553'>
+      ENDDO<a name='554'>
+<font color=#447700>!min----<a name='555'></font>
+<font color=#447700>!min------   fill up the array for return<a name='556'></font>
+      DO NT=0,M<a name='557'>
+        WINDOW(NT) = W(NT)<a name='558'>
+      ENDDO<a name='559'>
+<font color=#447700>!min----<a name='560'></font>
+      RETURN<a name='561'>
+      END subroutine dolphwin<a name='562'>
+<font color=#447700>!min----<a name='563'></font>
+<font color=#447700>!min----&lt;A NAME="DOLPH"&gt;<a name='564'></font>
+<font color=#447700>!min----<a name='565'></font>
+<A NAME='DOLPH'><A href='../../html_code/frame/module_dfi.F.html#DOLPH' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='566'>
+      <font color=#993300>SUBROUTINE  </font><font color=#cc0000>DOLPH</font>(MYPE, DELTAT, TAUS, M, WINDOW) <A href='../../call_to/DOLPH.html' TARGET='index'>1</A><a name='567'>
+<font color=#447700>!min----<a name='568'></font>
+<font color=#447700>!min----     calculation of dolph-chebyshev window or, for short,<a name='569'></font>
+<font color=#447700>!min----     dolph window, using the expression in the reference:<a name='570'></font>
+<font color=#447700>!min----<a name='571'></font>
+<font color=#447700>!min----     antoniou, andreas, 1993: digital filters: analysis,<a name='572'></font>
+<font color=#447700>!min----     design and applications. mcgraw-hill, inc., 689pp.<a name='573'></font>
+<font color=#447700>!min----<a name='574'></font>
+<font color=#447700>!min----     the dolph window is optimal in the following sense:<a name='575'></font>
+<font color=#447700>!min----     for a given main-lobe width, the stop-band attenuation<a name='576'></font>
+<font color=#447700>!min----     is minimal; for a given stop-band level, the main-lobe<a name='577'></font>
+<font color=#447700>!min----     width is minimal.<a name='578'></font>
+<font color=#447700>!min----<a name='579'></font>
+<font color=#447700>!min----     mype         ! current pe number (used only for message)<a name='580'></font>
+<font color=#447700>!min----<a name='581'></font>
+<font color=#447700>!min----------------------------------------------------------------<a name='582'></font>
+<font color=#447700>!min----<a name='583'></font>
+      implicit none<a name='584'>
+<a name='585'>
+      integer, intent(in)                  ::  m<a name='586'>
+      real, dimension(0:2*m),intent(out)     ::  window<a name='587'>
+      integer, intent(in)                  :: mype<a name='588'>
+      real, intent(in)                     :: deltat, taus<a name='589'>
+<a name='590'>
+<a name='591'>
+<a name='592'>
+<font color=#447700>!min---- local data<a name='593'></font>
+      integer, PARAMETER        ::  NMAX = 5000<a name='594'>
+      REAL, dimension(0:NMAX)   :: t, w, time<a name='595'>
+      real, dimension(0:2*nmax) :: w2<a name='596'>
+      INTEGER                   :: NPRPE=0        <font color=#447700>! no of pe<a name='597'></font>
+      CHARACTER*80              :: MES<a name='598'>
+<font color=#447700>!min----<a name='599'></font>
+      real    :: pi, thetas, x0, term1, term2, rr, r,db, sum, arg, sumw<a name='600'>
+      integer :: n, nm1, i, nt<a name='601'>
+      <a name='602'>
+      PI = 4*ATAN(1.D0)<a name='603'>
+<a name='604'>
+        print *, 'in dfcoef, deltat = ', deltat, 'taus=',taus<a name='605'>
+<a name='606'>
+<a name='607'>
+<font color=#447700>!min----<a name='608'></font>
+      N = 2*M+1<a name='609'>
+      NM1 = N-1<a name='610'>
+<font color=#447700>!min----<a name='611'></font>
+      THETAS = 2*PI*ABS(DELTAT/TAUS)<a name='612'>
+      X0 = 1/COS(THETAS/2)<a name='613'>
+      TERM1 = (X0 + SQRT(X0**2-1))**(FLOAT(N-1))<a name='614'>
+      TERM2 = (X0 - SQRT(X0**2-1))**(FLOAT(N-1))<a name='615'>
+      RR = 0.5*(TERM1+TERM2)<a name='616'>
+      R = 1/RR<a name='617'>
+      DB = 20*LOG10(R)<a name='618'>
+<a name='619'>
+<a name='620'>
+      WRITE(*,'(1X,''DOLPH: M,N='',2I8)')M,N<a name='621'>
+<font color=#447700>!CIVY---      CALL MESAGE(MYPE,NPRPE,MES)<a name='622'></font>
+      WRITE(*,'(1X,''DOLPH: THETAS (STOP-BAND EDGE)='',F10.3)')THETAS<a name='623'>
+<font color=#447700>!CIVY---      CALL MESAGE(MYPE,NPRPE,MES)<a name='624'></font>
+      WRITE(*,'(1X,''DOLPH: R,DB='',2F10.3)')R, DB<a name='625'>
+<font color=#447700>!CIVY---      CALL MESAGE(MYPE,NPRPE,MES)<a name='626'></font>
+<font color=#447700>!min----<a name='627'></font>
+<font color=#447700>!min----------------------------------------------------------------<a name='628'></font>
+<font color=#447700>!min----<a name='629'></font>
+      DO NT=0,M<a name='630'>
+         SUM = 1<a name='631'>
+         DO I=1,M<a name='632'>
+            ARG = X0*COS(I*PI/N)<a name='633'>
+            CALL <A href='../../html_code/frame/module_dfi.F.html#CHEBY'>CHEBY</A><A href='../../html_code/frame/module_dfi.F.html#POTTER2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CHEBY_2">(T,NM1,ARG)<a name='634'>
+            TERM1 = T(NM1)<a name='635'>
+            TERM2 = COS(2*NT*PI*I/N)<a name='636'>
+            SUM = SUM + R*2*TERM1*TERM2<a name='637'>
+         ENDDO<a name='638'>
+         W(NT) = SUM/N<a name='639'>
+         TIME(NT) = NT<a name='640'>
+         WRITE(*,'(1X,''DOLPH: TIME, W='',F10.6,2X,E17.7)')  &amp;<a name='641'>
+           TIME(NT), W(NT)<a name='642'>
+<font color=#447700>!CIVY---            CALL MESAGE(MYPE,NPRPE,MES)<a name='643'></font>
+      ENDDO<a name='644'>
+<font color=#447700>!min----     fill in the negative-time values by symmetry.<a name='645'></font>
+      DO NT=0,M<a name='646'>
+         W2(M+NT) = W(NT)<a name='647'>
+         W2(M-NT) = W(NT)<a name='648'>
+      ENDDO<a name='649'>
+<font color=#447700>!min----<a name='650'></font>
+<font color=#447700>!min------   fill up the array for return<a name='651'></font>
+      SUMW = 0.<a name='652'>
+      DO NT=0,2*M<a name='653'>
+         SUMW = SUMW + W2(NT)<a name='654'>
+      ENDDO<a name='655'>
+      WRITE(*,'(1X,''DOLPH: SUM OF WEIGHTS W2='',F10.4)')SUMW<a name='656'>
+<font color=#447700>!CIVY---      CALL MESAGE(MYPE,NPRPE,MES)<a name='657'></font>
+<font color=#447700>!min----<a name='658'></font>
+      DO NT=0,2*M<a name='659'>
+         WINDOW(NT) = W2(NT)<a name='660'>
+      ENDDO<a name='661'>
+<font color=#447700>!min----<a name='662'></font>
+      RETURN<a name='663'>
+      END subroutine dolph<a name='664'>
+<font color=#447700>!min----<a name='665'></font>
+<font color=#447700>!min----&lt;A NAME="CHEBY"&gt;<a name='666'></font>
+<font color=#447700>!min----<a name='667'></font>
+<A NAME='CHEBY'><A href='../../html_code/frame/module_dfi.F.html#CHEBY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='668'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>CHEBY</font>(T,N,X) <A href='../../call_to/CHEBY.html' TARGET='index'>2</A><a name='669'>
+<font color=#447700>!min----<a name='670'></font>
+<font color=#447700>!min----     calculate all chebyshev polynomials up to order n<a name='671'></font>
+<font color=#447700>!min----     for the argument value x.<a name='672'></font>
+<font color=#447700>!min----<a name='673'></font>
+<font color=#447700>!min----     reference: numerical recipes, page 184, recurrence<a name='674'></font>
+<font color=#447700>!min----         t_n(x) = 2xt_{n-1}(x) - t_{n-2}(x) ,  n&gt;=2.<a name='675'></font>
+<font color=#447700>!min----<a name='676'></font>
+      implicit none<a name='677'>
+<a name='678'>
+	  integer, intent(in) :: n<a name='679'>
+	  real   , intent(in) :: x<a name='680'>
+	  real, dimension(0:n):: t<a name='681'>
+ <a name='682'>
+          integer  :: nn<a name='683'>
+<font color=#447700>!min----<a name='684'></font>
+      T(0) = 1<a name='685'>
+      T(1) = X<a name='686'>
+      IF(N.LT.2) RETURN<a name='687'>
+      DO NN=2,N<a name='688'>
+         T(NN) = 2*X*T(NN-1) - T(NN-2)<a name='689'>
+      ENDDO<a name='690'>
+<font color=#447700>!min----<a name='691'></font>
+      RETURN<a name='692'>
+      END subroutine cheby<a name='693'>
+<font color=#447700>!min----<a name='694'></font>
+<font color=#447700>!min-&lt;A NAME="RHO"&gt;<a name='695'></font>
+<font color=#447700>!min-<a name='696'></font>
+<a name='697'>
+<a name='698'>
+<a name='699'>
+<A NAME='RHOFIL'><A href='../../html_code/frame/module_dfi.F.html#RHOFIL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='700'>
+        <font color=#993300>SUBROUTINE </font><font color=#cc0000>RHOFIL</font>(DT,TAUC,NORDER,NSTEP,ICTYPE,FROW,NOSIZE) <A href='../../call_to/RHOFIL.html' TARGET='index'>1</A>,<A href='../../call_from/RHOFIL.html' TARGET='index'>2</A><a name='701'>
+<font color=#447700>!min---c<a name='702'></font>
+<font color=#447700>!min---c       RHO = recurssive high order.<a name='703'></font>
+<font color=#447700>!min---c<a name='704'></font>
+<font color=#447700>!min----       This routine calculates and returns the <a name='705'></font>
+<font color=#447700>!min----       Last Row, FROW, of the FILTER matrix.<a name='706'></font>
+<font color=#447700>!min----<a name='707'></font>
+<font color=#447700>!min----       Input Parameters:<a name='708'></font>
+<font color=#447700>!min----              DT  :  Time Step in seconds<a name='709'></font>
+<font color=#447700>!min----            TAUC  :  Cut-off period (hours)<a name='710'></font>
+<font color=#447700>!min----          NORDER  :  Order of QS Filter<a name='711'></font>
+<font color=#447700>!min----           NSTEP  :  Number of step/Size of row.<a name='712'></font>
+<font color=#447700>!min----          ICTYPE  :  Initial Conditions<a name='713'></font>
+<font color=#447700>!min----          NOSIZE  :  Max. side of FROW.<a name='714'></font>
+<font color=#447700>!min----<a name='715'></font>
+<font color=#447700>!min----       Working Fields:<a name='716'></font>
+<font color=#447700>!min----           ACOEF  :  X-coefficients of filter<a name='717'></font>
+<font color=#447700>!min----           BCOEF  :  Y-coefficients of filter<a name='718'></font>
+<font color=#447700>!min----          FILTER  :  Filter Matrix.<a name='719'></font>
+<font color=#447700>!min----<a name='720'></font>
+<font color=#447700>!min----       Output Parameters:<a name='721'></font>
+<font color=#447700>!min----            FROW  : Last Row of Filter Matrix.<a name='722'></font>
+<font color=#447700>!min----<a name='723'></font>
+<font color=#447700>!min----       Note: Two types of initial conditions are permitted.<a name='724'></font>
+<font color=#447700>!min----          ICTYPE = 1 : Order increasing each row to NORDER.<a name='725'></font>
+<font color=#447700>!min----          ICTYPE = 2 : Order fixed at NORDER throughout.<a name='726'></font>
+<font color=#447700>!min----<a name='727'></font>
+<font color=#447700>!min----       DOUBLE PRECISION USED THROUGHOUT.<a name='728'></font>
+        IMPLICIT DOUBLE PRECISION (A-H,O-Z)<a name='729'>
+<font color=#447700>!min----<a name='730'></font>
+        DOUBLE PRECISION MUC<a name='731'>
+<font color=#447700>!min----<a name='732'></font>
+<font color=#447700>!min----       N.B. Single Precision for List Parameters.<a name='733'></font>
+        REAL, intent(in)    ::  DT,TAUC<a name='734'>
+<font color=#447700>!min----       Space for the last row of FILTER.<a name='735'></font>
+        integer, intent(in) ::  norder, nstep, ictype, nosize<a name='736'>
+        REAL   , dimension(0:nosize), intent(out)::  FROW<a name='737'>
+<font color=#447700>!min----<a name='738'></font>
+<font color=#447700>!min----       Arrays for rho filter.<a name='739'></font>
+        integer, PARAMETER  :: NOMAX=100<a name='740'>
+        real   , dimension(0:NOMAX) :: acoef, bcoef<a name='741'>
+        real   , dimension(0:NOMAX,0:NOMAX) :: filter<a name='742'>
+<font color=#447700>!min----       Working space.<a name='743'></font>
+        real   , dimension(0:NOMAX) :: alpha, beta<a name='744'>
+<font color=#447700>!kjw----<a name='745'></font>
+        real   :: DTT<a name='746'>
+        integer :: kk, k, NN, NORD, NR, NC, NROW, LL<a name='747'>
+	COMPLEX                  :: IOTA<a name='748'>
+<font color=#447700>!min----<a name='749'></font>
+<font color=#447700>!min-------------------------------------------------------------------<a name='750'></font>
+	DTT = ABS(DT)<a name='751'>
+<font color=#447700>!	DT = ABS(DT)<a name='752'></font>
+        PI = 2*DASIN(1.D0)<a name='753'>
+        IOTA = CMPLX(0.,1.)<a name='754'>
+<font color=#447700>!min-------------------------------------------------------------------<a name='755'></font>
+<font color=#447700>!min----<a name='756'></font>
+<font color=#447700>!min---       Filtering Parameters (derived).<a name='757'></font>
+        THETAC = 2*PI*DTT/(TAUC)<a name='758'>
+<font color=#447700>!        THETAC = 2*PI*DT/(TAUC)<a name='759'></font>
+        MUC = tan(THETAC/2) <a name='760'>
+        FC = THETAC/(2*PI)<a name='761'>
+<font color=#447700>!min---<a name='762'></font>
+<font color=#447700>!min---------------------------------------------------------------<a name='763'></font>
+<font color=#447700>!min---<a name='764'></font>
+<font color=#447700>!min---     Clear the arrays.<a name='765'></font>
+      DO NC=0,NOMAX<a name='766'>
+         ACOEF(NC) = 0.<a name='767'>
+         BCOEF(NC) = 0.<a name='768'>
+         ALPHA(NC) = 0.<a name='769'>
+         BETA (NC) = 0.<a name='770'>
+         FROW (NC) = 0.<a name='771'>
+         DO NR=0,NOMAX<a name='772'>
+            FILTER(NR,NC) = 0.<a name='773'>
+         ENDDO<a name='774'>
+      ENDDO<a name='775'>
+<font color=#447700>!min---<a name='776'></font>
+<font color=#447700>!min----     Fill up the Filter Matrix.<a name='777'></font>
+      FILTER(0,0) = 1.<a name='778'>
+<font color=#447700>!min---<a name='779'></font>
+<font color=#447700>!min---     Get the coefficients of the Filter.<a name='780'></font>
+      IF ( ICTYPE.eq.2 ) THEN<a name='781'>
+         CALL <A href='../../html_code/frame/module_dfi.F.html#RHOCOF'>RHOCOF</A><A href='../../html_code/frame/module_dfi.F.html#RHOFIL' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RHOCOF_1">(NORDER,NOMAX,MUC, ACOEF,BCOEF)<a name='782'>
+      ENDIF<a name='783'>
+<font color=#447700>!min----<a name='784'></font>
+      DO 100 NROW=1,NSTEP<a name='785'>
+<font color=#447700>!min----<a name='786'></font>
+            IF ( ICTYPE.eq.1 ) THEN<a name='787'>
+               NORD = MIN(NROW,NORDER)<a name='788'>
+               IF ( NORD.le.NORDER) THEN<a name='789'>
+                  CALL <A href='../../html_code/frame/module_dfi.F.html#RHOCOF'>RHOCOF</A><A href='../../html_code/frame/module_dfi.F.html#RHOFIL' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RHOCOF_2">(NORD,NOMAX,MUC, ACOEF,BCOEF)<a name='790'>
+               ENDIF<a name='791'>
+            ENDIF<a name='792'>
+<font color=#447700>!min---<a name='793'></font>
+         DO K=0,NROW<a name='794'>
+            ALPHA(K) = ACOEF(NROW-K)<a name='795'>
+            IF(K.lt.NROW) BETA(K) = BCOEF(NROW-K)<a name='796'>
+         ENDDO<a name='797'>
+<font color=#447700>!min----<a name='798'></font>
+<font color=#447700>!min----        Correction for terms of negative index.<a name='799'></font>
+      IF ( ICTYPE.eq.2 ) THEN<a name='800'>
+         IF ( NROW.lt.NORDER ) THEN<a name='801'>
+            CN = 0.<a name='802'>
+            DO NN=NROW+1,NORDER<a name='803'>
+               CN = CN + (ACOEF(NN)+BCOEF(NN))<a name='804'>
+            ENDDO<a name='805'>
+<font color=#447700>!min----CC         ACOEF(NROW) = ACOEF(NROW) + CN<a name='806'></font>
+            ALPHA(0) = ALPHA(0) + CN<a name='807'>
+         ENDIF<a name='808'>
+      ENDIF<a name='809'>
+<font color=#447700>!min----<a name='810'></font>
+<font color=#447700>!min----       Check sum of ALPHAs and BETAs = 1<a name='811'></font>
+        SUMAB = 0.<a name='812'>
+        DO NN=0,NROW<a name='813'>
+          SUMAB = SUMAB + ALPHA(NN)<a name='814'>
+            IF(NN.lt.NROW) SUMAB = SUMAB + BETA(NN)<a name='815'>
+        ENDDO<a name='816'>
+<font color=#447700>!min---<a name='817'></font>
+         DO KK=0,NROW-1<a name='818'>
+            SUMBF = 0.<a name='819'>
+            DO LL=0,NROW-1<a name='820'>
+               SUMBF = SUMBF + BETA(LL)*FILTER(LL,KK)<a name='821'>
+            ENDDO<a name='822'>
+            FILTER(NROW,KK) = ALPHA(KK)+SUMBF<a name='823'>
+         ENDDO<a name='824'>
+         FILTER(NROW,NROW) = ALPHA(NROW)<a name='825'>
+<font color=#447700>!min---<a name='826'></font>
+<font color=#447700>!min----       Check sum of row elements = 1<a name='827'></font>
+        SUMROW = 0.<a name='828'>
+        DO NN=0,NROW<a name='829'>
+          SUMROW = SUMROW + FILTER(NROW,NN)<a name='830'>
+        ENDDO<a name='831'>
+<font color=#447700>!min----<a name='832'></font>
+  100 CONTINUE<a name='833'>
+<font color=#447700>!min----<a name='834'></font>
+        DO NC=0,NSTEP<a name='835'>
+          FROW(NC) = FILTER(NSTEP,NC)<a name='836'>
+        ENDDO<a name='837'>
+<font color=#447700>!min----<a name='838'></font>
+        RETURN<a name='839'>
+        END subroutine RHOFIL<a name='840'>
+<font color=#447700>!min----<a name='841'></font>
+<font color=#447700>!min---***************************************************************<a name='842'></font>
+<font color=#447700>!min---<a name='843'></font>
+<A NAME='RHOCOF'><A href='../../html_code/frame/module_dfi.F.html#RHOCOF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='844'>
+        <font color=#993300>SUBROUTINE </font><font color=#cc0000>RHOCOF</font>(NORD,NOMAX,MUC,CA,CB) <A href='../../call_to/RHOCOF.html' TARGET='index'>2</A>,<A href='../../call_from/RHOCOF.html' TARGET='index'>1</A><a name='845'>
+<font color=#447700>!min---<a name='846'></font>
+<font color=#447700>!min---       Get the coefficients of the RHO Filter <a name='847'></font>
+<font color=#447700>!min---<a name='848'></font>
+        IMPLICIT DOUBLE PRECISION (A-H,O-Z)<a name='849'>
+<font color=#447700>!min---<a name='850'></font>
+        integer, intent(in)      :: nord, nomax<a name='851'>
+        real, dimension(0:nomax) :: ca, cb<a name='852'>
+        integer                  :: NN<a name='853'>
+<font color=#447700>!min---<a name='854'></font>
+        COMPLEX                  :: IOTA<a name='855'>
+<font color=#447700>!min---   REAL MUC<a name='856'></font>
+<font color=#447700>!min---   COMPLEX ZN<a name='857'></font>
+        DOUBLE PRECISION         :: MUC, ZN<a name='858'>
+<font color=#447700>!min---<a name='859'></font>
+        DOUBLE PRECISION         :: CNR<a name='860'>
+<font color=#447700>!min---<a name='861'></font>
+        PI = 2*ASIN(1.)<a name='862'>
+        ROOT2 = SQRT(2.)<a name='863'>
+        IOTA = (0.,1.)<a name='864'>
+<font color=#447700>!min---<a name='865'></font>
+              RN = 1./FLOAT(NORD)<a name='866'>
+              SIGMA = 1./( SQRT(2.**RN-1.) )<a name='867'>
+<font color=#447700>!min---<a name='868'></font>
+              GAIN  = (MUC*SIGMA/(1+MUC*SIGMA))**NORD<a name='869'>
+              ZN = (1-MUC*SIGMA)/(1+MUC*SIGMA)<a name='870'>
+<font color=#447700>!min---<a name='871'></font>
+        DO NN=0,NORD<a name='872'>
+          CA(NN) = <A href='../../html_code/frame/module_dfi.F.html#CNR'>CNR</A><A href='../../html_code/frame/module_dfi.F.html#RHOCOF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CNR_1">(NORD,NN)*GAIN<a name='873'>
+          IF(NN.gt.0) CB(NN) = -CNR(NORD,NN)*(-ZN)**NN<a name='874'>
+        ENDDO<a name='875'>
+<font color=#447700>!min---C       Check sum of coefficients = 1<a name='876'></font>
+        SUMCOF = 0.<a name='877'>
+        DO NN=0,NORD<a name='878'>
+          SUMCOF = SUMCOF + CA(NN)<a name='879'>
+          IF(NN.gt.0) SUMCOF = SUMCOF + CB(NN)<a name='880'>
+        ENDDO<a name='881'>
+<font color=#447700>!min---<a name='882'></font>
+        RETURN<a name='883'>
+        END subroutine RHOCOF<a name='884'>
+<a name='885'>
+END MODULE module_dfi<a name='886'>
+<font color=#447700>!min---***************************************************************<a name='887'></font>
+<A NAME='CNR'><A href='../../html_code/frame/module_dfi.F.html#CNR' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='888'>
+        DOUBLE PRECISION <font color=#993300>FUNCTION </font><font color=#cc0000>CNR</font>(N,R) <A href='../../call_to/CNR.html' TARGET='index'>1</A><a name='889'>
+<font color=#447700>!min--- <a name='890'></font>
+<font color=#447700>!min---        Binomial Coefficient (n,r).<a name='891'></font>
+        IMPLICIT DOUBLE PRECISION(C,X)<a name='892'>
+<font color=#447700>!min--- <a name='893'></font>
+        INTEGER , intent(in)    :: n, R<a name='894'>
+        IF ( R.eq.0 ) THEN<a name='895'>
+           CNR = 1.0<a name='896'>
+           RETURN<a name='897'>
+        ENDIF<a name='898'>
+        Coeff = 1.0<a name='899'>
+        XN = DFLOAT(N)<a name='900'>
+        XR = DFLOAT(R)<a name='901'>
+        DO K=1,R<a name='902'>
+          XK = DFLOAT(K)<a name='903'>
+          COEFF = COEFF * ( (XN-XR+XK)/XK )<a name='904'>
+        ENDDO<a name='905'>
+        CNR = COEFF<a name='906'>
+        RETURN<a name='907'>
+        END FUNCTION<a name='908'>
+<font color=#447700>!min---***************************************************************<a name='909'></font>
+<a name='910'>
+<a name='911'>
+<a name='912'>
+<A NAME='BESSI0'><A href='../../html_code/frame/module_dfi.F.html#BESSI0' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='913'>
+      real <font color=#993300>FUNCTION </font><font color=#cc0000>BESSI0</font>(X) <A href='../../call_to/BESSI0.html' TARGET='index'>2</A><a name='914'>
+<font color=#447700>!min---<a name='915'></font>
+<font color=#447700>!min---   from numerical recipes (press, et al.)<a name='916'></font>
+<font color=#447700>!min---<a name='917'></font>
+      implicit none<a name='918'>
+<a name='919'>
+	  real(8)      :: Y<a name='920'>
+	  real(8)      :: P1 = 1.0d0<a name='921'>
+	  real(8)      ::          P2 = 3.5156230D0<a name='922'>
+          real(8)      ::		 P3 = 3.0899424D0<a name='923'>
+          real(8)      ::	 P4 = 1.2067492D0<a name='924'>
+          real(8)      ::	 P5 = 0.2659732D0<a name='925'>
+	  real(8)      ::        P6 = 0.360768D-1<a name='926'>
+          real(8)      ::	 P7 = 0.45813D-2<a name='927'>
+<a name='928'>
+	  real*8  	  :: Q1 = 0.39894228D0<a name='929'>
+	  real*8  	  ::	                 Q2 = 0.1328592D-1<a name='930'>
+	  real*8  	  ::					 Q3 = 0.225319D-2<a name='931'>
+	  real*8  	  ::					 Q4 = -0.157565D-2<a name='932'>
+	  real*8  	  ::					 Q5 = 0.916281D-2<a name='933'>
+	  real*8  	  ::					 Q6 = -0.2057706D-1<a name='934'>
+	  real*8  	  ::					 Q7 = 0.2635537D-1<a name='935'>
+	  real*8  	  ::					 Q8 = -0.1647633D-1<a name='936'>
+	  real*8  	  ::					 Q9 = 0.392377D-2<a name='937'>
+<a name='938'>
+         real            :: x, ax<a name='939'>
+<a name='940'>
+<a name='941'>
+      IF (ABS(X).LT.3.75) THEN<a name='942'>
+        Y=(X/3.75)**2<a name='943'>
+        BESSI0=P1+Y*(P2+Y*(P3+Y*(P4+Y*(P5+Y*(P6+Y*P7)))))<a name='944'>
+      ELSE<a name='945'>
+        AX=ABS(X)<a name='946'>
+        Y=3.75/AX<a name='947'>
+        BESSI0=(EXP(AX)/SQRT(AX))*(Q1+Y*(Q2+Y*(Q3+Y*(Q4    &amp;<a name='948'>
+           +Y*(Q5+Y*(Q6+Y*(Q7+Y*(Q8+Y*Q9))))))))<a name='949'>
+      ENDIF<a name='950'>
+      RETURN<a name='951'>
+      END function bessi0<a name='952'>
+<a name='953'>
+<A NAME='DA_DOT'><A href='../../html_code/frame/module_dfi.F.html#DA_DOT' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='954'>
+      real <font color=#993300>function </font><font color=#cc0000>da_dot</font>(x,y,n)<a name='955'>
+<font color=#447700>!<a name='956'></font>
+<font color=#447700>!     forms the dot product of two vectors.<a name='957'></font>
+<font color=#447700>!     uses unrolled loops for increments equal to one.<a name='958'></font>
+<font color=#447700>!     jack dongarra, linpack, 3/11/78.<a name='959'></font>
+<font color=#447700>!<a name='960'></font>
+      implicit none<a name='961'>
+<a name='962'>
+      integer, intent(in)               :: n<a name='963'>
+      real, dimension(n), intent(in)    :: x,y<a name='964'>
+<a name='965'>
+      real dtemp1,dtemp1x<a name='966'>
+      integer i,m,mp1<a name='967'>
+      integer ierror     <font color=#447700>! MPI error code.<a name='968'></font>
+<font color=#447700>!<a name='969'></font>
+      da_dot = 0.0<a name='970'>
+      if(n &lt;= 0)return<a name='971'>
+      dtemp1 = 0.0<a name='972'>
+<font color=#447700>!<a name='973'></font>
+<font color=#447700>!        code for both increments equal to 1<a name='974'></font>
+<font color=#447700>!<a name='975'></font>
+      if(n &gt; 0 ) then<a name='976'>
+        m = mod(n,5)<a name='977'>
+        if( m /= 0 ) then<a name='978'>
+          do i = 1,m<a name='979'>
+            dtemp1 = dtemp1 + x(i)*y(i)<a name='980'>
+          end do<a name='981'>
+        end if<a name='982'>
+        if( n &gt;= 5 ) then<a name='983'>
+          mp1 = m + 1<a name='984'>
+          do i = mp1,n,5<a name='985'>
+            dtemp1 = dtemp1 + x(i    )*y(i    ) + x(i + 1)*y(i + 1) + &amp;<a name='986'>
+                              x(i + 2)*y(i + 2) + x(i + 3)*y(i + 3) + &amp;<a name='987'>
+                              x(i + 4)*y(i + 4)<a name='988'>
+          end do<a name='989'>
+        end if<a name='990'>
+      end if<a name='991'>
+      da_dot = dtemp1<a name='992'>
+      end function da_dot<a name='993'>
+<a name='994'>
+</pre></body></html>

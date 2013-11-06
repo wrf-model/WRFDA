@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="640" height="480" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+ <title>personnage</title>
+ <defs>
+  <linearGradient gradientUnits="userSpaceOnUse" y2="725.04077" x2="1340.2604" y1="725.04077" x1="1307.7538" id="linearGradient21360" xlink:href="#linearGradient21354"/>
+  <linearGradient id="linearGradient21354">
+   <stop stop-color="#ffffff" id="stop21356" offset="0"/>
+   <stop stop-color="#ffffff" stop-opacity="0" id="stop21358" offset="1"/>
+  </linearGradient>
+ </defs>
+ <metadata id="metadata3341">image/svg+xmlpersonnageAntoine BardelliCreatives Commons 2.0 Paternit   / Licence Art LibreFrhttp://bardelli.fr/</metadata>
+ <g>
+  <title>Layer 1</title>
+  <g id="layer1">
+   <g display="inline" id="g9726">
+    <g id="g5713">
+     <path fill="#000000" fill-rule="nonzero" stroke="#ffffff" stroke-width="1.743247" stroke-miterlimit="4" id="rect9675" d="m281.055756,8.77058c-18.454865,1.597986 -34.327988,18.04574 -37.395569,40.115223l-3.399597,25.157005c-0.682739,1.209328 -1.439606,2.340317 -2.039749,3.626236l-65.72551,140.969872c-2.65976,5.697876 -4.215363,11.674149 -4.75943,17.451263l-35.582428,0c-23.29892,0 -42.154976,18.629593 -42.154976,41.928345l0,133.037506c0,23.298706 18.856056,42.154968 42.154976,42.154968l61.872635,0c14.16246,12.815308 32.794586,20.624176 53.486954,20.624176l84.309967,0c44.266541,0 79.777161,-35.510681 79.777161,-79.77713l0,-137.117004c0,-44.266464 -35.51062,-79.777191 -79.777161,-79.777191l-26.063568,0l16.091431,-116.946064c3.505829,-25.222069 -10.953613,-48.025035 -32.636108,-51.220562c-2.710327,-0.399721 -5.522614,-0.454608 -8.159027,-0.226201l0,-0.000442z"/>
+     <rect fill="#000000" fill-rule="nonzero" stroke="#ffffff" stroke-width="1.771654" transform="matrix(0,7.252469544146462,-7.252469544146462,0,-41.50239627605619,7189.5076189884185) " ry="4.634307" y="-73.898647" x="-966.89909" height="24.954496" width="9.980928" id="rect9623-6"/>
+     <rect fill="#000000" fill-rule="nonzero" stroke="#ffffff" stroke-width="1.771654" transform="matrix(0,7.252469544146462,-7.252469544146462,0,-41.50239627605619,7189.5076189884185) " ry="4.990464" y="-77.746258" x="-956.63297" height="28.802109" width="9.980928" id="rect9623-6-5"/>
+     <rect fill="#000000" fill-rule="nonzero" stroke="#ffffff" stroke-width="1.771654" id="rect9671" width="9.980928" height="25.614088" x="-946.36686" y="-74.558243" ry="4.990464" transform="matrix(0,7.252469544146462,-7.252469544146462,0,-41.50239627605619,7189.5076189884185) "/>
+     <rect fill="#000000" fill-rule="nonzero" stroke="#ffffff" stroke-width="1.771654" transform="matrix(0,7.252469544146462,-7.252469544146462,0,-41.50239627605619,7189.5076189884185) " ry="4.990464" y="-71.150356" x="-936.10075" height="22.206205" width="9.980928" id="rect9673"/>
+    </g>
+   </g>
+  </g>
+ </g>
+</svg>

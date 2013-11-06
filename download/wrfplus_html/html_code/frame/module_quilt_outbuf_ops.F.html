@@ -1,0 +1,422 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='MODULE_QUILT_OUTBUF_OPS'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#MODULE_QUILT_OUTBUF_OPS' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_quilt_outbuf_ops</font> <A href='../../call_to/MODULE_QUILT_OUTBUF_OPS.html' TARGET='index'>5</A><a name='3'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='4'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='5'></font>
+<font color=#447700>! This module contains routines and data structures used by the I/O quilt <a name='6'></font>
+<font color=#447700>! servers to assemble fields ("quilting") and write them to disk.  <a name='7'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='8'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='9'></font>
+  INTEGER, PARAMETER :: tabsize = 1000<a name='10'>
+  INTEGER            :: num_entries<a name='11'>
+<a name='12'>
+  TYPE outrec<a name='13'>
+    CHARACTER*80                       :: VarName, DateStr, MemoryOrder, Stagger, DimNames(3)<a name='14'>
+    INTEGER                            :: ndim<a name='15'>
+    INTEGER, DIMENSION(3)              :: DomainStart, DomainEnd<a name='16'>
+    INTEGER                            :: FieldType<a name='17'>
+    REAL,    POINTER, DIMENSION(:,:,:) :: rptr <a name='18'>
+    INTEGER, POINTER, DIMENSION(:,:,:) :: iptr<a name='19'>
+  END TYPE outrec<a name='20'>
+<a name='21'>
+  TYPE(outrec), DIMENSION(tabsize) :: outbuf_table<a name='22'>
+<a name='23'>
+CONTAINS<a name='24'>
+<a name='25'>
+<A NAME='INIT_OUTBUF'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#INIT_OUTBUF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='26'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_outbuf</font> <A href='../../call_to/INIT_OUTBUF.html' TARGET='index'>1</A><a name='27'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='28'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='29'></font>
+<font color=#447700>! This routine re-initializes module data structures.  <a name='30'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='31'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='32'></font>
+    IMPLICIT NONE<a name='33'>
+    INTEGER i<a name='34'>
+    DO i = 1, tabsize<a name='35'>
+      outbuf_table(i)%VarName = ""<a name='36'>
+      outbuf_table(i)%DateStr = ""<a name='37'>
+      outbuf_table(i)%MemoryOrder = ""<a name='38'>
+      outbuf_table(i)%Stagger = ""<a name='39'>
+      outbuf_table(i)%DimNames(1) = ""<a name='40'>
+      outbuf_table(i)%DimNames(2) = ""<a name='41'>
+      outbuf_table(i)%DimNames(3) = ""<a name='42'>
+      outbuf_table(i)%ndim = 0<a name='43'>
+      NULLIFY( outbuf_table(i)%rptr )<a name='44'>
+      NULLIFY( outbuf_table(i)%iptr )<a name='45'>
+    ENDDO<a name='46'>
+    num_entries = 0<a name='47'>
+  END SUBROUTINE init_outbuf<a name='48'>
+<a name='49'>
+<a name='50'>
+<A NAME='WRITE_OUTBUF'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#WRITE_OUTBUF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='51'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>write_outbuf</font> ( DataHandle , io_form_arg ) <A href='../../call_to/WRITE_OUTBUF.html' TARGET='index'>1</A>,<A href='../../call_from/WRITE_OUTBUF.html' TARGET='index'>1</A><a name='52'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='53'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='54'></font>
+<font color=#447700>! This routine writes all of the records stored in outbuf_table to the <a name='55'></font>
+<font color=#447700>! file referenced by DataHandle using format specified by io_form_arg.  <a name='56'></font>
+<font color=#447700>! This routine calls the package-specific I/O routines to accomplish <a name='57'></font>
+<font color=#447700>! the write.  <a name='58'></font>
+<font color=#447700>! It then re-initializes module data structures.  <a name='59'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='60'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='61'></font>
+    USE module_state_description<a name='62'>
+    IMPLICIT NONE<a name='63'>
+    INCLUDE 'wrf_io_flags.h'<a name='64'>
+    INTEGER , INTENT(IN)  :: DataHandle, io_form_arg<a name='65'>
+    INTEGER               :: ii,ds1,de1,ds2,de2,ds3,de3<a name='66'>
+    INTEGER               :: Comm, IOComm, DomainDesc <font color=#447700>! dummy<a name='67'></font>
+    INTEGER               :: Status<a name='68'>
+    CHARACTER*80          :: mess<a name='69'>
+    Comm = 0 ; IOComm = 0 ; DomainDesc = 0 <a name='70'>
+    DO ii = 1, num_entries<a name='71'>
+      WRITE(mess,*)'writing ', &amp;<a name='72'>
+                    TRIM(outbuf_table(ii)%DateStr)," ",                                   &amp;<a name='73'>
+                    TRIM(outbuf_table(ii)%VarName)," ",                                   &amp;<a name='74'>
+                    TRIM(outbuf_table(ii)%MemoryOrder)<a name='75'>
+      ds1 = outbuf_table(ii)%DomainStart(1) ; de1 = outbuf_table(ii)%DomainEnd(1)<a name='76'>
+      ds2 = outbuf_table(ii)%DomainStart(2) ; de2 = outbuf_table(ii)%DomainEnd(2)<a name='77'>
+      ds3 = outbuf_table(ii)%DomainStart(3) ; de3 = outbuf_table(ii)%DomainEnd(3)<a name='78'>
+<a name='79'>
+      SELECT CASE ( io_form_arg )<a name='80'>
+<a name='81'>
+#ifdef NETCDF<a name='82'>
+        CASE ( IO_NETCDF   )<a name='83'>
+<a name='84'>
+          IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN<a name='85'>
+<a name='86'>
+          CALL ext_ncd_write_field ( DataHandle ,                                     &amp;<a name='87'>
+                                 TRIM(outbuf_table(ii)%DateStr),                      &amp;<a name='88'>
+                                 TRIM(outbuf_table(ii)%VarName),                      &amp;<a name='89'>
+                                 outbuf_table(ii)%rptr(ds1:de1,ds2:de2,ds3:de3),      &amp;<a name='90'>
+                                 outbuf_table(ii)%FieldType,                          &amp;  <font color=#447700>!*<a name='91'></font>
+                                 Comm, IOComm, DomainDesc ,                           &amp;<a name='92'>
+                                 TRIM(outbuf_table(ii)%MemoryOrder),                  &amp;<a name='93'>
+                                 TRIM(outbuf_table(ii)%Stagger),                      &amp;  <font color=#447700>!*<a name='94'></font>
+                                 outbuf_table(ii)%DimNames ,                          &amp;  <font color=#447700>!*<a name='95'></font>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='96'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='97'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='98'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='99'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='100'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='101'>
+                                 Status )<a name='102'>
+<a name='103'>
+          ELSE IF ( outbuf_table(ii)%FieldType .EQ. WRF_INTEGER ) THEN<a name='104'>
+          CALL ext_ncd_write_field ( DataHandle ,                                     &amp;<a name='105'>
+                                 TRIM(outbuf_table(ii)%DateStr),                      &amp;<a name='106'>
+                                 TRIM(outbuf_table(ii)%VarName),                      &amp;<a name='107'>
+                                 outbuf_table(ii)%iptr(ds1:de1,ds2:de2,ds3:de3),      &amp;<a name='108'>
+                                 outbuf_table(ii)%FieldType,                          &amp;  <font color=#447700>!*<a name='109'></font>
+                                 Comm, IOComm, DomainDesc ,                           &amp;<a name='110'>
+                                 TRIM(outbuf_table(ii)%MemoryOrder),                  &amp;<a name='111'>
+                                 TRIM(outbuf_table(ii)%Stagger),                      &amp;  <font color=#447700>!*<a name='112'></font>
+                                 outbuf_table(ii)%DimNames ,                          &amp;  <font color=#447700>!*<a name='113'></font>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='114'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='115'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='116'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='117'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='118'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='119'>
+                                 Status )<a name='120'>
+          ENDIF<a name='121'>
+#endif<a name='122'>
+#ifdef YYY<a name='123'>
+      CASE ( IO_YYY   )<a name='124'>
+<a name='125'>
+          IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN<a name='126'>
+<a name='127'>
+          CALL ext_yyy_write_field ( DataHandle ,                                     &amp;<a name='128'>
+                                 TRIM(outbuf_table(ii)%DateStr),                      &amp;<a name='129'>
+                                 TRIM(outbuf_table(ii)%VarName),                      &amp;<a name='130'>
+                                 outbuf_table(ii)%rptr(ds1:de1,ds2:de2,ds3:de3),      &amp;<a name='131'>
+                                 outbuf_table(ii)%FieldType,                          &amp;  <font color=#447700>!*<a name='132'></font>
+                                 Comm, IOComm, DomainDesc ,                           &amp;<a name='133'>
+                                 TRIM(outbuf_table(ii)%MemoryOrder),                  &amp;<a name='134'>
+                                 TRIM(outbuf_table(ii)%Stagger),                      &amp;  <font color=#447700>!*<a name='135'></font>
+                                 outbuf_table(ii)%DimNames ,                          &amp;  <font color=#447700>!*<a name='136'></font>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='137'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='138'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='139'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='140'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='141'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='142'>
+                                 Status )<a name='143'>
+<a name='144'>
+          ELSE IF ( outbuf_table(ii)%FieldType .EQ. WRF_INTEGER ) THEN<a name='145'>
+          CALL ext_yyy_write_field ( DataHandle ,                                     &amp;<a name='146'>
+                                 TRIM(outbuf_table(ii)%DateStr),                      &amp;<a name='147'>
+                                 TRIM(outbuf_table(ii)%VarName),                      &amp;<a name='148'>
+                                 outbuf_table(ii)%iptr(ds1:de1,ds2:de2,ds3:de3),      &amp;<a name='149'>
+                                 outbuf_table(ii)%FieldType,                          &amp;  <font color=#447700>!*<a name='150'></font>
+                                 Comm, IOComm, DomainDesc ,                           &amp;<a name='151'>
+                                 TRIM(outbuf_table(ii)%MemoryOrder),                  &amp;<a name='152'>
+                                 TRIM(outbuf_table(ii)%Stagger),                      &amp;  <font color=#447700>!*<a name='153'></font>
+                                 outbuf_table(ii)%DimNames ,                          &amp;  <font color=#447700>!*<a name='154'></font>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='155'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='156'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='157'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='158'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='159'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='160'>
+                                 Status )<a name='161'>
+          ENDIF<a name='162'>
+#endif<a name='163'>
+#ifdef INTIO<a name='164'>
+        CASE ( IO_INTIO  )<a name='165'>
+          IF ( outbuf_table(ii)%FieldType .EQ. WRF_REAL ) THEN<a name='166'>
+<a name='167'>
+          CALL ext_int_write_field ( DataHandle ,                                     &amp;<a name='168'>
+                                 TRIM(outbuf_table(ii)%DateStr),                      &amp;<a name='169'>
+                                 TRIM(outbuf_table(ii)%VarName),                      &amp;<a name='170'>
+                                 outbuf_table(ii)%rptr(ds1:de1,ds2:de2,ds3:de3),      &amp;<a name='171'>
+                                 outbuf_table(ii)%FieldType,                          &amp;  <font color=#447700>!*<a name='172'></font>
+                                 Comm, IOComm, DomainDesc ,                           &amp;<a name='173'>
+                                 TRIM(outbuf_table(ii)%MemoryOrder),                  &amp;<a name='174'>
+                                 TRIM(outbuf_table(ii)%Stagger),                      &amp;  <font color=#447700>!*<a name='175'></font>
+                                 outbuf_table(ii)%DimNames ,                          &amp;  <font color=#447700>!*<a name='176'></font>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='177'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='178'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='179'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='180'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='181'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='182'>
+                                 Status )<a name='183'>
+<a name='184'>
+          ELSE IF ( outbuf_table(ii)%FieldType .EQ. WRF_INTEGER ) THEN<a name='185'>
+<a name='186'>
+          CALL ext_int_write_field ( DataHandle ,                                     &amp;<a name='187'>
+                                 TRIM(outbuf_table(ii)%DateStr),                      &amp;<a name='188'>
+                                 TRIM(outbuf_table(ii)%VarName),                      &amp;<a name='189'>
+                                 outbuf_table(ii)%iptr(ds1:de1,ds2:de2,ds3:de3),      &amp;<a name='190'>
+                                 outbuf_table(ii)%FieldType,                          &amp;  <font color=#447700>!*<a name='191'></font>
+                                 Comm, IOComm, DomainDesc ,                           &amp;<a name='192'>
+                                 TRIM(outbuf_table(ii)%MemoryOrder),                  &amp;<a name='193'>
+                                 TRIM(outbuf_table(ii)%Stagger),                      &amp;  <font color=#447700>!*<a name='194'></font>
+                                 outbuf_table(ii)%DimNames ,                          &amp;  <font color=#447700>!*<a name='195'></font>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='196'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='197'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='198'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='199'>
+                                 outbuf_table(ii)%DomainStart,                        &amp;<a name='200'>
+                                 outbuf_table(ii)%DomainEnd,                          &amp;<a name='201'>
+                                 Status )<a name='202'>
+<a name='203'>
+          ENDIF<a name='204'>
+#endif<a name='205'>
+        CASE DEFAULT<a name='206'>
+      END SELECT<a name='207'>
+<a name='208'>
+<a name='209'>
+      IF ( ASSOCIATED( outbuf_table(ii)%rptr) ) DEALLOCATE(outbuf_table(ii)%rptr)<a name='210'>
+      IF ( ASSOCIATED( outbuf_table(ii)%iptr) ) DEALLOCATE(outbuf_table(ii)%iptr)<a name='211'>
+      NULLIFY( outbuf_table(ii)%rptr )<a name='212'>
+      NULLIFY( outbuf_table(ii)%iptr )<a name='213'>
+    ENDDO<a name='214'>
+    CALL <A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#INIT_OUTBUF'>init_outbuf</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#WRITE_OUTBUF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INIT_OUTBUF_1"><a name='215'>
+  END SUBROUTINE write_outbuf<a name='216'>
+<a name='217'>
+END MODULE module_quilt_outbuf_ops<a name='218'>
+<a name='219'>
+<font color=#447700>! don't let other programs see the definition of this; type mismatches<a name='220'></font>
+<font color=#447700>! on inbuf will result;  may want to make a module program at some point <a name='221'></font>
+<A NAME='STORE_PATCH_IN_OUTBUF'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PATCH_IN_OUTBUF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='222'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>store_patch_in_outbuf</font>( inbuf_r, inbuf_i, DateStr, VarName , FieldType, MemoryOrder, Stagger, DimNames, &amp; <A href='../../call_to/STORE_PATCH_IN_OUTBUF.html' TARGET='index'>2</A>,<A href='../../call_from/STORE_PATCH_IN_OUTBUF.html' TARGET='index'>4</A><a name='223'>
+                                    DomainStart , DomainEnd , &amp;<a name='224'>
+                                    MemoryStart , MemoryEnd , &amp;<a name='225'>
+                                    PatchStart , PatchEnd )<a name='226'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='227'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='228'></font>
+<font color=#447700>! This routine does the "output quilting".  <a name='229'></font>
+<font color=#447700>!<a name='230'></font>
+<font color=#447700>! It stores a patch in the appropriate location in a domain-sized array <a name='231'></font>
+<font color=#447700>! within an element of the outbuf_table data structure.  DateStr, VarName, and <a name='232'></font>
+<font color=#447700>! MemoryOrder are used to uniquely identify which element of outbuf_table is <a name='233'></font>
+<font color=#447700>! associated with this array.  If no element is associated, then this routine <a name='234'></font>
+<font color=#447700>! first assigns an unused element and allocates space within that element for <a name='235'></font>
+<font color=#447700>! the globally-sized array.  This routine also stores DateStr, VarName, <a name='236'></font>
+<font color=#447700>! FieldType, MemoryOrder, Stagger, DimNames, DomainStart, and DomainEnd within <a name='237'></font>
+<font color=#447700>! the same element of outbuf.  <a name='238'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='239'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='240'></font>
+    USE <A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#MODULE_QUILT_OUTBUF_OPS'>module_quilt_outbuf_ops</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PATCH_IN_OUTBUF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_QUILT_OUTBUF_OPS_2"><a name='241'>
+    IMPLICIT NONE<a name='242'>
+    INCLUDE 'wrf_io_flags.h'<a name='243'>
+    INTEGER ,                INTENT(IN) :: FieldType<a name='244'>
+    REAL    , DIMENSION(*) , INTENT(IN) :: inbuf_r<a name='245'>
+    INTEGER , DIMENSION(*) , INTENT(IN) :: inbuf_i<a name='246'>
+    INTEGER , DIMENSION(3) , INTENT(IN) :: DomainStart , DomainEnd , MemoryStart , MemoryEnd , PatchStart , PatchEnd<a name='247'>
+    CHARACTER*(*)    , INTENT(IN) :: DateStr , VarName, MemoryOrder , Stagger, DimNames(3)<a name='248'>
+<font color=#447700>! Local<a name='249'></font>
+    CHARACTER*120 mess<a name='250'>
+    INTEGER               :: l,m,n,ii,jj<a name='251'>
+    LOGICAL               :: found<a name='252'>
+<a name='253'>
+    <font color=#447700>! Find the VarName if it's in the buffer already<a name='254'></font>
+    ii = 1<a name='255'>
+    found = .false.<a name='256'>
+    DO WHILE ( .NOT. found .AND. ii .LE. num_entries )<a name='257'>
+      <font color=#447700>!TBH:  need to test other attributes too!  <a name='258'></font>
+      IF ( TRIM(VarName) .EQ. TRIM(outbuf_table(ii)%VarName) ) THEN<a name='259'>
+        IF ( TRIM(DateStr) .EQ. TRIM(outbuf_table(ii)%DateStr) ) THEN<a name='260'>
+          IF ( TRIM(MemoryOrder) .EQ. TRIM(outbuf_table(ii)%MemoryOrder) ) THEN<a name='261'>
+            found = .true.<a name='262'>
+          ELSE<a name='263'>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PATCH_IN_OUTBUF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_111">("store_patch_in_outbuf: memory order disagreement")<a name='264'>
+          ENDIF<a name='265'>
+        ELSE<a name='266'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PATCH_IN_OUTBUF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_112">("store_patch_in_outbuf: multiple dates in buffer")<a name='267'>
+        ENDIF<a name='268'>
+      ELSE<a name='269'>
+        ii = ii + 1<a name='270'>
+      ENDIF<a name='271'>
+    ENDDO<a name='272'>
+    IF ( .NOT. found ) THEN<a name='273'>
+      num_entries = num_entries + 1<a name='274'>
+      IF      ( FieldType .EQ. WRF_REAL ) THEN<a name='275'>
+        ALLOCATE( outbuf_table(num_entries)%rptr(DomainStart(1):DomainEnd(1), &amp;<a name='276'>
+                                                 DomainStart(2):DomainEnd(2),DomainStart(3):DomainEnd(3)) )<a name='277'>
+      ELSE IF ( FieldType .EQ. WRF_INTEGER ) THEN<a name='278'>
+        ALLOCATE( outbuf_table(num_entries)%iptr(DomainStart(1):DomainEnd(1), &amp;<a name='279'>
+                                                 DomainStart(2):DomainEnd(2),DomainStart(3):DomainEnd(3)) )<a name='280'>
+      ELSE<a name='281'>
+        write(mess,*)"store_patch_in_outbuf: unsupported type ", FieldType<a name='282'>
+        CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PATCH_IN_OUTBUF' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_113">(mess)<a name='283'>
+      ENDIF<a name='284'>
+      outbuf_table(num_entries)%VarName = TRIM(VarName)<a name='285'>
+      outbuf_table(num_entries)%DateStr = TRIM(DateStr)<a name='286'>
+      outbuf_table(num_entries)%MemoryOrder = TRIM(MemoryOrder)<a name='287'>
+      outbuf_table(num_entries)%Stagger = TRIM(Stagger)<a name='288'>
+      outbuf_table(num_entries)%DimNames(1) = TRIM(DimNames(1))<a name='289'>
+      outbuf_table(num_entries)%DimNames(2) = TRIM(DimNames(2))<a name='290'>
+      outbuf_table(num_entries)%DimNames(3) = TRIM(DimNames(3))<a name='291'>
+      outbuf_table(num_entries)%DomainStart = DomainStart<a name='292'>
+      outbuf_table(num_entries)%DomainEnd = DomainEnd<a name='293'>
+      outbuf_table(num_entries)%FieldType = FieldType<a name='294'>
+      ii = num_entries<a name='295'>
+    ENDIF<a name='296'>
+    jj = 1<a name='297'>
+    IF (  FieldType .EQ. WRF_REAL ) THEN<a name='298'>
+      DO n = PatchStart(3),PatchEnd(3)<a name='299'>
+        DO m = PatchStart(2),PatchEnd(2)<a name='300'>
+          DO l = PatchStart(1),PatchEnd(1)<a name='301'>
+            outbuf_table(ii)%rptr(l,m,n) = inbuf_r(jj)<a name='302'>
+            jj = jj + 1<a name='303'>
+          ENDDO<a name='304'>
+        ENDDO<a name='305'>
+      ENDDO<a name='306'>
+    ENDIF<a name='307'>
+    IF (  FieldType .EQ. WRF_INTEGER ) THEN<a name='308'>
+      DO n = PatchStart(3),PatchEnd(3)<a name='309'>
+        DO m = PatchStart(2),PatchEnd(2)<a name='310'>
+          DO l = PatchStart(1),PatchEnd(1)<a name='311'>
+            outbuf_table(ii)%iptr(l,m,n) = inbuf_i(jj)<a name='312'>
+            jj = jj + 1<a name='313'>
+          ENDDO<a name='314'>
+        ENDDO<a name='315'>
+      ENDDO<a name='316'>
+    ENDIF<a name='317'>
+<a name='318'>
+    RETURN<a name='319'>
+<a name='320'>
+  END SUBROUTINE store_patch_in_outbuf<a name='321'>
+<a name='322'>
+<font color=#447700>!call add_to_bufsize_for_field( VarName, hdrbufsize+chunksize )<a name='323'></font>
+<a name='324'>
+<A NAME='ADD_TO_BUFSIZE_FOR_FIELD'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#ADD_TO_BUFSIZE_FOR_FIELD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='325'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>add_to_bufsize_for_field</font>( VarName, Nbytes ) <A href='../../call_to/ADD_TO_BUFSIZE_FOR_FIELD.html' TARGET='index'>3</A>,<A href='../../call_from/ADD_TO_BUFSIZE_FOR_FIELD.html' TARGET='index'>1</A><a name='326'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='327'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='328'></font>
+<font color=#447700>! This routine is a wrapper for C routine add_to_bufsize_for_field_c() that <a name='329'></font>
+<font color=#447700>! is used to accumulate buffer sizes.  Buffer size Nbytes is added to the <a name='330'></font>
+<font color=#447700>! curent buffer size for the buffer named VarName.  Any buffer space <a name='331'></font>
+<font color=#447700>! associated with VarName is freed.  If a buffer named VarName does not exist, <a name='332'></font>
+<font color=#447700>! a new one is assigned and its size is set to Nbytes.  <a name='333'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='334'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='335'></font>
+    USE <A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#MODULE_QUILT_OUTBUF_OPS'>module_quilt_outbuf_ops</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#ADD_TO_BUFSIZE_FOR_FIELD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_QUILT_OUTBUF_OPS_3"><a name='336'>
+    IMPLICIT NONE<a name='337'>
+    CHARACTER*(*)    , INTENT(IN) :: VarName<a name='338'>
+    INTEGER          , INTENT(IN) :: Nbytes<a name='339'>
+<font color=#447700>! Local<a name='340'></font>
+    CHARACTER*120 mess<a name='341'>
+    INTEGER               :: i, ierr<a name='342'>
+    INTEGER               :: VarNameAsInts( 256 )<a name='343'>
+    VarNameAsInts( 1 ) = len(trim(VarName))<a name='344'>
+    DO i = 2, len(trim(VarName)) + 1<a name='345'>
+      VarNameAsInts( i ) = ICHAR( VarName(i-1:i-1) )<a name='346'>
+    ENDDO<a name='347'>
+    CALL add_to_bufsize_for_field_c ( VarNameAsInts, Nbytes )<a name='348'>
+    RETURN<a name='349'>
+  END SUBROUTINE add_to_bufsize_for_field<a name='350'>
+  <a name='351'>
+<A NAME='STORE_PIECE_OF_FIELD'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PIECE_OF_FIELD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='352'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>store_piece_of_field</font>( inbuf, VarName, Nbytes ) <A href='../../call_to/STORE_PIECE_OF_FIELD.html' TARGET='index'>3</A>,<A href='../../call_from/STORE_PIECE_OF_FIELD.html' TARGET='index'>2</A><a name='353'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='354'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='355'></font>
+<font color=#447700>! This routine is a wrapper for C routine store_piece_of_field_c() that <a name='356'></font>
+<font color=#447700>! is used to store pieces of a field in an internal buffer.  Nbytes bytes of <a name='357'></font>
+<font color=#447700>! buffer inbuf are appended to the end of the internal buffer named VarName.  <a name='358'></font>
+<font color=#447700>! An error occurs if either an internal buffer named VarName does not exist or <a name='359'></font>
+<font color=#447700>! if there are fewer than Nbytes bytes left in the internal buffer.  <a name='360'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='361'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='362'></font>
+    USE <A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#MODULE_QUILT_OUTBUF_OPS'>module_quilt_outbuf_ops</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PIECE_OF_FIELD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_QUILT_OUTBUF_OPS_4"><a name='363'>
+    IMPLICIT NONE<a name='364'>
+    INTEGER ,                INTENT(IN) :: Nbytes<a name='365'>
+    INTEGER , DIMENSION(*) , INTENT(IN) :: inbuf<a name='366'>
+    CHARACTER*(*)    , INTENT(IN) :: VarName<a name='367'>
+<font color=#447700>! Local<a name='368'></font>
+    CHARACTER*120 mess<a name='369'>
+    INTEGER               :: i, ierr<a name='370'>
+    INTEGER               :: VarNameAsInts( 256 )<a name='371'>
+<a name='372'>
+    VarNameAsInts( 1 ) = len(trim(VarName))<a name='373'>
+    DO i = 2, len(trim(VarName)) + 1<a name='374'>
+      VarNameAsInts( i ) = ICHAR( VarName(i-1:i-1) )<a name='375'>
+    ENDDO<a name='376'>
+    CALL store_piece_of_field_c ( inbuf, VarNameAsInts, Nbytes, ierr )<a name='377'>
+    IF ( ierr .NE. 0 ) CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#STORE_PIECE_OF_FIELD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_114"> ( "store_piece_of_field" )<a name='378'>
+    RETURN<a name='379'>
+  END SUBROUTINE store_piece_of_field<a name='380'>
+<a name='381'>
+<A NAME='RETRIEVE_PIECES_OF_FIELD'><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#RETRIEVE_PIECES_OF_FIELD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='382'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>retrieve_pieces_of_field</font>( outbuf, VarName, obufsz, Nbytes_tot, lret ) <A href='../../call_to/RETRIEVE_PIECES_OF_FIELD.html' TARGET='index'>2</A>,<A href='../../call_from/RETRIEVE_PIECES_OF_FIELD.html' TARGET='index'>1</A><a name='383'>
+<font color=#447700>!&lt;DESCRIPTION&gt;<a name='384'></font>
+<font color=#447700>!&lt;PRE&gt;<a name='385'></font>
+<font color=#447700>! This routine is a wrapper for C routine retrieve_pieces_of_field_c() that <a name='386'></font>
+<font color=#447700>! is used to extract the entire contents (i.e. all previously stored pieces of <a name='387'></font>
+<font color=#447700>! fields) of the next internal buffer.  The name associated with this internal <a name='388'></font>
+<font color=#447700>! buffer is returned in VarName.  The number of bytes read is returned in <a name='389'></font>
+<font color=#447700>! Nbytes_tot.  Bytes are stored in outbuf whose size (in bytes) is obufsz.  <a name='390'></font>
+<font color=#447700>! If there are more than obufsz bytes left in the next internal buffer, then <a name='391'></font>
+<font color=#447700>! only obufsz bytes are returned and the rest are discarded (probably an error <a name='392'></font>
+<font color=#447700>! in the making!).  The internal buffer is then freed.  Flag lret is set to <a name='393'></font>
+<font color=#447700>! .TRUE. iff there are more fields left to extract.  <a name='394'></font>
+<font color=#447700>!&lt;/PRE&gt;<a name='395'></font>
+<font color=#447700>!&lt;/DESCRIPTION&gt;<a name='396'></font>
+    USE <A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#MODULE_QUILT_OUTBUF_OPS'>module_quilt_outbuf_ops</A><A href='../../html_code/frame/module_quilt_outbuf_ops.F.html#RETRIEVE_PIECES_OF_FIELD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_QUILT_OUTBUF_OPS_5"><a name='397'>
+    IMPLICIT NONE<a name='398'>
+    INTEGER ,                INTENT(IN) :: obufsz<a name='399'>
+    INTEGER ,                INTENT(OUT) :: Nbytes_tot<a name='400'>
+    INTEGER , DIMENSION(*) , INTENT(OUT) :: outbuf<a name='401'>
+    CHARACTER*(*)    , INTENT(OUT) :: VarName<a name='402'>
+    LOGICAL                       :: lret   <font color=#447700>! true if more, false if not<a name='403'></font>
+<font color=#447700>! Local<a name='404'></font>
+    CHARACTER*120 mess<a name='405'>
+    INTEGER               :: i, iret<a name='406'>
+    INTEGER               :: VarNameAsInts( 256 )<a name='407'>
+<a name='408'>
+    CALL retrieve_pieces_of_field_c ( outbuf, VarNameAsInts, obufsz, Nbytes_tot, iret )<a name='409'>
+    IF ( iret .NE.  0 ) THEN<a name='410'>
+       lret = .FALSE.<a name='411'>
+    ELSE<a name='412'>
+       lret = .TRUE.<a name='413'>
+       VarName = ' '<a name='414'>
+       DO i = 2, VarNameAsInts(1) + 1<a name='415'>
+         VarName(i-1:i-1) = CHAR(VarNameAsInts( i ))<a name='416'>
+       ENDDO<a name='417'>
+    ENDIF<a name='418'>
+    RETURN<a name='419'>
+  END SUBROUTINE retrieve_pieces_of_field<a name='420'>
+<a name='421'>
+</pre></body></html>

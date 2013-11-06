@@ -1,0 +1,42 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:bc_time_utilities<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_BC_TIME_UTILITIES'><A href='../../html_code/share/module_bc_time_utilities.F.html#MODULE_BC_TIME_UTILITIES' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_bc_time_utilities</font> <A href='../../call_to/MODULE_BC_TIME_UTILITIES.html' TARGET='index'>27</A><a name='6'>
+  USE WRF_ESMF_MOD<a name='7'>
+<a name='8'>
+  Type(ESMF_Time), PRIVATE, SAVE :: time_to_read_again<a name='9'>
+<a name='10'>
+CONTAINS<a name='11'>
+<a name='12'>
+<A NAME='LBC_READ_TIME'><A href='../../html_code/share/module_bc_time_utilities.F.html#LBC_READ_TIME' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='13'>
+  LOGICAL <font color=#993300>FUNCTION </font><font color=#cc0000>lbc_read_time</font> ( xtime )<a name='14'>
+    IMPLICIT NONE<a name='15'>
+    Type (ESMF_Time), INTENT(IN) :: xtime<a name='16'>
+    IF ( xtime .LT. time_to_read_again ) THEN<a name='17'>
+      lbc_read_time = .false.<a name='18'>
+    ELSE<a name='19'>
+      lbc_read_time = .true.<a name='20'>
+    ENDIF<a name='21'>
+    RETURN<a name='22'>
+  END FUNCTION lbc_read_time<a name='23'>
+<a name='24'>
+<A NAME='SET_TIME_TO_READ_AGAIN'><A href='../../html_code/share/module_bc_time_utilities.F.html#SET_TIME_TO_READ_AGAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='25'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_time_to_read_again</font> ( newtime )<a name='26'>
+    IMPLICIT NONE<a name='27'>
+    Type(ESMF_Time), INTENT(IN) :: newtime<a name='28'>
+    time_to_read_again = newtime<a name='29'>
+    RETURN<a name='30'>
+  END SUBROUTINE set_time_to_read_again<a name='31'>
+<a name='32'>
+<A NAME='GET_TIME_TO_READ_AGAIN'><A href='../../html_code/share/module_bc_time_utilities.F.html#GET_TIME_TO_READ_AGAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='33'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>get_time_to_read_again</font> ( newtime )<a name='34'>
+    IMPLICIT NONE<a name='35'>
+    Type(ESMF_Time), INTENT(OUT) :: newtime<a name='36'>
+    newtime = time_to_read_again<a name='37'>
+    RETURN<a name='38'>
+  END SUBROUTINE get_time_to_read_again<a name='39'>
+<a name='40'>
+END MODULE module_bc_time_utilities<a name='41'>
+</pre></body></html>

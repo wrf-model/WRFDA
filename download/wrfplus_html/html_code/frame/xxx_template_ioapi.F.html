@@ -1,0 +1,829 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!<a name='2'></font>
+<font color=#447700>! This is a template for adding a package-dependent implemetnation of<a name='3'></font>
+<font color=#447700>! the I/O API.  You can use the name xxx since that is already set up<a name='4'></font>
+<font color=#447700>! as a placeholder in module_io.F, md_calls.m4, and the Registry, or<a name='5'></font>
+<font color=#447700>! you can change the name here and in those other places.  For additional<a name='6'></font>
+<font color=#447700>! information on adding a package to WRF, see the latest version of the<a name='7'></font>
+<font color=#447700>! WRF Design and Implementation Document 1.1 (Draft). June 21, 2001<a name='8'></font>
+<font color=#447700>!<a name='9'></font>
+<a name='10'>
+<font color=#447700>!--- ioinit<a name='11'></font>
+<A NAME='EXT_XXX_IOINIT'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_IOINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='12'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_ioinit</font>( SysDepInfo,Status ) <A href='../../call_to/EXT_XXX_IOINIT.html' TARGET='index'>2</A><a name='13'>
+  IMPLICIT NONE<a name='14'>
+  CHARACTER (LEN=80), INTENT(IN) :: SysDepInfo<a name='15'>
+  INTEGER, INTENT(INOUT) :: Status<a name='16'>
+  RETURN  <a name='17'>
+END SUBROUTINE ext_xxx_ioinit<a name='18'>
+<a name='19'>
+<A NAME='EXT_XXX_INQUIRY'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_INQUIRY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='20'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_inquiry</font>( Inquiry, Result,Status )<a name='21'>
+  IMPLICIT NONE<a name='22'>
+  CHARACTER *(*), INTENT(IN) :: Inquiry<a name='23'>
+  CHARACTER *(*), INTENT(OUT) :: Result<a name='24'>
+  INTEGER, INTENT(INOUT) :: Status<a name='25'>
+  RETURN  <a name='26'>
+END SUBROUTINE ext_xxx_inquiry<a name='27'>
+<a name='28'>
+<font color=#447700>!--- ioexit<a name='29'></font>
+<A NAME='EXT_XXX_IOEXIT'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_IOEXIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='30'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_ioexit</font>( Status ) <A href='../../call_to/EXT_XXX_IOEXIT.html' TARGET='index'>2</A><a name='31'>
+  IMPLICIT NONE<a name='32'>
+  INTEGER, INTENT(INOUT) :: Status<a name='33'>
+  RETURN  <a name='34'>
+END SUBROUTINE<a name='35'>
+<a name='36'>
+<font color=#447700>!--- open_for_write_begin<a name='37'></font>
+<A NAME='EXT_XXX_OPEN_FOR_WRITE_BEGIN'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_WRITE_BEGIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='38'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_write_begin</font>( FileName , Comm_compute, Comm_io, SysDepInfo, &amp; <A href='../../call_to/EXT_XXX_OPEN_FOR_WRITE_BEGIN.html' TARGET='index'>1</A><a name='39'>
+                                     DataHandle , Status )<a name='40'>
+  IMPLICIT NONE<a name='41'>
+  CHARACTER *(*), INTENT(IN)  :: FileName<a name='42'>
+  INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io<a name='43'>
+  CHARACTER *(*), INTENT(IN)  :: SysDepInfo<a name='44'>
+  INTEGER ,       INTENT(OUT) :: DataHandle<a name='45'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='46'>
+  RETURN  <a name='47'>
+END SUBROUTINE ext_xxx_open_for_write_begin<a name='48'>
+<a name='49'>
+<font color=#447700>!--- open_for_write_commit<a name='50'></font>
+<A NAME='EXT_XXX_OPEN_FOR_WRITE_COMMIT'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_WRITE_COMMIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='51'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_write_commit</font>( DataHandle , Status ) <A href='../../call_to/EXT_XXX_OPEN_FOR_WRITE_COMMIT.html' TARGET='index'>1</A><a name='52'>
+  IMPLICIT NONE<a name='53'>
+  INTEGER ,       INTENT(IN ) :: DataHandle<a name='54'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='55'>
+  RETURN  <a name='56'>
+END SUBROUTINE ext_xxx_open_for_write_commit<a name='57'>
+<a name='58'>
+<font color=#447700>!--- open_for_read <a name='59'></font>
+<A NAME='EXT_XXX_OPEN_FOR_READ'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_READ' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='60'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_read</font> ( FileName , Comm_compute, Comm_io, SysDepInfo, &amp; <A href='../../call_to/EXT_XXX_OPEN_FOR_READ.html' TARGET='index'>1</A><a name='61'>
+                               DataHandle , Status )<a name='62'>
+  IMPLICIT NONE<a name='63'>
+  CHARACTER *(*), INTENT(IN)  :: FileName<a name='64'>
+  INTEGER ,       INTENT(IN)  :: Comm_compute , Comm_io<a name='65'>
+  CHARACTER *(*), INTENT(IN)  :: SysDepInfo<a name='66'>
+  INTEGER ,       INTENT(OUT) :: DataHandle<a name='67'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='68'>
+  RETURN  <a name='69'>
+END SUBROUTINE ext_xxx_open_for_read<a name='70'>
+<a name='71'>
+<font color=#447700>!--- inquire_opened<a name='72'></font>
+<A NAME='EXT_XXX_INQUIRE_OPENED'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_INQUIRE_OPENED' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='73'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_inquire_opened</font> ( DataHandle, FileName , FileStatus, Status ) <A href='../../call_to/EXT_XXX_INQUIRE_OPENED.html' TARGET='index'>1</A><a name='74'>
+  IMPLICIT NONE<a name='75'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='76'>
+  CHARACTER *(*), INTENT(IN)  :: FileName<a name='77'>
+  INTEGER ,       INTENT(OUT) :: FileStatus<a name='78'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='79'>
+  RETURN<a name='80'>
+END SUBROUTINE ext_xxx_inquire_opened<a name='81'>
+<a name='82'>
+<font color=#447700>!--- inquire_filename<a name='83'></font>
+<A NAME='EXT_XXX_INQUIRE_FILENAME'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_INQUIRE_FILENAME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='84'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_inquire_filename</font> ( DataHandle, FileName , FileStatus, Status ) <A href='../../call_to/EXT_XXX_INQUIRE_FILENAME.html' TARGET='index'>1</A><a name='85'>
+  IMPLICIT NONE<a name='86'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='87'>
+  CHARACTER *(*), INTENT(OUT) :: FileName<a name='88'>
+  INTEGER ,       INTENT(OUT) :: FileStatus<a name='89'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='90'>
+END SUBROUTINE ext_xxx_inquire_filename<a name='91'>
+<a name='92'>
+<font color=#447700>!--- sync<a name='93'></font>
+<A NAME='EXT_XXX_IOSYNC'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_IOSYNC' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='94'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_iosync</font> ( DataHandle, Status ) <A href='../../call_to/EXT_XXX_IOSYNC.html' TARGET='index'>2</A><a name='95'>
+  IMPLICIT NONE<a name='96'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='97'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='98'>
+  RETURN<a name='99'>
+END SUBROUTINE ext_xxx_iosync<a name='100'>
+<a name='101'>
+<font color=#447700>!--- close<a name='102'></font>
+<A NAME='EXT_XXX_IOCLOSE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_IOCLOSE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='103'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_ioclose</font> ( DataHandle, Status ) <A href='../../call_to/EXT_XXX_IOCLOSE.html' TARGET='index'>1</A><a name='104'>
+  IMPLICIT NONE<a name='105'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='106'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='107'>
+  RETURN<a name='108'>
+END SUBROUTINE ext_xxx_ioclose<a name='109'>
+<a name='110'>
+<font color=#447700>!--- get_next_time (not defined for IntIO )<a name='111'></font>
+<A NAME='EXT_XXX_GET_NEXT_TIME'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_NEXT_TIME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='112'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_next_time</font> ( DataHandle, DateStr, Status ) <A href='../../call_to/EXT_XXX_GET_NEXT_TIME.html' TARGET='index'>1</A><a name='113'>
+  IMPLICIT NONE<a name='114'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='115'>
+  CHARACTER*(*) , INTENT(OUT) :: DateStr<a name='116'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='117'>
+  RETURN<a name='118'>
+END SUBROUTINE ext_xxx_get_next_time<a name='119'>
+<a name='120'>
+<font color=#447700>!--- set_time<a name='121'></font>
+<A NAME='EXT_XXX_SET_TIME'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_SET_TIME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='122'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_set_time</font> ( DataHandle, DateStr, Status ) <A href='../../call_to/EXT_XXX_SET_TIME.html' TARGET='index'>1</A><a name='123'>
+  IMPLICIT NONE<a name='124'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='125'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='126'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='127'>
+  RETURN<a name='128'>
+END SUBROUTINE ext_xxx_set_time<a name='129'>
+<a name='130'>
+<font color=#447700>!--- get_next_var  (not defined for IntIO)<a name='131'></font>
+<A NAME='EXT_XXX_GET_NEXT_VAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_NEXT_VAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='132'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_next_var</font> ( DataHandle, VarName, Status ) <A href='../../call_to/EXT_XXX_GET_NEXT_VAR.html' TARGET='index'>1</A><a name='133'>
+  IMPLICIT NONE<a name='134'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='135'>
+  CHARACTER*(*) , INTENT(OUT) :: VarName<a name='136'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='137'>
+  RETURN<a name='138'>
+END SUBROUTINE ext_xxx_get_next_var<a name='139'>
+<a name='140'>
+<font color=#447700>!--- get_dom_ti_real<a name='141'></font>
+<A NAME='EXT_XXX_GET_DOM_TI_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TI_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='142'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_ti_real</font> ( DataHandle,Element,   Data, Count, Outcount, Status )<a name='143'>
+  IMPLICIT NONE<a name='144'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='145'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='146'>
+RETURN<a name='147'>
+END SUBROUTINE ext_xxx_get_dom_ti_real <a name='148'>
+<a name='149'>
+<font color=#447700>!--- put_dom_ti_real<a name='150'></font>
+<A NAME='EXT_XXX_PUT_DOM_TI_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TI_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='151'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_ti_real</font> ( DataHandle,Element,   Data, Count,  Status )<a name='152'>
+  IMPLICIT NONE<a name='153'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='154'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='155'>
+  real ,            INTENT(IN) :: Data(*)<a name='156'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='157'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='158'>
+RETURN<a name='159'>
+END SUBROUTINE ext_xxx_put_dom_ti_real <a name='160'>
+<a name='161'>
+<font color=#447700>!--- get_dom_ti_double<a name='162'></font>
+<A NAME='EXT_XXX_GET_DOM_TI_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TI_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='163'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_ti_double</font> ( DataHandle,Element,   Data, Count, Outcount, Status )<a name='164'>
+  IMPLICIT NONE<a name='165'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='166'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='167'>
+  real*8 ,            INTENT(OUT) :: Data(*)<a name='168'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='169'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='170'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='171'>
+RETURN<a name='172'>
+END SUBROUTINE ext_xxx_get_dom_ti_double <a name='173'>
+<a name='174'>
+<font color=#447700>!--- put_dom_ti_double<a name='175'></font>
+<A NAME='EXT_XXX_PUT_DOM_TI_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TI_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='176'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_ti_double</font> ( DataHandle,Element,   Data, Count,  Status )<a name='177'>
+  IMPLICIT NONE<a name='178'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='179'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='180'>
+  real*8 ,            INTENT(IN) :: Data(*)<a name='181'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='182'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='183'>
+RETURN<a name='184'>
+END SUBROUTINE ext_xxx_put_dom_ti_double <a name='185'>
+<a name='186'>
+<font color=#447700>!--- get_dom_ti_integer<a name='187'></font>
+<A NAME='EXT_XXX_GET_DOM_TI_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TI_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='188'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_ti_integer</font> ( DataHandle,Element,   Data, Count, Outcount, Status )<a name='189'>
+  IMPLICIT NONE<a name='190'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='191'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='192'>
+  integer ,            INTENT(OUT) :: Data(*)<a name='193'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='194'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='195'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='196'>
+RETURN<a name='197'>
+END SUBROUTINE ext_xxx_get_dom_ti_integer <a name='198'>
+<a name='199'>
+<font color=#447700>!--- put_dom_ti_integer<a name='200'></font>
+<A NAME='EXT_XXX_PUT_DOM_TI_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TI_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='201'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_ti_integer</font> ( DataHandle,Element,   Data, Count,  Status )<a name='202'>
+  IMPLICIT NONE<a name='203'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='204'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='205'>
+  integer ,            INTENT(IN) :: Data(*)<a name='206'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='207'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='208'>
+RETURN<a name='209'>
+END SUBROUTINE ext_xxx_put_dom_ti_integer <a name='210'>
+<a name='211'>
+<font color=#447700>!--- get_dom_ti_logical<a name='212'></font>
+<A NAME='EXT_XXX_GET_DOM_TI_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TI_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='213'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_ti_logical</font> ( DataHandle,Element,   Data, Count, Outcount, Status )<a name='214'>
+  IMPLICIT NONE<a name='215'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='216'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='217'>
+  logical ,            INTENT(OUT) :: Data(*)<a name='218'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='219'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='220'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='221'>
+RETURN<a name='222'>
+END SUBROUTINE ext_xxx_get_dom_ti_logical <a name='223'>
+<a name='224'>
+<font color=#447700>!--- put_dom_ti_logical<a name='225'></font>
+<A NAME='EXT_XXX_PUT_DOM_TI_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TI_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='226'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_ti_logical</font> ( DataHandle,Element,   Data, Count,  Status )<a name='227'>
+  IMPLICIT NONE<a name='228'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='229'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='230'>
+  logical ,            INTENT(IN) :: Data(*)<a name='231'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='232'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='233'>
+RETURN<a name='234'>
+END SUBROUTINE ext_xxx_put_dom_ti_logical <a name='235'>
+<a name='236'>
+<font color=#447700>!--- get_dom_ti_char<a name='237'></font>
+<A NAME='EXT_XXX_GET_DOM_TI_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TI_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='238'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_ti_char</font> ( DataHandle,Element,   Data,  Status )<a name='239'>
+  IMPLICIT NONE<a name='240'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='241'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='242'>
+  CHARACTER*(*) , INTENT(OUT) :: Data<a name='243'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='244'>
+RETURN<a name='245'>
+END SUBROUTINE ext_xxx_get_dom_ti_char <a name='246'>
+<a name='247'>
+<font color=#447700>!--- put_dom_ti_char<a name='248'></font>
+<A NAME='EXT_XXX_PUT_DOM_TI_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TI_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='249'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_ti_char</font> ( DataHandle,Element,   Data,  Status )<a name='250'>
+  IMPLICIT NONE<a name='251'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='252'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='253'>
+  CHARACTER*(*) , INTENT(IN) :: Data<a name='254'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='255'>
+RETURN<a name='256'>
+END SUBROUTINE ext_xxx_put_dom_ti_char <a name='257'>
+<a name='258'>
+<font color=#447700>!--- get_dom_td_real<a name='259'></font>
+<A NAME='EXT_XXX_GET_DOM_TD_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TD_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='260'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_td_real</font> ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )<a name='261'>
+  IMPLICIT NONE<a name='262'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='263'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='264'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='265'>
+  real ,            INTENT(OUT) :: Data(*)<a name='266'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='267'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='268'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='269'>
+RETURN<a name='270'>
+END SUBROUTINE ext_xxx_get_dom_td_real <a name='271'>
+<a name='272'>
+<font color=#447700>!--- put_dom_td_real<a name='273'></font>
+<A NAME='EXT_XXX_PUT_DOM_TD_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TD_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='274'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_td_real</font> ( DataHandle,Element, DateStr,  Data, Count,  Status )<a name='275'>
+  IMPLICIT NONE<a name='276'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='277'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='278'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='279'>
+  real ,            INTENT(IN) :: Data(*)<a name='280'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='281'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='282'>
+RETURN<a name='283'>
+END SUBROUTINE ext_xxx_put_dom_td_real <a name='284'>
+<a name='285'>
+<font color=#447700>!--- get_dom_td_double<a name='286'></font>
+<A NAME='EXT_XXX_GET_DOM_TD_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TD_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='287'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_td_double</font> ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )<a name='288'>
+  IMPLICIT NONE<a name='289'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='290'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='291'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='292'>
+  real*8 ,            INTENT(OUT) :: Data(*)<a name='293'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='294'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='295'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='296'>
+RETURN<a name='297'>
+END SUBROUTINE ext_xxx_get_dom_td_double <a name='298'>
+<a name='299'>
+<font color=#447700>!--- put_dom_td_double<a name='300'></font>
+<A NAME='EXT_XXX_PUT_DOM_TD_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TD_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='301'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_td_double</font> ( DataHandle,Element, DateStr,  Data, Count,  Status )<a name='302'>
+  IMPLICIT NONE<a name='303'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='304'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='305'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='306'>
+  real*8 ,            INTENT(IN) :: Data(*)<a name='307'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='308'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='309'>
+RETURN<a name='310'>
+END SUBROUTINE ext_xxx_put_dom_td_double <a name='311'>
+<a name='312'>
+<font color=#447700>!--- get_dom_td_integer<a name='313'></font>
+<A NAME='EXT_XXX_GET_DOM_TD_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TD_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='314'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_td_integer</font> ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )<a name='315'>
+  IMPLICIT NONE<a name='316'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='317'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='318'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='319'>
+  integer ,            INTENT(OUT) :: Data(*)<a name='320'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='321'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='322'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='323'>
+RETURN<a name='324'>
+END SUBROUTINE ext_xxx_get_dom_td_integer <a name='325'>
+<a name='326'>
+<font color=#447700>!--- put_dom_td_integer<a name='327'></font>
+<A NAME='EXT_XXX_PUT_DOM_TD_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TD_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='328'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_td_integer</font> ( DataHandle,Element, DateStr,  Data, Count,  Status )<a name='329'>
+  IMPLICIT NONE<a name='330'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='331'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='332'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='333'>
+  integer ,            INTENT(IN) :: Data(*)<a name='334'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='335'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='336'>
+RETURN<a name='337'>
+END SUBROUTINE ext_xxx_put_dom_td_integer <a name='338'>
+<a name='339'>
+<font color=#447700>!--- get_dom_td_logical<a name='340'></font>
+<A NAME='EXT_XXX_GET_DOM_TD_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TD_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='341'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_td_logical</font> ( DataHandle,Element, DateStr,  Data, Count, Outcount, Status )<a name='342'>
+  IMPLICIT NONE<a name='343'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='344'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='345'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='346'>
+  logical ,            INTENT(OUT) :: Data(*)<a name='347'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='348'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='349'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='350'>
+RETURN<a name='351'>
+END SUBROUTINE ext_xxx_get_dom_td_logical <a name='352'>
+<a name='353'>
+<font color=#447700>!--- put_dom_td_logical<a name='354'></font>
+<A NAME='EXT_XXX_PUT_DOM_TD_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TD_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='355'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_td_logical</font> ( DataHandle,Element, DateStr,  Data, Count,  Status )<a name='356'>
+  IMPLICIT NONE<a name='357'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='358'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='359'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='360'>
+  logical ,            INTENT(IN) :: Data(*)<a name='361'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='362'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='363'>
+RETURN<a name='364'>
+END SUBROUTINE ext_xxx_put_dom_td_logical <a name='365'>
+<a name='366'>
+<font color=#447700>!--- get_dom_td_char<a name='367'></font>
+<A NAME='EXT_XXX_GET_DOM_TD_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_DOM_TD_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='368'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_dom_td_char</font> ( DataHandle,Element, DateStr,  Data,  Status )<a name='369'>
+  IMPLICIT NONE<a name='370'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='371'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='372'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='373'>
+  CHARACTER*(*) , INTENT(OUT) :: Data<a name='374'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='375'>
+RETURN<a name='376'>
+END SUBROUTINE ext_xxx_get_dom_td_char <a name='377'>
+<a name='378'>
+<font color=#447700>!--- put_dom_td_char<a name='379'></font>
+<A NAME='EXT_XXX_PUT_DOM_TD_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_DOM_TD_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='380'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_dom_td_char</font> ( DataHandle,Element, DateStr,  Data,  Status )<a name='381'>
+  IMPLICIT NONE<a name='382'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='383'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='384'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='385'>
+  CHARACTER*(*) , INTENT(IN) :: Data<a name='386'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='387'>
+RETURN<a name='388'>
+END SUBROUTINE ext_xxx_put_dom_td_char <a name='389'>
+<a name='390'>
+<font color=#447700>!--- get_var_ti_real<a name='391'></font>
+<A NAME='EXT_XXX_GET_VAR_TI_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TI_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='392'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_ti_real</font> ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )<a name='393'>
+  IMPLICIT NONE<a name='394'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='395'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='396'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='397'>
+  real ,            INTENT(OUT) :: Data(*)<a name='398'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='399'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='400'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='401'>
+RETURN<a name='402'>
+END SUBROUTINE ext_xxx_get_var_ti_real <a name='403'>
+<a name='404'>
+<font color=#447700>!--- put_var_ti_real<a name='405'></font>
+<A NAME='EXT_XXX_PUT_VAR_TI_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TI_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='406'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_ti_real</font> ( DataHandle,Element,  Varname, Data, Count,  Status )<a name='407'>
+  IMPLICIT NONE<a name='408'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='409'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='410'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='411'>
+  real ,            INTENT(IN) :: Data(*)<a name='412'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='413'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='414'>
+RETURN<a name='415'>
+END SUBROUTINE ext_xxx_put_var_ti_real <a name='416'>
+<a name='417'>
+<font color=#447700>!--- get_var_ti_double<a name='418'></font>
+<A NAME='EXT_XXX_GET_VAR_TI_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TI_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='419'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_ti_double</font> ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )<a name='420'>
+  IMPLICIT NONE<a name='421'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='422'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='423'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='424'>
+  real*8 ,            INTENT(OUT) :: Data(*)<a name='425'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='426'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='427'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='428'>
+RETURN<a name='429'>
+END SUBROUTINE ext_xxx_get_var_ti_double <a name='430'>
+<a name='431'>
+<font color=#447700>!--- put_var_ti_double<a name='432'></font>
+<A NAME='EXT_XXX_PUT_VAR_TI_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TI_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='433'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_ti_double</font> ( DataHandle,Element,  Varname, Data, Count,  Status )<a name='434'>
+  IMPLICIT NONE<a name='435'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='436'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='437'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='438'>
+  real*8 ,            INTENT(IN) :: Data(*)<a name='439'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='440'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='441'>
+RETURN<a name='442'>
+END SUBROUTINE ext_xxx_put_var_ti_double <a name='443'>
+<a name='444'>
+<font color=#447700>!--- get_var_ti_integer<a name='445'></font>
+<A NAME='EXT_XXX_GET_VAR_TI_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TI_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='446'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_ti_integer</font> ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )<a name='447'>
+  IMPLICIT NONE<a name='448'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='449'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='450'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='451'>
+  integer ,            INTENT(OUT) :: Data(*)<a name='452'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='453'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='454'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='455'>
+RETURN<a name='456'>
+END SUBROUTINE ext_xxx_get_var_ti_integer <a name='457'>
+<a name='458'>
+<font color=#447700>!--- put_var_ti_integer<a name='459'></font>
+<A NAME='EXT_XXX_PUT_VAR_TI_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TI_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='460'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_ti_integer</font> ( DataHandle,Element,  Varname, Data, Count,  Status )<a name='461'>
+  IMPLICIT NONE<a name='462'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='463'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='464'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='465'>
+  integer ,            INTENT(IN) :: Data(*)<a name='466'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='467'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='468'>
+RETURN<a name='469'>
+END SUBROUTINE ext_xxx_put_var_ti_integer <a name='470'>
+<a name='471'>
+<font color=#447700>!--- get_var_ti_logical<a name='472'></font>
+<A NAME='EXT_XXX_GET_VAR_TI_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TI_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='473'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_ti_logical</font> ( DataHandle,Element,  Varname, Data, Count, Outcount, Status )<a name='474'>
+  IMPLICIT NONE<a name='475'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='476'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='477'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='478'>
+  logical ,            INTENT(OUT) :: Data(*)<a name='479'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='480'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='481'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='482'>
+RETURN<a name='483'>
+END SUBROUTINE ext_xxx_get_var_ti_logical <a name='484'>
+<a name='485'>
+<font color=#447700>!--- put_var_ti_logical<a name='486'></font>
+<A NAME='EXT_XXX_PUT_VAR_TI_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TI_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='487'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_ti_logical</font> ( DataHandle,Element,  Varname, Data, Count,  Status )<a name='488'>
+  IMPLICIT NONE<a name='489'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='490'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='491'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='492'>
+  logical ,            INTENT(IN) :: Data(*)<a name='493'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='494'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='495'>
+RETURN<a name='496'>
+END SUBROUTINE ext_xxx_put_var_ti_logical <a name='497'>
+<a name='498'>
+<font color=#447700>!--- get_var_ti_char<a name='499'></font>
+<A NAME='EXT_XXX_GET_VAR_TI_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TI_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='500'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_ti_char</font> ( DataHandle,Element,  Varname, Data,  Status )<a name='501'>
+  IMPLICIT NONE<a name='502'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='503'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='504'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='505'>
+  CHARACTER*(*) , INTENT(OUT) :: Data<a name='506'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='507'>
+RETURN<a name='508'>
+END SUBROUTINE ext_xxx_get_var_ti_char <a name='509'>
+<a name='510'>
+<font color=#447700>!--- put_var_ti_char<a name='511'></font>
+<A NAME='EXT_XXX_PUT_VAR_TI_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TI_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='512'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_ti_char</font> ( DataHandle,Element,  Varname, Data,  Status )<a name='513'>
+  IMPLICIT NONE<a name='514'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='515'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='516'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='517'>
+  CHARACTER*(*) , INTENT(IN) :: Data<a name='518'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='519'>
+RETURN<a name='520'>
+END SUBROUTINE ext_xxx_put_var_ti_char <a name='521'>
+<a name='522'>
+<font color=#447700>!--- get_var_td_real<a name='523'></font>
+<A NAME='EXT_XXX_GET_VAR_TD_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TD_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='524'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_td_real</font> ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )<a name='525'>
+  IMPLICIT NONE<a name='526'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='527'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='528'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='529'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='530'>
+  real ,            INTENT(OUT) :: Data(*)<a name='531'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='532'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='533'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='534'>
+RETURN<a name='535'>
+END SUBROUTINE ext_xxx_get_var_td_real <a name='536'>
+<a name='537'>
+<font color=#447700>!--- put_var_td_real<a name='538'></font>
+<A NAME='EXT_XXX_PUT_VAR_TD_REAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TD_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='539'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_td_real</font> ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )<a name='540'>
+  IMPLICIT NONE<a name='541'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='542'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='543'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='544'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='545'>
+  real ,            INTENT(IN) :: Data(*)<a name='546'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='547'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='548'>
+RETURN<a name='549'>
+END SUBROUTINE ext_xxx_put_var_td_real <a name='550'>
+<a name='551'>
+<font color=#447700>!--- get_var_td_double<a name='552'></font>
+<A NAME='EXT_XXX_GET_VAR_TD_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TD_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='553'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_td_double</font> ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )<a name='554'>
+  IMPLICIT NONE<a name='555'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='556'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='557'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='558'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='559'>
+  real*8 ,            INTENT(OUT) :: Data(*)<a name='560'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='561'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='562'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='563'>
+RETURN<a name='564'>
+END SUBROUTINE ext_xxx_get_var_td_double <a name='565'>
+<a name='566'>
+<font color=#447700>!--- put_var_td_double<a name='567'></font>
+<A NAME='EXT_XXX_PUT_VAR_TD_DOUBLE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TD_DOUBLE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='568'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_td_double</font> ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )<a name='569'>
+  IMPLICIT NONE<a name='570'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='571'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='572'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='573'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='574'>
+  real*8 ,            INTENT(IN) :: Data(*)<a name='575'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='576'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='577'>
+RETURN<a name='578'>
+END SUBROUTINE ext_xxx_put_var_td_double <a name='579'>
+<a name='580'>
+<font color=#447700>!--- get_var_td_integer<a name='581'></font>
+<A NAME='EXT_XXX_GET_VAR_TD_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TD_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='582'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_td_integer</font> ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )<a name='583'>
+  IMPLICIT NONE<a name='584'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='585'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='586'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='587'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='588'>
+  integer ,            INTENT(OUT) :: Data(*)<a name='589'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='590'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='591'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='592'>
+RETURN<a name='593'>
+END SUBROUTINE ext_xxx_get_var_td_integer <a name='594'>
+<a name='595'>
+<font color=#447700>!--- put_var_td_integer<a name='596'></font>
+<A NAME='EXT_XXX_PUT_VAR_TD_INTEGER'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TD_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='597'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_td_integer</font> ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )<a name='598'>
+  IMPLICIT NONE<a name='599'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='600'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='601'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='602'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='603'>
+  integer ,            INTENT(IN) :: Data(*)<a name='604'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='605'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='606'>
+RETURN<a name='607'>
+END SUBROUTINE ext_xxx_put_var_td_integer <a name='608'>
+<a name='609'>
+<font color=#447700>!--- get_var_td_logical<a name='610'></font>
+<A NAME='EXT_XXX_GET_VAR_TD_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TD_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='611'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_td_logical</font> ( DataHandle,Element,  DateStr,Varname, Data, Count, Outcount, Status )<a name='612'>
+  IMPLICIT NONE<a name='613'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='614'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='615'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='616'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='617'>
+  logical ,            INTENT(OUT) :: Data(*)<a name='618'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='619'>
+  INTEGER ,       INTENT(OUT)  :: OutCount<a name='620'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='621'>
+RETURN<a name='622'>
+END SUBROUTINE ext_xxx_get_var_td_logical <a name='623'>
+<a name='624'>
+<font color=#447700>!--- put_var_td_logical<a name='625'></font>
+<A NAME='EXT_XXX_PUT_VAR_TD_LOGICAL'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TD_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='626'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_td_logical</font> ( DataHandle,Element,  DateStr,Varname, Data, Count,  Status )<a name='627'>
+  IMPLICIT NONE<a name='628'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='629'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='630'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='631'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='632'>
+  logical ,            INTENT(IN) :: Data(*)<a name='633'>
+  INTEGER ,       INTENT(IN)  :: Count<a name='634'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='635'>
+RETURN<a name='636'>
+END SUBROUTINE ext_xxx_put_var_td_logical <a name='637'>
+<a name='638'>
+<font color=#447700>!--- get_var_td_char<a name='639'></font>
+<A NAME='EXT_XXX_GET_VAR_TD_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_TD_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='640'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_td_char</font> ( DataHandle,Element,  DateStr,Varname, Data,  Status )<a name='641'>
+  IMPLICIT NONE<a name='642'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='643'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='644'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='645'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='646'>
+  CHARACTER*(*) , INTENT(OUT) :: Data<a name='647'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='648'>
+RETURN<a name='649'>
+END SUBROUTINE ext_xxx_get_var_td_char <a name='650'>
+<a name='651'>
+<font color=#447700>!--- put_var_td_char<a name='652'></font>
+<A NAME='EXT_XXX_PUT_VAR_TD_CHAR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_PUT_VAR_TD_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='653'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_put_var_td_char</font> ( DataHandle,Element,  DateStr,Varname, Data,  Status )<a name='654'>
+  IMPLICIT NONE<a name='655'>
+  INTEGER ,       INTENT(IN)  :: DataHandle<a name='656'>
+  CHARACTER*(*) , INTENT(IN)  :: Element<a name='657'>
+  CHARACTER*(*) , INTENT(IN)  :: DateStr<a name='658'>
+  CHARACTER*(*) , INTENT(IN)  :: VarName <a name='659'>
+  CHARACTER*(*) , INTENT(IN) :: Data<a name='660'>
+  INTEGER ,       INTENT(OUT) :: Status<a name='661'>
+RETURN<a name='662'>
+END SUBROUTINE ext_xxx_put_var_td_char <a name='663'>
+<a name='664'>
+<font color=#447700>!--- read_field<a name='665'></font>
+<A NAME='EXT_XXX_READ_FIELD'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_READ_FIELD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='666'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_read_field</font> ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm &amp;<a name='667'>
+                            DomainDesc , MemoryOrder , Stagger , DimNames ,              &amp;<a name='668'>
+                            DomainStart , DomainEnd ,                                    &amp;<a name='669'>
+                            MemoryStart , MemoryEnd ,                                    &amp;<a name='670'>
+                            PatchStart , PatchEnd ,                                      &amp;<a name='671'>
+                            Status )<a name='672'>
+  IMPLICIT NONE<a name='673'>
+  INTEGER ,       INTENT(IN)    :: DataHandle <a name='674'>
+  CHARACTER*(*) , INTENT(INOUT) :: DateStr<a name='675'>
+  CHARACTER*(*) , INTENT(INOUT) :: VarName<a name='676'>
+  INTEGER ,       INTENT(INOUT) :: Field(*)<a name='677'>
+  integer                       ,intent(in)    :: FieldType<a name='678'>
+  integer                       ,intent(inout) :: Comm<a name='679'>
+  integer                       ,intent(inout) :: IOComm<a name='680'>
+  integer                       ,intent(in)    :: DomainDesc<a name='681'>
+  character*(*)                 ,intent(in)    :: MemoryOrder<a name='682'>
+  character*(*)                 ,intent(in)    :: Stagger<a name='683'>
+  character*(*) , dimension (*) ,intent(in)    :: DimNames<a name='684'>
+  integer ,dimension(*)         ,intent(in)    :: DomainStart, DomainEnd<a name='685'>
+  integer ,dimension(*)         ,intent(in)    :: MemoryStart, MemoryEnd<a name='686'>
+  integer ,dimension(*)         ,intent(in)    :: PatchStart,  PatchEnd<a name='687'>
+  integer                       ,intent(out)   :: Status<a name='688'>
+RETURN<a name='689'>
+END SUBROUTINE ext_xxx_read_field<a name='690'>
+<a name='691'>
+<font color=#447700>!--- write_field<a name='692'></font>
+<A NAME='EXT_XXX_WRITE_FIELD'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_WRITE_FIELD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='693'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_write_field</font> ( DataHandle , DateStr , VarName , Field , FieldType , Comm , IOComm , &amp;<a name='694'>
+                             DomainDesc , MemoryOrder , Stagger , DimNames ,              &amp;<a name='695'>
+                             DomainStart , DomainEnd ,                                    &amp;<a name='696'>
+                             MemoryStart , MemoryEnd ,                                    &amp;<a name='697'>
+                             PatchStart , PatchEnd ,                                      &amp;<a name='698'>
+                             Status )<a name='699'>
+  IMPLICIT NONE<a name='700'>
+  INTEGER ,       INTENT(IN)    :: DataHandle <a name='701'>
+  CHARACTER*(*) , INTENT(IN)    :: DateStr<a name='702'>
+  CHARACTER*(*) , INTENT(IN)    :: VarName<a name='703'>
+  INTEGER ,       INTENT(IN)    :: Field(*)<a name='704'>
+  integer                       ,intent(in)    :: FieldType<a name='705'>
+  integer                       ,intent(inout) :: Comm<a name='706'>
+  integer                       ,intent(inout) :: IOComm<a name='707'>
+  integer                       ,intent(in)    :: DomainDesc<a name='708'>
+  character*(*)                 ,intent(in)    :: MemoryOrder<a name='709'>
+  character*(*)                 ,intent(in)    :: Stagger<a name='710'>
+  character*(*) , dimension (*) ,intent(in)    :: DimNames<a name='711'>
+  integer ,dimension(*)         ,intent(in)    :: DomainStart, DomainEnd<a name='712'>
+  integer ,dimension(*)         ,intent(in)    :: MemoryStart, MemoryEnd<a name='713'>
+  integer ,dimension(*)         ,intent(in)    :: PatchStart,  PatchEnd<a name='714'>
+  integer                       ,intent(out)   :: Status<a name='715'>
+RETURN<a name='716'>
+END SUBROUTINE ext_xxx_write_field<a name='717'>
+<a name='718'>
+<font color=#447700>!--- get_var_info  (not implemented for IntIO)<a name='719'></font>
+<A NAME='EXT_XXX_GET_VAR_INFO'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_VAR_INFO' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='720'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_var_info</font> ( DataHandle , VarName , NDim , MemoryOrder , Stagger , &amp; <A href='../../call_to/EXT_XXX_GET_VAR_INFO.html' TARGET='index'>1</A><a name='721'>
+                              DomainStart , DomainEnd , Status )<a name='722'>
+  IMPLICIT NONE<a name='723'>
+  integer               ,intent(in)     :: DataHandle<a name='724'>
+  character*(*)         ,intent(in)     :: VarName<a name='725'>
+  integer               ,intent(out)    :: NDim<a name='726'>
+  character*(*)         ,intent(out)    :: MemoryOrder<a name='727'>
+  character*(*)         ,intent(out)    :: Stagger<a name='728'>
+  integer ,dimension(*) ,intent(out)    :: DomainStart, DomainEnd<a name='729'>
+  integer               ,intent(out)    :: Status<a name='730'>
+RETURN<a name='731'>
+END SUBROUTINE ext_xxx_get_var_info<a name='732'>
+<a name='733'>
+<a name='734'>
+<font color=#447700>!--- end_of_frame<a name='735'></font>
+<A NAME='EXT_XXX_END_OF_FRAME'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_END_OF_FRAME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='736'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_end_of_frame</font>(DataHandle, Status)<a name='737'>
+  IMPLICIT NONE<a name='738'>
+  INTEGER, INTENT(IN)  :: DataHandle<a name='739'>
+  INTEGER, INTENT(OUT) :: Status<a name='740'>
+RETURN<a name='741'>
+END SUBROUTINE ext_xxx_end_of_frame<a name='742'>
+<a name='743'>
+<a name='744'>
+<font color=#447700>!--- error_str<a name='745'></font>
+<A NAME='EXT_XXX_ERROR_STR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_ERROR_STR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='746'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_error_str</font>( Code, ReturnString, Status)<a name='747'>
+  IMPLICIT NONE<a name='748'>
+  INTEGER       , INTENT(IN)  :: Code<a name='749'>
+  CHARACTER *(*), INTENT(OUT) :: ReturnString<a name='750'>
+  INTEGER       , INTENT(OUT) :: Status<a name='751'>
+RETURN<a name='752'>
+END SUBROUTINE ext_xxx_error_str<a name='753'>
+<a name='754'>
+<a name='755'>
+<font color=#447700>!--- get_previous_time<a name='756'></font>
+<A NAME='EXT_XXX_GET_PREVIOUS_TIME'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_GET_PREVIOUS_TIME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='757'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_get_previous_time</font>(DataHandle, DateStr, Status) <A href='../../call_to/EXT_XXX_GET_PREVIOUS_TIME.html' TARGET='index'>1</A><a name='758'>
+  IMPLICIT NONE<a name='759'>
+  INTEGER      , INTENT(IN)  :: DataHandle<a name='760'>
+  CHARACTER*(*), INTENT(OUT) :: DateStr<a name='761'>
+  INTEGER      , INTENT(OUT) :: Status<a name='762'>
+RETURN<a name='763'>
+END SUBROUTINE ext_xxx_get_previous_time<a name='764'>
+<a name='765'>
+<a name='766'>
+<font color=#447700>!--- open_for_read_begin<a name='767'></font>
+<A NAME='EXT_XXX_OPEN_FOR_READ_BEGIN'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_READ_BEGIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='768'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_read_begin</font>( FileName, Comm, IOComm, SysDepInfo, DataHandle, Status) <A href='../../call_to/EXT_XXX_OPEN_FOR_READ_BEGIN.html' TARGET='index'>1</A><a name='769'>
+  IMPLICIT NONE<a name='770'>
+  CHARACTER*(*), INTENT(IN)      :: FileName<a name='771'>
+  INTEGER      , INTENT(IN)      :: Comm<a name='772'>
+  INTEGER      , INTENT(IN)      :: IOComm<a name='773'>
+  CHARACTER*(*), INTENT(IN)      :: SysDepInfo<a name='774'>
+  INTEGER      , INTENT(OUT)     :: DataHandle<a name='775'>
+  INTEGER      , INTENT(OUT)     :: Status<a name='776'>
+RETURN<a name='777'>
+END SUBROUTINE ext_xxx_open_for_read_begin<a name='778'>
+<a name='779'>
+<a name='780'>
+<font color=#447700>!--- open_for_read_commit<a name='781'></font>
+<A NAME='EXT_XXX_OPEN_FOR_READ_COMMIT'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_READ_COMMIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='782'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_read_commit</font>(DataHandle, Status) <A href='../../call_to/EXT_XXX_OPEN_FOR_READ_COMMIT.html' TARGET='index'>1</A><a name='783'>
+  IMPLICIT NONE<a name='784'>
+  INTEGER, INTENT(IN)  :: DataHandle<a name='785'>
+  INTEGER, INTENT(OUT) :: Status<a name='786'>
+RETURN<a name='787'>
+END SUBROUTINE ext_xxx_open_for_read_commit<a name='788'>
+<a name='789'>
+<a name='790'>
+<font color=#447700>!--- open_for_update<a name='791'></font>
+<A NAME='EXT_XXX_OPEN_FOR_UPDATE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_UPDATE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='792'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_update</font>( FileName, Comm, IOComm, SysDepInfo, DataHandle, Status)<a name='793'>
+  IMPLICIT NONE<a name='794'>
+  CHARACTER*(*), INTENT(IN)  :: FileName<a name='795'>
+  INTEGER      , INTENT(IN)  :: Comm<a name='796'>
+  INTEGER      , INTENT(IN)  :: IOComm<a name='797'>
+  CHARACTER*(*), INTENT(IN)  :: SysDepInfo<a name='798'>
+  INTEGER      , INTENT(OUT) :: DataHandle<a name='799'>
+  INTEGER      , INTENT(OUT) :: Status<a name='800'>
+RETURN<a name='801'>
+END SUBROUTINE ext_xxx_open_for_update<a name='802'>
+<a name='803'>
+<a name='804'>
+<font color=#447700>!--- open_for_write<a name='805'></font>
+<A NAME='EXT_XXX_OPEN_FOR_WRITE'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_OPEN_FOR_WRITE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='806'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_open_for_write</font> (DatasetName, Comm1, Comm2, &amp;<a name='807'>
+                                   SysDepInfo, DataHandle, Status)<a name='808'>
+  IMPLICIT NONE<a name='809'>
+  CHARACTER *(*), INTENT(IN)  :: DatasetName<a name='810'>
+  INTEGER       , INTENT(IN)  :: Comm1, Comm2<a name='811'>
+  CHARACTER *(*), INTENT(IN)  :: SysDepInfo<a name='812'>
+  INTEGER       , INTENT(OUT) :: DataHandle<a name='813'>
+  INTEGER       , INTENT(OUT) :: Status<a name='814'>
+RETURN<a name='815'>
+END SUBROUTINE ext_xxx_open_for_write<a name='816'>
+<a name='817'>
+<a name='818'>
+<font color=#447700>!--- warning_str<a name='819'></font>
+<A NAME='EXT_XXX_WARNING_STR'><A href='../../html_code/frame/xxx_template_ioapi.F.html#EXT_XXX_WARNING_STR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='820'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>ext_xxx_warning_str</font>( Code, ReturnString, Status)<a name='821'>
+  IMPLICIT NONE<a name='822'>
+  INTEGER       , INTENT(IN)  :: Code<a name='823'>
+  CHARACTER *(*), INTENT(OUT) :: ReturnString<a name='824'>
+  INTEGER       , INTENT(OUT) :: Status<a name='825'>
+RETURN<a name='826'>
+END SUBROUTINE ext_xxx_warning_str<a name='827'>
+<a name='828'>
+</pre></body></html>

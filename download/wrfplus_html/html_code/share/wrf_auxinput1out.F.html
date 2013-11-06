@@ -1,0 +1,59 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='WRF_AUXINPUT1OUT'><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>wrf_auxinput1out</font> ( fid , grid , config_flags, switch , &amp; <A href='../../call_to/WRF_AUXINPUT1OUT.html' TARGET='index'>1</A>,<A href='../../call_from/WRF_AUXINPUT1OUT.html' TARGET='index'>6</A><a name='3'>
+                                dryrun, ierr )<a name='4'>
+    USE <A href='../../html_code/frame/module_io.F.html#MODULE_IO'>module_io</A><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_20"><a name='5'>
+    USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_64"><a name='6'>
+    USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_22"><a name='7'>
+    USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_194"><a name='8'>
+    USE module_state_description<a name='9'>
+    USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_204"><a name='10'>
+    USE WRF_ESMF_MOD<a name='11'>
+    IMPLICIT NONE<a name='12'>
+#include &lt;<A href='../../html_code/include/wrf_io_flags.h.html'>wrf_io_flags.h</A>&gt;<A NAME="wrf_io_flags.h_1"><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='13'>
+#include &lt;<A href='../../html_code/include/wrf_status_codes.h.html'>wrf_status_codes.h</A>&gt;<A NAME="wrf_status_codes.h_2"><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='14'>
+    TYPE(domain) :: grid<a name='15'>
+    TYPE(grid_config_rec_type),  INTENT(INOUT)    :: config_flags<a name='16'>
+    INTEGER, INTENT(IN) :: fid, switch<a name='17'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='18'>
+    LOGICAL, INTENT(IN) :: dryrun<a name='19'>
+<a name='20'>
+    <font color=#447700>! Local data<a name='21'></font>
+    INTEGER ids , ide , jds , jde , kds , kde , &amp;<a name='22'>
+            ims , ime , jms , jme , kms , kme , &amp;<a name='23'>
+            ips , ipe , jps , jpe , kps , kpe<a name='24'>
+<a name='25'>
+    INTEGER , DIMENSION(3) :: domain_start , domain_end<a name='26'>
+    INTEGER , DIMENSION(3) :: memory_start , memory_end<a name='27'>
+    INTEGER , DIMENSION(3) :: patch_start , patch_end<a name='28'>
+    INTEGER i,j<a name='29'>
+    INTEGER julyr, julday, idt, iswater , map_proj<a name='30'>
+    REAL    gmt, cen_lat, cen_lon, bdyfrq , truelat1 , truelat2<a name='31'>
+    INTEGER dyn_opt, diff_opt, km_opt, damp_opt,  &amp;<a name='32'>
+            mp_physics, ra_lw_physics, ra_sw_physics, sf_sfclay_physics, &amp;<a name='33'>
+            sf_surface_physics, bl_pbl_physics, cu_physics<a name='34'>
+    REAL    khdif, kvdif<a name='35'>
+    INTEGER rc<a name='36'>
+<a name='37'>
+    CHARACTER*256 message<a name='38'>
+    CHARACTER*80  char_junk<a name='39'>
+    INTEGER    ibuf(1)<a name='40'>
+    REAL       rbuf(1)<a name='41'>
+    CHARACTER*40            :: next_datestr<a name='42'>
+<a name='43'>
+    CALL <A href='../../html_code/frame/module_domain.F.html#GET_IJK_FROM_GRID'>get_ijk_from_grid</A><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GET_IJK_FROM_GRID_31"> (  grid ,                        &amp;<a name='44'>
+                              ids, ide, jds, jde, kds, kde,    &amp;<a name='45'>
+                              ims, ime, jms, jme, kms, kme,    &amp;<a name='46'>
+                              ips, ipe, jps, jpe, kps, kpe    )<a name='47'>
+<a name='48'>
+    call nl_get_dyn_opt ( 1 , dyn_opt                       )<a name='49'>
+<a name='50'>
+    <font color=#447700>! note that the string current_date comes in through use association<a name='51'></font>
+    <font color=#447700>! of module_io_wrf<a name='52'></font>
+<a name='53'>
+<font color=#447700>! generated by the registry<a name='54'></font>
+#include &lt;<A href='../../html_code/include/wrf_auxinput1out.inc.html'>wrf_auxinput1out.inc</A>&gt;<A NAME="wrf_auxinput1out.inc_3"><A href='../../html_code/share/wrf_auxinput1out.F.html#WRF_AUXINPUT1OUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='55'>
+<a name='56'>
+    RETURN<a name='57'>
+    END<a name='58'>
+</pre></body></html>

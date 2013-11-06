@@ -1,0 +1,184 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+      <p class="headingtext" id="Font20">Cycling Help</p>
+      <blockquote>
+        <p class="style5" id="Font16">WRF/WRFDA cycling on a nested domain</p>
+        <p class="bodytext">1. You will need a global analysis for initial conditions (for instance, the GFS-based FNL Analysis (http://rda.ucar.edu/datasets/ds083.2/) or the NCEP/NCAR global reanalysis (http://rda.ucar.edu/datasets/ds090.0/)) at every time step you wish to do assimilation on, and run this through WPS to produce a set of met_em* files. For example: if you wish to do 24-hour forecasts with assimilation at each 12Z point, starting on January first of this year, you must have (using FNL as an example) the files "fnl_20120101_12_00_c", "fnl_20120102_12_00_c", etc. through the end of the time you would like to run your cycle.</p>
+      <p class="bodytext">2. Run WPS as you normally would for a nested case, with "interval_seconds = 86400" in the "&share" section of "namelist.wps" so that you will get one met_em.d01* and one met_em.d02* file every 24 hours from your initial conditions.</p>
+      <p class="bodytext">3. Run real.exe to get wrfbdy_01, wrfinput_01 and wrfinput_02</p>
+      <p class="bodytext">4. Run your data assimilation of choice, using wrfinput_02 as your first guess file ("fg")</p>
+      <p class="bodytext">5. Overwrite the wrfinput_02 file with your wrfvar_output file.</p>
+      <p class="bodytext">6. Run your 24-hour WRF forecast as usual.</p>
+      <p class="bodytext">7. Run real.exe again for the next time period.</p>
+      <p class="bodytext">8. Copy your final wrfout file (wrfout_d02_2012-01-02_12:00:00 in this example) and give the copied file the name "fg" (this will be your first guess file for the second cycle of assimilation)</p>
+      <p class="bodytext">9. Run update_bc.exe with the following parame.in settings:
+</p>
+      <p class="code">   &control_param<br>
+   da_file            = './fg'<br>
+   wrf_input          = './wrfinput_02'<br>
+   update_lateral_bdy = .false.<br>
+   update_low_bdy     = .true.<br>
+   /</p>
+      <p class="bodytext">This step will update the lower boundary conditions of the "fg" file before assimilation.</p>
+
+      <p class="bodytext">10. Run your data assimilation method of choice.</p>
+      <p class="bodytext">Repeat steps 5-10 until you are done cycling. There are a few more steps if you want to do assimilation on the outer domain, or if you would like to use multiple nests. </p>
+
+
+
+      </blockquote>
+      <br>
+      <strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+
+      </table>      
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

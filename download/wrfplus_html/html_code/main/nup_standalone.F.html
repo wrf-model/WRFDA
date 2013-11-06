@@ -1,0 +1,597 @@
+<HTML> <BODY BGCOLOR=#eeeeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='NUP_STANDALONE'><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='top_target'><IMG SRC="../../gif/bar_yellow.gif" border=0></A><a name='2'>
+      <font color=#993300>program </font><font color=#cc0000>nup_standalone</font>,<A href='../../call_from/NUP_STANDALONE.html' TARGET='index'>15</A><a name='3'>
+<font color=#447700>!  Program to read/write wrf output. <a name='4'></font>
+<font color=#447700>!  OPTION -thin  : It will nestup data to the ratio given<a name='5'></font>
+<font color=#447700>!   Cindy Bruyere - March 2006<a name='6'></font>
+<font color=#447700>!   Some code borrowed from Jim Bresch<a name='7'></font>
+<font color=#447700>!   Modyfied for multi-incremental wrf4dvar by Xin Zhang - Sept. 2006<a name='8'></font>
+<font color=#447700>!   Modyfied for more improvement by Xin Zhang - Jan. 2008<a name='9'></font>
+<font color=#447700>!=================================Run Program================================<a name='10'></font>
+<font color=#447700>!  To thin your input file (by picking up corresponding points)<a name='11'></font>
+<font color=#447700>!     nup_standalone wrfout_file -thin 3 [-debug]<a name='12'></font>
+<font color=#447700>!<a name='13'></font>
+<font color=#447700>!  To see more options<a name='14'></font>
+<font color=#447700>!     nup_standalone -help         <a name='15'></font>
+<font color=#447700>!<a name='16'></font>
+<font color=#447700>!  The output will be written to a file with original file name + -thin<a name='17'></font>
+<font color=#447700>!<a name='18'></font>
+<font color=#447700>!=================================Make Executable============================<a name='19'></font>
+<font color=#447700>!  Make executable:<a name='20'></font>
+<font color=#447700>!    DEC Alpha<a name='21'></font>
+<font color=#447700>!      f90 nup_standalone.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='22'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -free  -o nup_standalone<a name='23'></font>
+<font color=#447700>!<a name='24'></font>
+<font color=#447700>!   linux flags<a name='25'></font>
+<font color=#447700>!      pgf90 nup_standalone.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='26'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -Mfree  -o nup_standalone<a name='27'></font>
+<font color=#447700>!<a name='28'></font>
+<font color=#447700>!   Sun flags<a name='29'></font>
+<font color=#447700>!      f90 nup_standalone.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='30'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -free  -o nup_standalone<a name='31'></font>
+<font color=#447700>!<a name='32'></font>
+<font color=#447700>!   SGI flags<a name='33'></font>
+<font color=#447700>!      f90 nup_standalone.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='34'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -freeform  -o nup_standalone<a name='35'></font>
+<font color=#447700>!<a name='36'></font>
+<font color=#447700>!   IBM flags (NCAR bluesky - 32bit)<a name='37'></font>
+<font color=#447700>!      xlf nup_standalone.f -L/usr/local/lib32/r4i4 -lnetcdf -lm  \<a name='38'></font>
+<font color=#447700>!      -I/usr/local/include  -qfree=f90  -o nup_standalone<a name='39'></font>
+<font color=#447700>!<a name='40'></font>
+<font color=#447700>!   IBM flags (NCAR bluesky - 64bit)<a name='41'></font>
+<font color=#447700>!      xlf nup_standalone.f -L/usr/local/lib64/r4i4 -lnetcdf -lm  \<a name='42'></font>
+<font color=#447700>!      -I/usr/local/include  -qfree=f90  -o nup_standalone<a name='43'></font>
+<font color=#447700>!<a name='44'></font>
+<font color=#447700>!   IBM flags (NCAR bluevista)   <a name='45'></font>
+<font color=#447700>!      xlf nup_standalone.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='46'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -qfree=f90  -o nup_standalone<a name='47'></font>
+<font color=#447700>!<a name='48'></font>
+<font color=#447700>!   Mac flags (with xlf compiler)<a name='49'></font>
+<font color=#447700>!      xlf -O3 nup_standalone.f -L/usr/local/netcdf-3.5.1-xlf/lib -lnetcdf -lm  \<a name='50'></font>
+<font color=#447700>!      -I/usr/local/netcdf-3.5.1-xlf/include  -qfree=f90  -o nup_standalone<a name='51'></font>
+<font color=#447700>!<a name='52'></font>
+<font color=#447700>!============================================================================<a name='53'></font>
+<a name='54'>
+      use <A href='../../html_code/main/module_nup_feedback.F.html#MODULE_NUP_FEEDBACK'>module_nup_feedback</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_NUP_FEEDBACK_1"><a name='55'>
+      INCLUDE 'netcdf.inc'<a name='56'>
+      parameter (jdim=6)<a name='57'>
+      integer ncid, status<a name='58'>
+      integer ishape(jdim)<a name='59'>
+      integer ishape2(jdim)<a name='60'>
+      character cval*50<a name='61'>
+      character name*31<a name='62'>
+      character (len=31),allocatable, dimension(:)      :: dname<a name='63'>
+      integer,           allocatable, dimension(:)       :: dval, dval2<a name='64'>
+      real,              allocatable, dimension(:,:,:,:) :: data, data2<a name='65'>
+      double precision,  allocatable, dimension(:,:,:,:) :: ddata, ddata2<a name='66'>
+      integer,           allocatable, dimension(:,:,:,:) :: idata, idata2<a name='67'>
+      character,         allocatable, dimension(:,:,:,:) :: text<a name='68'>
+      character omit(10)*80<a name='69'>
+      integer             :: dims_in(4), dims_out(4), box_start(3), box_end(3)<a name='70'>
+      real                :: new_cen<a name='71'>
+      character (len=80)  :: input_file, output_file<a name='72'>
+      character (len=10)  :: option<a name='73'>
+      logical             :: debug=.FALSE.<a name='74'>
+      logical             :: x_ave=.FALSE.<a name='75'>
+      logical             :: y_ave=.FALSE.<a name='76'>
+      real                :: okm<a name='77'>
+      double precision    :: dbval<a name='78'>
+      integer             :: i, j, ii, jj<a name='79'>
+<a name='80'>
+      call <A href='../../html_code/main/nupdown.F.html#READ_ARGS'>read_args</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="READ_ARGS_1">(input_file,option,ratio,box_start,box_end,debug)<a name='81'>
+      output_file  = trim(input_file)//option<a name='82'>
+<a name='83'>
+      write(6,*) <a name='84'>
+      write(6,*) "#########################################"<a name='85'>
+      write(6,*) " Running NUP_STANDALONE with option ",option<a name='86'>
+      write(6,*) <a name='87'>
+      IF ( .not. debug ) write(6,*) "   Ouput will be written to ",output_file<a name='88'>
+<a name='89'>
+      IF (debug) THEN<a name='90'>
+        write(6,*) "INPUT FILE:         ",input_file<a name='91'>
+        write(6,*) "OUTPUT FILE:        ",output_file<a name='92'>
+        write(6,*) "OPTION:             ",option    <a name='93'>
+        if ( option(1:5) == '-thin' ) then           <font color=#447700>! used for -thin<a name='94'></font>
+          write(6,*) "RATIO:             ",int(ratio)    <a name='95'>
+        endif<a name='96'>
+      ENDIF<a name='97'>
+<a name='98'>
+<a name='99'>
+<font color=#447700>! OPEN INPUT AND OUTPUT FILE<a name='100'></font>
+<font color=#447700>! output_file is input_file_new<a name='101'></font>
+      status = nf_open(input_file, 0, ncid)<a name='102'>
+      if (status .ne. nf_noerr) call <A href='../../html_code/main/nupdown.F.html#HANDLE_ERR'>handle_err</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HANDLE_ERR_1">(status)<a name='103'>
+      status = nf_create(output_file, 0, mcid)<a name='104'>
+      if (status .ne. nf_noerr) call <A href='../../html_code/main/nupdown.F.html#HANDLE_ERR'>handle_err</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HANDLE_ERR_2">(status)<a name='105'>
+<a name='106'>
+<font color=#447700>! GET BASIC INFORMTION ABOUT THE FILE<a name='107'></font>
+<font color=#447700>! most important <a name='108'></font>
+<font color=#447700>!   ndims:  number of dimensions<a name='109'></font>
+<font color=#447700>!   nvars:  number of variables<a name='110'></font>
+<font color=#447700>!   ngatts: number of global attributes<a name='111'></font>
+      status = nf_inq(ncid, ndims, nvars, ngatts, nunlimdimid)<a name='112'>
+      if (status .ne. nf_noerr) call <A href='../../html_code/main/nupdown.F.html#HANDLE_ERR'>handle_err</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HANDLE_ERR_3">(status)<a name='113'>
+      IF (debug) THEN<a name='114'>
+        write(6,*) 'ndims = ',ndims,' nvars = ',nvars,' ngatts = ',ngatts, &amp;<a name='115'>
+                   ' nunlimdimid =',nunlimdimid<a name='116'>
+      ENDIF<a name='117'>
+<a name='118'>
+<font color=#447700>! ALLOCATE SOME VARIABLES<a name='119'></font>
+      allocate (dval(ndims))<a name='120'>
+      allocate(dval2(ndims))<a name='121'>
+      allocate(dname(ndims))<a name='122'>
+<a name='123'>
+<font color=#447700>! GET SOME BASIC DIMS FROM INPUT_FILE<a name='124'></font>
+      dx = -99.<a name='125'>
+      status = nf_get_att_real (ncid, nf_global, 'DX', dx)<a name='126'>
+      status = nf_get_att_int (ncid, nf_global, 'WEST-EAST_GRID_DIMENSION', iweg)<a name='127'>
+      status = nf_get_att_int (ncid, nf_global, 'SOUTH-NORTH_GRID_DIMENSION', isng)<a name='128'>
+      status = nf_get_att_int (ncid, nf_global, 'BOTTOM-TOP_GRID_DIMENSION', ibtg)<a name='129'>
+      IF (debug) THEN<a name='130'>
+        write(6,*) "BASICS from input file:"<a name='131'>
+        write(6,*) "       DX= ", dx<a name='132'>
+        write(6,*) "       DT= ", dt<a name='133'>
+        write(6,*) "        X= ", iweg<a name='134'>
+        write(6,*) "        Y= ", isng<a name='135'>
+        write(6,*) "        Z= ", ibtg<a name='136'>
+      ENDIF<a name='137'>
+      if (dx .lt. 0.) stop 'dx is bad'<a name='138'>
+<a name='139'>
+<font color=#447700>! CALCULATE DIMS FOR OUTPUT FILE<a name='140'></font>
+      IF ( option(1:5) == '-thin' ) THEN           <font color=#447700>! used for -thin<a name='141'></font>
+        okm = dx*ratio<a name='142'>
+        jweg = int((iweg-1)/ratio) + 1<a name='143'>
+        jsng = int((isng-1)/ratio) + 1<a name='144'>
+        jbtg = ibtg<a name='145'>
+      ENDIF<a name='146'>
+      IF (debug) THEN<a name='147'>
+        write(6,*) "BASICS for output file:"<a name='148'>
+        write(6,*) "       DX= ", okm<a name='149'>
+        write(6,*) "       DT= ", dt<a name='150'>
+        write(6,*) "        X= ", jweg<a name='151'>
+        write(6,*) "        Y= ", jsng<a name='152'>
+        write(6,*) "        Z= ", jbtg<a name='153'>
+      ENDIF<a name='154'>
+      <font color=#447700>!! We also need to fix the CEN_LAT and CEN_LON later, so get<a name='155'></font>
+      <font color=#447700>!! the middle of the new domain<a name='156'></font>
+      ix = int((jweg-1)/2.)<a name='157'>
+      iy = int((jsng-1)/2.)<a name='158'>
+      if ( ix .eq. int(jweg/2.) ) x_ave = .TRUE.<a name='159'>
+      if ( iy .eq. int(jsng/2.) ) y_ave = .TRUE.<a name='160'>
+      ix = int(jweg/2.)<a name='161'>
+      iy = int(jsng/2.)<a name='162'>
+<a name='163'>
+<font color=#447700>! READ ALL DIMS FROM INPUT FILE AND CREATE DIMS FOR OUTPUT FILE<a name='164'></font>
+      IF (debug) THEN<a name='165'>
+        write(6,*) <a name='166'>
+        write(6,*) "FILE dimensions:"<a name='167'>
+      ENDIF<a name='168'>
+      do i = 1, ndims<a name='169'>
+        status = nf_inq_dim(ncid, i, dname(i), dval(i))<a name='170'>
+	dval2(i) = dval(i)<a name='171'>
+<font color=#447700>!       CAUTION -- this stuff is hard-wired<a name='172'></font>
+	if (dname(i) .eq. 'west_east_stag') then<a name='173'>
+	  dval2(i) = jweg<a name='174'>
+	else if (dname(i) .eq. 'west_east') then<a name='175'>
+	  dval2(i) = jweg-1<a name='176'>
+	else if (dname(i) .eq. 'south_north_stag') then<a name='177'>
+	  dval2(i) = jsng<a name='178'>
+	else if (dname(i) .eq. 'south_north') then<a name='179'>
+	  dval2(i) = jsng-1<a name='180'>
+	else if (dname(i) .eq. 'bottom_top_stag') then<a name='181'>
+	  dval2(i) = jbtg<a name='182'>
+	else if (dname(i) .eq. 'bottom_top') then<a name='183'>
+	  dval2(i) = jbtg-1<a name='184'>
+        endif<a name='185'>
+        status = nf_def_dim(mcid, dname(i), dval2(i), i)<a name='186'>
+        IF (debug) THEN<a name='187'>
+	  write(6,'(" i = ",i2," : ",A," in = ",i4," (out = ",i4,")")') &amp;<a name='188'>
+                i,dname(i),dval(i),dval2(i)<a name='189'>
+        ENDIF<a name='190'>
+      enddo<a name='191'>
+<a name='192'>
+<font color=#447700>! DEALING WITH THE GLOBAL ATTRIBUTES<a name='193'></font>
+      IF (debug) THEN<a name='194'>
+        write(6,*) <a name='195'>
+        write(6,*) "FILE attributes:"<a name='196'>
+      ENDIF<a name='197'>
+      do i = 1, ngatts<a name='198'>
+        status = nf_inq_attname(ncid, nf_global, i, name)<a name='199'>
+        status = nf_inq_atttype(ncid, nf_global, name, itype)<a name='200'>
+        status = nf_inq_attlen(ncid, nf_global, name, ilen)<a name='201'>
+<a name='202'>
+	if ( itype .eq. 2 ) then        <font color=#447700>! characters<a name='203'></font>
+	  status = nf_get_att_text (ncid, nf_global, name, cval)<a name='204'>
+          IF (debug) THEN<a name='205'>
+	    write(6,'(" i = ",i2," : ",A," in = ",A," (out = ",$)') &amp;<a name='206'>
+                  i,name,cval(1:ilen)<a name='207'>
+          ENDIF<a name='208'>
+	  if(name(1:5) .eq. 'TITLE') then<a name='209'>
+             cval = cval(1:ilen)//" : nup_standalone"//option<a name='210'>
+             ilen = len_trim(cval)<a name='211'>
+          endif<a name='212'>
+          IF (debug) write(6,'(A,")")') cval(1:ilen)<a name='213'>
+	  status = nf_put_att_text(mcid, nf_global, name, ilen,&amp;<a name='214'>
+                    cval(1:ilen))<a name='215'>
+<a name='216'>
+	elseif ( itype .eq. 4 ) then     <font color=#447700>! integers<a name='217'></font>
+	  status = nf_get_att_int (ncid, nf_global, name, ival)<a name='218'>
+          IF (debug) THEN<a name='219'>
+	    write(6,'(" i = ",i2," : ",A," in = ",i7," (out = ",$)') &amp;<a name='220'>
+                  i,name,ival        <a name='221'>
+          ENDIF<a name='222'>
+	  if(name .eq. 'WEST-EAST_GRID_DIMENSION') ival = jweg<a name='223'>
+	  if(name .eq. 'SOUTH-NORTH_GRID_DIMENSION') ival = jsng<a name='224'>
+	  if(name .eq. 'BOTTOM-TOP_GRID_DIMENSION') ival = jbtg<a name='225'>
+	  if(name .eq. 'WEST-EAST_PATCH_END_UNSTAG') ival = jweg-1<a name='226'>
+	  if(name .eq. 'WEST-EAST_PATCH_END_STAG') ival = jweg<a name='227'>
+	  if(name .eq. 'SOUTH-NORTH_PATCH_END_UNSTAG') ival = jsng-1<a name='228'>
+	  if(name .eq. 'SOUTH-NORTH_PATCH_END_STAG') ival = jsng<a name='229'>
+          iF (debug) write(6,'(i7,")")') ival<a name='230'>
+          status = nf_put_att_int(mcid, nf_global, name, itype,&amp;<a name='231'>
+                    ilen, ival)<a name='232'>
+<a name='233'>
+	elseif ( itype .eq. 5 ) then    <font color=#447700>! real<a name='234'></font>
+	  status = nf_get_att_real (ncid, nf_global, name, rval)<a name='235'>
+          IF (debug) THEN<a name='236'>
+	    write(6,'(" i = ",i2," : ",A," in = ",G18.10E2," (out = ",$)') &amp;<a name='237'>
+                  i,name,rval        <a name='238'>
+          ENDIF<a name='239'>
+          if(name(1:2) .eq. 'DX' .or. name(1:2) .eq. 'DY') rval = okm<a name='240'>
+          IF (debug) write(6,'(G18.10E2,")")') rval<a name='241'>
+	  status = nf_put_att_real(mcid, nf_global, name, itype,&amp;<a name='242'>
+                    ilen, rval)<a name='243'>
+	elseif ( itype .eq. 6 ) then    <font color=#447700>! double<a name='244'></font>
+	  status = nf_get_att_double (ncid, nf_global, name, dbval)<a name='245'>
+          IF (debug) THEN<a name='246'>
+	    write(6,'(" i = ",i2," : ",A," in = ",G18.10E2," (out = ",$)') &amp;<a name='247'>
+                  i,name,dbval        <a name='248'>
+          ENDIF<a name='249'>
+          if(name(1:2) .eq. 'DX' .or. name(1:2) .eq. 'DY') dbval = okm<a name='250'>
+          IF (debug) write(6,'(G18.10E2,")")') dbval<a name='251'>
+	  status = nf_put_att_double(mcid, nf_global, name, itype,&amp;<a name='252'>
+                    ilen, dbval)<a name='253'>
+	endif<a name='254'>
+      enddo<a name='255'>
+<a name='256'>
+<a name='257'>
+      IF (debug) THEN<a name='258'>
+        write(6,*) <a name='259'>
+        write(6,*) <a name='260'>
+        write(6,*) "FILE variables:"<a name='261'>
+      ENDIF<a name='262'>
+      do i = 1, nvars<a name='263'>
+        status = nf_inq_var(ncid, i, cval, itype, idm, ishape, natt)<a name='264'>
+	if (idm .gt. jdim) stop<a name='265'>
+	status = nf_def_var(mcid, cval, itype, idm, ishape, j)<a name='266'>
+	do na = 1, natt<a name='267'>
+          status = nf_inq_attname(ncid, i, na, name)<a name='268'>
+          status = nf_copy_att(ncid, i, name, mcid, i)<a name='269'>
+	enddo<a name='270'>
+      enddo<a name='271'>
+      status = nf_enddef(mcid)<a name='272'>
+<a name='273'>
+<font color=#447700>! ########## LOOP THROUGH THE DATA <a name='274'></font>
+      do i = 1, nvars<a name='275'>
+        status = nf_inq_var(ncid, i, cval, itype, idm, ishape, natt)<a name='276'>
+        IF (debug) THEN<a name='277'>
+          write(6,*) <a name='278'>
+	  write(6,*) 'VARIABLE: ',trim(cval), '    itype: ',itype<a name='279'>
+        ENDIF<a name='280'>
+<a name='281'>
+<font color=#447700>! GET THE DIMS FOR INPUT AND OUTPUT FROM THE SHAPE<a name='282'></font>
+        dims_in  = 1<a name='283'>
+        dims_out = 1<a name='284'>
+        do ii = 1,idm<a name='285'>
+          dims_in(ii)  = dval(ishape(ii))<a name='286'>
+          dims_out(ii) = dval2(ishape(ii))<a name='287'>
+        enddo<a name='288'>
+        IF (debug) THEN<a name='289'>
+          write(6,*) '   DIMS  IN: ',dims_in<a name='290'>
+          write(6,*) '   DIMS OUT: ',dims_out<a name='291'>
+        ENDIF<a name='292'>
+<a name='293'>
+<a name='294'>
+<font color=#447700>! ALLOCATE THE INPUT AND OUTPUT ARRAYS<a name='295'></font>
+<font color=#447700>! READ THE DATA FROM INPUT FILE<a name='296'></font>
+<font color=#447700>! THIN THE GRID IF NEEDED, OR GET THE CORRECT BOX<a name='297'></font>
+<a name='298'>
+	IF     (itype .eq. 2) THEN          <font color=#447700>! character<a name='299'></font>
+          allocate (text(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='300'>
+                         dims_in(4)))<a name='301'>
+	  status = nf_get_var_text(ncid, i, text)<a name='302'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',text(:,1,1,1)<a name='303'>
+	  status = nf_put_var_text (mcid, i, text)<a name='304'>
+          deallocate (text)<a name='305'>
+<a name='306'>
+	ELSEIF (itype .eq. 4) THEN          <font color=#447700>! integer<a name='307'></font>
+          allocate (idata(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='308'>
+                          dims_in(4)))<a name='309'>
+          allocate(idata2(dims_out(1),dims_out(2),dims_out(3),&amp;<a name='310'>
+                          dims_out(4)))<a name='311'>
+	  status = nf_get_var_int(ncid, i, idata)<a name='312'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',idata(1,1,1,1)<a name='313'>
+          if (idm .ge. 3) then<a name='314'>
+            IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio), 'copy_fcni'<a name='315'>
+            call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCNI'>copy_fcni</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCNI_1">(idata2,                                           &amp;  <font color=#447700>! CD field<a name='316'></font>
+                           1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='317'>
+                           idata,                                            &amp;  <font color=#447700>! ND field<a name='318'></font>
+                           1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='319'>
+                           .false., .false.,                                 &amp;  <font color=#447700>! staggering of field<a name='320'></font>
+                           1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='321'></font>
+                           int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='322'></font>
+	  else<a name='323'>
+	    idata2 = idata<a name='324'>
+	  endif<a name='325'>
+	  status = nf_put_var_int (mcid, i, idata2)<a name='326'>
+          deallocate (idata)<a name='327'>
+          deallocate (idata2)<a name='328'>
+<a name='329'>
+	ELSEIF (itype .eq. 5) THEN          <font color=#447700>! real<a name='330'></font>
+          allocate (data(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='331'>
+                         dims_in(4)))<a name='332'>
+          allocate(data2(dims_out(1),dims_out(2),dims_out(3), &amp;<a name='333'>
+                         dims_out(4)))<a name='334'>
+	  status = nf_get_var_real(ncid, i, data)<a name='335'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',data(1,1,1,1)<a name='336'>
+            if (idm .ge. 3) then<a name='337'>
+            if ( trim(cval) == 'MAPFAC_UX' .or. trim(cval) == 'MAPFAC_U' .or.  &amp;<a name='338'>
+                 trim(cval) == 'MAPFAC_UY' .or.  &amp;<a name='339'>
+                 trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then<a name='340'>
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcnm'<a name='341'>
+                 call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCNM'>copy_fcnm</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCNM_1">(data2,                                            &amp;  <font color=#447700>! CD field<a name='342'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='343'>
+                                data,                                             &amp;  <font color=#447700>! ND field<a name='344'></font>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='345'>
+                                .true., .false.,                                  &amp;  <font color=#447700>! staggering of field<a name='346'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='347'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='348'></font>
+            elseif ( trim(cval) == 'MAPFAC_VX' .or. trim(cval) == 'MAPFAC_V' .or.  &amp;<a name='349'>
+                 trim(cval) == 'MAPFAC_VY' .or. trim(cval) == 'MF_VX_INV' .or. &amp;<a name='350'>
+                 trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then<a name='351'>
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcnm'<a name='352'>
+                 call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCNM'>copy_fcnm</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCNM_2">(data2,                                            &amp;  <font color=#447700>! CD field<a name='353'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='354'>
+                                data,                                             &amp;  <font color=#447700>! ND field<a name='355'></font>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='356'>
+                                .false., .true.,                                  &amp;  <font color=#447700>! staggering of field<a name='357'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='358'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='359'></font>
+            elseif ( trim(cval) == 'U' ) then<a name='360'>
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcn'<a name='361'>
+                 call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCN'>copy_fcn</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCN_1"> (data2,                                            &amp;  <font color=#447700>! CD field<a name='362'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='363'>
+                                data,                                             &amp;  <font color=#447700>! ND field<a name='364'></font>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='365'>
+                                .true., .false.,                                  &amp;  <font color=#447700>! staggering of field<a name='366'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='367'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='368'></font>
+                 CALL <A href='../../html_code/share/interp_fcn.F.html#SMOOTHER'>smoother</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SMOOTHER_1"> (                                                               &amp;<a name='369'>
+                                data2,                                            &amp;         <font color=#447700>! CD field<a name='370'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='371'>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='372'>
+                                .TRUE., .FALSE.,                                                &amp;         <font color=#447700>! xstag, ystag<a name='373'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='374'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='375'></font>
+            elseif ( trim(cval) == 'V' ) then<a name='376'>
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcn'<a name='377'>
+                 call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCN'>copy_fcn</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCN_2"> (data2,                                            &amp;  <font color=#447700>! CD field<a name='378'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='379'>
+                                data,                                             &amp;  <font color=#447700>! ND field<a name='380'></font>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='381'>
+                                .false., .true.,                                  &amp;  <font color=#447700>! staggering of field<a name='382'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='383'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='384'></font>
+                 CALL <A href='../../html_code/share/interp_fcn.F.html#SMOOTHER'>smoother</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SMOOTHER_2"> (                                                               &amp;<a name='385'>
+                                data2,                                            &amp;         <font color=#447700>! CD field<a name='386'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='387'>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='388'>
+                                .FALSE., .TRUE.,                                                &amp;         <font color=#447700>! xstag, ystag<a name='389'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='390'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='391'></font>
+            elseif ( trim(cval) == 'W' .or. trim(cval) == 'PH' .or. trim(cval) == 'PHB' .or. &amp;<a name='392'>
+                     trim(cval) == 'T' .or. trim(cval) == 'T_INIT' .or. trim(cval) == 'MU' .or. &amp;<a name='393'>
+                     trim(cval) == 'MUB' .or. trim(cval) == 'MU0' .or. trim(cval) == 'Q2' .or. &amp;<a name='394'>
+                     trim(cval) == 'T2' .or. trim(cval) == 'TH2' .or. trim(cval) == 'PSFC' .or. &amp;<a name='395'>
+                     trim(cval) == 'U10' .or. trim(cval) == 'V10' .or. trim(cval) == 'TH10' .or. &amp;<a name='396'>
+                     trim(cval) == 'Q10' .or. trim(cval) == 'QVAPOR' .or. trim(cval) == 'QCLOUD' .or. &amp;<a name='397'>
+                     trim(cval) == 'QRAIN' .or. trim(cval) == 'QICE' .or. trim(cval) == 'QGRAUP' .or. &amp;<a name='398'>
+                     trim(cval) == 'HGT' .or. trim(cval) == 'SNOWNC' .or. trim(cval) == 'GRAUPELNCV' &amp;<a name='399'>
+                      ) then<a name='400'>
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcn'<a name='401'>
+                 call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCN'>copy_fcn</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCN_3"> (data2,                                            &amp;  <font color=#447700>! CD field<a name='402'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='403'>
+                                data,                                             &amp;  <font color=#447700>! ND field<a name='404'></font>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='405'>
+                                .false., .false.,                                  &amp;  <font color=#447700>! staggering of field<a name='406'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='407'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='408'></font>
+                 CALL <A href='../../html_code/share/interp_fcn.F.html#SMOOTHER'>smoother</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SMOOTHER_3"> (                                                               &amp;<a name='409'>
+                                data2,                                            &amp;         <font color=#447700>! CD field<a name='410'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='411'>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='412'>
+                                .FALSE., .FALSE.,                                                &amp;         <font color=#447700>! xstag, ystag<a name='413'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='414'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='415'></font>
+            else<a name='416'>
+                 IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio),'copy_fcnm'<a name='417'>
+                 call <A href='../../html_code/share/interp_fcn.F.html#COPY_FCNM'>copy_fcnm</A><A href='../../html_code/main/nup_standalone.F.html#NUP_STANDALONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COPY_FCNM_3">(data2,                                            &amp;  <font color=#447700>! CD field<a name='418'></font>
+                                1, dims_out(1), 1, dims_out(2), 1, dims_out(3),   &amp;<a name='419'>
+                                data,                                             &amp;  <font color=#447700>! ND field<a name='420'></font>
+                                1, dims_in(1), 1, dims_in(2), 1, dims_in(3),      &amp;<a name='421'>
+                                .false., .false.,                                 &amp;  <font color=#447700>! staggering of field<a name='422'></font>
+                                1, 1,                                             &amp;  <font color=#447700>! Position of lower left of nest in CD<a name='423'></font>
+                                int(ratio), int(ratio)               )               <font color=#447700>! nest ratios<a name='424'></font>
+            endif<a name='425'>
+	  else<a name='426'>
+	    data2 = data<a name='427'>
+	  endif<a name='428'>
+	  status = nf_put_var_real (mcid, i, data2)<a name='429'>
+          IF ( cval == 'XLAT' .or. cval == 'XLONG' ) THEN<a name='430'>
+<font color=#447700>!            We need fix the box's center long and lat<a name='431'></font>
+             new_cen = data2(ix,iy,1,1)<a name='432'>
+             if ( x_ave .and. y_ave ) then<a name='433'>
+               new_cen = (data2(ix,  iy,1,1)+data2(ix  ,iy+1,1,1)+  &amp;<a name='434'>
+                          data2(ix+1,iy,1,1)+data2(ix+1,iy+1,1,1))/4.<a name='435'>
+             elseif ( x_ave .and. .not. y_ave ) then<a name='436'>
+               new_cen = (data2(ix,  iy,1,1)+data2(ix+1,iy  ,1,1))/2.<a name='437'>
+             elseif ( .not. x_ave .and. y_ave ) then<a name='438'>
+               new_cen = (data2(ix,  iy,1,1)+data2(ix  ,iy+1,1,1))/2.<a name='439'>
+             endif<a name='440'>
+          ENDIF<a name='441'>
+          IF ( cval == 'XLAT' ) THEN<a name='442'>
+             IF (debug) write(6,*) '   Fix global attribute CEN_LAT: now = ', new_cen<a name='443'>
+             status = nf_inq_atttype(ncid, nf_global, 'CEN_LAT', itype)<a name='444'>
+             status = nf_inq_attlen(ncid, nf_global, 'CEN_LAT', ilen)<a name='445'>
+<font color=#447700>! 	     status = nf_put_att_real(mcid, nf_global, 'CEN_LAT', itype,&amp;<a name='446'></font>
+<font color=#447700>!                      ilen, new_cen)<a name='447'></font>
+          ELSEIF ( cval == 'XLONG' ) THEN<a name='448'>
+             IF (debug) write(6,*) '   Fix global attribute CEN_LON: now = ', new_cen<a name='449'>
+             status = nf_inq_atttype(ncid, nf_global, 'CEN_LON', itype)<a name='450'>
+             status = nf_inq_attlen(ncid, nf_global, 'CEN_LON', ilen)<a name='451'>
+<font color=#447700>!	     status = nf_put_att_real(mcid, nf_global, 'CEN_LON', itype,&amp;<a name='452'></font>
+<font color=#447700>!                      ilen, new_cen)<a name='453'></font>
+          ENDIF<a name='454'>
+          deallocate (data)<a name='455'>
+          deallocate (data2)<a name='456'>
+<a name='457'>
+	ELSEIF (itype .eq. 6) THEN          <font color=#447700>! double<a name='458'></font>
+          allocate (ddata(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='459'>
+                          dims_in(4)))<a name='460'>
+          allocate(ddata2(dims_out(1),dims_out(2),dims_out(3),&amp;<a name='461'>
+                          dims_out(4)))<a name='462'>
+	  status = nf_get_var_double(ncid, i, ddata)<a name='463'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',ddata(1,1,1,1)<a name='464'>
+            if (idm .ge. 3) then<a name='465'>
+            IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio)<a name='466'>
+            if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &amp;<a name='467'>
+                 trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then<a name='468'>
+                 IF (debug) write(6,*) '   Attention'<a name='469'>
+                 ddata2 = ddata(1:dims_in(1):3,2:dims_in(2):3,:,:)<a name='470'>
+            elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or.  &amp;<a name='471'>
+                 trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then<a name='472'>
+                 IF (debug) write(6,*) '   Attention'<a name='473'>
+                 ddata2 = ddata(2:dims_in(1):3,1:dims_in(2):3,:,:)<a name='474'>
+            else<a name='475'>
+                 ddata2 = ddata(2:dims_in(1):3,2:dims_in(2):3,:,:)<a name='476'>
+            endif<a name='477'>
+	  else<a name='478'>
+	    ddata2 = ddata<a name='479'>
+	  endif<a name='480'>
+	  status = nf_put_var_double (mcid, i, ddata2)<a name='481'>
+          deallocate (ddata)<a name='482'>
+          deallocate (ddata2)<a name='483'>
+        ELSE<a name='484'>
+	    stop 'trouble - do not know the variable type'<a name='485'>
+        ENDIF<a name='486'>
+<a name='487'>
+      ENDDO     <font color=#447700>! END OF VARIABLE LOOP<a name='488'></font>
+      status = nf_close(mcid)<a name='489'>
+<a name='490'>
+      write(6,*) <a name='491'>
+      write(6,*) " Success - we are out of here"      <a name='492'>
+      write(6,*) "#########################################"<a name='493'>
+<a name='494'>
+      end program nup_standalone<a name='495'>
+<font color=#447700>!---------------------------------------------------------------------<a name='496'></font>
+<A NAME='HANDLE_ERR'><A href='../../html_code/main/nup_standalone.F.html#HANDLE_ERR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='497'>
+      <font color=#993300>subroutine </font><font color=#cc0000>handle_err</font>(status) <A href='../../call_to/HANDLE_ERR.html' TARGET='index'>6</A><a name='498'>
+      integer status<a name='499'>
+      write(6,*) 'Error number ',status<a name='500'>
+      stop<a name='501'>
+      end subroutine<a name='502'>
+<font color=#447700>!---------------------------------------------------------------------<a name='503'></font>
+<a name='504'>
+<A NAME='READ_ARGS'><A href='../../html_code/main/nup_standalone.F.html#READ_ARGS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='505'>
+  <font color=#993300>subroutine </font><font color=#cc0000>read_args</font>(input_file,option,ratio,box_start,box_end,debug) <A href='../../call_to/READ_ARGS.html' TARGET='index'>2</A>,<A href='../../call_from/READ_ARGS.html' TARGET='index'>10</A><a name='506'>
+<a name='507'>
+  implicit none<a name='508'>
+  character (len=80)    :: input_file<a name='509'>
+  character (len=10)    :: option<a name='510'>
+<a name='511'>
+  integer               :: iratio<a name='512'>
+  real                  :: ratio<a name='513'>
+  integer               :: box_start(3), box_end(3)<a name='514'>
+  logical               :: debug<a name='515'>
+<a name='516'>
+  integer               :: numarg, i, idummy, idummy1, idummy2<a name='517'>
+  real                  :: rdummy<a name='518'>
+  integer, external     :: iargc<a name='519'>
+  character (len=80)    :: dummy, dir<a name='520'>
+<a name='521'>
+<font color=#447700>! set up some defaults first<a name='522'></font>
+  input_file = " "<a name='523'>
+  option = " "<a name='524'>
+  ratio = 0.0<a name='525'>
+  idummy1 = 0<a name='526'>
+  idummy2 = 0<a name='527'>
+  box_start = 0<a name='528'>
+  box_end   = 0<a name='529'>
+  numarg = iargc()<a name='530'>
+  i = 1<a name='531'>
+<a name='532'>
+  if (numarg .lt. 1) call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_1"><a name='533'>
+<a name='534'>
+  do while (i &lt;= numarg)<a name='535'>
+    call getarg(i,dummy)<a name='536'>
+<a name='537'>
+    if (dummy(1:1) == "-") then    <font color=#447700>! We have an option, else it is the filename<a name='538'></font>
+<a name='539'>
+      SELECTCASE (trim(dummy))<a name='540'>
+          CASE ("-help")<a name='541'>
+               call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_2"><a name='542'>
+          CASE ("-h")<a name='543'>
+               call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_3"><a name='544'>
+          CASE ("-debug")<a name='545'>
+               debug = .TRUE.     <a name='546'>
+          CASE ("-thin")<a name='547'>
+               option = dummy<a name='548'>
+               i = i+1<a name='549'>
+               call getarg(i,dummy)<a name='550'>
+               read(dummy,'(i3)')idummy<a name='551'>
+               iratio = idummy<a name='552'>
+               if ( iratio .lt. 2 ) STOP ' Must supply a ratio of 2 or more ' <a name='553'>
+               ratio = real(iratio)<a name='554'>
+          CASE DEFAULT<a name='555'>
+               call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_4"><a name='556'>
+      END SELECT<a name='557'>
+    else<a name='558'>
+      input_file = dummy<a name='559'>
+    endif<a name='560'>
+<a name='561'>
+      i = i+1<a name='562'>
+<a name='563'>
+  enddo<a name='564'>
+<a name='565'>
+  if (input_file == " ") call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_5"><a name='566'>
+<a name='567'>
+<a name='568'>
+  end subroutine read_args<a name='569'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='570'></font>
+<a name='571'>
+<A NAME='HELP_INFO'><A href='../../html_code/main/nup_standalone.F.html#HELP_INFO' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='572'>
+  <font color=#993300>subroutine </font><font color=#cc0000>help_info</font> <A href='../../call_to/HELP_INFO.html' TARGET='index'>10</A><a name='573'>
+<a name='574'>
+  print*," "<a name='575'>
+  print*," nup_standalone   wrf_data_file_name  [-options] "<a name='576'>
+  print*," "<a name='577'>
+  print*," Current options available are:"<a name='578'>
+  print*," -help     : Print this information"                           <a name='579'>
+  print*," -h        : Print this information"                           <a name='580'>
+  print*," "<a name='581'>
+  print*," -thin x   : Thin the input grid, with a ration of x"  <a name='582'>
+  print*,"             Example:"<a name='583'>
+  print*,"                -thin 3 " <a name='584'>
+  print*,"             Will thin the grid with a ratio of 3, i.e.,   "<a name='585'>
+  print*,"             a 12km grid will be upscaled to a 36km grid" <a name='586'>
+  print*,"             The new grid point will be the feedback value from the input domain"<a name='587'>
+  print*," "<a name='588'>
+  print*," -debug    : Print information about dimensions/attributes and variables"<a name='589'>
+  print*," "<a name='590'>
+<a name='591'>
+  STOP<a name='592'>
+<a name='593'>
+  end subroutine help_info<a name='594'>
+<a name='595'>
+<font color=#447700>!-----------------------------------------------------------------------------<a name='596'></font>
+</pre></body></html>

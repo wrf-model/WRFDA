@@ -1,0 +1,222 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+      <p class="headingtext" id="Font20">Introduction</p>
+      <p class="bodytext">The WRF Data Assimilation system (WRFDA) is a community data assimilation system for the Weather Research and Forecasting model. It is a community system in the sense that the model is kept open-source and released in the public domain. WRFDA currently has support for 3DVAR, FGAT, 4DVAR, and EnKF methods of data assimilation, and is undergoing constant improvements and additions. The system is maintained by the WRFDA Group of the Mesoscale and Microscale Meteorology (MMM; pronounced "em cubed") division of the NCAR Earth System Laboratory (NESL). However, we are constantly incorporating improvements proposed and designed by community users as well.</p>
+      <p class="bodytext">In addition to being open-source and public domain, WRFDA is designed and maintained to be as flexible as possible, keeping within the goals of the WRF model to be flexible for a wide range of uses (e.g. research, theory, modeling, and operational) and run on a wide range of platforms (e.g. several supported compilers, on single or multiple processors, on systems ranging from Mac/Linux PCs to the largest supercomputers, including NCAR's own <a href="https://www2.cisl.ucar.edu/resources/yellowstone">Yellowstone</a>).</p><!-- 
+This part should probably be converted into a bulleted list. Damn 3am making me type in run-on sentences
+-->
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="5%" valign="top"><img src="../images/ref.svg" alt="Reference" width="50" height="50"></td>
+          <td width="95%" bgcolor="#AADDAA">
+            <p class="bodytext"><strong>The WRFDA system and its history are summarized in detail in the following journal article:</strong></p>
+            <p class="citetext">  Barker, D., X.-Y. Huang, Z. Liu, T. Aulign&eacute;, X. Zhang, S. Rugg, R. Ajjaji, A. Bourgeois, J. Bray, Y. Chen, M. Demirtas, Y.-R. Guo, T. Henderson, W. Huang, H.-C. Lin, J. Michalakes, S. Rizvi, and X. Zhang, 2012: <a href="http://journals.ametsoc.org/doi/abs/10.1175/BAMS-D-11-00167.1">The Weather Research and Forecasting Model's Community Variational/Ensemble Data Assimilation System: WRFDA</a>. <i>Bull. Amer. Meteor. Soc.</i>, <b>93</b>, 831&ndash;843. </p>
+          </td>
+        </tr>
+      </table>
+      <a name="software"><p class="headingtext" id="Font20">Software requirements</p>
+      <p class="headingtext" id="Font16"><em>Platforms/Operating Systems</em></p>
+      <p class="bodytext">WRFDA can be run on almost any Unix- or Linux-based system. Official support is offered for the following platforms:</p>
+      <ul>
+        <li class="bodybullet">Macintosh, OS X "Snow Leopard" and "Lion"</li>
+        <li class="bodybullet">Linux PC, Red Hat Enterprise Linux</li>
+        <li class="bodybullet">NCAR Yellowstone Supercomputer (also using Red Hat Enterprise Linux)</li>
+      </ul>
+      <p class="bodytext">We will gladly offer help for problems with other Unix- and Linux-based systems (and WRFDA has been shown to work on dozens of different platforms), but cannot guarantee WRFDA's functionality outside of the above-listed platforms. WRFDA will not work on Windows-based systems.</p>
+      <p class="headingtext" id="Font16"><em>Compilers</em></p>
+      <p class="bodytext">WRFDA requires both Fortran and C compilers. Fortran90 or higher support is necessary. The following compiler combinations are fully tested and supported:</p>
+      <ul>
+        <li class="bodybullet">GNU Fortran (gfortran; version 3.4 or later) and C Compilers (gcc)</li>
+        <li class="bodybullet">Portland Group Fortran 90 (pgf90) and C (pgcc) Compilers, as well as pgf90 with gcc</li>
+        <li class="bodybullet">Intel Fortran (ifort) and C Compilers (icc)</li>
+<!--        <li class="bodybullet">PathScale Fortran (pathf90) and C Compilers</li> 
+
+            PATHSCALE still does not work on Yellowstone-->
+        </ul>
+      <p class="bodytext">In addition, there is limited support available for the g95 and XLF compilers, though these are being phased out.</p>
+      <p class="headingtext" id="Font16"><em>Other necessary software</em></p>
+      <ul>
+        <li class="bodybullet">perl 5.04 or later</li>
+        <li class="bodybullet">netCDF libraries</li>
+        <li class="bodybullet">MPI libraries, if parallel runs are desired</li>
+        <li class="bodybullet"><a href="http://www.gzip.org/">GNU zip (gzip)</a>, a free file-compression utility
+        <li class="bodybullet">The following UNIX utilities: csh and Bourne shell, tar, make, M4, sed, awk, and the uname command<br>
+      </ul>
+
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="5%" valign="top"><img src="../images/exclamation.svg" alt="Tip" width="50" height="50"></td>
+          <td width="95%" bgcolor="#DDAA55" class="bodytext"><em>Note: WRFDA does not yet support netCDF4 features such as HDF5, and may fail if netCDF4 libraries are used. To avoid this problem, either install netCDF version 3.6.3 or earlier (not recommended) or configure a more recent version of netCDF with the option "--disable-netcdf-4". See the "<a href="../Help/netcdf.html">netCDF Help Page</a>" for more information.</em>
+          </td>
+        </tr>
+      </table>
+
+      <a name="documentation"><p class="headingtext" id="Font20">Documentation</p>
+      <p class="bodytext"><a href="http://www.mmm.ucar.edu/wrf/users/docs/user_guide_V3/contents.html">Users' Guide</a><br>
+      This Online Tutorial is complementary to the Users' Guide. The latest WRFDA, WRF and WPS codes are described in this document. Chapter 6 covers WRFDA specifically. The Users' Guide is updated for every Bi-Annual WRF Tutorial (typically January and July), in addition to every major release (typically in April), thus it is the most up-to-date guide for running WRFDA. It is highly recommended to download this guide before you start running the model. </p>
+<!--      <p class="bodytext"><a href="http://www.mmm.ucar.edu/wrf/users/docs/arw_v3.pdf">WRF ARW Technical Note</a><br>
+        This document contains:<br>
+        - Descriptions of ARW model equations, discretization, initialization, and nesting<br>
+- General description of physics options available in the model<br>
+- General description of the WRF-Var        </p>-->
+      <p class="bodytext"><a href="../../Tutorials/2012_July/tutorial_presentation_summer_2012.html">Annual Tutorial Presentations</a><br>
+      All the slide shows presented at the last Annual Tutorial Class, held at the NCAR Foothills Laboratory in Boulder, Colorado, USA. </p>
+
+      <br>
+      <p class="bodytext"><strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> Getting started </span>&nbsp;&nbsp;&nbsp;<a href="start.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+        <tr>
+          <td><div align="right"><a href="../Help/index.html"><img src="../images/help.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;<a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+
+      </table>      
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

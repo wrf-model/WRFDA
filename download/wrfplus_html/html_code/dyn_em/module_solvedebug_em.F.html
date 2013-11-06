@@ -1,0 +1,332 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION_LAYER:UTIL<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_SOLVEDEBUG_EM'><A href='../../html_code/dyn_em/module_solvedebug_em.F.html#MODULE_SOLVEDEBUG_EM' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_solvedebug_em</font> <A href='../../call_to/MODULE_SOLVEDEBUG_EM.html' TARGET='index'>5</A><a name='6'>
+CONTAINS<a name='7'>
+<A NAME='VAR_MIN_MAX'><A href='../../html_code/dyn_em/module_solvedebug_em.F.html#VAR_MIN_MAX' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='8'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>var_min_max</font>( u,v,w,t,r,                  &amp;<a name='9'>
+                              ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='10'></font>
+                              ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='11'></font>
+                              ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='12'></font>
+                              its,ite, jts,jte, kts,kte )<a name='13'>
+<a name='14'>
+      IMPLICIT NONE<a name='15'>
+<a name='16'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='17'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='18'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='19'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='20'>
+<a name='21'>
+      REAL,  DIMENSION( kms: , ims: , jms: ), &amp;<a name='22'>
+                   INTENT(IN) :: u,v,w,t,r<a name='23'>
+<a name='24'>
+      INTEGER  :: i, j, k, istag, jstag, imax, imin, jmax, jmin, &amp;<a name='25'>
+                  kmax, kmin<a name='26'>
+<a name='27'>
+      REAL :: vmax, vmin, vavg<a name='28'>
+<a name='29'>
+      vmin = u(1,1,1)<a name='30'>
+      vmax = u(1,1,1)<a name='31'>
+      vavg = 0.<a name='32'>
+      imax = 1<a name='33'>
+      imin = 1<a name='34'>
+      jmax = 1<a name='35'>
+      jmin = 1<a name='36'>
+      kmax = 1<a name='37'>
+      kmin = 1<a name='38'>
+<a name='39'>
+      do j=jps,jpe-1<a name='40'>
+      do i=ips,ipe<a name='41'>
+      do k=kps,kpe-1<a name='42'>
+        if(u(k,i,j) .gt. vmax) then<a name='43'>
+          vmax = u(k,i,j)<a name='44'>
+          imax = i<a name='45'>
+          jmax = j<a name='46'>
+          kmax = k<a name='47'>
+         endif<a name='48'>
+<a name='49'>
+        if(u(k,i,j) .lt. vmin) then<a name='50'>
+          vmin = u(k,i,j)<a name='51'>
+          imin = i<a name='52'>
+          jmin = j<a name='53'>
+          kmin = k<a name='54'>
+         endif<a name='55'>
+        vavg = vavg + abs(u(k,i,j))<a name='56'>
+      enddo<a name='57'>
+      enddo<a name='58'>
+      enddo<a name='59'>
+      vavg = vavg/float((ipe-ips)*(jpe-jps-1)*(kpe-kps-1))<a name='60'>
+      write(6,*) ' ru min,max,avg ',vmin,vmax,vavg<a name='61'>
+      write(6,*) kmax, imax, jmax, kmin, imin, jmin<a name='62'>
+<a name='63'>
+<a name='64'>
+      vmin = v(1,1,1)<a name='65'>
+      vmax = v(1,1,1)<a name='66'>
+      vavg = 0.<a name='67'>
+      imax = 1<a name='68'>
+      imin = 1<a name='69'>
+      jmax = 1<a name='70'>
+      jmin = 1<a name='71'>
+      kmax = 1<a name='72'>
+      kmin = 1<a name='73'>
+<a name='74'>
+      do j=jps,jpe<a name='75'>
+      do i=ips,ipe-1<a name='76'>
+      do k=kps,kpe-1<a name='77'>
+        if(v(k,i,j) .gt. vmax) then<a name='78'>
+          vmax = v(k,i,j)<a name='79'>
+          imax = i<a name='80'>
+          jmax = j<a name='81'>
+          kmax = k<a name='82'>
+        endif<a name='83'>
+        if(v(k,i,j) .lt. vmin) then<a name='84'>
+          vmin = v(k,i,j)<a name='85'>
+          imin = i<a name='86'>
+          jmin = j<a name='87'>
+          kmin = k<a name='88'>
+        endif<a name='89'>
+        vavg = vavg + abs(v(k,i,j))<a name='90'>
+      enddo<a name='91'>
+      enddo<a name='92'>
+      enddo<a name='93'>
+      vavg = vavg/float((ipe-ips-1)*(jpe-jps)*(kpe-kps-1))<a name='94'>
+      write(6,*) ' rv min,max,avg ',vmin,vmax,vavg<a name='95'>
+      write(6,*) kmax, imax, jmax, kmin, imin, jmin<a name='96'>
+<a name='97'>
+<a name='98'>
+<a name='99'>
+      vmin = w(1,1,1)<a name='100'>
+      vmax = w(1,1,1)<a name='101'>
+      vavg = 0.<a name='102'>
+      imax = 1<a name='103'>
+      imin = 1<a name='104'>
+      jmax = 1<a name='105'>
+      jmin = 1<a name='106'>
+      kmax = 1<a name='107'>
+      kmin = 1<a name='108'>
+<a name='109'>
+      do j=jps,jpe-1<a name='110'>
+      do i=ips,ipe-1<a name='111'>
+      do k=kps,kpe<a name='112'>
+        if(w(k,i,j) .gt. vmax) then<a name='113'>
+          vmax = w(k,i,j)<a name='114'>
+          imax = i<a name='115'>
+          jmax = j<a name='116'>
+          kmax = k<a name='117'>
+        endif<a name='118'>
+        if(w(k,i,j) .lt. vmin) then<a name='119'>
+          vmin = w(k,i,j)<a name='120'>
+          imin = i<a name='121'>
+          jmin = j<a name='122'>
+          kmin = k<a name='123'>
+        endif<a name='124'>
+        vavg = vavg + abs(w(k,i,j))<a name='125'>
+      enddo<a name='126'>
+      enddo<a name='127'>
+      enddo<a name='128'>
+      vavg = vavg/float((ipe-ips-1)*(jpe-jps-1)*(kpe-kps))<a name='129'>
+      write(6,*) ' rom min,max,avg ',vmin,vmax,vavg<a name='130'>
+      write(6,*) kmax, imax, jmax, kmin, imin, jmin<a name='131'>
+<a name='132'>
+<a name='133'>
+<a name='134'>
+      vmin = t(1,1,1)<a name='135'>
+      vmax = t(1,1,1)<a name='136'>
+      vavg = 0.<a name='137'>
+      imax = 1<a name='138'>
+      imin = 1<a name='139'>
+      jmax = 1<a name='140'>
+      jmin = 1<a name='141'>
+      kmax = 1<a name='142'>
+      kmin = 1<a name='143'>
+<a name='144'>
+      do j=jps,jpe-1<a name='145'>
+      do i=ips,ipe-1<a name='146'>
+      do k=kps,kpe-1<a name='147'>
+        if(t(k,i,j) .gt. vmax) then<a name='148'>
+          vmax = t(k,i,j)<a name='149'>
+          imax = i<a name='150'>
+          jmax = j<a name='151'>
+          kmax = k<a name='152'>
+        endif<a name='153'>
+        if(t(k,i,j) .lt. vmin) then<a name='154'>
+          vmin = t(k,i,j)<a name='155'>
+          imin = i<a name='156'>
+          jmin = j<a name='157'>
+          kmin = k<a name='158'>
+        endif<a name='159'>
+        vavg = vavg + abs(t(k,i,j))<a name='160'>
+      enddo<a name='161'>
+      enddo<a name='162'>
+      enddo<a name='163'>
+      vavg = vavg/float((ipe-ips-1)*(jpe-jps-1)*(kpe-kps-1))<a name='164'>
+      write(6,*) ' rtp min,max,avg ',vmin,vmax,vavg<a name='165'>
+      write(6,*) kmax, imax, jmax, kmin, imin, jmin<a name='166'>
+<a name='167'>
+<a name='168'>
+<a name='169'>
+      vmin = r(1,1,1)<a name='170'>
+      vmax = r(1,1,1)<a name='171'>
+      vavg = 0.<a name='172'>
+      imax = 1<a name='173'>
+      imin = 1<a name='174'>
+      jmax = 1<a name='175'>
+      jmin = 1<a name='176'>
+      kmax = 1<a name='177'>
+      kmin = 1<a name='178'>
+<a name='179'>
+      do j=jps,jpe-1<a name='180'>
+      do i=ips,ipe-1<a name='181'>
+      do k=kps,kpe-1<a name='182'>
+        if(r(k,i,j) .gt. vmax) then<a name='183'>
+          vmax = r(k,i,j)<a name='184'>
+          imax = i<a name='185'>
+          jmax = j<a name='186'>
+          kmax = k<a name='187'>
+        endif<a name='188'>
+        if(r(k,i,j) .lt. vmin) then<a name='189'>
+          vmin = r(k,i,j)<a name='190'>
+          imin = i<a name='191'>
+          jmin = j<a name='192'>
+          kmin = k<a name='193'>
+        endif<a name='194'>
+        vavg = vavg + abs(r(k,i,j))<a name='195'>
+      enddo<a name='196'>
+      enddo<a name='197'>
+      enddo<a name='198'>
+      vavg = vavg/float((ipe-ips-1)*(jpe-jps-1)*(kpe-kps-1))<a name='199'>
+      write(6,*) ' rhop min,max,avg ',vmin,vmax,vavg<a name='200'>
+      write(6,*) kmax, imax, jmax, kmin, imin, jmin<a name='201'>
+<a name='202'>
+      return<a name='203'>
+      end subroutine var_min_max<a name='204'>
+<a name='205'>
+<A NAME='VAR1_MIN_MAX'><A href='../../html_code/dyn_em/module_solvedebug_em.F.html#VAR1_MIN_MAX' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='206'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>var1_min_max</font>( u, &amp;<a name='207'>
+                              ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='208'></font>
+                              ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='209'></font>
+                              ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='210'></font>
+                              its,ite, jts,jte, kts,kte )<a name='211'>
+<a name='212'>
+      IMPLICIT NONE<a name='213'>
+<a name='214'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='215'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='216'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='217'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='218'>
+<a name='219'>
+      REAL,  DIMENSION(kms: , ims: , jms: ), &amp;<a name='220'>
+                   INTENT(IN) :: u<a name='221'>
+<a name='222'>
+      INTEGER  :: i, j, k, istag, jstag, imax, imin, jmax, jmin, &amp;<a name='223'>
+                  kmax, kmin<a name='224'>
+<a name='225'>
+      REAL :: vmax, vmin, vavg<a name='226'>
+<a name='227'>
+      write(6,*) ' min, max, and avg stats '<a name='228'>
+<a name='229'>
+      vmin = u(1,1,1)<a name='230'>
+      vmax = u(1,1,1)<a name='231'>
+      vavg = 0.<a name='232'>
+      imax = 1<a name='233'>
+      imin = 1<a name='234'>
+      jmax = 1<a name='235'>
+      jmin = 1<a name='236'>
+      kmax = 1<a name='237'>
+      kmin = 1<a name='238'>
+<a name='239'>
+      do j=jps,jpe-1<a name='240'>
+      do i=ips,ipe<a name='241'>
+      do k=kps,kpe-1<a name='242'>
+        if(u(k,i,j) .gt. vmax) then<a name='243'>
+          vmax = u(k,i,j)<a name='244'>
+          imax = i<a name='245'>
+          jmax = j<a name='246'>
+          kmax = k<a name='247'>
+         endif<a name='248'>
+<a name='249'>
+        if(u(k,i,j) .lt. vmin) then<a name='250'>
+          vmin = u(k,i,j)<a name='251'>
+          imin = i<a name='252'>
+          jmin = j<a name='253'>
+          kmin = k<a name='254'>
+         endif<a name='255'>
+        vavg = vavg + abs(u(k,i,j))<a name='256'>
+      enddo<a name='257'>
+      enddo<a name='258'>
+      enddo<a name='259'>
+      vavg = vavg/float((ipe-ips)*(jpe-jps-1)*(kpe-kps-1))<a name='260'>
+      write(6,*) ' ru max,min,avg ',vmax,vmin,vavg<a name='261'>
+      write(6,*) kmax, imax, jmax, kmin, imin, jmin<a name='262'>
+<a name='263'>
+      return<a name='264'>
+      end subroutine var1_min_max<a name='265'>
+<a name='266'>
+<a name='267'>
+<a name='268'>
+<a name='269'>
+<A NAME='VAR_PRINT'><A href='../../html_code/dyn_em/module_solvedebug_em.F.html#VAR_PRINT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='270'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>var_print</font> ( u, &amp;<a name='271'>
+                              ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='272'></font>
+                              ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='273'></font>
+                              level                )  <a name='274'>
+<a name='275'>
+      IMPLICIT NONE<a name='276'>
+<a name='277'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='278'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='279'>
+      INTEGER,      INTENT(IN   )    :: level<a name='280'>
+<a name='281'>
+      REAL,  DIMENSION(kms:kme, ims:ime, jms:jme), &amp;<a name='282'>
+                   INTENT(IN) :: u<a name='283'>
+<a name='284'>
+      INTEGER  :: i, j, k, istag, jstag, it, imax, imin, jmax, jmin, &amp;<a name='285'>
+                  kmax, kmin, ii,jj<a name='286'>
+<a name='287'>
+      REAL :: vmax, vmin, vavg<a name='288'>
+<a name='289'>
+      write(6,*) ' level for print ',level<a name='290'>
+      write(6,*) (u(level, ii, 1),ii=1,ipe)<a name='291'>
+      write(6,*) (u(level, 1, jj),jj=1,jpe)<a name='292'>
+<a name='293'>
+      return<a name='294'>
+      end subroutine var_print<a name='295'>
+<a name='296'>
+<A NAME='SYMM_CHECK'><A href='../../html_code/dyn_em/module_solvedebug_em.F.html#SYMM_CHECK' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='297'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>symm_check</font> ( f, &amp;<a name='298'>
+                              ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='299'></font>
+                              ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='300'></font>
+                              ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='301'></font>
+                              level                )  <a name='302'>
+<a name='303'>
+      IMPLICIT NONE<a name='304'>
+<a name='305'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='306'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='307'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='308'>
+      INTEGER,      INTENT(IN   )    :: level<a name='309'>
+<a name='310'>
+      REAL,  DIMENSION(kms:kme, ims:ime, jms:jme), &amp;<a name='311'>
+                   INTENT(IN) :: f<a name='312'>
+<a name='313'>
+      INTEGER  :: i, j, k, istag, jstag, it, imax, imin, jmax, jmin, &amp;<a name='314'>
+                  kmax, kmin, ii,jj<a name='315'>
+<a name='316'>
+      REAL :: vmax, vmin, vavg<a name='317'>
+<a name='318'>
+      write(6,*) ide,' = ide'<a name='319'>
+<a name='320'>
+      do k=kps,kpe<a name='321'>
+       do i=ips,ipe<a name='322'>
+        do j=jps,jpe<a name='323'>
+          if(f(k,i,j).ne.f(k,ide-i,j))print *,' x asymmetry at kij ',k,i,j<a name='324'>
+          if(f(k,i,j).ne.f(k,i,jde-j))print *,' y asymmetry at kij ',k,i,j<a name='325'>
+        enddo<a name='326'>
+       enddo<a name='327'>
+      enddo<a name='328'>
+      return<a name='329'>
+      end subroutine symm_check<a name='330'>
+END MODULE module_solvedebug_em<a name='331'>
+</pre></body></html>

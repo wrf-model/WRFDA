@@ -1,0 +1,2113 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!<a name='2'></font>
+<A NAME='MODULE_CU_SAS'><A href='../../html_code/phys/module_cu_sas.F.html#MODULE_CU_SAS' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='3'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_cu_sas</font> <A href='../../call_to/MODULE_CU_SAS.html' TARGET='index'>2</A><a name='4'>
+<a name='5'>
+CONTAINS<a name='6'>
+<a name='7'>
+<font color=#447700>!-----------------------------------------------------------------<a name='8'></font>
+<A NAME='CU_SAS'><A href='../../html_code/phys/module_cu_sas.F.html#CU_SAS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='9'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>CU_SAS</font>(                                        &amp; <A href='../../call_to/CU_SAS.html' TARGET='index'>1</A>,<A href='../../call_from/CU_SAS.html' TARGET='index'>3</A><a name='10'>
+                 DT,ITIMESTEP,STEPCU                            &amp;<a name='11'>
+                ,RAINCV,HTOP,HBOT                               &amp;<a name='12'>
+                ,U3D,V3D,W,T3D,QV3D,QC3D,QI3D,PI3D,RHO3D        &amp;<a name='13'>
+                ,DZ8W,PCPS,P8W,XLAND,CU_ACT_FLAG                &amp;<a name='14'>
+                ,ids,ide, jds,jde, kds,kde                      &amp;<a name='15'>
+                ,ims,ime, jms,jme, kms,kme                      &amp;<a name='16'>
+                ,its,ite, jts,jte, kts,kte                      &amp;<a name='17'>
+                ,F_QV    ,F_QC    ,F_QR    ,F_QI    ,F_QS       &amp;<a name='18'>
+                ,RTHCUTEN,RQVCUTEN,RQCCUTEN,RQICUTEN            &amp;<a name='19'>
+                                                                )<a name='20'>
+<a name='21'>
+<font color=#447700>!-------------------------------------------------------------------<a name='22'></font>
+      USE <A href='../../html_code/phys/module_gfs_constants.F.html#MODULE_GFS_CONSTANTS'>MODULE_GFS_CONSTANTS</A><A href='../../html_code/phys/module_cu_sas.F.html#CU_SAS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_GFS_CONSTANTS_6">, ONLY:kind_phys, g=&gt;con_g,rd=&gt;con_rd, gpvs<a name='23'>
+<font color=#447700>!-------------------------------------------------------------------<a name='24'></font>
+      IMPLICIT NONE<a name='25'>
+<font color=#447700>!-------------------------------------------------------------------<a name='26'></font>
+<font color=#447700>!-- U3D         3D u-velocity interpolated to theta points (m/s)<a name='27'></font>
+<font color=#447700>!-- V3D         3D v-velocity interpolated to theta points (m/s)<a name='28'></font>
+<font color=#447700>!-- TH3D	3D potential temperature (K)<a name='29'></font>
+<font color=#447700>!-- T3D         temperature (K)<a name='30'></font>
+<font color=#447700>!-- QV3D        3D water vapor mixing ratio (Kg/Kg)<a name='31'></font>
+<font color=#447700>!-- QC3D        3D cloud mixing ratio (Kg/Kg)<a name='32'></font>
+<font color=#447700>!-- QI3D        3D ice mixing ratio (Kg/Kg)<a name='33'></font>
+<font color=#447700>!-- P8w         3D pressure at full levels (Pa)<a name='34'></font>
+<font color=#447700>!-- Pcps        3D pressure (Pa)<a name='35'></font>
+<font color=#447700>!-- PI3D	3D exner function (dimensionless)<a name='36'></font>
+<font color=#447700>!-- rr3D	3D dry air density (kg/m^3)<a name='37'></font>
+<font color=#447700>!-- RUBLTEN     U tendency due to<a name='38'></font>
+<font color=#447700>!               PBL parameterization (m/s^2)<a name='39'></font>
+<font color=#447700>!-- RVBLTEN     V tendency due to<a name='40'></font>
+<font color=#447700>!               PBL parameterization (m/s^2)<a name='41'></font>
+<font color=#447700>!-- RTHBLTEN    Theta tendency due to<a name='42'></font>
+<font color=#447700>!               PBL parameterization (K/s)<a name='43'></font>
+<font color=#447700>!-- RQVBLTEN    Qv tendency due to<a name='44'></font>
+<font color=#447700>!               PBL parameterization (kg/kg/s)<a name='45'></font>
+<font color=#447700>!-- RQCBLTEN    Qc tendency due to<a name='46'></font>
+<font color=#447700>!               PBL parameterization (kg/kg/s)<a name='47'></font>
+<font color=#447700>!-- RQIBLTEN    Qi tendency due to<a name='48'></font>
+<font color=#447700>!               PBL parameterization (kg/kg/s)<a name='49'></font>
+<font color=#447700>!-- CP          heat capacity at constant pressure for dry air (J/kg/K)<a name='50'></font>
+<font color=#447700>!-- G           acceleration due to gravity (m/s^2)<a name='51'></font>
+<font color=#447700>!-- ROVCP       R/CP<a name='52'></font>
+<font color=#447700>!-- RD          gas constant for dry air (J/kg/K)<a name='53'></font>
+<font color=#447700>!-- ROVG 	R/G<a name='54'></font>
+<font color=#447700>!-- P_QI	species index for cloud ice<a name='55'></font>
+<font color=#447700>!-- dz8w	dz between full levels (m)<a name='56'></font>
+<font color=#447700>!-- z		height above sea level (m)<a name='57'></font>
+<font color=#447700>!-- PSFC        pressure at the surface (Pa)<a name='58'></font>
+<font color=#447700>!-- UST		u* in similarity theory (m/s)<a name='59'></font>
+<font color=#447700>!-- PBL		PBL height (m)<a name='60'></font>
+<font color=#447700>!-- PSIM        similarity stability function for momentum<a name='61'></font>
+<font color=#447700>!-- PSIH        similarity stability function for heat<a name='62'></font>
+<font color=#447700>!-- HFX		upward heat flux at the surface (W/m^2)<a name='63'></font>
+<font color=#447700>!-- QFX		upward moisture flux at the surface (kg/m^2/s)<a name='64'></font>
+<font color=#447700>!-- TSK		surface temperature (K)<a name='65'></font>
+<font color=#447700>!-- GZ1OZ0      log(z/z0) where z0 is roughness length<a name='66'></font>
+<font color=#447700>!-- WSPD        wind speed at lowest model level (m/s)<a name='67'></font>
+<font color=#447700>!-- BR          bulk Richardson number in surface layer<a name='68'></font>
+<font color=#447700>!-- DT		time step (s)<a name='69'></font>
+<font color=#447700>!-- rvovrd      R_v divided by R_d (dimensionless)<a name='70'></font>
+<font color=#447700>!-- EP1         constant for virtual temperature (R_v/R_d - 1) (dimensionless)<a name='71'></font>
+<font color=#447700>!-- KARMAN      Von Karman constant<a name='72'></font>
+<font color=#447700>!-- ids         start index for i in domain<a name='73'></font>
+<font color=#447700>!-- ide         end index for i in domain<a name='74'></font>
+<font color=#447700>!-- jds         start index for j in domain<a name='75'></font>
+<font color=#447700>!-- jde         end index for j in domain<a name='76'></font>
+<font color=#447700>!-- kds         start index for k in domain<a name='77'></font>
+<font color=#447700>!-- kde         end index for k in domain<a name='78'></font>
+<font color=#447700>!-- ims         start index for i in memory<a name='79'></font>
+<font color=#447700>!-- ime         end index for i in memory<a name='80'></font>
+<font color=#447700>!-- jms         start index for j in memory<a name='81'></font>
+<font color=#447700>!-- jme         end index for j in memory<a name='82'></font>
+<font color=#447700>!-- kms         start index for k in memory<a name='83'></font>
+<font color=#447700>!-- kme         end index for k in memory<a name='84'></font>
+<font color=#447700>!-- its         start index for i in tile<a name='85'></font>
+<font color=#447700>!-- ite         end index for i in tile<a name='86'></font>
+<font color=#447700>!-- jts         start index for j in tile<a name='87'></font>
+<font color=#447700>!-- jte         end index for j in tile<a name='88'></font>
+<font color=#447700>!-- kts         start index for k in tile<a name='89'></font>
+<font color=#447700>!-- kte         end index for k in tile<a name='90'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='91'></font>
+<a name='92'>
+      INTEGER ::                        ICLDCK<a name='93'>
+<a name='94'>
+      INTEGER, INTENT(IN) ::            ids,ide, jds,jde, kds,kde,      &amp;<a name='95'>
+                                        ims,ime, jms,jme, kms,kme,      &amp;<a name='96'>
+                                        its,ite, jts,jte, kts,kte,      &amp;<a name='97'>
+                                        ITIMESTEP,                      &amp;<a name='98'>
+                                        STEPCU<a name='99'>
+<a name='100'>
+      REAL,    INTENT(IN) ::                                            &amp;<a name='101'>
+                                        DT<a name='102'>
+<a name='103'>
+<a name='104'>
+      REAL,    DIMENSION(ims:ime, jms:jme), INTENT(IN) ::               &amp;<a name='105'>
+                                        XLAND<a name='106'>
+<a name='107'>
+      REAL,    DIMENSION(ims:ime, jms:jme), INTENT(INOUT) ::            &amp;<a name='108'>
+                                        RAINCV<a name='109'>
+<a name='110'>
+      REAL,    DIMENSION(ims:ime, jms:jme), INTENT(OUT) ::              &amp;<a name='111'>
+                                        HBOT,                           &amp;<a name='112'>
+                                        HTOP<a name='113'>
+<a name='114'>
+      LOGICAL, DIMENSION(IMS:IME,JMS:JME), INTENT(INOUT) ::             &amp;<a name='115'>
+                                        CU_ACT_FLAG<a name='116'>
+<a name='117'>
+<a name='118'>
+      REAL,    DIMENSION(ims:ime, kms:kme, jms:jme), INTENT(IN) ::      &amp;<a name='119'>
+                                        DZ8W,                           &amp;<a name='120'>
+                                        P8w,                            &amp;<a name='121'>
+                                        Pcps,                           &amp;<a name='122'>
+                                        PI3D,                           &amp;<a name='123'>
+                                        QC3D,                           &amp;<a name='124'>
+                                        QI3D,                           &amp;<a name='125'>
+                                        QV3D,                           &amp;<a name='126'>
+                                        RHO3D,                          &amp;<a name='127'>
+                                        T3D,                            &amp;<a name='128'>
+                                        U3D,                            &amp;<a name='129'>
+                                        V3D,                            &amp;<a name='130'>
+                                        W<a name='131'>
+<a name='132'>
+<font color=#447700>!--------------------------- OPTIONAL VARS ----------------------------<a name='133'></font>
+<a name='134'>
+      REAL, DIMENSION(ims:ime, kms:kme, jms:jme),                       &amp;<a name='135'>
+               OPTIONAL, INTENT(INOUT) ::                               &amp;<a name='136'>
+                                        RQCCUTEN,                       &amp;<a name='137'>
+                                        RQICUTEN,                       &amp;<a name='138'>
+                                        RQVCUTEN,                       &amp;<a name='139'>
+                                        RTHCUTEN<a name='140'>
+<a name='141'>
+<font color=#447700>!<a name='142'></font>
+<font color=#447700>! Flags relating to the optional tendency arrays declared above<a name='143'></font>
+<font color=#447700>! Models that carry the optional tendencies will provdide the<a name='144'></font>
+<font color=#447700>! optional arguments at compile time; these flags all the model<a name='145'></font>
+<font color=#447700>! to determine at run-time whether a particular tracer is in<a name='146'></font>
+<font color=#447700>! use or not.<a name='147'></font>
+<font color=#447700>!<a name='148'></font>
+   LOGICAL, OPTIONAL ::                                      &amp;<a name='149'>
+                                                   F_QV      &amp;<a name='150'>
+                                                  ,F_QC      &amp;<a name='151'>
+                                                  ,F_QR      &amp;<a name='152'>
+                                                  ,F_QI      &amp;<a name='153'>
+                                                  ,F_QS<a name='154'>
+<a name='155'>
+<a name='156'>
+<font color=#447700>!--------------------------- LOCAL VARS ------------------------------<a name='157'></font>
+<a name='158'>
+      REAL,    DIMENSION(ims:ime, jms:jme) ::                           &amp;<a name='159'>
+                                        PSFC<a name='160'>
+<a name='161'>
+<a name='162'>
+      REAL     (kind=kind_phys) ::                                      &amp;<a name='163'>
+                                        DELT,                           &amp;<a name='164'>
+                                        RDELT,                          &amp;<a name='165'>
+                                        RSEED<a name='166'>
+<a name='167'>
+      REAL     (kind=kind_phys), DIMENSION(its:ite) ::                  &amp;<a name='168'>
+                                        CLDWRK,                         &amp;<a name='169'>
+                                        PS,                             &amp;<a name='170'>
+                                        RCS,                            &amp;<a name='171'>
+                                        RN,                             &amp;<a name='172'>
+                                        SLIMSK,                         &amp;<a name='173'>
+                                        XKT2<a name='174'>
+<a name='175'>
+      REAL     (kind=kind_phys), DIMENSION(its:ite, kts:kte) ::         &amp;<a name='176'>
+                                        DEL,                            &amp;<a name='177'>
+                                        DOT,                            &amp;<a name='178'>
+                                        PHIL,                           &amp;<a name='179'>
+                                        PRSL,                           &amp;<a name='180'>
+                                        Q1,                             &amp; <a name='181'>
+                                        T1,                             &amp; <a name='182'>
+                                        U1,                             &amp; <a name='183'>
+                                        V1,                             &amp; <a name='184'>
+                                        ZI,                             &amp; <a name='185'>
+                                        ZL <a name='186'>
+<a name='187'>
+      REAL     (kind=kind_phys), DIMENSION(its:ite, kts:kte, 2) ::      &amp;<a name='188'>
+                                        QL <a name='189'>
+<a name='190'>
+      INTEGER, DIMENSION(its:ite) ::                                    &amp;<a name='191'>
+                                        KBOT,                           &amp;<a name='192'>
+                                        KTOP,                           &amp;<a name='193'>
+                                        KUO<a name='194'>
+<a name='195'>
+      INTEGER ::                                                        &amp;<a name='196'>
+                                        I,                              &amp;<a name='197'>
+                                        IGPVS,                          &amp;<a name='198'>
+                                        IM,                             &amp;<a name='199'>
+                                        J,                              &amp;<a name='200'>
+                                        JCAP,                           &amp;<a name='201'>
+                                        K,                              &amp;<a name='202'>
+                                        KM,                             &amp;<a name='203'>
+                                        KP,                             &amp;<a name='204'>
+                                        KX,                             &amp;<a name='205'>
+                                        NCLOUD <a name='206'>
+<a name='207'>
+      DATA IGPVS/0/<a name='208'>
+<a name='209'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='210'></font>
+<font color=#447700>!<a name='211'></font>
+<font color=#447700>!***  CHECK TO SEE IF THIS IS A CONVECTION TIMESTEP<a name='212'></font>
+<font color=#447700>!<a name='213'></font>
+      ICLDCK=MOD(ITIMESTEP,STEPCU)<a name='214'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='215'></font>
+<a name='216'>
+<a name='217'>
+   IF(ICLDCK.EQ.0.OR.ITIMESTEP.EQ.0)THEN<a name='218'>
+<a name='219'>
+      DO J=JTS,JTE<a name='220'>
+         DO I=ITS,ITE<a name='221'>
+            CU_ACT_FLAG(I,J)=.TRUE.<a name='222'>
+         ENDDO<a name='223'>
+      ENDDO<a name='224'>
+ <a name='225'>
+      IM=ITE-ITS+1<a name='226'>
+      KX=KTE-KTS+1<a name='227'>
+      JCAP=126<a name='228'>
+      DELT=DT*STEPCU<a name='229'>
+      RDELT=1./DELT<a name='230'>
+      NCLOUD=1<a name='231'>
+<a name='232'>
+<a name='233'>
+   DO J=jms,jme<a name='234'>
+     DO I=ims,ime<a name='235'>
+       PSFC(i,j)=P8w(i,kms,j)<a name='236'>
+     ENDDO<a name='237'>
+   ENDDO<a name='238'>
+<a name='239'>
+   if(igpvs.eq.0) CALL <A href='../../html_code/phys/module_mp_etanew.F.html#GPVS'>GPVS</A><A href='../../html_code/phys/module_cu_sas.F.html#CU_SAS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GPVS_1"><a name='240'>
+   igpvs=1<a name='241'>
+<a name='242'>
+<font color=#447700>!-------------  J LOOP (OUTER) --------------------------------------------------<a name='243'></font>
+<a name='244'>
+   DO J=jts,jte<a name='245'>
+<a name='246'>
+<font color=#447700>! --------------- compute zi and zl -----------------------------------------<a name='247'></font>
+      DO i=its,ite<a name='248'>
+        ZI(I,KTS)=0.0<a name='249'>
+      ENDDO<a name='250'>
+<a name='251'>
+      DO k=kts+1,kte<a name='252'>
+        KM=K-1<a name='253'>
+        DO i=its,ite<a name='254'>
+          ZI(I,K)=ZI(I,KM)+dz8w(i,km,j)<a name='255'>
+        ENDDO<a name='256'>
+      ENDDO<a name='257'>
+<a name='258'>
+      DO k=kts+1,kte<a name='259'>
+        KM=K-1<a name='260'>
+        DO i=its,ite<a name='261'>
+          ZL(I,KM)=(ZI(I,K)+ZI(I,KM))*0.5<a name='262'>
+        ENDDO<a name='263'>
+      ENDDO<a name='264'>
+<a name='265'>
+      DO i=its,ite<a name='266'>
+        ZL(I,KTE)=2.*ZI(I,KTE)-ZL(I,KTE-1)<a name='267'>
+      ENDDO<a name='268'>
+<a name='269'>
+<font color=#447700>! --------------- end compute zi and zl -------------------------------------<a name='270'></font>
+<a name='271'>
+<a name='272'>
+      call random_number(XKT2)<a name='273'>
+      DO i=its,ite<a name='274'>
+        PS(i)=PSFC(i,j)*.001<a name='275'>
+        RCS(i)=1.<a name='276'>
+        SLIMSK(i)=ABS(XLAND(i,j)-2.)<a name='277'>
+      ENDDO<a name='278'>
+<a name='279'>
+      DO k=kts,kte<a name='280'>
+        kp=k+1<a name='281'>
+        DO i=its,ite<a name='282'>
+          PRSL(I,K)=Pcps(i,k,j)*.001<a name='283'>
+          PHIL(I,K)=ZL(I,K)*G<a name='284'>
+          DOT(i,k)=-5.0E-4*G*rho3d(i,k,j)*(w(i,k,j)+w(i,kp,j))<a name='285'>
+        ENDDO<a name='286'>
+      ENDDO<a name='287'>
+<a name='288'>
+      DO k=kts,kte<a name='289'>
+        DO i=its,ite<a name='290'>
+          DEL(i,k)=PRSL(i,k)*G/RD*dz8w(i,k,j)/T3D(i,k,j)<a name='291'>
+          U1(i,k)=U3D(i,k,j)<a name='292'>
+          V1(i,k)=V3D(i,k,j)<a name='293'>
+          Q1(i,k)=QV3D(i,k,j)<a name='294'>
+          T1(i,k)=T3D(i,k,j)<a name='295'>
+          QL(i,k,1)=QI3D(i,k,j)<a name='296'>
+          QL(i,k,2)=QC3D(i,k,j)<a name='297'>
+        ENDDO<a name='298'>
+      ENDDO<a name='299'>
+<a name='300'>
+<a name='301'>
+      CALL <A href='../../html_code/phys/module_cu_sas.F.html#SASCNV'>SASCNV</A><A href='../../html_code/phys/module_cu_sas.F.html#CU_SAS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SASCNV_1">(IM,IM,KX,JCAP,DELT,DEL,PRSL,PS,PHIL,                  &amp;<a name='302'>
+                  QL,Q1,T1,U1,V1,RCS,CLDWRK,RN,KBOT,                    &amp;<a name='303'>
+                  KTOP,KUO,SLIMSK,DOT,XKT2,NCLOUD)<a name='304'>
+<a name='305'>
+      DO I=ITS,ITE<a name='306'>
+        RAINCV(I,J)=RN(I)*1000./STEPCU<a name='307'>
+        HBOT(I,J)=KBOT(I)<a name='308'>
+        HTOP(I,J)=KTOP(I)<a name='309'>
+      ENDDO<a name='310'>
+<a name='311'>
+      DO K=KTS,KTE<a name='312'>
+        DO I=ITS,ITE<a name='313'>
+          RTHCUTEN(I,K,J)=(T1(I,K)-T3D(I,K,J))/PI3D(I,K,J)*RDELT<a name='314'>
+          RQVCUTEN(I,K,J)=(Q1(I,K)-QV3D(I,K,J))*RDELT<a name='315'>
+        ENDDO<a name='316'>
+      ENDDO<a name='317'>
+<a name='318'>
+      IF(PRESENT(RQCCUTEN))THEN<a name='319'>
+        IF ( F_QC ) THEN<a name='320'>
+          DO K=KTS,KTE<a name='321'>
+            DO I=ITS,ITE<a name='322'>
+              RQCCUTEN(I,K,J)=(QL(I,K,2)-QC3D(I,K,J))*RDELT<a name='323'>
+            ENDDO<a name='324'>
+          ENDDO<a name='325'>
+        ENDIF<a name='326'>
+      ENDIF<a name='327'>
+<a name='328'>
+      IF(PRESENT(RQICUTEN))THEN<a name='329'>
+        IF ( F_QI ) THEN<a name='330'>
+          DO K=KTS,KTE<a name='331'>
+            DO I=ITS,ITE<a name='332'>
+              RQICUTEN(I,K,J)=(QL(I,K,1)-QI3D(I,K,J))*RDELT<a name='333'>
+            ENDDO<a name='334'>
+          ENDDO<a name='335'>
+        ENDIF<a name='336'>
+      ENDIF<a name='337'>
+<a name='338'>
+   ENDDO<a name='339'>
+<a name='340'>
+   ENDIF<a name='341'>
+<a name='342'>
+<a name='343'>
+   END SUBROUTINE CU_SAS<a name='344'>
+<a name='345'>
+<font color=#447700>!====================================================================<a name='346'></font>
+<A NAME='SASINIT'><A href='../../html_code/phys/module_cu_sas.F.html#SASINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='347'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>sasinit</font>(RTHCUTEN,RQVCUTEN,RQCCUTEN,RQICUTEN,              &amp; <A href='../../call_to/SASINIT.html' TARGET='index'>1</A><a name='348'>
+                     RESTART,P_QC,P_QI,P_FIRST_SCALAR,                  &amp;<a name='349'>
+                     allowed_to_read,                                   &amp;<a name='350'>
+                     ids, ide, jds, jde, kds, kde,                      &amp;<a name='351'>
+                     ims, ime, jms, jme, kms, kme,                      &amp;<a name='352'>
+                     its, ite, jts, jte, kts, kte)<a name='353'>
+<font color=#447700>!--------------------------------------------------------------------<a name='354'></font>
+   IMPLICIT NONE<a name='355'>
+<font color=#447700>!--------------------------------------------------------------------<a name='356'></font>
+   LOGICAL , INTENT(IN)           ::  allowed_to_read,restart<a name='357'>
+   INTEGER , INTENT(IN)           ::  ids, ide, jds, jde, kds, kde, &amp;<a name='358'>
+                                      ims, ime, jms, jme, kms, kme, &amp;<a name='359'>
+                                      its, ite, jts, jte, kts, kte<a name='360'>
+   INTEGER , INTENT(IN)           ::  P_FIRST_SCALAR, P_QI, P_QC<a name='361'>
+<a name='362'>
+   REAL,     DIMENSION( ims:ime , kms:kme , jms:jme ) , INTENT(OUT) ::  &amp;<a name='363'>
+                                                              RTHCUTEN, &amp;<a name='364'>
+                                                              RQVCUTEN, &amp;<a name='365'>
+                                                              RQCCUTEN, &amp;<a name='366'>
+                                                              RQICUTEN<a name='367'>
+<a name='368'>
+   INTEGER :: i, j, k, itf, jtf, ktf<a name='369'>
+<a name='370'>
+   jtf=min0(jte,jde-1)<a name='371'>
+   ktf=min0(kte,kde-1)<a name='372'>
+   itf=min0(ite,ide-1)<a name='373'>
+<a name='374'>
+   IF(.not.restart)THEN<a name='375'>
+     DO j=jts,jtf<a name='376'>
+     DO k=kts,ktf<a name='377'>
+     DO i=its,itf<a name='378'>
+       RTHCUTEN(i,k,j)=0.<a name='379'>
+       RQVCUTEN(i,k,j)=0.<a name='380'>
+     ENDDO<a name='381'>
+     ENDDO<a name='382'>
+     ENDDO<a name='383'>
+<a name='384'>
+     IF (P_QC .ge. P_FIRST_SCALAR) THEN<a name='385'>
+        DO j=jts,jtf<a name='386'>
+        DO k=kts,ktf<a name='387'>
+        DO i=its,itf<a name='388'>
+           RQCCUTEN(i,k,j)=0.<a name='389'>
+        ENDDO<a name='390'>
+        ENDDO<a name='391'>
+        ENDDO<a name='392'>
+     ENDIF<a name='393'>
+<a name='394'>
+     IF (P_QI .ge. P_FIRST_SCALAR) THEN<a name='395'>
+        DO j=jts,jtf<a name='396'>
+        DO k=kts,ktf<a name='397'>
+        DO i=its,itf<a name='398'>
+           RQICUTEN(i,k,j)=0.<a name='399'>
+        ENDDO<a name='400'>
+        ENDDO<a name='401'>
+        ENDDO<a name='402'>
+     ENDIF<a name='403'>
+   ENDIF<a name='404'>
+<a name='405'>
+      END SUBROUTINE sasinit<a name='406'>
+<a name='407'>
+<font color=#447700>! ------------------------------------------------------------------------<a name='408'></font>
+<a name='409'>
+<A NAME='SASCNV'><A href='../../html_code/phys/module_cu_sas.F.html#SASCNV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='410'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>SASCNV</font>(IM,IX,KM,JCAP,DELT,DEL,PRSL,PS,PHIL,QL,         &amp; <A href='../../call_to/SASCNV.html' TARGET='index'>1</A>,<A href='../../call_from/SASCNV.html' TARGET='index'>1</A><a name='411'>
+<font color=#447700>!     SUBROUTINE SASCNV(IM,IX,KM,JCAP,DLT,DEL,PRSL,PHIL,QL,             &amp;<a name='412'></font>
+     &amp;       Q1,T1,U1,V1,RCS,CLDWRK,RN,KBOT,KTOP,KUO,SLIMSK,            &amp;<a name='413'>
+     &amp;       DOT,XKT2,ncloud)<a name='414'>
+<font color=#447700>!  for cloud water version<a name='415'></font>
+<font color=#447700>!     parameter(ncloud=0)<a name='416'></font>
+<font color=#447700>!     SUBROUTINE SASCNV(KM,JCAP,DELT,DEL,SL,SLK,PS,QL,<a name='417'></font>
+<font color=#447700>!    &amp;       Q1,T1,U1,V1,RCS,CLDWRK,RN,KBOT,KTOP,KUO,SLIMSK,<a name='418'></font>
+<font color=#447700>!    &amp;       DOT,xkt2,ncloud)<a name='419'></font>
+<font color=#447700>!<a name='420'></font>
+      USE <A href='../../html_code/phys/module_gfs_constants.F.html#MODULE_GFS_CONSTANTS'>MODULE_GFS_CONSTANTS</A><A href='../../html_code/phys/module_cu_sas.F.html#SASCNV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_GFS_CONSTANTS_7">, ONLY: kind_phys,fpvs,                   &amp;<a name='421'>
+     &amp;       grav =&gt; con_g, CP =&gt; con_CP, HVAP =&gt; con_HVAP              &amp;<a name='422'>
+     &amp;,      RV =&gt; con_RV, FV =&gt; con_fvirt, T0C =&gt; con_T0C              &amp;<a name='423'>
+     &amp;,      CVAP =&gt; con_CVAP, CLIQ =&gt; con_CLIQ                         &amp;<a name='424'>
+     &amp;,      EPS =&gt; con_eps, EPSM1 =&gt; con_epsm1<a name='425'>
+      implicit none<a name='426'>
+<font color=#447700>!<a name='427'></font>
+<font color=#447700>!     include 'constant.h'<a name='428'></font>
+<font color=#447700>!<a name='429'></font>
+      integer            IM, IX,  KM, JCAP, ncloud,                     &amp;<a name='430'>
+     &amp;                   KBOT(IM), KTOP(IM), KUO(IM)<a name='431'>
+      real(kind=kind_phys) DELT<a name='432'>
+      real(kind=kind_phys) PS(IM),      DEL(IX,KM),  PRSL(IX,KM),       &amp;<a name='433'>
+<font color=#447700>!     real(kind=kind_phys)              DEL(IX,KM),  PRSL(IX,KM),<a name='434'></font>
+     &amp;                     QL(IX,KM,2), Q1(IX,KM),   T1(IX,KM),         &amp;<a name='435'>
+     &amp;                     U1(IX,KM),   V1(IX,KM),   RCS(IM),           &amp;<a name='436'>
+     &amp;                     CLDWRK(IM),  RN(IM),      SLIMSK(IM),        &amp;<a name='437'>
+     &amp;                     DOT(IX,KM),  XKT2(IM),    PHIL(IX,KM)<a name='438'>
+<font color=#447700>!<a name='439'></font>
+      integer              I, INDX, jmn, k, knumb, latd, lond, km1<a name='440'>
+<font color=#447700>!<a name='441'></font>
+      real(kind=kind_phys) adw,     alpha,   alphal,  alphas,           &amp;<a name='442'>
+     &amp;                     aup,     beta,    betal,   betas,            &amp;<a name='443'>
+     &amp;                     c0,      cpoel,   dellat,  delta,            &amp;<a name='444'>
+     &amp;                     desdt,   deta,    detad,   dg,               &amp;<a name='445'>
+     &amp;                     dh,      dhh,     dlnsig,  dp,               &amp;<a name='446'>
+     &amp;                     dq,      dqsdp,   dqsdt,   dt,               &amp;<a name='447'>
+     &amp;                     dt2,     dtmax,   dtmin,   dv1,              &amp;<a name='448'>
+     &amp;                     dv1q,    dv2,     dv2q,    dv1u,             &amp;<a name='449'>
+     &amp;                     dv1v,    dv2u,    dv2v,    dv3u,             &amp;<a name='450'>
+     &amp;                     dv3v,    dv3,     dv3q,    dvq1,             &amp;<a name='451'>
+     &amp;                     dz,      dz1,     e1,      edtmax,           &amp;<a name='452'>
+     &amp;                     edtmaxl, edtmaxs, el2orc,  elocp,            &amp;<a name='453'>
+     &amp;                     es,      etah,                               &amp;<a name='454'>
+     &amp;                     evef,    evfact,  evfactl, fact1,            &amp;<a name='455'>
+     &amp;                     fact2,   factor,  fjcap,   fkm,              &amp;<a name='456'>
+     &amp;                     fuv,     g,       gamma,   onemf,            &amp;<a name='457'>
+     &amp;                     onemfu,  pdetrn,  pdpdwn,  pprime,           &amp;<a name='458'>
+     &amp;                     qc,      qlk,     qrch,    qs,               &amp;<a name='459'>
+     &amp;                     rain,    rfact,   shear,   tem1,             &amp;<a name='460'>
+     &amp;                     tem2,    terr,    val,     val1,             &amp;<a name='461'>
+     &amp;                     val2,    w1,      w1l,     w1s,              &amp;<a name='462'>
+     &amp;                     w2,      w2l,     w2s,     w3,               &amp;<a name='463'>
+     &amp;                     w3l,     w3s,     w4,      w4l,              &amp; <a name='464'>
+     &amp;                     w4s,     xdby,    xpw,     xpwd,             &amp; <a name='465'>
+     &amp;                     xqc,     xqrch,   xlambu,  mbdt,             &amp;<a name='466'>
+     &amp;                     tem<a name='467'>
+<font color=#447700>!<a name='468'></font>
+<font color=#447700>!<a name='469'></font>
+      integer              JMIN(IM), KB(IM), KBCON(IM), KBDTR(IM),      &amp; <a name='470'>
+     &amp;                     KT2(IM),  KTCON(IM), LMIN(IM),               &amp;<a name='471'>
+     &amp;                     kbm(IM),  kbmax(IM), kmax(IM)<a name='472'>
+<font color=#447700>!<a name='473'></font>
+      real(kind=kind_phys) AA1(IM),     ACRT(IM),   ACRTFCT(IM),        &amp; <a name='474'>
+     &amp;                     DELHBAR(IM), DELQ(IM),   DELQ2(IM),          &amp;<a name='475'>
+     &amp;                     DELQBAR(IM), DELQEV(IM), DELTBAR(IM),        &amp;<a name='476'>
+     &amp;                     DELTV(IM),   DTCONV(IM), EDT(IM),            &amp;<a name='477'>
+     &amp;                     EDTO(IM),    EDTX(IM),   FLD(IM),            &amp;<a name='478'>
+     &amp;                     HCDO(IM),    HKBO(IM),   HMAX(IM),           &amp;<a name='479'>
+     &amp;                     HMIN(IM),    HSBAR(IM),  UCDO(IM),           &amp;<a name='480'>
+     &amp;                     UKBO(IM),    VCDO(IM),   VKBO(IM),           &amp;<a name='481'>
+     &amp;                     PBCDIF(IM),  PDOT(IM),   PO(IM,KM),          &amp;<a name='482'>
+     &amp;                                  PWAVO(IM),  PWEVO(IM),          &amp;<a name='483'>
+<font color=#447700>!    &amp;                     PSFC(IM),    PWAVO(IM),  PWEVO(IM),          &amp;<a name='484'></font>
+     &amp;                     QCDO(IM),    QCOND(IM),  QEVAP(IM),          &amp;<a name='485'>
+     &amp;                     QKBO(IM),    RNTOT(IM),  VSHEAR(IM),         &amp;<a name='486'>
+     &amp;                     XAA0(IM),    XHCD(IM),   XHKB(IM),           &amp; <a name='487'>
+     &amp;                     XK(IM),      XLAMB(IM),  XLAMD(IM),          &amp;<a name='488'>
+     &amp;                     XMB(IM),     XMBMAX(IM), XPWAV(IM),          &amp;<a name='489'>
+     &amp;                     XPWEV(IM),   XQCD(IM),   XQKB(IM)<a name='490'>
+<font color=#447700>!<a name='491'></font>
+<font color=#447700>!  PHYSICAL PARAMETERS<a name='492'></font>
+      PARAMETER(G=grav)<a name='493'>
+      PARAMETER(CPOEL=CP/HVAP,ELOCP=HVAP/CP,                            &amp;<a name='494'>
+     &amp;          EL2ORC=HVAP*HVAP/(RV*CP))<a name='495'>
+      PARAMETER(TERR=0.,C0=.002,DELTA=fv)<a name='496'>
+      PARAMETER(FACT1=(CVAP-CLIQ)/RV,FACT2=HVAP/RV-FACT1*T0C)<a name='497'>
+<font color=#447700>!  LOCAL VARIABLES AND ARRAYS<a name='498'></font>
+      real(kind=kind_phys) PFLD(IM,KM),    TO(IM,KM),     QO(IM,KM),    &amp;<a name='499'>
+     &amp;                     UO(IM,KM),      VO(IM,KM),     QESO(IM,KM)<a name='500'>
+<font color=#447700>!  cloud water<a name='501'></font>
+      real(kind=kind_phys) QLKO_KTCON(IM), DELLAL(IM),    TVO(IM,KM),   &amp;<a name='502'>
+     &amp;                     DBYO(IM,KM),    ZO(IM,KM),     SUMZ(IM,KM),  &amp;<a name='503'>
+     &amp;                     SUMH(IM,KM),    HEO(IM,KM),    HESO(IM,KM),  &amp;<a name='504'>
+     &amp;                     QRCD(IM,KM),    DELLAH(IM,KM), DELLAQ(IM,KM),&amp;<a name='505'>
+     &amp;                     DELLAU(IM,KM),  DELLAV(IM,KM), HCKO(IM,KM),  &amp;<a name='506'>
+     &amp;                     UCKO(IM,KM),    VCKO(IM,KM),   QCKO(IM,KM),  &amp;<a name='507'>
+     &amp;                     ETA(IM,KM),     ETAU(IM,KM),   ETAD(IM,KM),  &amp;<a name='508'>
+     &amp;                     QRCDO(IM,KM),   PWO(IM,KM),    PWDO(IM,KM),  &amp;<a name='509'>
+     &amp;                     RHBAR(IM),      TX1(IM)<a name='510'>
+<font color=#447700>!<a name='511'></font>
+      LOGICAL TOTFLG, CNVFLG(IM), DWNFLG(IM), DWNFLG2(IM), FLG(IM)<a name='512'>
+<font color=#447700>!<a name='513'></font>
+      real(kind=kind_phys) PCRIT(15), ACRITT(15), ACRIT(15)<a name='514'>
+<font color=#447700>!     SAVE PCRIT, ACRITT<a name='515'></font>
+      DATA PCRIT/850.,800.,750.,700.,650.,600.,550.,500.,450.,400.,     &amp;<a name='516'>
+     &amp;           350.,300.,250.,200.,150./<a name='517'>
+      DATA ACRITT/.0633,.0445,.0553,.0664,.075,.1082,.1521,.2216,       &amp;<a name='518'>
+     &amp;           .3151,.3677,.41,.5255,.7663,1.1686,1.6851/<a name='519'>
+<font color=#447700>!  GDAS DERIVED ACRIT<a name='520'></font>
+<font color=#447700>!     DATA ACRITT/.203,.515,.521,.566,.625,.665,.659,.688,              &amp; <a name='521'></font>
+<font color=#447700>!    &amp;            .743,.813,.886,.947,1.138,1.377,1.896/<a name='522'></font>
+<font color=#447700>!<a name='523'></font>
+      real(kind=kind_phys) TF, TCR, TCRF, RZERO, RONE<a name='524'>
+      parameter (TF=233.16, TCR=263.16, TCRF=1.0/(TCR-TF))<a name='525'>
+      parameter (RZERO=0.0,RONE=1.0)<a name='526'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='527'></font>
+<font color=#447700>!<a name='528'></font>
+      km1 = km - 1<a name='529'>
+<font color=#447700>!  INITIALIZE ARRAYS<a name='530'></font>
+<font color=#447700>!<a name='531'></font>
+      DO I=1,IM<a name='532'>
+        RN(I)=0.<a name='533'>
+        KBOT(I)=KM+1<a name='534'>
+        KTOP(I)=0<a name='535'>
+        KUO(I)=0<a name='536'>
+        CNVFLG(I) = .TRUE.<a name='537'>
+        DTCONV(I) = 3600.<a name='538'>
+        CLDWRK(I) = 0.<a name='539'>
+        PDOT(I) = 0.<a name='540'>
+        KT2(I) = 0<a name='541'>
+        QLKO_KTCON(I) = 0.<a name='542'>
+        DELLAL(I) = 0.<a name='543'>
+      ENDDO<a name='544'>
+<font color=#447700>!!<a name='545'></font>
+      DO K = 1, 15<a name='546'>
+        ACRIT(K) = ACRITT(K) * (975. - PCRIT(K))<a name='547'>
+      ENDDO<a name='548'>
+      DT2 = DELT<a name='549'>
+<font color=#447700>!cmr  dtmin = max(dt2,1200.)<a name='550'></font>
+      val   =         1200.<a name='551'>
+      dtmin = max(dt2, val )<a name='552'>
+<font color=#447700>!cmr  dtmax = max(dt2,3600.)<a name='553'></font>
+      val   =         3600.<a name='554'>
+      dtmax = max(dt2, val )<a name='555'>
+<font color=#447700>!  MODEL TUNABLE PARAMETERS ARE ALL HERE<a name='556'></font>
+      MBDT    = 10.<a name='557'>
+      EDTMAXl = .3<a name='558'>
+      EDTMAXs = .3<a name='559'>
+      ALPHAl  = .5<a name='560'>
+      ALPHAs  = .5<a name='561'>
+      BETAl   = .15<a name='562'>
+      betas   = .15<a name='563'>
+      BETAl   = .05<a name='564'>
+      betas   = .05<a name='565'>
+<font color=#447700>!     EVEF    = 0.07<a name='566'></font>
+      evfact  = 0.3<a name='567'>
+      evfactl = 0.3<a name='568'>
+      PDPDWN  = 0.<a name='569'>
+      PDETRN  = 200.<a name='570'>
+      xlambu  = 1.e-4<a name='571'>
+      fjcap   = (float(jcap) / 126.) ** 2<a name='572'>
+<font color=#447700>!cmr  fjcap   = max(fjcap,1.)<a name='573'></font>
+      val     =           1.<a name='574'>
+      fjcap   = max(fjcap,val)<a name='575'>
+      fkm     = (float(km) / 28.) ** 2<a name='576'>
+<font color=#447700>!cmr  fkm     = max(fkm,1.)<a name='577'></font>
+      fkm     = max(fkm,val)<a name='578'>
+      W1l     = -8.E-3 <a name='579'>
+      W2l     = -4.E-2<a name='580'>
+      W3l     = -5.E-3 <a name='581'>
+      W4l     = -5.E-4<a name='582'>
+      W1s     = -2.E-4<a name='583'>
+      W2s     = -2.E-3<a name='584'>
+      W3s     = -1.E-3<a name='585'>
+      W4s     = -2.E-5<a name='586'>
+<font color=#447700>!CCCC IF(IM.EQ.384) THEN<a name='587'></font>
+        LATD  = 92<a name='588'>
+        lond  = 189<a name='589'>
+<font color=#447700>!CCCC ELSEIF(IM.EQ.768) THEN<a name='590'></font>
+<font color=#447700>!CCCC   LATD = 80<a name='591'></font>
+<font color=#447700>!CCCC ELSE<a name='592'></font>
+<font color=#447700>!CCCC   LATD = 0<a name='593'></font>
+<font color=#447700>!CCCC ENDIF<a name='594'></font>
+<font color=#447700>!<a name='595'></font>
+<font color=#447700>!  DEFINE TOP LAYER FOR SEARCH OF THE DOWNDRAFT ORIGINATING LAYER<a name='596'></font>
+<font color=#447700>!  AND THE MAXIMUM THETAE FOR UPDRAFT<a name='597'></font>
+<font color=#447700>!<a name='598'></font>
+      DO I=1,IM<a name='599'>
+        KBMAX(I) = KM<a name='600'>
+        KBM(I)   = KM<a name='601'>
+        KMAX(I)  = KM<a name='602'>
+        TX1(I)   = 1.0 / PS(I)<a name='603'>
+      ENDDO<a name='604'>
+<font color=#447700>!     <a name='605'></font>
+      DO K = 1, KM<a name='606'>
+        DO I=1,IM<a name='607'>
+          IF (prSL(I,K)*tx1(I) .GT. 0.45) KBMAX(I) = K + 1<a name='608'>
+          IF (prSL(I,K)*tx1(I) .GT. 0.70) KBM(I)   = K + 1<a name='609'>
+          IF (prSL(I,K)*tx1(I) .GT. 0.04) KMAX(I)  = K + 1<a name='610'>
+        ENDDO<a name='611'>
+      ENDDO<a name='612'>
+      DO I=1,IM<a name='613'>
+        KBMAX(I) = MIN(KBMAX(I),KMAX(I))<a name='614'>
+        KBM(I)   = MIN(KBM(I),KMAX(I))<a name='615'>
+      ENDDO<a name='616'>
+<font color=#447700>!<a name='617'></font>
+<font color=#447700>!   CONVERT SURFACE PRESSURE TO MB FROM CB<a name='618'></font>
+<font color=#447700>!<a name='619'></font>
+<font color=#447700>!!<a name='620'></font>
+      DO K = 1, KM<a name='621'>
+        DO I=1,IM<a name='622'>
+          if (K .le. kmax(i)) then<a name='623'>
+            PFLD(I,k) = PRSL(I,K) * 10.0<a name='624'>
+            PWO(I,k)  = 0.<a name='625'>
+            PWDO(I,k) = 0.<a name='626'>
+            TO(I,k)   = T1(I,k)<a name='627'>
+            QO(I,k)   = Q1(I,k)<a name='628'>
+            UO(I,k)   = U1(I,k)<a name='629'>
+            VO(I,k)   = V1(I,k)<a name='630'>
+            DBYO(I,k) = 0.<a name='631'>
+            SUMZ(I,k) = 0.<a name='632'>
+            SUMH(I,k) = 0.<a name='633'>
+          endif<a name='634'>
+        ENDDO<a name='635'>
+      ENDDO<a name='636'>
+<a name='637'>
+<font color=#447700>!<a name='638'></font>
+<font color=#447700>!  COLUMN VARIABLES<a name='639'></font>
+<font color=#447700>!  P IS PRESSURE OF THE LAYER (MB)<a name='640'></font>
+<font color=#447700>!  T IS TEMPERATURE AT T-DT (K)..TN<a name='641'></font>
+<font color=#447700>!  Q IS MIXING RATIO AT T-DT (KG/KG)..QN<a name='642'></font>
+<font color=#447700>!  TO IS TEMPERATURE AT T+DT (K)... THIS IS AFTER ADVECTION AND TURBULAN<a name='643'></font>
+<font color=#447700>!  QO IS MIXING RATIO AT T+DT (KG/KG)..Q1<a name='644'></font>
+<font color=#447700>!<a name='645'></font>
+      DO K = 1, KM<a name='646'>
+        DO I=1,IM<a name='647'>
+          if (k .le. kmax(i)) then<a name='648'>
+         <font color=#447700>!jfe        QESO(I,k) = 10. * FPVS(T1(I,k))<a name='649'></font>
+         <font color=#447700>!<a name='650'></font>
+            QESO(I,k) = 0.01 * fpvs(T1(I,K))      <font color=#447700>! fpvs is in Pa<a name='651'></font>
+         <font color=#447700>!<a name='652'></font>
+            QESO(I,k) = EPS * QESO(I,k) / (PFLD(I,k) + EPSM1*QESO(I,k))<a name='653'>
+         <font color=#447700>!cmr        QESO(I,k) = MAX(QESO(I,k),1.E-8)<a name='654'></font>
+            val1      =             1.E-8<a name='655'>
+            QESO(I,k) = MAX(QESO(I,k), val1)<a name='656'>
+         <font color=#447700>!cmr        QO(I,k)   = max(QO(I,k),1.e-10)<a name='657'></font>
+            val2      =           1.e-10<a name='658'>
+            QO(I,k)   = max(QO(I,k), val2 )<a name='659'>
+         <font color=#447700>!           QO(I,k)   = MIN(QO(I,k),QESO(I,k))<a name='660'></font>
+            TVO(I,k)  = TO(I,k) + DELTA * TO(I,k) * QO(I,k)<a name='661'>
+          endif<a name='662'>
+        ENDDO<a name='663'>
+      ENDDO<a name='664'>
+<a name='665'>
+<font color=#447700>!<a name='666'></font>
+<font color=#447700>!  HYDROSTATIC HEIGHT ASSUME ZERO TERR<a name='667'></font>
+<font color=#447700>!<a name='668'></font>
+      DO K = 1, KM<a name='669'>
+        DO I=1,IM<a name='670'>
+          ZO(I,k) = PHIL(I,k) / G<a name='671'>
+        ENDDO<a name='672'>
+      ENDDO<a name='673'>
+<font color=#447700>!  COMPUTE MOIST STATIC ENERGY<a name='674'></font>
+      DO K = 1, KM<a name='675'>
+        DO I=1,IM<a name='676'>
+          if (K .le. kmax(i)) then<a name='677'>
+<font color=#447700>!           tem       = G * ZO(I,k) + CP * TO(I,k)<a name='678'></font>
+            tem       = PHIL(I,k) + CP * TO(I,k)<a name='679'>
+            HEO(I,k)  = tem  + HVAP * QO(I,k)<a name='680'>
+            HESO(I,k) = tem  + HVAP * QESO(I,k)<a name='681'>
+<font color=#447700>!           HEO(I,k)  = MIN(HEO(I,k),HESO(I,k))<a name='682'></font>
+          endif<a name='683'>
+        ENDDO<a name='684'>
+      ENDDO<a name='685'>
+<font color=#447700>!<a name='686'></font>
+<font color=#447700>!  DETERMINE LEVEL WITH LARGEST MOIST STATIC ENERGY<a name='687'></font>
+<font color=#447700>!  THIS IS THE LEVEL WHERE UPDRAFT STARTS<a name='688'></font>
+<font color=#447700>!<a name='689'></font>
+      DO I=1,IM<a name='690'>
+        HMAX(I) = HEO(I,1)<a name='691'>
+        KB(I) = 1<a name='692'>
+      ENDDO<a name='693'>
+<font color=#447700>!!<a name='694'></font>
+      DO K = 2, KM<a name='695'>
+        DO I=1,IM<a name='696'>
+          if (k .le. kbm(i)) then<a name='697'>
+            IF(HEO(I,k).GT.HMAX(I).AND.CNVFLG(I)) THEN<a name='698'>
+              KB(I)   = K<a name='699'>
+              HMAX(I) = HEO(I,k)<a name='700'>
+            ENDIF<a name='701'>
+          endif<a name='702'>
+        ENDDO<a name='703'>
+      ENDDO<a name='704'>
+<font color=#447700>!     DO K = 1, KMAX - 1<a name='705'></font>
+<font color=#447700>!         TOL(k) = .5 * (TO(I,k) + TO(I,k+1))<a name='706'></font>
+<font color=#447700>!         QOL(k) = .5 * (QO(I,k) + QO(I,k+1))<a name='707'></font>
+<font color=#447700>!         QESOL(I,k) = .5 * (QESO(I,k) + QESO(I,k+1))<a name='708'></font>
+<font color=#447700>!         HEOL(I,k) = .5 * (HEO(I,k) + HEO(I,k+1))<a name='709'></font>
+<font color=#447700>!         HESOL(I,k) = .5 * (HESO(I,k) + HESO(I,k+1))<a name='710'></font>
+<font color=#447700>!     ENDDO<a name='711'></font>
+      DO K = 1, KM1<a name='712'>
+        DO I=1,IM<a name='713'>
+          if (k .le. kmax(i)-1) then<a name='714'>
+            DZ      = .5 * (ZO(I,k+1) - ZO(I,k))<a name='715'>
+            DP      = .5 * (PFLD(I,k+1) - PFLD(I,k))<a name='716'>
+<font color=#447700>!jfe        ES      = 10. * FPVS(TO(I,k+1))<a name='717'></font>
+<font color=#447700>!<a name='718'></font>
+            ES      = 0.01 * fpvs(TO(I,K+1))      <font color=#447700>! fpvs is in Pa<a name='719'></font>
+<font color=#447700>!<a name='720'></font>
+            PPRIME  = PFLD(I,k+1) + EPSM1 * ES<a name='721'>
+            QS      = EPS * ES / PPRIME<a name='722'>
+            DQSDP   = - QS / PPRIME<a name='723'>
+            DESDT   = ES * (FACT1 / TO(I,k+1) + FACT2 / (TO(I,k+1)**2))<a name='724'>
+            DQSDT   = QS * PFLD(I,k+1) * DESDT / (ES * PPRIME)<a name='725'>
+            GAMMA   = EL2ORC * QESO(I,k+1) / (TO(I,k+1)**2)<a name='726'>
+            DT      = (G * DZ + HVAP * DQSDP * DP) / (CP * (1. + GAMMA))<a name='727'>
+            DQ      = DQSDT * DT + DQSDP * DP<a name='728'>
+            TO(I,k) = TO(I,k+1) + DT<a name='729'>
+            QO(I,k) = QO(I,k+1) + DQ<a name='730'>
+            PO(I,k) = .5 * (PFLD(I,k) + PFLD(I,k+1))<a name='731'>
+          endif<a name='732'>
+        ENDDO<a name='733'>
+      ENDDO<a name='734'>
+<font color=#447700>!<a name='735'></font>
+      DO K = 1, KM1<a name='736'>
+        DO I=1,IM<a name='737'>
+          if (k .le. kmax(I)-1) then<a name='738'>
+<font color=#447700>!jfe        QESO(I,k) = 10. * FPVS(TO(I,k))<a name='739'></font>
+<font color=#447700>!<a name='740'></font>
+            QESO(I,k) = 0.01 * fpvs(TO(I,K))      <font color=#447700>! fpvs is in Pa<a name='741'></font>
+<font color=#447700>!<a name='742'></font>
+            QESO(I,k) = EPS * QESO(I,k) / (PO(I,k) + EPSM1*QESO(I,k))<a name='743'>
+<font color=#447700>!cmr        QESO(I,k) = MAX(QESO(I,k),1.E-8)<a name='744'></font>
+            val1      =             1.E-8<a name='745'>
+            QESO(I,k) = MAX(QESO(I,k), val1)<a name='746'>
+<font color=#447700>!cmr        QO(I,k)   = max(QO(I,k),1.e-10)<a name='747'></font>
+            val2      =           1.e-10<a name='748'>
+            QO(I,k)   = max(QO(I,k), val2 )<a name='749'>
+<font color=#447700>!           QO(I,k)   = MIN(QO(I,k),QESO(I,k))<a name='750'></font>
+            HEO(I,k)  = .5 * G * (ZO(I,k) + ZO(I,k+1)) +                &amp;<a name='751'>
+     &amp;                  CP * TO(I,k) + HVAP * QO(I,k)<a name='752'>
+            HESO(I,k) = .5 * G * (ZO(I,k) + ZO(I,k+1)) +                &amp; <a name='753'>
+     &amp;                  CP * TO(I,k) + HVAP * QESO(I,k)<a name='754'>
+            UO(I,k)   = .5 * (UO(I,k) + UO(I,k+1))<a name='755'>
+            VO(I,k)   = .5 * (VO(I,k) + VO(I,k+1))<a name='756'>
+          endif<a name='757'>
+        ENDDO<a name='758'>
+      ENDDO<a name='759'>
+<font color=#447700>!     k = kmax<a name='760'></font>
+<font color=#447700>!       HEO(I,k) = HEO(I,k)<a name='761'></font>
+<font color=#447700>!       hesol(k) = HESO(I,k)<a name='762'></font>
+<font color=#447700>!      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN<a name='763'></font>
+<font color=#447700>!        PRINT *, '   HEO ='<a name='764'></font>
+<font color=#447700>!        PRINT 6001, (HEO(I,K),K=1,KMAX)<a name='765'></font>
+<font color=#447700>!        PRINT *, '   HESO ='<a name='766'></font>
+<font color=#447700>!        PRINT 6001, (HESO(I,K),K=1,KMAX)<a name='767'></font>
+<font color=#447700>!        PRINT *, '   TO ='<a name='768'></font>
+<font color=#447700>!        PRINT 6002, (TO(I,K)-273.16,K=1,KMAX)<a name='769'></font>
+<font color=#447700>!        PRINT *, '   QO ='<a name='770'></font>
+<font color=#447700>!        PRINT 6003, (QO(I,K),K=1,KMAX)<a name='771'></font>
+<font color=#447700>!        PRINT *, '   QSO ='<a name='772'></font>
+<font color=#447700>!        PRINT 6003, (QESO(I,K),K=1,KMAX)<a name='773'></font>
+<font color=#447700>!      ENDIF<a name='774'></font>
+<font color=#447700>!<a name='775'></font>
+<font color=#447700>!  LOOK FOR CONVECTIVE CLOUD BASE AS THE LEVEL OF FREE CONVECTION<a name='776'></font>
+<font color=#447700>!<a name='777'></font>
+      DO I=1,IM<a name='778'>
+        IF(CNVFLG(I)) THEN<a name='779'>
+          INDX    = KB(I)<a name='780'>
+          HKBO(I) = HEO(I,INDX)<a name='781'>
+          QKBO(I) = QO(I,INDX)<a name='782'>
+          UKBO(I) = UO(I,INDX)<a name='783'>
+          VKBO(I) = VO(I,INDX)<a name='784'>
+        ENDIF<a name='785'>
+        FLG(I)    = CNVFLG(I)<a name='786'>
+        KBCON(I)  = KMAX(I)<a name='787'>
+      ENDDO<a name='788'>
+<font color=#447700>!!<a name='789'></font>
+      DO K = 1, KM<a name='790'>
+        DO I=1,IM<a name='791'>
+          if (k .le. kbmax(i)) then<a name='792'>
+            IF(FLG(I).AND.K.GT.KB(I)) THEN<a name='793'>
+              HSBAR(I)   = HESO(I,k)<a name='794'>
+              IF(HKBO(I).GT.HSBAR(I)) THEN<a name='795'>
+                FLG(I)   = .FALSE.<a name='796'>
+                KBCON(I) = K<a name='797'>
+              ENDIF<a name='798'>
+            ENDIF<a name='799'>
+          endif<a name='800'>
+        ENDDO<a name='801'>
+      ENDDO<a name='802'>
+      DO I=1,IM<a name='803'>
+        IF(CNVFLG(I)) THEN<a name='804'>
+          PBCDIF(I) = -PFLD(I,KBCON(I)) + PFLD(I,KB(I))<a name='805'>
+          PDOT(I)   = 10.* DOT(I,KBCON(I))<a name='806'>
+          IF(PBCDIF(I).GT.150.)    CNVFLG(I) = .FALSE.<a name='807'>
+          IF(KBCON(I).EQ.KMAX(I))  CNVFLG(I) = .FALSE.<a name='808'>
+        ENDIF<a name='809'>
+      ENDDO<a name='810'>
+<font color=#447700>!!<a name='811'></font>
+      TOTFLG = .TRUE.<a name='812'>
+      DO I=1,IM<a name='813'>
+        TOTFLG = TOTFLG .AND. (.NOT. CNVFLG(I))<a name='814'>
+      ENDDO<a name='815'>
+      IF(TOTFLG) RETURN<a name='816'>
+<font color=#447700>!  FOUND LFC, CAN DEFINE REST OF VARIABLES<a name='817'></font>
+ 6001 FORMAT(2X,-2P10F12.2)<a name='818'>
+ 6002 FORMAT(2X,10F12.2)<a name='819'>
+ 6003 FORMAT(2X,3P10F12.2)<a name='820'>
+<a name='821'>
+<font color=#447700>!<a name='822'></font>
+<font color=#447700>!  DETERMINE ENTRAINMENT RATE BETWEEN KB AND KBCON<a name='823'></font>
+<font color=#447700>!<a name='824'></font>
+      DO I = 1, IM<a name='825'>
+        alpha = alphas<a name='826'>
+        if(SLIMSK(I).eq.1.) alpha = alphal<a name='827'>
+        IF(CNVFLG(I)) THEN<a name='828'>
+          IF(KB(I).EQ.1) THEN<a name='829'>
+            DZ = .5 * (ZO(I,KBCON(I)) + ZO(I,KBCON(I)-1)) - ZO(I,1)<a name='830'>
+          ELSE<a name='831'>
+            DZ = .5 * (ZO(I,KBCON(I)) + ZO(I,KBCON(I)-1))               &amp;<a name='832'>
+     &amp;         - .5 * (ZO(I,KB(I)) + ZO(I,KB(I)-1))<a name='833'>
+          ENDIF<a name='834'>
+          IF(KBCON(I).NE.KB(I)) THEN<a name='835'>
+<font color=#447700>!cmr        XLAMB(I) = -ALOG(ALPHA) / DZ<a name='836'></font>
+            XLAMB(I) = - LOG(ALPHA) / DZ<a name='837'>
+          ELSE<a name='838'>
+            XLAMB(I) = 0.<a name='839'>
+          ENDIF<a name='840'>
+        ENDIF<a name='841'>
+      ENDDO<a name='842'>
+<font color=#447700>!  DETERMINE UPDRAFT MASS FLUX<a name='843'></font>
+      DO K = 1, KM<a name='844'>
+        DO I = 1, IM<a name='845'>
+          if (k .le. kmax(i) .and. CNVFLG(I)) then<a name='846'>
+            ETA(I,k)  = 1.<a name='847'>
+            ETAU(I,k) = 1.<a name='848'>
+          ENDIF<a name='849'>
+        ENDDO<a name='850'>
+      ENDDO<a name='851'>
+      DO K = KM1, 2, -1<a name='852'>
+        DO I = 1, IM<a name='853'>
+          if (k .le. kbmax(i)) then<a name='854'>
+            IF(CNVFLG(I).AND.K.LT.KBCON(I).AND.K.GE.KB(I)) THEN<a name='855'>
+              DZ        = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='856'>
+              ETA(I,k)  = ETA(I,k+1) * EXP(-XLAMB(I) * DZ)<a name='857'>
+              ETAU(I,k) = ETA(I,k)<a name='858'>
+            ENDIF<a name='859'>
+          endif<a name='860'>
+        ENDDO<a name='861'>
+      ENDDO<a name='862'>
+      DO I = 1, IM<a name='863'>
+        IF(CNVFLG(I).AND.KB(I).EQ.1.AND.KBCON(I).GT.1) THEN<a name='864'>
+          DZ = .5 * (ZO(I,2) - ZO(I,1))<a name='865'>
+          ETA(I,1) = ETA(I,2) * EXP(-XLAMB(I) * DZ)<a name='866'>
+          ETAU(I,1) = ETA(I,1)<a name='867'>
+        ENDIF<a name='868'>
+      ENDDO<a name='869'>
+<font color=#447700>!<a name='870'></font>
+<font color=#447700>!  WORK UP UPDRAFT CLOUD PROPERTIES<a name='871'></font>
+<font color=#447700>!<a name='872'></font>
+      DO I = 1, IM<a name='873'>
+        IF(CNVFLG(I)) THEN<a name='874'>
+          INDX         = KB(I)<a name='875'>
+          HCKO(I,INDX) = HKBO(I)<a name='876'>
+          QCKO(I,INDX) = QKBO(I)<a name='877'>
+          UCKO(I,INDX) = UKBO(I)<a name='878'>
+          VCKO(I,INDX) = VKBO(I)<a name='879'>
+          PWAVO(I)     = 0.<a name='880'>
+        ENDIF<a name='881'>
+      ENDDO<a name='882'>
+<font color=#447700>!<a name='883'></font>
+<font color=#447700>!  CLOUD PROPERTY BELOW CLOUD BASE IS MODIFIED BY THE ENTRAINMENT PROCES<a name='884'></font>
+<font color=#447700>!<a name='885'></font>
+      DO K = 2, KM1<a name='886'>
+        DO I = 1, IM<a name='887'>
+          if (k .le. kmax(i)-1) then<a name='888'>
+            IF(CNVFLG(I).AND.K.GT.KB(I).AND.K.LE.KBCON(I)) THEN<a name='889'>
+              FACTOR = ETA(I,k-1) / ETA(I,k)<a name='890'>
+              ONEMF = 1. - FACTOR<a name='891'>
+              HCKO(I,k) = FACTOR * HCKO(I,k-1) + ONEMF *                &amp;<a name='892'>
+     &amp;                    .5 * (HEO(I,k) + HEO(I,k+1))<a name='893'>
+              UCKO(I,k) = FACTOR * UCKO(I,k-1) + ONEMF *                &amp; <a name='894'>
+     &amp;                    .5 * (UO(I,k) + UO(I,k+1))<a name='895'>
+              VCKO(I,k) = FACTOR * VCKO(I,k-1) + ONEMF *                &amp;<a name='896'>
+     &amp;                    .5 * (VO(I,k) + VO(I,k+1))<a name='897'>
+              DBYO(I,k) = HCKO(I,k) - HESO(I,k)<a name='898'>
+            ENDIF<a name='899'>
+            IF(CNVFLG(I).AND.K.GT.KBCON(I)) THEN<a name='900'>
+              HCKO(I,k) = HCKO(I,k-1)<a name='901'>
+              UCKO(I,k) = UCKO(I,k-1)<a name='902'>
+              VCKO(I,k) = VCKO(I,k-1)<a name='903'>
+              DBYO(I,k) = HCKO(I,k) - HESO(I,k)<a name='904'>
+            ENDIF<a name='905'>
+          endif<a name='906'>
+        ENDDO<a name='907'>
+      ENDDO<a name='908'>
+<font color=#447700>!  DETERMINE CLOUD TOP<a name='909'></font>
+      DO I = 1, IM<a name='910'>
+        FLG(I) = CNVFLG(I)<a name='911'>
+        KTCON(I) = 1<a name='912'>
+      ENDDO<a name='913'>
+<font color=#447700>!     DO K = 2, KMAX<a name='914'></font>
+<font color=#447700>!       KK = KMAX - K + 1<a name='915'></font>
+<font color=#447700>!         IF(DBYO(I,kK).GE.0..AND.FLG(I).AND.KK.GT.KBCON(I)) THEN<a name='916'></font>
+<font color=#447700>!           KTCON(I) = KK + 1<a name='917'></font>
+<font color=#447700>!           FLG(I) = .FALSE.<a name='918'></font>
+<font color=#447700>!         ENDIF<a name='919'></font>
+<font color=#447700>!     ENDDO<a name='920'></font>
+      DO K = 2, KM<a name='921'>
+        DO I = 1, IM<a name='922'>
+          if (k .le. kmax(i)) then<a name='923'>
+            IF(DBYO(I,k).LT.0..AND.FLG(I).AND.K.GT.KBCON(I)) THEN<a name='924'>
+              KTCON(I) = K<a name='925'>
+              FLG(I) = .FALSE.<a name='926'>
+            ENDIF<a name='927'>
+          endif<a name='928'>
+        ENDDO<a name='929'>
+      ENDDO<a name='930'>
+      DO I = 1, IM<a name='931'>
+        IF(CNVFLG(I).AND.(PFLD(I,KBCON(I)) - PFLD(I,KTCON(I))).LT.150.) &amp;<a name='932'>
+     &amp;  CNVFLG(I) = .FALSE.<a name='933'>
+      ENDDO<a name='934'>
+      TOTFLG = .TRUE.<a name='935'>
+      DO I = 1, IM<a name='936'>
+        TOTFLG = TOTFLG .AND. (.NOT. CNVFLG(I))<a name='937'>
+      ENDDO<a name='938'>
+      IF(TOTFLG) RETURN<a name='939'>
+<font color=#447700>!<a name='940'></font>
+<font color=#447700>!  SEARCH FOR DOWNDRAFT ORIGINATING LEVEL ABOVE THETA-E MINIMUM<a name='941'></font>
+<font color=#447700>!<a name='942'></font>
+      DO I = 1, IM<a name='943'>
+        HMIN(I) = HEO(I,KBCON(I))<a name='944'>
+        LMIN(I) = KBMAX(I)<a name='945'>
+        JMIN(I) = KBMAX(I)<a name='946'>
+      ENDDO<a name='947'>
+      DO I = 1, IM<a name='948'>
+        DO K = KBCON(I), KBMAX(I)<a name='949'>
+          IF(HEO(I,k).LT.HMIN(I).AND.CNVFLG(I)) THEN<a name='950'>
+            LMIN(I) = K + 1<a name='951'>
+            HMIN(I) = HEO(I,k)<a name='952'>
+          ENDIF<a name='953'>
+        ENDDO<a name='954'>
+      ENDDO<a name='955'>
+<font color=#447700>!<a name='956'></font>
+<font color=#447700>!  Make sure that JMIN(I) is within the cloud<a name='957'></font>
+<font color=#447700>!<a name='958'></font>
+      DO I = 1, IM<a name='959'>
+        IF(CNVFLG(I)) THEN<a name='960'>
+          JMIN(I) = MIN(LMIN(I),KTCON(I)-1)<a name='961'>
+          XMBMAX(I) = .1<a name='962'>
+          JMIN(I) = MAX(JMIN(I),KBCON(I)+1)<a name='963'>
+        ENDIF<a name='964'>
+      ENDDO<a name='965'>
+<font color=#447700>!<a name='966'></font>
+<font color=#447700>!  ENTRAINING CLOUD<a name='967'></font>
+<font color=#447700>!<a name='968'></font>
+      do k = 2, km1<a name='969'>
+        DO I = 1, IM<a name='970'>
+          if (k .le. kmax(i)-1) then<a name='971'>
+            if(CNVFLG(I).and.k.gt.JMIN(I).and.k.le.KTCON(I)) THEN<a name='972'>
+              SUMZ(I,k) = SUMZ(I,k-1) + .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='973'>
+              SUMH(I,k) = SUMH(I,k-1) + .5 * (ZO(I,k+1) - ZO(I,k-1))    &amp;<a name='974'>
+     &amp;                  * HEO(I,k)<a name='975'>
+            ENDIF<a name='976'>
+          endif<a name='977'>
+        enddo<a name='978'>
+      enddo<a name='979'>
+<font color=#447700>!!<a name='980'></font>
+      DO I = 1, IM<a name='981'>
+        IF(CNVFLG(I)) THEN<a name='982'>
+<font color=#447700>!         call random_number(XKT2)<a name='983'></font>
+<font color=#447700>!         call srand(fhour)<a name='984'></font>
+<font color=#447700>!         XKT2(I) = rand()<a name='985'></font>
+          KT2(I) = nint(XKT2(I)*float(KTCON(I)-JMIN(I))-.5)+JMIN(I)+1<a name='986'>
+<font color=#447700>!         KT2(I) = nint(sqrt(XKT2(I))*float(KTCON(I)-JMIN(I))-.5) + JMIN(I) + 1<a name='987'></font>
+<font color=#447700>!         KT2(I) = nint(ranf() *float(KTCON(I)-JMIN(I))-.5) + JMIN(I) + 1<a name='988'></font>
+          tem1 = (HCKO(I,JMIN(I)) - HESO(I,KT2(I)))<a name='989'>
+          tem2 = (SUMZ(I,KT2(I)) * HESO(I,KT2(I)) - SUMH(I,KT2(I)))<a name='990'>
+          if (abs(tem2) .gt. 0.000001) THEN<a name='991'>
+            XLAMB(I) = tem1 / tem2<a name='992'>
+          else<a name='993'>
+            CNVFLG(I) = .false.<a name='994'>
+          ENDIF<a name='995'>
+<font color=#447700>!         XLAMB(I) = (HCKO(I,JMIN(I)) - HESO(I,KT2(I)))<a name='996'></font>
+<font color=#447700>!    &amp;          / (SUMZ(I,KT2(I)) * HESO(I,KT2(I)) - SUMH(I,KT2(I)))<a name='997'></font>
+          XLAMB(I) = max(XLAMB(I),RZERO)<a name='998'>
+          XLAMB(I) = min(XLAMB(I),2.3/SUMZ(I,KT2(I)))<a name='999'>
+        ENDIF<a name='1000'>
+      ENDDO<a name='1001'>
+<font color=#447700>!!<a name='1002'></font>
+      DO I = 1, IM<a name='1003'>
+       DWNFLG(I)  = CNVFLG(I)<a name='1004'>
+       DWNFLG2(I) = CNVFLG(I)<a name='1005'>
+       IF(CNVFLG(I)) THEN<a name='1006'>
+        if(KT2(I).ge.KTCON(I)) DWNFLG(I) = .false.<a name='1007'>
+      if(XLAMB(I).le.1.e-30.or.HCKO(I,JMIN(I))-HESO(I,KT2(I)).le.1.e-30)&amp;<a name='1008'>
+     &amp;  DWNFLG(I) = .false.<a name='1009'>
+        do k = JMIN(I), KT2(I)<a name='1010'>
+          if(DWNFLG(I).and.HEO(I,k).gt.HESO(I,KT2(I))) DWNFLG(I)=.false.<a name='1011'>
+        enddo<a name='1012'>
+<font color=#447700>!       IF(CNVFLG(I).AND.(PFLD(KBCON(I))-PFLD(KTCON(I))).GT.PDETRN)<a name='1013'></font>
+<font color=#447700>!    &amp;     DWNFLG(I)=.FALSE.<a name='1014'></font>
+        IF(CNVFLG(I).AND.(PFLD(I,KBCON(I))-PFLD(I,KTCON(I))).LT.PDPDWN) &amp;<a name='1015'>
+     &amp;     DWNFLG2(I)=.FALSE.<a name='1016'>
+       ENDIF<a name='1017'>
+      ENDDO<a name='1018'>
+<font color=#447700>!!<a name='1019'></font>
+      DO K = 2, KM1<a name='1020'>
+        DO I = 1, IM<a name='1021'>
+          if (k .le. kmax(i)-1) then<a name='1022'>
+            IF(DWNFLG(I).AND.K.GT.JMIN(I).AND.K.LE.KT2(I)) THEN<a name='1023'>
+              DZ        = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='1024'>
+<font color=#447700>!             ETA(I,k)  = ETA(I,k-1) * EXP( XLAMB(I) * DZ)<a name='1025'></font>
+<font color=#447700>!  to simplify matter, we will take the linear approach here<a name='1026'></font>
+<font color=#447700>!<a name='1027'></font>
+              ETA(I,k)  = ETA(I,k-1) * (1. + XLAMB(I) * dz)<a name='1028'>
+              ETAU(I,k) = ETAU(I,k-1) * (1. + (XLAMB(I)+xlambu) * dz)<a name='1029'>
+            ENDIF<a name='1030'>
+          endif<a name='1031'>
+        ENDDO<a name='1032'>
+      ENDDO<a name='1033'>
+<font color=#447700>!!<a name='1034'></font>
+      DO K = 2, KM1<a name='1035'>
+        DO I = 1, IM<a name='1036'>
+          if (k .le. kmax(i)-1) then<a name='1037'>
+<font color=#447700>!           IF(.NOT.DWNFLG(I).AND.K.GT.JMIN(I).AND.K.LE.KT2(I)) THEN<a name='1038'></font>
+            IF(.NOT.DWNFLG(I).AND.K.GT.JMIN(I).AND.K.LE.KTCON(I)) THEN<a name='1039'>
+              DZ        = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='1040'>
+              ETAU(I,k) = ETAU(I,k-1) * (1. + xlambu * dz)<a name='1041'>
+            ENDIF<a name='1042'>
+          endif<a name='1043'>
+        ENDDO<a name='1044'>
+      ENDDO<a name='1045'>
+<font color=#447700>!      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN<a name='1046'></font>
+<font color=#447700>!        PRINT *, ' LMIN(I), KT2(I)=', LMIN(I), KT2(I)<a name='1047'></font>
+<font color=#447700>!        PRINT *, ' KBOT, KTOP, JMIN(I) =', KBCON(I), KTCON(I), JMIN(I)<a name='1048'></font>
+<font color=#447700>!      ENDIF<a name='1049'></font>
+<font color=#447700>!     IF(LAT.EQ.LATD.AND.lon.eq.lond) THEN<a name='1050'></font>
+<font color=#447700>!       print *, ' xlamb =', xlamb<a name='1051'></font>
+<font color=#447700>!       print *, ' eta =', (eta(k),k=1,KT2(I))<a name='1052'></font>
+<font color=#447700>!       print *, ' ETAU =', (ETAU(I,k),k=1,KT2(I))<a name='1053'></font>
+<font color=#447700>!       print *, ' HCKO =', (HCKO(I,k),k=1,KT2(I))<a name='1054'></font>
+<font color=#447700>!       print *, ' SUMZ =', (SUMZ(I,k),k=1,KT2(I))<a name='1055'></font>
+<font color=#447700>!       print *, ' SUMH =', (SUMH(I,k),k=1,KT2(I))<a name='1056'></font>
+<font color=#447700>!     ENDIF<a name='1057'></font>
+      DO I = 1, IM<a name='1058'>
+        if(DWNFLG(I)) THEN<a name='1059'>
+          KTCON(I) = KT2(I)<a name='1060'>
+        ENDIF<a name='1061'>
+      ENDDO<a name='1062'>
+<font color=#447700>!<a name='1063'></font>
+<font color=#447700>!  CLOUD PROPERTY ABOVE CLOUD Base IS MODIFIED BY THE DETRAINMENT PROCESS<a name='1064'></font>
+<font color=#447700>!<a name='1065'></font>
+      DO K = 2, KM1<a name='1066'>
+        DO I = 1, IM<a name='1067'>
+          if (k .le. kmax(i)-1) then<a name='1068'>
+<font color=#447700>!jfe<a name='1069'></font>
+            IF(CNVFLG(I).AND.K.GT.KBCON(I).AND.K.LE.KTCON(I)) THEN<a name='1070'>
+<font color=#447700>!jfe      IF(K.GT.KBCON(I).AND.K.LE.KTCON(I)) THEN<a name='1071'></font>
+              FACTOR    = ETA(I,k-1) / ETA(I,k)<a name='1072'>
+              ONEMF     = 1. - FACTOR<a name='1073'>
+              fuv       = ETAU(I,k-1) / ETAU(I,k)<a name='1074'>
+              onemfu    = 1. - fuv<a name='1075'>
+              HCKO(I,k) = FACTOR * HCKO(I,k-1) + ONEMF *                &amp;<a name='1076'>
+     &amp;                    .5 * (HEO(I,k) + HEO(I,k+1))<a name='1077'>
+              UCKO(I,k) = fuv * UCKO(I,k-1) + ONEMFu *                  &amp;<a name='1078'>
+     &amp;                    .5 * (UO(I,k) + UO(I,k+1))<a name='1079'>
+              VCKO(I,k) = fuv * VCKO(I,k-1) + ONEMFu *                  &amp;<a name='1080'>
+     &amp;                    .5 * (VO(I,k) + VO(I,k+1))<a name='1081'>
+              DBYO(I,k) = HCKO(I,k) - HESO(I,k)<a name='1082'>
+            ENDIF<a name='1083'>
+          endif<a name='1084'>
+        ENDDO<a name='1085'>
+      ENDDO<a name='1086'>
+<font color=#447700>!      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN<a name='1087'></font>
+<font color=#447700>!        PRINT *, ' UCKO=', (UCKO(I,k),k=KBCON(I)+1,KTCON(I))<a name='1088'></font>
+<font color=#447700>!        PRINT *, ' uenv=', (.5*(UO(I,k)+UO(I,k-1)),k=KBCON(I)+1,KTCON(I))<a name='1089'></font>
+<font color=#447700>!      ENDIF<a name='1090'></font>
+      DO I = 1, IM<a name='1091'>
+        if(CNVFLG(I).and.DWNFLG2(I).and.JMIN(I).le.KBCON(I))            &amp;<a name='1092'>
+     &amp;     THEN<a name='1093'>
+          CNVFLG(I) = .false.<a name='1094'>
+          DWNFLG(I) = .false.<a name='1095'>
+          DWNFLG2(I) = .false.<a name='1096'>
+        ENDIF<a name='1097'>
+      ENDDO<a name='1098'>
+<font color=#447700>!!<a name='1099'></font>
+      TOTFLG = .TRUE.<a name='1100'>
+      DO I = 1, IM<a name='1101'>
+        TOTFLG = TOTFLG .AND. (.NOT. CNVFLG(I))<a name='1102'>
+      ENDDO<a name='1103'>
+      IF(TOTFLG) RETURN<a name='1104'>
+<font color=#447700>!!<a name='1105'></font>
+<font color=#447700>!<a name='1106'></font>
+<font color=#447700>!  COMPUTE CLOUD MOISTURE PROPERTY AND PRECIPITATION<a name='1107'></font>
+<font color=#447700>!<a name='1108'></font>
+      DO I = 1, IM<a name='1109'>
+          AA1(I) = 0.<a name='1110'>
+          RHBAR(I) = 0.<a name='1111'>
+      ENDDO<a name='1112'>
+      DO K = 1, KM<a name='1113'>
+        DO I = 1, IM<a name='1114'>
+          if (k .le. kmax(i)) then<a name='1115'>
+            IF(CNVFLG(I).AND.K.GT.KB(I).AND.K.LT.KTCON(I)) THEN<a name='1116'>
+              DZ = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='1117'>
+              DZ1 = (ZO(I,k) - ZO(I,k-1))<a name='1118'>
+              GAMMA = EL2ORC * QESO(I,k) / (TO(I,k)**2)<a name='1119'>
+              QRCH = QESO(I,k)                                          &amp;<a name='1120'>
+     &amp;             + GAMMA * DBYO(I,k) / (HVAP * (1. + GAMMA))<a name='1121'>
+              FACTOR = ETA(I,k-1) / ETA(I,k)<a name='1122'>
+              ONEMF = 1. - FACTOR<a name='1123'>
+              QCKO(I,k) = FACTOR * QCKO(I,k-1) + ONEMF *                &amp;<a name='1124'>
+     &amp;                    .5 * (QO(I,k) + QO(I,k+1))<a name='1125'>
+              DQ = ETA(I,k) * QCKO(I,k) - ETA(I,k) * QRCH<a name='1126'>
+              RHBAR(I) = RHBAR(I) + QO(I,k) / QESO(I,k)<a name='1127'>
+<font color=#447700>!<a name='1128'></font>
+<font color=#447700>!  BELOW LFC CHECK IF THERE IS EXCESS MOISTURE TO RELEASE LATENT HEAT<a name='1129'></font>
+<font color=#447700>!<a name='1130'></font>
+              IF(DQ.GT.0.) THEN<a name='1131'>
+                ETAH = .5 * (ETA(I,k) + ETA(I,k-1))<a name='1132'>
+                QLK = DQ / (ETA(I,k) + ETAH * C0 * DZ)<a name='1133'>
+                AA1(I) = AA1(I) - DZ1 * G * QLK<a name='1134'>
+                QC = QLK + QRCH<a name='1135'>
+                PWO(I,k) = ETAH * C0 * DZ * QLK<a name='1136'>
+                QCKO(I,k) = QC<a name='1137'>
+                PWAVO(I) = PWAVO(I) + PWO(I,k)<a name='1138'>
+              ENDIF<a name='1139'>
+            ENDIF<a name='1140'>
+          endif<a name='1141'>
+        ENDDO<a name='1142'>
+      ENDDO<a name='1143'>
+      DO I = 1, IM<a name='1144'>
+        RHBAR(I) = RHBAR(I) / float(KTCON(I) - KB(I) - 1)<a name='1145'>
+      ENDDO<a name='1146'>
+<font color=#447700>!<a name='1147'></font>
+<font color=#447700>!  this section is ready for cloud water<a name='1148'></font>
+<font color=#447700>!<a name='1149'></font>
+      if(ncloud.gt.0) THEN<a name='1150'>
+<font color=#447700>!<a name='1151'></font>
+<font color=#447700>!  compute liquid and vapor separation at cloud top<a name='1152'></font>
+<font color=#447700>!<a name='1153'></font>
+      DO I = 1, IM<a name='1154'>
+        k = KTCON(I)<a name='1155'>
+        IF(CNVFLG(I)) THEN<a name='1156'>
+          GAMMA = EL2ORC * QESO(I,K) / (TO(I,K)**2)<a name='1157'>
+          QRCH = QESO(I,K)                                              &amp;<a name='1158'>
+     &amp;         + GAMMA * DBYO(I,K) / (HVAP * (1. + GAMMA))<a name='1159'>
+          DQ = QCKO(I,K-1) - QRCH<a name='1160'>
+<font color=#447700>!<a name='1161'></font>
+<font color=#447700>!  CHECK IF THERE IS EXCESS MOISTURE TO RELEASE LATENT HEAT<a name='1162'></font>
+<font color=#447700>!<a name='1163'></font>
+          IF(DQ.GT.0.) THEN<a name='1164'>
+            QLKO_KTCON(I) = dq<a name='1165'>
+            QCKO(I,K-1) = QRCH<a name='1166'>
+          ENDIF<a name='1167'>
+        ENDIF<a name='1168'>
+      ENDDO<a name='1169'>
+      ENDIF<a name='1170'>
+<font color=#447700>!<a name='1171'></font>
+<font color=#447700>!  CALCULATE CLOUD WORK FUNCTION AT T+DT<a name='1172'></font>
+<font color=#447700>!<a name='1173'></font>
+      DO K = 1, KM<a name='1174'>
+        DO I = 1, IM<a name='1175'>
+          if (k .le. kmax(i)) then<a name='1176'>
+            IF(CNVFLG(I).AND.K.GT.KBCON(I).AND.K.LE.KTCON(I)) THEN<a name='1177'>
+              DZ1 = ZO(I,k) - ZO(I,k-1)<a name='1178'>
+              GAMMA = EL2ORC * QESO(I,k-1) / (TO(I,k-1)**2)<a name='1179'>
+              RFACT =  1. + DELTA * CP * GAMMA                          &amp;<a name='1180'>
+     &amp;                 * TO(I,k-1) / HVAP<a name='1181'>
+              AA1(I) = AA1(I) +                                         &amp;<a name='1182'>
+     &amp;                 DZ1 * (G / (CP * TO(I,k-1)))                     &amp;<a name='1183'>
+     &amp;                 * DBYO(I,k-1) / (1. + GAMMA)                     &amp;<a name='1184'>
+     &amp;                 * RFACT<a name='1185'>
+              val = 0.<a name='1186'>
+              AA1(I)=AA1(I)+                                            &amp;<a name='1187'>
+     &amp;                 DZ1 * G * DELTA *                                &amp;<a name='1188'>
+<font color=#447700>!cmr &amp;                 MAX( 0.,(QESO(I,k-1) - QO(I,k-1)))               &amp; <a name='1189'></font>
+     &amp;                 MAX(val,(QESO(I,k-1) - QO(I,k-1)))<a name='1190'>
+            ENDIF<a name='1191'>
+          endif<a name='1192'>
+        ENDDO<a name='1193'>
+      ENDDO<a name='1194'>
+      DO I = 1, IM<a name='1195'>
+        IF(CNVFLG(I).AND.AA1(I).LE.0.) DWNFLG(I)  = .FALSE.<a name='1196'>
+        IF(CNVFLG(I).AND.AA1(I).LE.0.) DWNFLG2(I) = .FALSE.<a name='1197'>
+        IF(CNVFLG(I).AND.AA1(I).LE.0.) CNVFLG(I)  = .FALSE.<a name='1198'>
+      ENDDO<a name='1199'>
+<font color=#447700>!!<a name='1200'></font>
+      TOTFLG = .TRUE.<a name='1201'>
+      DO I = 1, IM<a name='1202'>
+        TOTFLG = TOTFLG .AND. (.NOT. CNVFLG(I))<a name='1203'>
+      ENDDO<a name='1204'>
+      IF(TOTFLG) RETURN<a name='1205'>
+<font color=#447700>!!<a name='1206'></font>
+<font color=#447700>!cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN<a name='1207'></font>
+<font color=#447700>!cccc   PRINT *, ' AA1(I) BEFORE DWNDRFT =', AA1(I)<a name='1208'></font>
+<font color=#447700>!cccc ENDIF<a name='1209'></font>
+<font color=#447700>!<a name='1210'></font>
+<font color=#447700>!------- DOWNDRAFT CALCULATIONS<a name='1211'></font>
+<font color=#447700>!<a name='1212'></font>
+<font color=#447700>!<a name='1213'></font>
+<font color=#447700>!--- DETERMINE DOWNDRAFT STRENGTH IN TERMS OF WINDSHEAR<a name='1214'></font>
+<font color=#447700>!<a name='1215'></font>
+      DO I = 1, IM<a name='1216'>
+        IF(CNVFLG(I)) THEN<a name='1217'>
+          VSHEAR(I) = 0.<a name='1218'>
+        ENDIF<a name='1219'>
+      ENDDO<a name='1220'>
+      DO K = 1, KM<a name='1221'>
+        DO I = 1, IM<a name='1222'>
+          if (k .le. kmax(i)) then<a name='1223'>
+            IF(K.GE.KB(I).AND.K.LE.KTCON(I).AND.CNVFLG(I)) THEN<a name='1224'>
+              shear=rcs(I) * sqrt((UO(I,k+1)-UO(I,k)) ** 2              &amp;<a name='1225'>
+     &amp;                          + (VO(I,k+1)-VO(I,k)) ** 2)<a name='1226'>
+              VSHEAR(I) = VSHEAR(I) + SHEAR<a name='1227'>
+            ENDIF<a name='1228'>
+          endif<a name='1229'>
+        ENDDO<a name='1230'>
+      ENDDO<a name='1231'>
+      DO I = 1, IM<a name='1232'>
+        EDT(I) = 0.<a name='1233'>
+        IF(CNVFLG(I)) THEN<a name='1234'>
+          KNUMB = KTCON(I) - KB(I) + 1<a name='1235'>
+          KNUMB = MAX(KNUMB,1)<a name='1236'>
+          VSHEAR(I) = 1.E3 * VSHEAR(I) / (ZO(I,KTCON(I))-ZO(I,KB(I)))<a name='1237'>
+          E1=1.591-.639*VSHEAR(I)                                       &amp;<a name='1238'>
+     &amp;       +.0953*(VSHEAR(I)**2)-.00496*(VSHEAR(I)**3)<a name='1239'>
+          EDT(I)=1.-E1<a name='1240'>
+<font color=#447700>!cmr      EDT(I) = MIN(EDT(I),.9)<a name='1241'></font>
+          val =         .9<a name='1242'>
+          EDT(I) = MIN(EDT(I),val)<a name='1243'>
+<font color=#447700>!cmr      EDT(I) = MAX(EDT(I),.0)<a name='1244'></font>
+          val =         .0<a name='1245'>
+          EDT(I) = MAX(EDT(I),val)<a name='1246'>
+          EDTO(I)=EDT(I)<a name='1247'>
+          EDTX(I)=EDT(I)<a name='1248'>
+        ENDIF<a name='1249'>
+      ENDDO<a name='1250'>
+<font color=#447700>!  DETERMINE DETRAINMENT RATE BETWEEN 1 AND KBDTR<a name='1251'></font>
+      DO I = 1, IM<a name='1252'>
+        KBDTR(I) = KBCON(I)<a name='1253'>
+        beta = betas<a name='1254'>
+        if(SLIMSK(I).eq.1.) beta = betal<a name='1255'>
+        IF(CNVFLG(I)) THEN<a name='1256'>
+          KBDTR(I) = KBCON(I)<a name='1257'>
+          KBDTR(I) = MAX(KBDTR(I),1)<a name='1258'>
+          XLAMD(I) = 0.<a name='1259'>
+          IF(KBDTR(I).GT.1) THEN<a name='1260'>
+            DZ = .5 * ZO(I,KBDTR(I)) + .5 * ZO(I,KBDTR(I)-1)            &amp;<a name='1261'>
+     &amp;         - ZO(I,1)<a name='1262'>
+            XLAMD(I) =  LOG(BETA) / DZ<a name='1263'>
+          ENDIF<a name='1264'>
+        ENDIF<a name='1265'>
+      ENDDO<a name='1266'>
+<font color=#447700>!  DETERMINE DOWNDRAFT MASS FLUX<a name='1267'></font>
+      DO K = 1, KM<a name='1268'>
+        DO I = 1, IM<a name='1269'>
+          IF(k .le. kmax(i)) then<a name='1270'>
+            IF(CNVFLG(I)) THEN<a name='1271'>
+              ETAD(I,k) = 1.<a name='1272'>
+            ENDIF<a name='1273'>
+            QRCDO(I,k) = 0.<a name='1274'>
+          endif<a name='1275'>
+        ENDDO<a name='1276'>
+      ENDDO<a name='1277'>
+      DO K = KM1, 2, -1<a name='1278'>
+        DO I = 1, IM<a name='1279'>
+          if (k .le. kbmax(i)) then<a name='1280'>
+            IF(CNVFLG(I).AND.K.LT.KBDTR(I)) THEN<a name='1281'>
+              DZ        = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='1282'>
+              ETAD(I,k) = ETAD(I,k+1) * EXP(XLAMD(I) * DZ)<a name='1283'>
+            ENDIF<a name='1284'>
+          endif<a name='1285'>
+        ENDDO<a name='1286'>
+      ENDDO<a name='1287'>
+      K = 1<a name='1288'>
+      DO I = 1, IM<a name='1289'>
+        IF(CNVFLG(I).AND.KBDTR(I).GT.1) THEN<a name='1290'>
+          DZ = .5 * (ZO(I,2) - ZO(I,1))<a name='1291'>
+          ETAD(I,k) = ETAD(I,k+1) * EXP(XLAMD(I) * DZ)<a name='1292'>
+        ENDIF<a name='1293'>
+      ENDDO<a name='1294'>
+<font color=#447700>!<a name='1295'></font>
+<font color=#447700>!--- DOWNDRAFT MOISTURE PROPERTIES<a name='1296'></font>
+<font color=#447700>!<a name='1297'></font>
+      DO I = 1, IM<a name='1298'>
+        PWEVO(I) = 0.<a name='1299'>
+        FLG(I) = CNVFLG(I)<a name='1300'>
+      ENDDO<a name='1301'>
+      DO I = 1, IM<a name='1302'>
+        IF(CNVFLG(I)) THEN<a name='1303'>
+          JMN = JMIN(I)<a name='1304'>
+          HCDO(I) = HEO(I,JMN)<a name='1305'>
+          QCDO(I) = QO(I,JMN)<a name='1306'>
+          QRCDO(I,JMN) = QESO(I,JMN)<a name='1307'>
+          UCDO(I) = UO(I,JMN)<a name='1308'>
+          VCDO(I) = VO(I,JMN)<a name='1309'>
+        ENDIF<a name='1310'>
+      ENDDO<a name='1311'>
+      DO K = KM1, 1, -1<a name='1312'>
+        DO I = 1, IM<a name='1313'>
+          if (k .le. kmax(i)-1) then<a name='1314'>
+            IF(CNVFLG(I).AND.K.LT.JMIN(I)) THEN<a name='1315'>
+              DQ = QESO(I,k)<a name='1316'>
+              DT = TO(I,k)<a name='1317'>
+              GAMMA      = EL2ORC * DQ / DT**2<a name='1318'>
+              DH         = HCDO(I) - HESO(I,k)<a name='1319'>
+              QRCDO(I,k) = DQ+(1./HVAP)*(GAMMA/(1.+GAMMA))*DH<a name='1320'>
+              DETAD      = ETAD(I,k+1) - ETAD(I,k)<a name='1321'>
+              PWDO(I,k)  = ETAD(I,k+1) * QCDO(I) -                      &amp;<a name='1322'>
+     &amp;                     ETAD(I,k) * QRCDO(I,k)<a name='1323'>
+              PWDO(I,k)  = PWDO(I,k) - DETAD *                          &amp;<a name='1324'>
+     &amp;                    .5 * (QRCDO(I,k) + QRCDO(I,k+1))<a name='1325'>
+              QCDO(I)    = QRCDO(I,k)<a name='1326'>
+              PWEVO(I)   = PWEVO(I) + PWDO(I,k)<a name='1327'>
+            ENDIF<a name='1328'>
+          endif<a name='1329'>
+        ENDDO<a name='1330'>
+      ENDDO<a name='1331'>
+<font color=#447700>!     IF(LAT.EQ.LATD.AND.lon.eq.lond.and.DWNFLG(I)) THEN<a name='1332'></font>
+<font color=#447700>!       PRINT *, ' PWAVO(I), PWEVO(I) =', PWAVO(I), PWEVO(I)<a name='1333'></font>
+<font color=#447700>!     ENDIF<a name='1334'></font>
+<font color=#447700>!<a name='1335'></font>
+<font color=#447700>!--- FINAL DOWNDRAFT STRENGTH DEPENDENT ON PRECIP<a name='1336'></font>
+<font color=#447700>!--- EFFICIENCY (EDT), NORMALIZED CONDENSATE (PWAV), AND<a name='1337'></font>
+<font color=#447700>!--- EVAPORATE (PWEV)<a name='1338'></font>
+<font color=#447700>!<a name='1339'></font>
+      DO I = 1, IM<a name='1340'>
+        edtmax = edtmaxl<a name='1341'>
+        if(SLIMSK(I).eq.0.) edtmax = edtmaxs<a name='1342'>
+        IF(DWNFLG2(I)) THEN<a name='1343'>
+          IF(PWEVO(I).LT.0.) THEN<a name='1344'>
+            EDTO(I) = -EDTO(I) * PWAVO(I) / PWEVO(I)<a name='1345'>
+            EDTO(I) = MIN(EDTO(I),EDTMAX)<a name='1346'>
+          ELSE<a name='1347'>
+            EDTO(I) = 0.<a name='1348'>
+          ENDIF<a name='1349'>
+        ELSE<a name='1350'>
+          EDTO(I) = 0.<a name='1351'>
+        ENDIF<a name='1352'>
+      ENDDO<a name='1353'>
+<font color=#447700>!<a name='1354'></font>
+<font color=#447700>!<a name='1355'></font>
+<font color=#447700>!--- DOWNDRAFT CLOUDWORK FUNCTIONS<a name='1356'></font>
+<font color=#447700>!<a name='1357'></font>
+<font color=#447700>!<a name='1358'></font>
+      DO K = KM1, 1, -1<a name='1359'>
+        DO I = 1, IM<a name='1360'>
+          if (k .le. kmax(i)-1) then<a name='1361'>
+            IF(DWNFLG2(I).AND.K.LT.JMIN(I)) THEN<a name='1362'>
+              GAMMA = EL2ORC * QESO(I,k+1) / TO(I,k+1)**2<a name='1363'>
+              DHH=HCDO(I)<a name='1364'>
+              DT=TO(I,k+1)<a name='1365'>
+              DG=GAMMA<a name='1366'>
+              DH=HESO(I,k+1)<a name='1367'>
+              DZ=-1.*(ZO(I,k+1)-ZO(I,k))<a name='1368'>
+              AA1(I)=AA1(I)+EDTO(I)*DZ*(G/(CP*DT))*((DHH-DH)/(1.+DG))   &amp;<a name='1369'>
+     &amp;               *(1.+DELTA*CP*DG*DT/HVAP)<a name='1370'>
+              val=0.<a name='1371'>
+              AA1(I)=AA1(I)+EDTO(I)*                                    &amp; <a name='1372'>
+<font color=#447700>!cmr &amp;        DZ*G*DELTA*MAX( 0.,(QESO(I,k+1)-QO(I,k+1)))               &amp;<a name='1373'></font>
+     &amp;        DZ*G*DELTA*MAX(val,(QESO(I,k+1)-QO(I,k+1)))<a name='1374'>
+            ENDIF<a name='1375'>
+          endif<a name='1376'>
+        ENDDO<a name='1377'>
+      ENDDO<a name='1378'>
+<font color=#447700>!cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.DWNFLG2(I)) THEN<a name='1379'></font>
+<font color=#447700>!cccc   PRINT *, '  AA1(I) AFTER DWNDRFT =', AA1(I)<a name='1380'></font>
+<font color=#447700>!cccc ENDIF<a name='1381'></font>
+      DO I = 1, IM<a name='1382'>
+        IF(AA1(I).LE.0.) CNVFLG(I)  = .FALSE.<a name='1383'>
+        IF(AA1(I).LE.0.) DWNFLG(I)  = .FALSE.<a name='1384'>
+        IF(AA1(I).LE.0.) DWNFLG2(I) = .FALSE.<a name='1385'>
+      ENDDO<a name='1386'>
+<font color=#447700>!!<a name='1387'></font>
+      TOTFLG = .TRUE.<a name='1388'>
+      DO I = 1, IM<a name='1389'>
+        TOTFLG = TOTFLG .AND. (.NOT. CNVFLG(I))<a name='1390'>
+      ENDDO<a name='1391'>
+      IF(TOTFLG) RETURN<a name='1392'>
+<font color=#447700>!!<a name='1393'></font>
+<font color=#447700>!<a name='1394'></font>
+<font color=#447700>!<a name='1395'></font>
+<font color=#447700>!--- WHAT WOULD THE CHANGE BE, THAT A CLOUD WITH UNIT MASS<a name='1396'></font>
+<font color=#447700>!--- WILL DO TO THE ENVIRONMENT?<a name='1397'></font>
+<font color=#447700>!<a name='1398'></font>
+      DO K = 1, KM<a name='1399'>
+        DO I = 1, IM<a name='1400'>
+          IF(k .le. kmax(i) .and. CNVFLG(I)) THEN<a name='1401'>
+            DELLAH(I,k) = 0.<a name='1402'>
+            DELLAQ(I,k) = 0.<a name='1403'>
+            DELLAU(I,k) = 0.<a name='1404'>
+            DELLAV(I,k) = 0.<a name='1405'>
+          ENDIF<a name='1406'>
+        ENDDO<a name='1407'>
+      ENDDO<a name='1408'>
+      DO I = 1, IM<a name='1409'>
+        IF(CNVFLG(I)) THEN<a name='1410'>
+          DP = 1000. * DEL(I,1)<a name='1411'>
+          DELLAH(I,1) = EDTO(I) * ETAD(I,1) * (HCDO(I)                  &amp;<a name='1412'>
+     &amp;                - HEO(I,1)) * G / DP<a name='1413'>
+          DELLAQ(I,1) = EDTO(I) * ETAD(I,1) * (QCDO(I)                  &amp;<a name='1414'>
+     &amp;                - QO(I,1)) * G / DP<a name='1415'>
+          DELLAU(I,1) = EDTO(I) * ETAD(I,1) * (UCDO(I)                  &amp;<a name='1416'>
+     &amp;                - UO(I,1)) * G / DP<a name='1417'>
+          DELLAV(I,1) = EDTO(I) * ETAD(I,1) * (VCDO(I)                  &amp;<a name='1418'>
+     &amp;                - VO(I,1)) * G / DP<a name='1419'>
+        ENDIF<a name='1420'>
+      ENDDO<a name='1421'>
+<font color=#447700>!<a name='1422'></font>
+<font color=#447700>!--- CHANGED DUE TO SUBSIDENCE AND ENTRAINMENT<a name='1423'></font>
+<font color=#447700>!<a name='1424'></font>
+      DO K = 2, KM1<a name='1425'>
+        DO I = 1, IM<a name='1426'>
+          if (k .le. kmax(i)-1) then<a name='1427'>
+            IF(CNVFLG(I).AND.K.LT.KTCON(I)) THEN<a name='1428'>
+              AUP = 1.<a name='1429'>
+              IF(K.LE.KB(I)) AUP = 0.<a name='1430'>
+              ADW = 1.<a name='1431'>
+              IF(K.GT.JMIN(I)) ADW = 0.<a name='1432'>
+              DV1= HEO(I,k)<a name='1433'>
+              DV2 = .5 * (HEO(I,k) + HEO(I,k+1))<a name='1434'>
+              DV3= HEO(I,k-1)<a name='1435'>
+              DV1Q= QO(I,k)<a name='1436'>
+              DV2Q = .5 * (QO(I,k) + QO(I,k+1))<a name='1437'>
+              DV3Q= QO(I,k-1)<a name='1438'>
+              DV1U= UO(I,k)<a name='1439'>
+              DV2U = .5 * (UO(I,k) + UO(I,k+1))<a name='1440'>
+              DV3U= UO(I,k-1)<a name='1441'>
+              DV1V= VO(I,k)<a name='1442'>
+              DV2V = .5 * (VO(I,k) + VO(I,k+1))<a name='1443'>
+              DV3V= VO(I,k-1)<a name='1444'>
+              DP = 1000. * DEL(I,K)<a name='1445'>
+              DZ = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='1446'>
+              DETA = ETA(I,k) - ETA(I,k-1)<a name='1447'>
+              DETAD = ETAD(I,k) - ETAD(I,k-1)<a name='1448'>
+              DELLAH(I,k) = DELLAH(I,k) +                               &amp;<a name='1449'>
+     &amp;            ((AUP * ETA(I,k) - ADW * EDTO(I) * ETAD(I,k)) * DV1   &amp;<a name='1450'>
+     &amp;        - (AUP * ETA(I,k-1) - ADW * EDTO(I) * ETAD(I,k-1))* DV3   &amp;<a name='1451'>
+     &amp;                    - AUP * DETA * DV2                            &amp;<a name='1452'>
+     &amp;                    + ADW * EDTO(I) * DETAD * HCDO(I)) * G / DP<a name='1453'>
+              DELLAQ(I,k) = DELLAQ(I,k) +                               &amp;<a name='1454'>
+     &amp;            ((AUP * ETA(I,k) - ADW * EDTO(I) * ETAD(I,k)) * DV1Q  &amp;<a name='1455'>
+     &amp;        - (AUP * ETA(I,k-1) - ADW * EDTO(I) * ETAD(I,k-1))* DV3Q  &amp;<a name='1456'>
+     &amp;                    - AUP * DETA * DV2Q                           &amp;<a name='1457'>
+     &amp;       +ADW*EDTO(I)*DETAD*.5*(QRCDO(I,k)+QRCDO(I,k-1))) * G / DP<a name='1458'>
+              DELLAU(I,k) = DELLAU(I,k) +                               &amp;<a name='1459'>
+     &amp;            ((AUP * ETA(I,k) - ADW * EDTO(I) * ETAD(I,k)) * DV1U  &amp;<a name='1460'>
+     &amp;        - (AUP * ETA(I,k-1) - ADW * EDTO(I) * ETAD(I,k-1))* DV3U  &amp;<a name='1461'>
+     &amp;                     - AUP * DETA * DV2U                          &amp;<a name='1462'>
+     &amp;                    + ADW * EDTO(I) * DETAD * UCDO(I)             &amp; <a name='1463'>
+     &amp;                    ) * G / DP<a name='1464'>
+              DELLAV(I,k) = DELLAV(I,k) +                               &amp;<a name='1465'>
+     &amp;            ((AUP * ETA(I,k) - ADW * EDTO(I) * ETAD(I,k)) * DV1V  &amp;<a name='1466'>
+     &amp;        - (AUP * ETA(I,k-1) - ADW * EDTO(I) * ETAD(I,k-1))* DV3V  &amp;<a name='1467'>
+     &amp;                     - AUP * DETA * DV2V                          &amp;<a name='1468'>
+     &amp;                    + ADW * EDTO(I) * DETAD * VCDO(I)             &amp;<a name='1469'>
+     &amp;                    ) * G / DP<a name='1470'>
+            ENDIF<a name='1471'>
+          endif<a name='1472'>
+        ENDDO<a name='1473'>
+      ENDDO<a name='1474'>
+<font color=#447700>!<a name='1475'></font>
+<font color=#447700>!------- CLOUD TOP<a name='1476'></font>
+<font color=#447700>!<a name='1477'></font>
+      DO I = 1, IM<a name='1478'>
+        IF(CNVFLG(I)) THEN<a name='1479'>
+          INDX = KTCON(I)<a name='1480'>
+          DP = 1000. * DEL(I,INDX)<a name='1481'>
+          DV1 = HEO(I,INDX-1)<a name='1482'>
+          DELLAH(I,INDX) = ETA(I,INDX-1) *                              &amp;<a name='1483'>
+     &amp;                     (HCKO(I,INDX-1) - DV1) * G / DP<a name='1484'>
+          DVQ1 = QO(I,INDX-1) <a name='1485'>
+          DELLAQ(I,INDX) = ETA(I,INDX-1) *                              &amp;<a name='1486'>
+     &amp;                     (QCKO(I,INDX-1) - DVQ1) * G / DP<a name='1487'>
+          DV1U = UO(I,INDX-1)<a name='1488'>
+          DELLAU(I,INDX) = ETA(I,INDX-1) *                              &amp;<a name='1489'>
+     &amp;                     (UCKO(I,INDX-1) - DV1U) * G / DP<a name='1490'>
+          DV1V = VO(I,INDX-1)<a name='1491'>
+          DELLAV(I,INDX) = ETA(I,INDX-1) *                              &amp;<a name='1492'>
+     &amp;                     (VCKO(I,INDX-1) - DV1V) * G / DP<a name='1493'>
+<font color=#447700>!<a name='1494'></font>
+<font color=#447700>!  cloud water<a name='1495'></font>
+<font color=#447700>!<a name='1496'></font>
+          DELLAL(I) = ETA(I,INDX-1) * QLKO_KTCON(I) * g / dp<a name='1497'>
+        ENDIF<a name='1498'>
+      ENDDO<a name='1499'>
+<font color=#447700>!<a name='1500'></font>
+<font color=#447700>!------- FINAL CHANGED VARIABLE PER UNIT MASS FLUX<a name='1501'></font>
+<font color=#447700>!<a name='1502'></font>
+      DO K = 1, KM<a name='1503'>
+        DO I = 1, IM<a name='1504'>
+          if (k .le. kmax(i)) then<a name='1505'>
+            IF(CNVFLG(I).and.k.gt.KTCON(I)) THEN<a name='1506'>
+              QO(I,k) = Q1(I,k)<a name='1507'>
+              TO(I,k) = T1(I,k)<a name='1508'>
+              UO(I,k) = U1(I,k)<a name='1509'>
+              VO(I,k) = V1(I,k)<a name='1510'>
+            ENDIF<a name='1511'>
+            IF(CNVFLG(I).AND.K.LE.KTCON(I)) THEN<a name='1512'>
+              QO(I,k) = DELLAQ(I,k) * MBDT + Q1(I,k)<a name='1513'>
+              DELLAT = (DELLAH(I,k) - HVAP * DELLAQ(I,k)) / CP<a name='1514'>
+              TO(I,k) = DELLAT * MBDT + T1(I,k)<a name='1515'>
+<font color=#447700>!cmr          QO(I,k) = max(QO(I,k),1.e-10)<a name='1516'></font>
+              val   =           1.e-10<a name='1517'>
+              QO(I,k) = max(QO(I,k), val  )<a name='1518'>
+            ENDIF<a name='1519'>
+          endif<a name='1520'>
+        ENDDO<a name='1521'>
+      ENDDO<a name='1522'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='1523'></font>
+<font color=#447700>!<a name='1524'></font>
+<font color=#447700>!--- THE ABOVE CHANGED ENVIRONMENT IS NOW USED TO CALULATE THE<a name='1525'></font>
+<font color=#447700>!--- EFFECT THE ARBITRARY CLOUD (WITH UNIT MASS FLUX)<a name='1526'></font>
+<font color=#447700>!--- WOULD HAVE ON THE STABILITY,<a name='1527'></font>
+<font color=#447700>!--- WHICH THEN IS USED TO CALCULATE THE REAL MASS FLUX,<a name='1528'></font>
+<font color=#447700>!--- NECESSARY TO KEEP THIS CHANGE IN BALANCE WITH THE LARGE-SCALE<a name='1529'></font>
+<font color=#447700>!--- DESTABILIZATION.<a name='1530'></font>
+<font color=#447700>!<a name='1531'></font>
+<font color=#447700>!--- ENVIRONMENTAL CONDITIONS AGAIN, FIRST HEIGHTS<a name='1532'></font>
+<font color=#447700>!<a name='1533'></font>
+      DO K = 1, KM<a name='1534'>
+        DO I = 1, IM<a name='1535'>
+          IF(k .le. kmax(i) .and. CNVFLG(I)) THEN<a name='1536'>
+<font color=#447700>!jfe        QESO(I,k) = 10. * FPVS(TO(I,k))<a name='1537'></font>
+<font color=#447700>!<a name='1538'></font>
+            QESO(I,k) = 0.01 * fpvs(TO(I,K))      <font color=#447700>! fpvs is in Pa<a name='1539'></font>
+<font color=#447700>!<a name='1540'></font>
+            QESO(I,k) = EPS * QESO(I,k) / (PFLD(I,k)+EPSM1*QESO(I,k))<a name='1541'>
+<font color=#447700>!cmr        QESO(I,k) = MAX(QESO(I,k),1.E-8)<a name='1542'></font>
+            val       =             1.E-8<a name='1543'>
+            QESO(I,k) = MAX(QESO(I,k), val )<a name='1544'>
+            TVO(I,k)  = TO(I,k) + DELTA * TO(I,k) * QO(I,k)<a name='1545'>
+          ENDIF<a name='1546'>
+        ENDDO<a name='1547'>
+      ENDDO<a name='1548'>
+      DO I = 1, IM<a name='1549'>
+        IF(CNVFLG(I)) THEN<a name='1550'>
+          XAA0(I) = 0.<a name='1551'>
+          XPWAV(I) = 0.<a name='1552'>
+        ENDIF<a name='1553'>
+      ENDDO<a name='1554'>
+<font color=#447700>!<a name='1555'></font>
+<font color=#447700>!  HYDROSTATIC HEIGHT ASSUME ZERO TERR<a name='1556'></font>
+<font color=#447700>!<a name='1557'></font>
+<font color=#447700>!     DO I = 1, IM<a name='1558'></font>
+<font color=#447700>!       IF(CNVFLG(I)) THEN<a name='1559'></font>
+<font color=#447700>!         DLNSIG =  LOG(PRSL(I,1)/PS(I))<a name='1560'></font>
+<font color=#447700>!         ZO(I,1) = TERR - DLNSIG * RD / G * TVO(I,1)<a name='1561'></font>
+<font color=#447700>!       ENDIF<a name='1562'></font>
+<font color=#447700>!     ENDDO<a name='1563'></font>
+<font color=#447700>!     DO K = 2, KM<a name='1564'></font>
+<font color=#447700>!       DO I = 1, IM<a name='1565'></font>
+<font color=#447700>!         IF(k .le. kmax(i) .and. CNVFLG(I)) THEN<a name='1566'></font>
+<font color=#447700>!           DLNSIG =  LOG(PRSL(I,K) / PRSL(I,K-1))<a name='1567'></font>
+<font color=#447700>!           ZO(I,k) = ZO(I,k-1) - DLNSIG * RD / G<a name='1568'></font>
+<font color=#447700>!    &amp;             * .5 * (TVO(I,k) + TVO(I,k-1))<a name='1569'></font>
+<font color=#447700>!         ENDIF<a name='1570'></font>
+<font color=#447700>!       ENDDO<a name='1571'></font>
+<font color=#447700>!     ENDDO<a name='1572'></font>
+<font color=#447700>!<a name='1573'></font>
+<font color=#447700>!--- MOIST STATIC ENERGY<a name='1574'></font>
+<font color=#447700>!<a name='1575'></font>
+      DO K = 1, KM1<a name='1576'>
+        DO I = 1, IM<a name='1577'>
+          IF(k .le. kmax(i)-1 .and. CNVFLG(I)) THEN<a name='1578'>
+            DZ = .5 * (ZO(I,k+1) - ZO(I,k))<a name='1579'>
+            DP = .5 * (PFLD(I,k+1) - PFLD(I,k))<a name='1580'>
+<font color=#447700>!jfe        ES = 10. * FPVS(TO(I,k+1))<a name='1581'></font>
+<font color=#447700>!<a name='1582'></font>
+            ES = 0.01 * fpvs(TO(I,K+1))      <font color=#447700>! fpvs is in Pa<a name='1583'></font>
+<font color=#447700>!<a name='1584'></font>
+            PPRIME = PFLD(I,k+1) + EPSM1 * ES<a name='1585'>
+            QS = EPS * ES / PPRIME<a name='1586'>
+            DQSDP = - QS / PPRIME<a name='1587'>
+            DESDT = ES * (FACT1 / TO(I,k+1) + FACT2 / (TO(I,k+1)**2))<a name='1588'>
+            DQSDT = QS * PFLD(I,k+1) * DESDT / (ES * PPRIME)<a name='1589'>
+            GAMMA = EL2ORC * QESO(I,k+1) / (TO(I,k+1)**2)<a name='1590'>
+            DT = (G * DZ + HVAP * DQSDP * DP) / (CP * (1. + GAMMA))<a name='1591'>
+            DQ = DQSDT * DT + DQSDP * DP<a name='1592'>
+            TO(I,k) = TO(I,k+1) + DT<a name='1593'>
+            QO(I,k) = QO(I,k+1) + DQ<a name='1594'>
+            PO(I,k) = .5 * (PFLD(I,k) + PFLD(I,k+1))<a name='1595'>
+          ENDIF<a name='1596'>
+        ENDDO<a name='1597'>
+      ENDDO<a name='1598'>
+      DO K = 1, KM1<a name='1599'>
+        DO I = 1, IM<a name='1600'>
+          IF(k .le. kmax(i)-1 .and. CNVFLG(I)) THEN<a name='1601'>
+<font color=#447700>!jfe        QESO(I,k) = 10. * FPVS(TO(I,k))<a name='1602'></font>
+<font color=#447700>!<a name='1603'></font>
+            QESO(I,k) = 0.01 * fpvs(TO(I,K))      <font color=#447700>! fpvs is in Pa<a name='1604'></font>
+<font color=#447700>!<a name='1605'></font>
+            QESO(I,k) = EPS * QESO(I,k) / (PO(I,k) + EPSM1 * QESO(I,k))<a name='1606'>
+<font color=#447700>!cmr        QESO(I,k) = MAX(QESO(I,k),1.E-8)<a name='1607'></font>
+            val1      =             1.E-8<a name='1608'>
+            QESO(I,k) = MAX(QESO(I,k), val1)<a name='1609'>
+<font color=#447700>!cmr        QO(I,k)   = max(QO(I,k),1.e-10)<a name='1610'></font>
+            val2      =           1.e-10<a name='1611'>
+            QO(I,k)   = max(QO(I,k), val2 )<a name='1612'>
+<font color=#447700>!           QO(I,k)   = MIN(QO(I,k),QESO(I,k))<a name='1613'></font>
+            HEO(I,k)   = .5 * G * (ZO(I,k) + ZO(I,k+1)) +               &amp;<a name='1614'>
+     &amp;                    CP * TO(I,k) + HVAP * QO(I,k)<a name='1615'>
+            HESO(I,k) = .5 * G * (ZO(I,k) + ZO(I,k+1)) +                &amp;<a name='1616'>
+     &amp;                  CP * TO(I,k) + HVAP * QESO(I,k)<a name='1617'>
+          ENDIF<a name='1618'>
+        ENDDO<a name='1619'>
+      ENDDO<a name='1620'>
+      DO I = 1, IM<a name='1621'>
+        k = kmax(i)<a name='1622'>
+        IF(CNVFLG(I)) THEN<a name='1623'>
+          HEO(I,k) = G * ZO(I,k) + CP * TO(I,k) + HVAP * QO(I,k)<a name='1624'>
+          HESO(I,k) = G * ZO(I,k) + CP * TO(I,k) + HVAP * QESO(I,k)<a name='1625'>
+<font color=#447700>!         HEO(I,k) = MIN(HEO(I,k),HESO(I,k))<a name='1626'></font>
+        ENDIF<a name='1627'>
+      ENDDO<a name='1628'>
+      DO I = 1, IM<a name='1629'>
+        IF(CNVFLG(I)) THEN<a name='1630'>
+          INDX = KB(I)<a name='1631'>
+          XHKB(I) = HEO(I,INDX)<a name='1632'>
+          XQKB(I) = QO(I,INDX)<a name='1633'>
+          HCKO(I,INDX) = XHKB(I)<a name='1634'>
+          QCKO(I,INDX) = XQKB(I)<a name='1635'>
+        ENDIF<a name='1636'>
+      ENDDO<a name='1637'>
+<font color=#447700>!<a name='1638'></font>
+<font color=#447700>!<a name='1639'></font>
+<font color=#447700>!**************************** STATIC CONTROL<a name='1640'></font>
+<font color=#447700>!<a name='1641'></font>
+<font color=#447700>!<a name='1642'></font>
+<font color=#447700>!------- MOISTURE AND CLOUD WORK FUNCTIONS<a name='1643'></font>
+<font color=#447700>!<a name='1644'></font>
+      DO K = 2, KM1<a name='1645'>
+        DO I = 1, IM<a name='1646'>
+          if (k .le. kmax(i)-1) then<a name='1647'>
+<font color=#447700>!           IF(CNVFLG(I).AND.K.GT.KB(I).AND.K.LE.KBCON(I)) THEN<a name='1648'></font>
+            IF(CNVFLG(I).AND.K.GT.KB(I).AND.K.LE.KTCON(I)) THEN<a name='1649'>
+              FACTOR = ETA(I,k-1) / ETA(I,k)<a name='1650'>
+              ONEMF = 1. - FACTOR<a name='1651'>
+              HCKO(I,k) = FACTOR * HCKO(I,k-1) + ONEMF *                &amp;<a name='1652'>
+     &amp;                    .5 * (HEO(I,k) + HEO(I,k+1))<a name='1653'>
+            ENDIF<a name='1654'>
+<font color=#447700>!           IF(CNVFLG(I).AND.K.GT.KBCON(I)) THEN<a name='1655'></font>
+<font color=#447700>!             HEO(I,k) = HEO(I,k-1)<a name='1656'></font>
+<font color=#447700>!           ENDIF<a name='1657'></font>
+          endif<a name='1658'>
+        ENDDO<a name='1659'>
+      ENDDO<a name='1660'>
+      DO K = 2, KM1<a name='1661'>
+        DO I = 1, IM<a name='1662'>
+          if (k .le. kmax(i)-1) then<a name='1663'>
+            IF(CNVFLG(I).AND.K.GT.KB(I).AND.K.LT.KTCON(I)) THEN<a name='1664'>
+              DZ = .5 * (ZO(I,k+1) - ZO(I,k-1))<a name='1665'>
+              GAMMA = EL2ORC * QESO(I,k) / (TO(I,k)**2)<a name='1666'>
+              XDBY = HCKO(I,k) - HESO(I,k)<a name='1667'>
+<font color=#447700>!cmr          XDBY = MAX(XDBY,0.)<a name='1668'></font>
+              val  =          0.<a name='1669'>
+              XDBY = MAX(XDBY,val)<a name='1670'>
+              XQRCH = QESO(I,k)                                         &amp;<a name='1671'>
+     &amp;              + GAMMA * XDBY / (HVAP * (1. + GAMMA))<a name='1672'>
+              FACTOR = ETA(I,k-1) / ETA(I,k)<a name='1673'>
+              ONEMF = 1. - FACTOR<a name='1674'>
+              QCKO(I,k) = FACTOR * QCKO(I,k-1) + ONEMF *                &amp;<a name='1675'>
+     &amp;                    .5 * (QO(I,k) + QO(I,k+1))<a name='1676'>
+              DQ = ETA(I,k) * QCKO(I,k) - ETA(I,k) * XQRCH<a name='1677'>
+              IF(DQ.GT.0.) THEN<a name='1678'>
+                ETAH = .5 * (ETA(I,k) + ETA(I,k-1))<a name='1679'>
+                QLK = DQ / (ETA(I,k) + ETAH * C0 * DZ)<a name='1680'>
+                XAA0(I) = XAA0(I) - (ZO(I,k) - ZO(I,k-1)) * G * QLK<a name='1681'>
+                XQC = QLK + XQRCH<a name='1682'>
+                XPW = ETAH * C0 * DZ * QLK<a name='1683'>
+                QCKO(I,k) = XQC<a name='1684'>
+                XPWAV(I) = XPWAV(I) + XPW<a name='1685'>
+              ENDIF<a name='1686'>
+            ENDIF<a name='1687'>
+<font color=#447700>!           IF(CNVFLG(I).AND.K.GT.KBCON(I).AND.K.LT.KTCON(I)) THEN<a name='1688'></font>
+            IF(CNVFLG(I).AND.K.GT.KBCON(I).AND.K.LE.KTCON(I)) THEN<a name='1689'>
+              DZ1 = ZO(I,k) - ZO(I,k-1)<a name='1690'>
+              GAMMA = EL2ORC * QESO(I,k-1) / (TO(I,k-1)**2)<a name='1691'>
+              RFACT =  1. + DELTA * CP * GAMMA                          &amp;<a name='1692'>
+     &amp;                 * TO(I,k-1) / HVAP<a name='1693'>
+              XDBY = HCKO(I,k-1) - HESO(I,k-1)<a name='1694'>
+              XAA0(I) = XAA0(I)                                         &amp; <a name='1695'>
+     &amp;                + DZ1 * (G / (CP * TO(I,k-1)))                    &amp;<a name='1696'>
+     &amp;                * XDBY / (1. + GAMMA)                             &amp;<a name='1697'>
+     &amp;                * RFACT<a name='1698'>
+              val=0.<a name='1699'>
+              XAA0(I)=XAA0(I)+                                          &amp;<a name='1700'>
+     &amp;                 DZ1 * G * DELTA *                                &amp;<a name='1701'>
+<font color=#447700>!cmr &amp;                 MAX( 0.,(QESO(I,k-1) - QO(I,k-1)))               &amp; <a name='1702'></font>
+     &amp;                 MAX(val,(QESO(I,k-1) - QO(I,k-1)))<a name='1703'>
+            ENDIF<a name='1704'>
+          endif<a name='1705'>
+        ENDDO<a name='1706'>
+      ENDDO<a name='1707'>
+<font color=#447700>!cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN<a name='1708'></font>
+<font color=#447700>!cccc   PRINT *, ' XAA BEFORE DWNDRFT =', XAA0(I)<a name='1709'></font>
+<font color=#447700>!cccc ENDIF<a name='1710'></font>
+<font color=#447700>!<a name='1711'></font>
+<font color=#447700>!------- DOWNDRAFT CALCULATIONS<a name='1712'></font>
+<font color=#447700>!<a name='1713'></font>
+<font color=#447700>!<a name='1714'></font>
+<font color=#447700>!--- DOWNDRAFT MOISTURE PROPERTIES<a name='1715'></font>
+<font color=#447700>!<a name='1716'></font>
+      DO I = 1, IM<a name='1717'>
+        XPWEV(I) = 0.<a name='1718'>
+      ENDDO<a name='1719'>
+      DO I = 1, IM<a name='1720'>
+        IF(DWNFLG2(I)) THEN<a name='1721'>
+          JMN = JMIN(I)<a name='1722'>
+          XHCD(I) = HEO(I,JMN)<a name='1723'>
+          XQCD(I) = QO(I,JMN)<a name='1724'>
+          QRCD(I,JMN) = QESO(I,JMN)<a name='1725'>
+        ENDIF<a name='1726'>
+      ENDDO<a name='1727'>
+      DO K = KM1, 1, -1<a name='1728'>
+        DO I = 1, IM<a name='1729'>
+          if (k .le. kmax(i)-1) then<a name='1730'>
+            IF(DWNFLG2(I).AND.K.LT.JMIN(I)) THEN<a name='1731'>
+              DQ = QESO(I,k)<a name='1732'>
+              DT = TO(I,k)<a name='1733'>
+              GAMMA    = EL2ORC * DQ / DT**2<a name='1734'>
+              DH       = XHCD(I) - HESO(I,k)<a name='1735'>
+              QRCD(I,k)=DQ+(1./HVAP)*(GAMMA/(1.+GAMMA))*DH<a name='1736'>
+              DETAD    = ETAD(I,k+1) - ETAD(I,k)<a name='1737'>
+              XPWD     = ETAD(I,k+1) * QRCD(I,k+1) -                    &amp;<a name='1738'>
+     &amp;                   ETAD(I,k) * QRCD(I,k)<a name='1739'>
+              XPWD     = XPWD - DETAD *                                 &amp; <a name='1740'>
+     &amp;                 .5 * (QRCD(I,k) + QRCD(I,k+1))<a name='1741'>
+              XPWEV(I) = XPWEV(I) + XPWD<a name='1742'>
+            ENDIF<a name='1743'>
+          endif<a name='1744'>
+        ENDDO<a name='1745'>
+      ENDDO<a name='1746'>
+<font color=#447700>!<a name='1747'></font>
+      DO I = 1, IM<a name='1748'>
+        edtmax = edtmaxl<a name='1749'>
+        if(SLIMSK(I).eq.0.) edtmax = edtmaxs<a name='1750'>
+        IF(DWNFLG2(I)) THEN<a name='1751'>
+          IF(XPWEV(I).GE.0.) THEN<a name='1752'>
+            EDTX(I) = 0.<a name='1753'>
+          ELSE<a name='1754'>
+            EDTX(I) = -EDTX(I) * XPWAV(I) / XPWEV(I)<a name='1755'>
+            EDTX(I) = MIN(EDTX(I),EDTMAX)<a name='1756'>
+          ENDIF<a name='1757'>
+        ELSE<a name='1758'>
+          EDTX(I) = 0.<a name='1759'>
+        ENDIF<a name='1760'>
+      ENDDO<a name='1761'>
+<font color=#447700>!<a name='1762'></font>
+<font color=#447700>!<a name='1763'></font>
+<font color=#447700>!<a name='1764'></font>
+<font color=#447700>!--- DOWNDRAFT CLOUDWORK FUNCTIONS<a name='1765'></font>
+<font color=#447700>!<a name='1766'></font>
+<font color=#447700>!<a name='1767'></font>
+      DO K = KM1, 1, -1<a name='1768'>
+        DO I = 1, IM<a name='1769'>
+          if (k .le. kmax(i)-1) then<a name='1770'>
+            IF(DWNFLG2(I).AND.K.LT.JMIN(I)) THEN<a name='1771'>
+              GAMMA = EL2ORC * QESO(I,k+1) / TO(I,k+1)**2<a name='1772'>
+              DHH=XHCD(I)<a name='1773'>
+              DT= TO(I,k+1)<a name='1774'>
+              DG= GAMMA<a name='1775'>
+              DH= HESO(I,k+1)<a name='1776'>
+              DZ=-1.*(ZO(I,k+1)-ZO(I,k))<a name='1777'>
+              XAA0(I)=XAA0(I)+EDTX(I)*DZ*(G/(CP*DT))*((DHH-DH)/(1.+DG)) &amp;<a name='1778'>
+     &amp;                *(1.+DELTA*CP*DG*DT/HVAP)<a name='1779'>
+              val=0.<a name='1780'>
+              XAA0(I)=XAA0(I)+EDTX(I)*                                  &amp;<a name='1781'>
+<font color=#447700>!cmr &amp;        DZ*G*DELTA*MAX( 0.,(QESO(I,k+1)-QO(I,k+1)))               &amp;<a name='1782'></font>
+     &amp;        DZ*G*DELTA*MAX(val,(QESO(I,k+1)-QO(I,k+1)))<a name='1783'>
+            ENDIF<a name='1784'>
+          endif<a name='1785'>
+        ENDDO<a name='1786'>
+      ENDDO<a name='1787'>
+<font color=#447700>!cccc IF(LAT.EQ.LATD.AND.lon.eq.lond.and.DWNFLG2(I)) THEN<a name='1788'></font>
+<font color=#447700>!cccc   PRINT *, '  XAA AFTER DWNDRFT =', XAA0(I)<a name='1789'></font>
+<font color=#447700>!cccc ENDIF<a name='1790'></font>
+<font color=#447700>!<a name='1791'></font>
+<font color=#447700>!  CALCULATE CRITICAL CLOUD WORK FUNCTION<a name='1792'></font>
+<font color=#447700>!<a name='1793'></font>
+      DO I = 1, IM<a name='1794'>
+        ACRT(I) = 0.<a name='1795'>
+        IF(CNVFLG(I)) THEN<a name='1796'>
+<font color=#447700>!       IF(CNVFLG(I).AND.SLIMSK(I).NE.1.) THEN<a name='1797'></font>
+          IF(PFLD(I,KTCON(I)).LT.PCRIT(15))THEN<a name='1798'>
+            ACRT(I)=ACRIT(15)*(975.-PFLD(I,KTCON(I)))                   &amp;    <a name='1799'>
+     &amp;              /(975.-PCRIT(15))<a name='1800'>
+          ELSE IF(PFLD(I,KTCON(I)).GT.PCRIT(1))THEN<a name='1801'>
+            ACRT(I)=ACRIT(1)<a name='1802'>
+          ELSE<a name='1803'>
+<font color=#447700>!cmr        K = IFIX((850. - PFLD(I,KTCON(I)))/50.) + 2<a name='1804'></font>
+            K =  int((850. - PFLD(I,KTCON(I)))/50.) + 2<a name='1805'>
+            K = MIN(K,15)<a name='1806'>
+            K = MAX(K,2)<a name='1807'>
+            ACRT(I)=ACRIT(K)+(ACRIT(K-1)-ACRIT(K))*                     &amp;<a name='1808'>
+     &amp;           (PFLD(I,KTCON(I))-PCRIT(K))/(PCRIT(K-1)-PCRIT(K))<a name='1809'>
+           ENDIF<a name='1810'>
+<font color=#447700>!        ELSE<a name='1811'></font>
+<font color=#447700>!          ACRT(I) = .5 * (PFLD(I,KBCON(I)) - PFLD(I,KTCON(I)))<a name='1812'></font>
+         ENDIF<a name='1813'>
+      ENDDO<a name='1814'>
+      DO I = 1, IM<a name='1815'>
+        ACRTFCT(I) = 1.<a name='1816'>
+        IF(CNVFLG(I)) THEN<a name='1817'>
+          if(SLIMSK(I).eq.1.) THEN<a name='1818'>
+            w1 = w1l<a name='1819'>
+            w2 = w2l<a name='1820'>
+            w3 = w3l<a name='1821'>
+            w4 = w4l<a name='1822'>
+          else<a name='1823'>
+            w1 = w1s<a name='1824'>
+            w2 = w2s<a name='1825'>
+            w3 = w3s<a name='1826'>
+            w4 = w4s<a name='1827'>
+          ENDIF<a name='1828'>
+<font color=#447700>!C       IF(CNVFLG(I).AND.SLIMSK(I).EQ.1.) THEN<a name='1829'></font>
+<font color=#447700>!         ACRTFCT(I) = PDOT(I) / W3<a name='1830'></font>
+<font color=#447700>!<a name='1831'></font>
+<font color=#447700>!  modify critical cloud workfunction by cloud base vertical velocity<a name='1832'></font>
+<font color=#447700>!<a name='1833'></font>
+          IF(PDOT(I).LE.W4) THEN<a name='1834'>
+            ACRTFCT(I) = (PDOT(I) - W4) / (W3 - W4)<a name='1835'>
+          ELSEIF(PDOT(I).GE.-W4) THEN<a name='1836'>
+            ACRTFCT(I) = - (PDOT(I) + W4) / (W4 - W3)<a name='1837'>
+          ELSE<a name='1838'>
+            ACRTFCT(I) = 0.<a name='1839'>
+          ENDIF<a name='1840'>
+<font color=#447700>!cmr      ACRTFCT(I) = MAX(ACRTFCT(I),-1.)<a name='1841'></font>
+          val1    =             -1.<a name='1842'>
+          ACRTFCT(I) = MAX(ACRTFCT(I),val1)<a name='1843'>
+<font color=#447700>!cmr      ACRTFCT(I) = MIN(ACRTFCT(I),1.)<a name='1844'></font>
+          val2    =             1.<a name='1845'>
+          ACRTFCT(I) = MIN(ACRTFCT(I),val2)<a name='1846'>
+          ACRTFCT(I) = 1. - ACRTFCT(I)<a name='1847'>
+<font color=#447700>!<a name='1848'></font>
+<font color=#447700>!  modify ACRTFCT(I) by colume mean rh if RHBAR(I) is greater than 80 percent<a name='1849'></font>
+<font color=#447700>!<a name='1850'></font>
+<font color=#447700>!         if(RHBAR(I).ge..8) THEN<a name='1851'></font>
+<font color=#447700>!           ACRTFCT(I) = ACRTFCT(I) * (.9 - min(RHBAR(I),.9)) * 10.<a name='1852'></font>
+<font color=#447700>!         ENDIF<a name='1853'></font>
+<font color=#447700>!<a name='1854'></font>
+<font color=#447700>!  modify adjustment time scale by cloud base vertical velocity<a name='1855'></font>
+<font color=#447700>!<a name='1856'></font>
+          DTCONV(I) = DT2 + max((1800. - DT2),RZERO) *                  &amp;<a name='1857'>
+     &amp;                (PDOT(I) - W2) / (W1 - W2)<a name='1858'>
+<font color=#447700>!         DTCONV(I) = MAX(DTCONV(I), DT2)<a name='1859'></font>
+<font color=#447700>!         DTCONV(I) = 1800. * (PDOT(I) - w2) / (w1 - w2)<a name='1860'></font>
+          DTCONV(I) = max(DTCONV(I),dtmin)<a name='1861'>
+          DTCONV(I) = min(DTCONV(I),dtmax)<a name='1862'>
+<a name='1863'>
+        ENDIF<a name='1864'>
+      ENDDO<a name='1865'>
+<font color=#447700>!<a name='1866'></font>
+<font color=#447700>!--- LARGE SCALE FORCING<a name='1867'></font>
+<font color=#447700>!<a name='1868'></font>
+      DO I= 1, IM<a name='1869'>
+        FLG(I) = CNVFLG(I)<a name='1870'>
+        IF(CNVFLG(I)) THEN<a name='1871'>
+<font color=#447700>!         F = AA1(I) / DTCONV(I)<a name='1872'></font>
+          FLD(I) = (AA1(I) - ACRT(I) * ACRTFCT(I)) / DTCONV(I)<a name='1873'>
+          IF(FLD(I).LE.0.) FLG(I) = .FALSE.<a name='1874'>
+        ENDIF<a name='1875'>
+        CNVFLG(I) = FLG(I)<a name='1876'>
+        IF(CNVFLG(I)) THEN<a name='1877'>
+<font color=#447700>!         XAA0(I) = MAX(XAA0(I),0.)<a name='1878'></font>
+          XK(I) = (XAA0(I) - AA1(I)) / MBDT<a name='1879'>
+          IF(XK(I).GE.0.) FLG(I) = .FALSE.<a name='1880'>
+        ENDIF<a name='1881'>
+<font color=#447700>!<a name='1882'></font>
+<font color=#447700>!--- KERNEL, CLOUD BASE MASS FLUX<a name='1883'></font>
+<font color=#447700>!<a name='1884'></font>
+        CNVFLG(I) = FLG(I)<a name='1885'>
+        IF(CNVFLG(I)) THEN<a name='1886'>
+          XMB(I) = -FLD(I) / XK(I)<a name='1887'>
+          XMB(I) = MIN(XMB(I),XMBMAX(I))<a name='1888'>
+        ENDIF<a name='1889'>
+      ENDDO<a name='1890'>
+<font color=#447700>!      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I)) THEN<a name='1891'></font>
+<font color=#447700>!        print *, ' RHBAR(I), ACRTFCT(I) =', RHBAR(I), ACRTFCT(I)<a name='1892'></font>
+<font color=#447700>!        PRINT *, '  A1, XA =', AA1(I), XAA0(I)<a name='1893'></font>
+<font color=#447700>!        PRINT *, ' XMB(I), ACRT =', XMB(I), ACRT<a name='1894'></font>
+<font color=#447700>!      ENDIF<a name='1895'></font>
+      TOTFLG = .TRUE.<a name='1896'>
+      DO I = 1, IM<a name='1897'>
+        TOTFLG = TOTFLG .AND. (.NOT. CNVFLG(I))<a name='1898'>
+      ENDDO<a name='1899'>
+      IF(TOTFLG) RETURN<a name='1900'>
+<font color=#447700>!<a name='1901'></font>
+<font color=#447700>!  restore t0 and QO to t1 and q1 in case convection stops<a name='1902'></font>
+<font color=#447700>!<a name='1903'></font>
+      do k = 1, km<a name='1904'>
+        DO I = 1, IM<a name='1905'>
+          if (k .le. kmax(i)) then<a name='1906'>
+            TO(I,k) = T1(I,k)<a name='1907'>
+            QO(I,k) = Q1(I,k)<a name='1908'>
+<font color=#447700>!jfe        QESO(I,k) = 10. * FPVS(T1(I,k))<a name='1909'></font>
+<font color=#447700>!<a name='1910'></font>
+            QESO(I,k) = 0.01 * fpvs(T1(I,K))      <font color=#447700>! fpvs is in Pa<a name='1911'></font>
+<font color=#447700>!<a name='1912'></font>
+            QESO(I,k) = EPS * QESO(I,k) / (PFLD(I,k) + EPSM1*QESO(I,k))<a name='1913'>
+<font color=#447700>!cmr        QESO(I,k) = MAX(QESO(I,k),1.E-8)<a name='1914'></font>
+            val     =             1.E-8<a name='1915'>
+            QESO(I,k) = MAX(QESO(I,k), val )<a name='1916'>
+          endif<a name='1917'>
+        enddo<a name='1918'>
+      enddo<a name='1919'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='1920'></font>
+<font color=#447700>!<a name='1921'></font>
+<font color=#447700>!--- FEEDBACK: SIMPLY THE CHANGES FROM THE CLOUD WITH UNIT MASS FLUX<a name='1922'></font>
+<font color=#447700>!---           MULTIPLIED BY  THE MASS FLUX NECESSARY TO KEEP THE<a name='1923'></font>
+<font color=#447700>!---           EQUILIBRIUM WITH THE LARGER-SCALE.<a name='1924'></font>
+<font color=#447700>!<a name='1925'></font>
+      DO I = 1, IM<a name='1926'>
+        DELHBAR(I) = 0.<a name='1927'>
+        DELQBAR(I) = 0.<a name='1928'>
+        DELTBAR(I) = 0.<a name='1929'>
+        QCOND(I) = 0.<a name='1930'>
+      ENDDO<a name='1931'>
+      DO K = 1, KM<a name='1932'>
+        DO I = 1, IM<a name='1933'>
+          if (k .le. kmax(i)) then<a name='1934'>
+            IF(CNVFLG(I).AND.K.LE.KTCON(I)) THEN<a name='1935'>
+              AUP = 1.<a name='1936'>
+              IF(K.Le.KB(I)) AUP = 0.<a name='1937'>
+              ADW = 1.<a name='1938'>
+              IF(K.GT.JMIN(I)) ADW = 0.<a name='1939'>
+              DELLAT = (DELLAH(I,k) - HVAP * DELLAQ(I,k)) / CP<a name='1940'>
+              T1(I,k) = T1(I,k) + DELLAT * XMB(I) * DT2<a name='1941'>
+              Q1(I,k) = Q1(I,k) + DELLAQ(I,k) * XMB(I) * DT2<a name='1942'>
+              U1(I,k) = U1(I,k) + DELLAU(I,k) * XMB(I) * DT2<a name='1943'>
+              V1(I,k) = V1(I,k) + DELLAV(I,k) * XMB(I) * DT2<a name='1944'>
+              DP = 1000. * DEL(I,K)<a name='1945'>
+              DELHBAR(I) = DELHBAR(I) + DELLAH(I,k)*XMB(I)*DP/G<a name='1946'>
+              DELQBAR(I) = DELQBAR(I) + DELLAQ(I,k)*XMB(I)*DP/G<a name='1947'>
+              DELTBAR(I) = DELTBAR(I) + DELLAT*XMB(I)*DP/G<a name='1948'>
+            ENDIF<a name='1949'>
+          endif<a name='1950'>
+        ENDDO<a name='1951'>
+      ENDDO<a name='1952'>
+      DO K = 1, KM<a name='1953'>
+        DO I = 1, IM<a name='1954'>
+          if (k .le. kmax(i)) then<a name='1955'>
+            IF(CNVFLG(I).AND.K.LE.KTCON(I)) THEN<a name='1956'>
+<font color=#447700>!jfe          QESO(I,k) = 10. * FPVS(T1(I,k))<a name='1957'></font>
+<font color=#447700>!<a name='1958'></font>
+              QESO(I,k) = 0.01 * fpvs(T1(I,K))      <font color=#447700>! fpvs is in Pa<a name='1959'></font>
+<font color=#447700>!<a name='1960'></font>
+              QESO(I,k) = EPS * QESO(I,k)/(PFLD(I,k) + EPSM1*QESO(I,k))<a name='1961'>
+<font color=#447700>!cmr          QESO(I,k) = MAX(QESO(I,k),1.E-8)<a name='1962'></font>
+              val     =             1.E-8<a name='1963'>
+              QESO(I,k) = MAX(QESO(I,k), val )<a name='1964'>
+<font color=#447700>!<a name='1965'></font>
+<font color=#447700>!  cloud water<a name='1966'></font>
+<font color=#447700>!<a name='1967'></font>
+              if(ncloud.gt.0.and.CNVFLG(I).and.k.eq.KTCON(I)) THEN<a name='1968'>
+                tem  = DELLAL(I) * XMB(I) * dt2<a name='1969'>
+                tem1 = MAX(RZERO, MIN(RONE, (TCR-t1(I,K))*TCRF))<a name='1970'>
+                if (QL(I,k,2) .gt. -999.0) then<a name='1971'>
+                  QL(I,k,1) = QL(I,k,1) + tem * tem1            <font color=#447700>! Ice<a name='1972'></font>
+                  QL(I,k,2) = QL(I,k,2) + tem *(1.0-tem1)       <font color=#447700>! Water<a name='1973'></font>
+                else<a name='1974'>
+                  tem2      = QL(I,k,1) + tem<a name='1975'>
+                  QL(I,k,1) = tem2 * tem1                       <font color=#447700>! Ice<a name='1976'></font>
+                  QL(I,k,2) = tem2 - QL(I,k,1)                  <font color=#447700>! Water<a name='1977'></font>
+                endif<a name='1978'>
+<font color=#447700>!               QL(I,k) = QL(I,k) + DELLAL(I) * XMB(I) * dt2<a name='1979'></font>
+                dp = 1000. * del(i,k)<a name='1980'>
+                DELLAL(I) = DELLAL(I) * XMB(I) * dp / g<a name='1981'>
+              ENDIF<a name='1982'>
+            ENDIF<a name='1983'>
+          endif<a name='1984'>
+        ENDDO<a name='1985'>
+      ENDDO<a name='1986'>
+<font color=#447700>!     IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I) ) THEN<a name='1987'></font>
+<font color=#447700>!       PRINT *, ' DELHBAR, DELQBAR, DELTBAR ='<a name='1988'></font>
+<font color=#447700>!       PRINT *, DELHBAR, HVAP*DELQBAR, CP*DELTBAR<a name='1989'></font>
+<font color=#447700>!       PRINT *, '   DELLBAR ='<a name='1990'></font>
+<font color=#447700>!       PRINT 6003,  HVAP*DELLbar<a name='1991'></font>
+<font color=#447700>!       PRINT *, '   DELLAQ ='<a name='1992'></font>
+<font color=#447700>!       PRINT 6003, (HVAP*DELLAQ(I,k)*XMB(I),K=1,KMAX)<a name='1993'></font>
+<font color=#447700>!       PRINT *, '   DELLAT ='<a name='1994'></font>
+<font color=#447700>!       PRINT 6003, (DELLAH(i,k)*XMB(I)-HVAP*DELLAQ(I,k)*XMB(I),         &amp;<a name='1995'></font>
+<font color=#447700>!    &amp;               K=1,KMAX)<a name='1996'></font>
+<font color=#447700>!     ENDIF<a name='1997'></font>
+      DO I = 1, IM<a name='1998'>
+        RNTOT(I) = 0.<a name='1999'>
+        DELQEV(I) = 0.<a name='2000'>
+        DELQ2(I) = 0.<a name='2001'>
+        FLG(I) = CNVFLG(I)<a name='2002'>
+      ENDDO<a name='2003'>
+      DO K = KM, 1, -1<a name='2004'>
+        DO I = 1, IM<a name='2005'>
+          if (k .le. kmax(i)) then<a name='2006'>
+            IF(CNVFLG(I).AND.K.LE.KTCON(I)) THEN<a name='2007'>
+              AUP = 1.<a name='2008'>
+              IF(K.Le.KB(I)) AUP = 0.<a name='2009'>
+              ADW = 1.<a name='2010'>
+              IF(K.GT.JMIN(I)) ADW = 0.<a name='2011'>
+              rain =  AUP * PWO(I,k) + ADW * EDTO(I) * PWDO(I,k)<a name='2012'>
+              RNTOT(I) = RNTOT(I) + rain * XMB(I) * .001 * dt2<a name='2013'>
+            ENDIF<a name='2014'>
+          endif<a name='2015'>
+        ENDDO<a name='2016'>
+      ENDDO<a name='2017'>
+      DO K = KM, 1, -1<a name='2018'>
+        DO I = 1, IM<a name='2019'>
+          if (k .le. kmax(i)) then<a name='2020'>
+            DELTV(I) = 0.<a name='2021'>
+            DELQ(I) = 0.<a name='2022'>
+            QEVAP(I) = 0.<a name='2023'>
+            IF(CNVFLG(I).AND.K.LE.KTCON(I)) THEN<a name='2024'>
+              AUP = 1.<a name='2025'>
+              IF(K.Le.KB(I)) AUP = 0.<a name='2026'>
+              ADW = 1.<a name='2027'>
+              IF(K.GT.JMIN(I)) ADW = 0.<a name='2028'>
+              rain =  AUP * PWO(I,k) + ADW * EDTO(I) * PWDO(I,k)<a name='2029'>
+              RN(I) = RN(I) + rain * XMB(I) * .001 * dt2<a name='2030'>
+            ENDIF<a name='2031'>
+            IF(FLG(I).AND.K.LE.KTCON(I)) THEN<a name='2032'>
+              evef = EDT(I) * evfact<a name='2033'>
+              if(SLIMSK(I).eq.1.) evef=EDT(I) * evfactl<a name='2034'>
+<font color=#447700>!             if(SLIMSK(I).eq.1.) evef=.07<a name='2035'></font>
+<font color=#447700>!             if(SLIMSK(I).ne.1.) evef = 0.<a name='2036'></font>
+              QCOND(I) = EVEF * (Q1(I,k) - QESO(I,k))                   &amp;<a name='2037'>
+     &amp;                 / (1. + EL2ORC * QESO(I,k) / T1(I,k)**2)<a name='2038'>
+              DP = 1000. * DEL(I,K)<a name='2039'>
+              IF(RN(I).GT.0..AND.QCOND(I).LT.0.) THEN<a name='2040'>
+                QEVAP(I) = -QCOND(I) * (1.-EXP(-.32*SQRT(DT2*RN(I))))<a name='2041'>
+                QEVAP(I) = MIN(QEVAP(I), RN(I)*1000.*G/DP)<a name='2042'>
+                DELQ2(I) = DELQEV(I) + .001 * QEVAP(I) * dp / g<a name='2043'>
+              ENDIF<a name='2044'>
+              if(RN(I).gt.0..and.QCOND(I).LT.0..and.                    &amp;<a name='2045'>
+     &amp;           DELQ2(I).gt.RNTOT(I)) THEN<a name='2046'>
+                QEVAP(I) = 1000.* g * (RNTOT(I) - DELQEV(I)) / dp<a name='2047'>
+                FLG(I) = .false.<a name='2048'>
+              ENDIF<a name='2049'>
+              IF(RN(I).GT.0..AND.QEVAP(I).gt.0.) THEN<a name='2050'>
+                Q1(I,k) = Q1(I,k) + QEVAP(I)<a name='2051'>
+                T1(I,k) = T1(I,k) - ELOCP * QEVAP(I)<a name='2052'>
+                RN(I) = RN(I) - .001 * QEVAP(I) * DP / G<a name='2053'>
+                DELTV(I) = - ELOCP*QEVAP(I)/DT2<a name='2054'>
+                DELQ(I) =  + QEVAP(I)/DT2<a name='2055'>
+                DELQEV(I) = DELQEV(I) + .001*dp*QEVAP(I)/g<a name='2056'>
+              ENDIF<a name='2057'>
+              DELLAQ(I,k) = DELLAQ(I,k) + DELQ(I) / XMB(I)<a name='2058'>
+              DELQBAR(I) = DELQBAR(I) + DELQ(I)*DP/G<a name='2059'>
+              DELTBAR(I) = DELTBAR(I) + DELTV(I)*DP/G<a name='2060'>
+            ENDIF<a name='2061'>
+          endif<a name='2062'>
+        ENDDO<a name='2063'>
+      ENDDO<a name='2064'>
+<font color=#447700>!      IF(LAT.EQ.LATD.AND.lon.eq.lond.and.CNVFLG(I) ) THEN<a name='2065'></font>
+<font color=#447700>!        PRINT *, '   DELLAH ='<a name='2066'></font>
+<font color=#447700>!        PRINT 6003, (DELLAH(k)*XMB(I),K=1,KMAX)<a name='2067'></font>
+<font color=#447700>!        PRINT *, '   DELLAQ ='<a name='2068'></font>
+<font color=#447700>!        PRINT 6003, (HVAP*DELLAQ(I,k)*XMB(I),K=1,KMAX)<a name='2069'></font>
+<font color=#447700>!        PRINT *, ' DELHBAR, DELQBAR, DELTBAR ='<a name='2070'></font>
+<font color=#447700>!        PRINT *, DELHBAR, HVAP*DELQBAR, CP*DELTBAR<a name='2071'></font>
+<font color=#447700>!        PRINT *, ' PRECIP =', HVAP*RN(I)*1000./DT2<a name='2072'></font>
+<font color=#447700>!CCCC   PRINT *, '   DELLBAR ='<a name='2073'></font>
+<font color=#447700>!CCCC   PRINT *,  HVAP*DELLbar<a name='2074'></font>
+<font color=#447700>!      ENDIF<a name='2075'></font>
+<font color=#447700>!<a name='2076'></font>
+<font color=#447700>!  PRECIPITATION RATE CONVERTED TO ACTUAL PRECIP<a name='2077'></font>
+<font color=#447700>!  IN UNIT OF M INSTEAD OF KG<a name='2078'></font>
+<font color=#447700>!<a name='2079'></font>
+      DO I = 1, IM<a name='2080'>
+        IF(CNVFLG(I)) THEN<a name='2081'>
+<font color=#447700>!<a name='2082'></font>
+<font color=#447700>!  IN THE EVENT OF UPPER LEVEL RAIN EVAPORATION AND LOWER LEVEL DOWNDRAF<a name='2083'></font>
+<font color=#447700>!    MOISTENING, RN CAN BECOME NEGATIVE, IN THIS CASE, WE BACK OUT OF TH<a name='2084'></font>
+<font color=#447700>!    HEATING AND THE MOISTENING<a name='2085'></font>
+<font color=#447700>!<a name='2086'></font>
+          if(RN(I).lt.0..and..not.FLG(I)) RN(I) = 0.<a name='2087'>
+          IF(RN(I).LE.0.) THEN<a name='2088'>
+            RN(I) = 0.<a name='2089'>
+          ELSE<a name='2090'>
+            KTOP(I) = KTCON(I)<a name='2091'>
+            KBOT(I) = KBCON(I)<a name='2092'>
+            KUO(I) = 1<a name='2093'>
+            CLDWRK(I) = AA1(I)<a name='2094'>
+          ENDIF<a name='2095'>
+        ENDIF<a name='2096'>
+      ENDDO<a name='2097'>
+      DO K = 1, KM<a name='2098'>
+        DO I = 1, IM<a name='2099'>
+          if (k .le. kmax(i)) then<a name='2100'>
+            IF(CNVFLG(I).AND.RN(I).LE.0.) THEN<a name='2101'>
+              T1(I,k) = TO(I,k)<a name='2102'>
+              Q1(I,k) = QO(I,k)<a name='2103'>
+            ENDIF<a name='2104'>
+          endif<a name='2105'>
+        ENDDO<a name='2106'>
+      ENDDO<a name='2107'>
+<font color=#447700>!!<a name='2108'></font>
+      RETURN<a name='2109'>
+   END SUBROUTINE SASCNV<a name='2110'>
+END MODULE module_cu_sas<a name='2111'>
+<a name='2112'>
+</pre></body></html>

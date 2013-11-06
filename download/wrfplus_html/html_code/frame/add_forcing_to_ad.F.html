@@ -1,0 +1,26 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='ADD_FORCING_TO_AD'><A href='../../html_code/frame/add_forcing_to_ad.F.html#ADD_FORCING_TO_AD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>add_forcing_to_ad</font>(grid) <A href='../../call_to/ADD_FORCING_TO_AD.html' TARGET='index'>3</A>,<A href='../../call_from/ADD_FORCING_TO_AD.html' TARGET='index'>1</A><a name='3'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/add_forcing_to_ad.F.html#ADD_FORCING_TO_AD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_23"><a name='4'>
+   IMPLICIT NONE<a name='5'>
+   TYPE(domain), INTENT(INOUT)  :: grid<a name='6'>
+integer ims,ime,jms,jme,i,j<a name='7'>
+#ifdef WRFVAR<a name='8'>
+<font color=#447700>!  grid%em_a_u_1  = grid%em_a_u_1  + grid%em_g_u_1<a name='9'></font>
+<a name='10'>
+   grid%em_a_u_2  = grid%em_a_u_2  + grid%em_g_u_2<a name='11'>
+<font color=#447700>!  grid%em_a_v_1  = grid%em_a_v_1  + grid%em_g_v_1<a name='12'></font>
+   grid%em_a_v_2  = grid%em_a_v_2  + grid%em_g_v_2<a name='13'>
+<font color=#447700>!  grid%em_a_w_1  = grid%em_a_w_1  + grid%em_g_w_1<a name='14'></font>
+   grid%em_a_w_2  = grid%em_a_w_2  + grid%em_g_w_2<a name='15'>
+<font color=#447700>!  grid%em_a_ph_1 = grid%em_a_ph_1 + grid%em_g_ph_1<a name='16'></font>
+   grid%em_a_ph_2 = grid%em_a_ph_2 + grid%em_g_ph_2<a name='17'>
+<font color=#447700>!  grid%em_a_t_1  = grid%em_a_t_1  + grid%em_g_t_1<a name='18'></font>
+   grid%em_a_t_2  = grid%em_a_t_2  + grid%em_g_t_2<a name='19'>
+<font color=#447700>!  grid%em_a_mu_1 = grid%em_a_mu_1 + grid%em_g_mu_1<a name='20'></font>
+   grid%em_a_mu_2 = grid%em_a_mu_2 + grid%em_g_mu_2<a name='21'>
+<font color=#447700>!  grid%a_moist_1 = grid%a_moist_1 + grid%g_moist_1<a name='22'></font>
+   grid%a_moist_2 = grid%a_moist_2 + grid%g_moist_2<a name='23'>
+#endif<a name='24'>
+END SUBROUTINE add_forcing_to_ad<a name='25'>
+</pre></body></html>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="150px"
+	 height="150px" viewBox="0 0 150 150" enable-background="new 0 0 150 150" xml:space="preserve">
+<g id="Layer_1">
+	<g>
+		
+			<image overflow="visible" opacity="0.75" width="500" height="500" xlink:href="3AA612DB.png"  transform="matrix(0.24 0 0 0.24 22 22)">
+		</image>
+		<g>
+			<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="106.8193" y1="106.8193" x2="43.1804" y2="43.1804">
+				<stop  offset="0" style="stop-color:#000000"/>
+				<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.5"/>
+			</linearGradient>
+			<circle fill="url(#SVGID_1_)" cx="75" cy="75" r="45"/>
+		</g>
+	</g>
+</g>
+<g id="Triangle">
+	<polygon stroke="#000000" stroke-miterlimit="10" points="91.875,75 58.125,41.25 58.125,108.75 	"/>
+</g>
+</svg>

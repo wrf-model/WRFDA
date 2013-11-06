@@ -1,0 +1,166 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION_LAYER:<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MED_INITIALDATA_INPUT_PTR'><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT_PTR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='5'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>med_initialdata_input_ptr</font> ( grid , config_flags ) <A href='../../call_to/MED_INITIALDATA_INPUT_PTR.html' TARGET='index'>1</A>,<A href='../../call_from/MED_INITIALDATA_INPUT_PTR.html' TARGET='index'>5</A><a name='6'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT_PTR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_158"><a name='7'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT_PTR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_170"><a name='8'>
+   IMPLICIT NONE<a name='9'>
+   TYPE (domain) , POINTER :: grid<a name='10'>
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags<a name='11'>
+   INTERFACE <a name='12'>
+      SUBROUTINE med_initialdata_input ( grid , config_flags )<a name='13'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT_PTR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_159"><a name='14'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT_PTR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_171"><a name='15'>
+         TYPE (domain) :: grid<a name='16'>
+         TYPE (grid_config_rec_type) , INTENT(IN):: config_flags<a name='17'>
+      END SUBROUTINE med_initialdata_input<a name='18'>
+   END INTERFACE<a name='19'>
+   CALL  <A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT'>med_initialdata_input</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT_PTR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_INITIALDATA_INPUT_2"> ( grid , config_flags )<a name='20'>
+<a name='21'>
+<a name='22'>
+END SUBROUTINE med_initialdata_input_ptr<a name='23'>
+<a name='24'>
+<A NAME='MED_INITIALDATA_INPUT'><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='25'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>med_initialdata_input</font> ( grid , config_flags ) <A href='../../call_to/MED_INITIALDATA_INPUT.html' TARGET='index'>3</A>,<A href='../../call_from/MED_INITIALDATA_INPUT.html' TARGET='index'>22</A><a name='26'>
+  <font color=#447700>! Driver layer<a name='27'></font>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_160"><a name='28'>
+   USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_29"><a name='29'>
+   USE <A href='../../html_code/frame/module_timing.F.html#MODULE_TIMING'>module_timing</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_TIMING_39"><a name='30'>
+  <font color=#447700>! Model layer<a name='31'></font>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_172"><a name='32'>
+   USE <A href='../../html_code/share/module_bc_time_utilities.F.html#MODULE_BC_TIME_UTILITIES'>module_bc_time_utilities</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_TIME_UTILITIES_13"><a name='33'>
+   USE WRF_ESMF_MOD<a name='34'>
+<a name='35'>
+   IMPLICIT NONE<a name='36'>
+<a name='37'>
+<a name='38'>
+  <font color=#447700>! Interface <a name='39'></font>
+   INTERFACE<a name='40'>
+     SUBROUTINE start_domain ( grid , allowed_to_read )  <font color=#447700>! comes from module_start in appropriate dyn_ directory<a name='41'></font>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_161"><a name='42'>
+       TYPE (domain) grid<a name='43'>
+       LOGICAL, INTENT(IN) :: allowed_to_read <a name='44'>
+     END SUBROUTINE start_domain<a name='45'>
+   END INTERFACE<a name='46'>
+<a name='47'>
+  <font color=#447700>! Arguments<a name='48'></font>
+   TYPE(domain)                               :: grid<a name='49'>
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags<a name='50'>
+  <font color=#447700>! Local<a name='51'></font>
+   INTEGER                :: fid , ierr , myproc<a name='52'>
+   CHARACTER (LEN=80)     :: inpname , rstname, timestr<a name='53'>
+   CHARACTER (LEN=80)     :: message<a name='54'>
+   LOGICAL                :: restart<a name='55'>
+   TYPE(ESMF_Time)        :: CurrTime<a name='56'>
+<a name='57'>
+<a name='58'>
+   CALL nl_get_restart( 1, restart )<a name='59'>
+   IF ( .NOT. restart ) THEN<a name='60'>
+     <font color=#447700>!  Initialize the mother domain.<a name='61'></font>
+     grid%input_from_file = .true.<a name='62'>
+     IF ( grid%input_from_file ) THEN<a name='63'>
+<a name='64'>
+        CALL       wrf_debug ( 1 , 'wrf main: calling open_r_dataset for wrfinput' )<a name='65'>
+<a name='66'>
+<font color=#447700>! typically &lt;date&gt; will not be part of input_inname but allow for it<a name='67'></font>
+        CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )<a name='68'>
+        CALL <A href='../../html_code/share/module_date_time.F.html#WRF_TIMETOA'>wrf_timetoa</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_TIMETOA_27"> ( CurrTime, timestr )<a name='69'>
+        CALL <A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME2A'>construct_filename2a</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTRUCT_FILENAME2A_26"> ( inpname , config_flags%input_inname , grid%id , 2 , timestr )<a name='70'>
+<a name='71'>
+        CALL <A href='../../html_code/share/module_io_domain.F.html#OPEN_R_DATASET'>open_r_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPEN_R_DATASET_20"> ( fid, TRIM(inpname) , grid , config_flags , "DATASET=INPUT", ierr )<a name='72'>
+        IF ( ierr .NE. 0 ) THEN<a name='73'>
+          WRITE( wrf_err_message , * ) 'program wrf: error opening ',TRIM(inpname),' for reading ierr=',ierr<a name='74'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>WRF_ERROR_FATAL</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_226"> ( wrf_err_message )<a name='75'>
+        ENDIF<a name='76'>
+        CALL       wrf_debug ( 100 , 'wrf: calling input_model_input' )<a name='77'>
+        CALL <A href='../../html_code/share/module_io_domain.F.html#INPUT_MODEL_INPUT'>input_model_input</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_MODEL_INPUT_1"> ( fid ,   grid , config_flags , ierr )<a name='78'>
+        CALL       <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_228"> ( 100 , 'wrf: back from input_model_input' )<a name='79'>
+        CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_36"> ( fid , config_flags , "DATASET=INPUT" )<a name='80'>
+#ifdef MOVE_NESTS<a name='81'>
+        grid%nest_pos = grid%ht<a name='82'>
+        where ( grid%nest_pos .gt. 0 ) grid%nest_pos = grid%nest_pos + 500.  <font color=#447700>! make a cliff<a name='83'></font>
+#endif<a name='84'>
+     ENDIF<a name='85'>
+     grid%imask_nostag = 1<a name='86'>
+     grid%imask_xstag = 1<a name='87'>
+     grid%imask_ystag = 1<a name='88'>
+     grid%imask_xystag = 1<a name='89'>
+     CALL <A href='../../html_code/share/start_domain.F.html#START_DOMAIN'>start_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="START_DOMAIN_6"> ( grid , .TRUE. )<a name='90'>
+   ELSE<a name='91'>
+     CALL ESMF_ClockGet( grid%domain_clock, CurrTime=CurrTime, rc=ierr )<a name='92'>
+     CALL <A href='../../html_code/share/module_date_time.F.html#WRF_TIMETOA'>wrf_timetoa</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_TIMETOA_28"> ( CurrTime, timestr )<a name='93'>
+     CALL <A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME2A'>construct_filename2a</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CONSTRUCT_FILENAME2A_27"> ( rstname , config_flags%rst_inname , grid%id , 2 , timestr )<a name='94'>
+<a name='95'>
+     WRITE(message,*)'RESTART run: opening ',TRIM(rstname),' for reading'<a name='96'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_87"> (  message )<a name='97'>
+     CALL <A href='../../html_code/share/module_io_domain.F.html#OPEN_R_DATASET'>open_r_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OPEN_R_DATASET_21"> ( fid , TRIM(rstname) , grid , config_flags , "DATASET=RESTART", ierr )<a name='98'>
+     IF ( ierr .NE. 0 ) THEN<a name='99'>
+       WRITE( message , '("program wrf: error opening ",A32," for reading")') TRIM(rstname)<a name='100'>
+       CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>WRF_ERROR_FATAL</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_227"> ( message )<a name='101'>
+     ENDIF<a name='102'>
+     CALL <A href='../../html_code/share/module_io_domain.F.html#INPUT_RESTART'>input_restart</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_RESTART_2"> ( fid,   grid , config_flags , ierr )<a name='103'>
+     CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_37"> ( fid , config_flags , "DATASET=RESTART" )<a name='104'>
+     grid%imask_nostag = 1<a name='105'>
+     grid%imask_xstag = 1<a name='106'>
+     grid%imask_ystag = 1<a name='107'>
+     grid%imask_xystag = 1<a name='108'>
+     CALL <A href='../../html_code/share/start_domain.F.html#START_DOMAIN'>start_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_INITIALDATA_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="START_DOMAIN_7"> ( grid , .TRUE. )<a name='109'>
+   ENDIF<a name='110'>
+<a name='111'>
+   RETURN<a name='112'>
+END SUBROUTINE med_initialdata_input<a name='113'>
+<a name='114'>
+<A NAME='MED_SHUTDOWN_IO'><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='115'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>med_shutdown_io</font> ( grid , config_flags ) <A href='../../call_to/MED_SHUTDOWN_IO.html' TARGET='index'>7</A>,<A href='../../call_from/MED_SHUTDOWN_IO.html' TARGET='index'>16</A><a name='116'>
+  <font color=#447700>! Driver layer<a name='117'></font>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_162"><a name='118'>
+   USE <A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN'>module_io_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_DOMAIN_30"><a name='119'>
+  <font color=#447700>! Model layer<a name='120'></font>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_173"><a name='121'>
+<a name='122'>
+   IMPLICIT NONE<a name='123'>
+<a name='124'>
+  <font color=#447700>! Arguments<a name='125'></font>
+   TYPE(domain)                               :: grid<a name='126'>
+   TYPE (grid_config_rec_type) , INTENT(IN)   :: config_flags<a name='127'>
+  <font color=#447700>! Local<a name='128'></font>
+   CHARACTER (LEN=80)      :: message<a name='129'>
+   INTEGER                 :: ierr<a name='130'>
+<a name='131'>
+   IF ( grid%oid &gt; 0 ) CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_38"> ( grid%oid , config_flags , "DATASET=HISTORY" )<a name='132'>
+   IF ( grid%auxhist1_oid &gt; 0 ) CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_39"> ( grid%auxhist1_oid , config_flags , "DATASET=AUXHIST1" )<a name='133'>
+   IF ( grid%auxhist2_oid &gt; 0 ) CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_40"> ( grid%auxhist2_oid , config_flags , "DATASET=AUXHIST2" )<a name='134'>
+   IF ( grid%auxhist3_oid &gt; 0 ) CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_41"> ( grid%auxhist3_oid , config_flags , "DATASET=AUXHIST3" )<a name='135'>
+   IF ( grid%auxhist4_oid &gt; 0 ) CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_42"> ( grid%auxhist4_oid , config_flags , "DATASET=AUXHIST4" )<a name='136'>
+   IF ( grid%auxhist5_oid &gt; 0 ) CALL <A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET'>close_dataset</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLOSE_DATASET_43"> ( grid%auxhist5_oid , config_flags , "DATASET=AUXHIST5" )<a name='137'>
+<a name='138'>
+   CALL <A href='../../html_code/frame/module_io.F.html#WRF_IOEXIT'>wrf_ioexit</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_SHUTDOWN_IO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_IOEXIT_2">( ierr )    <font color=#447700>! shut down the quilt I/O<a name='139'></font>
+<a name='140'>
+   RETURN<a name='141'>
+<a name='142'>
+END SUBROUTINE med_shutdown_io<a name='143'>
+<a name='144'>
+<A NAME='MED_ADD_CONFIG_INFO_TO_GRID'><A href='../../html_code/share/mediation_wrfmain.F.html#MED_ADD_CONFIG_INFO_TO_GRID' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='145'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>med_add_config_info_to_grid</font> ( grid ) <A href='../../call_to/MED_ADD_CONFIG_INFO_TO_GRID.html' TARGET='index'>3</A>,<A href='../../call_from/MED_ADD_CONFIG_INFO_TO_GRID.html' TARGET='index'>4</A><a name='146'>
+<a name='147'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_ADD_CONFIG_INFO_TO_GRID' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_163"><a name='148'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_wrfmain.F.html#MED_ADD_CONFIG_INFO_TO_GRID' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_174"><a name='149'>
+ <a name='150'>
+   IMPLICIT NONE<a name='151'>
+<a name='152'>
+   <font color=#447700>!  Input data.<a name='153'></font>
+<a name='154'>
+   TYPE(domain) , TARGET          :: grid<a name='155'>
+<a name='156'>
+#define SOURCE_RECORD model_config_rec %<a name='157'>
+#define SOURCE_REC_DEX (grid%id)<a name='158'>
+#define DEST_RECORD   grid %<a name='159'>
+#include &lt;<A href='../../html_code/include/config_assigns.inc.html'>config_assigns.inc</A>&gt;<A NAME="config_assigns.inc_1"><A href='../../html_code/share/mediation_wrfmain.F.html#MED_ADD_CONFIG_INFO_TO_GRID' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='160'>
+<a name='161'>
+   RETURN<a name='162'>
+<a name='163'>
+END SUBROUTINE med_add_config_info_to_grid<a name='164'>
+<a name='165'>
+</pre></body></html>

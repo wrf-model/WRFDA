@@ -1,0 +1,193 @@
+<html>
+
+<head>
+
+<title>WRF Adjoint and Tangent Linear Model (WRFPLUS)</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style2 {
+	color: #FFFFFF;
+	font-size: 9px;
+}
+.style3 {font-family: Verdana, Arial, Helvetica, sans-serif}
+.style4 {font-size: 12px}
+.style5 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; }
+-->
+</style>
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
+
+ <tr bgcolor="#000000">
+
+     <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="../images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" bgcolor="#009933" class="background">
+
+  <tr>
+
+    <td height="802" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+
+        <td width="117" height="879" valign="top" bgcolor="#009933"><p>&nbsp;</p>
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+
+            <tr>
+              <td><p align="center"><a href="../downloads.html" class="leftnavlink">Overview</a></p>
+                <p align="center"><a href="get_source.html" class="leftnavlink">WRFDA</a></p>
+                <p align="center"><a href="testdata.html" class="leftnavlink">Test data</a></p>
+                <p align="center"><a href="wrfnl.html" class="leftnavlink">WRFNL</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFPLUS</p>
+                <p align="center"><a href="fso.html" class="leftnavlink">FSO</a></p>
+                <p align="center"><a href="madis.html" class="leftnavlink">MADIS2LITTLER</a></p>
+                <p align="center"><a href="tools.html" class="leftnavlink">Tools</a></p>
+                <p align="center"><a href="free_data.html" class="leftnavlink">Free Met Data</a></p>
+                <p align="center"><a href="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com"
+                  class="leftnavlink">Real-time Data from NCEP</a></p>
+              </td>
+            </tr>
+          </table>          
+
+          <p>&nbsp;</p>          <p>&nbsp;</p>          <img src="../images/shim112.gif" width="112" height="1"></td>
+
+          <td><p>&nbsp;</p>
+            <p class="pagetitle">WRFPLUS</p>
+            <p class="bodytext"><strong>The most recent version of WRFPLUS (Version 3.5) can be found <a href="WRFPLUS_V3.5.tar.gz" class="style7">here</a>.</strong></p>
+            <p class="bodytext">WRFPLUS is a package containing the adjoint and tangent-linear version of WRF model, in addition to a specialized version of the non-linear WRF model (previously known as WRFNL). It is tailored for use with WRFDA 4D-Var only. You should use the same version number of WRFPLUS as you do WRFDA.</p>
+            <p class="bodytext">How to build WRFPLUS:</p>
+            <ul>
+              <ul>
+                <li><span class="style3"><span class="style4">Download the desired WRFPLUS archive:</span></span></li>
+                <ul>
+                    <li class="style5"><strong><a href="WRFPLUS_V3.5.tar.gz" class="style7">Version 3.5 (most recent)</a></strong></li>
+                    <li class="style5"><a href="WRFPLUS_V3.4.1_r5858.tar.gz" class="style7">Version 3.4.1</a></li>
+                    <li class="style5"><a href="WRFPLUS_V3.4.tar.gz" class="style7">Version 3.4</a></li>
+                    <li class="style5"><a href="WRFPLUS3.3.1_r5153.tar.gz" class="style5">Version 3.3.1</a></li>
+                    <li class="style5"><a href="WRFPLUS3.3_r4897.tar.gz" class="style5">Version 3.3</a></li>
+                    <li class="style5"><a href="WRFPLUS3.2.1_r3990.tar.gz" class="style5">Version 3.2.1</a></li>
+                    <li class="style5"><a href="WRFPLUS3.2_r3959.tar.gz" class="style5">Version 3.2</a></li>
+                    <li class="style5"><a href="WRFPLUS3.1.tar.gz" class="style5">Version 3.1</a></li>
+                </ul>
+                <li class="style5"><kbd>gunzip &#060;filename&#062;.tar.gz</kbd></li>
+                <li class="style5"><kbd>tar -xvf &#060;filename&#062;.tar</kbd></li>
+                <li class="style5"><kbd>cd WRFPLUS</kbd></li>
+                <li class="style5"><kbd>./configure wrfplus</kbd></li>
+                <li class="style5"><kbd>./compile em_real</kbd></li>
+              </ul>
+            <p class="bodytext"><strong>NOTE:</strong> For versions older than V3.3, you may need to use <kbd>./compile wrf</kbd> instead of <kbd>./compile em_real</kbd></p>
+                </li>
+              </ul>
+            </ul>            
+            <p class="bodytext"><br>
+            </p>            
+
+	<p class="bodytext">Since July 2011</p>
+    <p class="bodytext">
+	<a href="http://s09.flagcounter.com/more/2qi"><img src="http://s09.flagcounter.com/count/2qi/bg=FFFFFF/txt=000000/border=CCCCCC/columns=5/maxflags=50/viewers=0/labels=0/" alt="free counters" border="0"></a>
+	</p>
+<p><a href="http://m.maploco.com/details/9a72dhk6"><img style="border:0px;" src="http://www.maploco.com/vmap/3988518.png" alt="Locations of Site Visitors" title="Locations of Site Visitors"/></a><p>
+        
+<img src="../images/transgif.gif" width="1" height="1"><img src="../images/shim162.gif" width="162" height="1">
+            <p align="center" class="detailtextRed">
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+              <br>
+          </p></td>
+ 
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" valign="bottom">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

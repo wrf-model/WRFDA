@@ -1,0 +1,76 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<!-- TemplateBeginEditable name="doctitle" -->
+<title>WRFDA Practical</title>
+<!-- TemplateEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+
+<style type="text/css">
+<!--
+.body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	color: 090706;
+}
+.toplinks {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10pt;
+	font-weight: bolder;
+	color: ebe3de;
+	text-decoration: none;
+}
+.style2 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12pt;
+	font-weight: bolder;
+	color: #006600;
+	text-decoration: none;
+}
+-->
+</style>
+<link href="../assets/wrfstyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style8 {
+	color: #FF0000;
+	font-weight: bold;
+}
+-->
+</style>
+<!-- TemplateBeginEditable name="head" -->
+<!-- TemplateEndEditable -->
+</head>
+
+<body bgcolor="#CBFFCD">
+<table width="100%" border="0" cellspacing="0" cellpadding="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="191" align="left" bgcolor="cbffcd"><img src="../Tutorials/2010_Feb/images/hands_on.jpg" width="190" height="125" border="0"></td>
+    <td width="943" colspan="4" bgcolor="#cbffcd"><div align="center">
+      <a href="../index.html"><img src="../Tutorials/2010_Feb/images/header.png" alt="page header" width="530" height="77" border="0"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td colspan="5" bgcolor="006600" class="style2">hh</td>
+  </tr>
+  <tr> 
+    <td colspan="5" bgcolor="cbffcd"> <table width="100%" border="0" cellpadding="0" cellspacing="20">
+        <tr> 
+          <td><!-- TemplateBeginEditable name="maincontent" -->maincontent<!-- TemplateEndEditable --><br>
+            
+          </td>
+        </tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="5" bgcolor="#006600">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../index.html" alt="practical_page_header">
+</map>
+</body>
+</html>

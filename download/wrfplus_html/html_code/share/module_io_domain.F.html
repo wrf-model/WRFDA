@@ -1,0 +1,644 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION_LAYER:IO<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_IO_DOMAIN'><A href='../../html_code/share/module_io_domain.F.html#MODULE_IO_DOMAIN' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_io_domain</font> <A href='../../call_to/MODULE_IO_DOMAIN.html' TARGET='index'>35</A><a name='6'>
+USE <A href='../../html_code/frame/module_io.F.html#MODULE_IO'>module_io</A><A href='../../html_code/share/module_io_domain.F.html#module_io_domain.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_6"><a name='7'>
+USE <A href='../../html_code/share/module_io_wrf.F.html#MODULE_IO_WRF'>module_io_wrf</A><A href='../../html_code/share/module_io_domain.F.html#module_io_domain.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_WRF_4"><a name='8'>
+USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/share/module_io_domain.F.html#module_io_domain.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_50"><a name='9'>
+USE <A href='../../html_code/share/module_date_time.F.html#MODULE_DATE_TIME'>module_date_time</A><A href='../../html_code/share/module_io_domain.F.html#module_io_domain.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DATE_TIME_13"><a name='10'>
+USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_io_domain.F.html#module_io_domain.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_177"><a name='11'>
+USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/module_io_domain.F.html#module_io_domain.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_164"><a name='12'>
+<a name='13'>
+  PRIVATE open_dataset<a name='14'>
+<a name='15'>
+CONTAINS<a name='16'>
+<a name='17'>
+<A NAME='OPEN_R_DATASET'><A href='../../html_code/share/module_io_domain.F.html#OPEN_R_DATASET' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='18'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>open_r_dataset</font> ( id , fname , grid , config_flags , sysdepinfo, ierr ) <A href='../../call_to/OPEN_R_DATASET.html' TARGET='index'>21</A>,<A href='../../call_from/OPEN_R_DATASET.html' TARGET='index'>1</A><a name='19'>
+   TYPE (domain)             :: grid<a name='20'>
+   CHARACTER*(*) :: fname<a name='21'>
+   CHARACTER*(*) :: sysdepinfo<a name='22'>
+   INTEGER      , INTENT(INOUT) :: id , ierr<a name='23'>
+   LOGICAL , EXTERNAL :: wrf_dm_on_monitor<a name='24'>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='25'>
+   CHARACTER*128             :: DataSet<a name='26'>
+   LOGICAL                   :: anyway<a name='27'>
+   CALL <A href='../../html_code/frame/module_io.F.html#WRF_OPEN_FOR_READ'>wrf_open_for_read</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_R_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_OPEN_FOR_READ_1"> ( fname ,                     &amp;<a name='28'>
+                            grid%communicator ,         &amp;<a name='29'>
+                            grid%iocommunicator ,       &amp;<a name='30'>
+                            sysdepinfo ,                &amp;<a name='31'>
+                            id ,                        &amp;<a name='32'>
+                            ierr )<a name='33'>
+   RETURN<a name='34'>
+  END SUBROUTINE open_r_dataset<a name='35'>
+<a name='36'>
+<A NAME='OPEN_W_DATASET'><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='37'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>open_w_dataset</font> ( id , fname , grid , config_flags , outsub , sysdepinfo, ierr ) <A href='../../call_to/OPEN_W_DATASET.html' TARGET='index'>19</A>,<A href='../../call_from/OPEN_W_DATASET.html' TARGET='index'>7</A><a name='38'>
+   TYPE (domain)             :: grid<a name='39'>
+   CHARACTER*(*) :: fname<a name='40'>
+   CHARACTER*(*) :: sysdepinfo<a name='41'>
+   INTEGER      , INTENT(INOUT) :: id , ierr<a name='42'>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='43'>
+   LOGICAL , EXTERNAL :: wrf_dm_on_monitor<a name='44'>
+   EXTERNAL outsub<a name='45'>
+   CHARACTER*128             :: DataSet<a name='46'>
+   LOGICAL                   :: anyway<a name='47'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_237"> ( 100 , 'calling wrf_open_for_write_begin in open_w_dataset' )<a name='48'>
+   CALL <A href='../../html_code/frame/module_io.F.html#WRF_OPEN_FOR_WRITE_BEGIN'>wrf_open_for_write_begin</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_OPEN_FOR_WRITE_BEGIN_1"> ( fname ,     &amp;<a name='49'>
+                                   grid%communicator ,         &amp;<a name='50'>
+                                   grid%iocommunicator ,       &amp;<a name='51'>
+                                   sysdepinfo ,                &amp;<a name='52'>
+                                   id ,                        &amp;<a name='53'>
+                                   ierr )<a name='54'>
+   IF ( ierr .LE. 0 ) THEN<a name='55'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_238"> ( 100 , 'calling outsub in open_w_dataset' )<a name='56'>
+     CALL outsub( id , grid , config_flags , ierr )<a name='57'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_239"> ( 100 , 'back from outsub in open_w_dataset' )<a name='58'>
+   ENDIF<a name='59'>
+   IF ( ierr .LE. 0 ) THEN<a name='60'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_240"> ( 100 , 'calling wrf_open_for_write_commit in open_w_dataset' )<a name='61'>
+     CALL <A href='../../html_code/frame/module_io.F.html#WRF_OPEN_FOR_WRITE_COMMIT'>wrf_open_for_write_commit</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_OPEN_FOR_WRITE_COMMIT_1"> ( id ,                        &amp;<a name='62'>
+                                      ierr )<a name='63'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_W_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_241"> ( 100 , 'back from wrf_open_for_write_commit in open_w_dataset' )<a name='64'>
+   ENDIF<a name='65'>
+  END SUBROUTINE open_w_dataset<a name='66'>
+<a name='67'>
+<A NAME='OPEN_U_DATASET'><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='68'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>open_u_dataset</font> ( id , fname , grid , config_flags , insub , sysdepinfo, ierr ) <A href='../../call_to/OPEN_U_DATASET.html' TARGET='index'>6</A>,<A href='../../call_from/OPEN_U_DATASET.html' TARGET='index'>10</A><a name='69'>
+   TYPE (domain)             :: grid<a name='70'>
+   CHARACTER*(*) :: fname<a name='71'>
+   CHARACTER*(*) :: sysdepinfo<a name='72'>
+   INTEGER      , INTENT(INOUT) :: id , ierr<a name='73'>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='74'>
+   LOGICAL , EXTERNAL :: wrf_dm_on_monitor<a name='75'>
+   EXTERNAL insub<a name='76'>
+   CHARACTER*128             :: DataSet<a name='77'>
+   LOGICAL                   :: anyway<a name='78'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_242"> ( 100 , 'calling wrf_open_for_read_begin in open_u_dataset' )<a name='79'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_243"> ( 0 , 'calling wrf_open_for_read_begin in open_u_dataset' )<a name='80'>
+<a name='81'>
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__<a name='82'>
+   write(unit=*, fmt='(2a)') 'fname=', trim(fname)<a name='83'>
+<a name='84'>
+   CALL <A href='../../html_code/frame/module_io.F.html#WRF_OPEN_FOR_READ'>wrf_open_for_read</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_OPEN_FOR_READ_2"> ( fname ,                     &amp;<a name='85'>
+                            grid%communicator ,         &amp;<a name='86'>
+                            grid%iocommunicator ,       &amp;<a name='87'>
+                            sysdepinfo ,                &amp;<a name='88'>
+                            id ,                        &amp;<a name='89'>
+                            ierr )<a name='90'>
+<a name='91'>
+<font color=#447700>!  CALL wrf_open_for_read_begin ( fname ,     &amp;<a name='92'></font>
+<font color=#447700>!                                 grid%communicator ,         &amp;<a name='93'></font>
+<font color=#447700>!                                 grid%iocommunicator ,       &amp;<a name='94'></font>
+<font color=#447700>!                                 sysdepinfo ,                &amp;<a name='95'></font>
+<font color=#447700>!                                 id ,                        &amp;<a name='96'></font>
+<font color=#447700>!                                 ierr )<a name='97'></font>
+<a name='98'>
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__<a name='99'>
+   write(unit=*, fmt='(2a)') 'sysdepinfo=', trim(sysdepinfo)<a name='100'>
+   write(unit=*, fmt='(a,i6)') 'file id:', id<a name='101'>
+   write(unit=*, fmt='(a,i6)') 'ierr:', ierr<a name='102'>
+<a name='103'>
+   IF ( ierr .LE. 0 ) THEN<a name='104'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_244"> ( 100 , 'calling insub in open_u_dataset' )<a name='105'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_245"> ( 0 , 'calling insub in open_u_dataset' )<a name='106'>
+     CALL insub( id , grid , config_flags , ierr )<a name='107'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_246"> ( 0 , 'back from insub in open_u_dataset' )<a name='108'>
+   ENDIF<a name='109'>
+<a name='110'>
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__<a name='111'>
+   write(unit=*, fmt='(a,i6)') 'ierr:', ierr<a name='112'>
+<a name='113'>
+   IF ( ierr .LE. 0 ) THEN<a name='114'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_247"> ( 100 , 'calling wrf_open_for_read_commit in open_u_dataset' )<a name='115'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_248"> ( 0 , 'calling wrf_open_for_read_commit in open_u_dataset' )<a name='116'>
+     CALL <A href='../../html_code/frame/module_io.F.html#WRF_OPEN_FOR_READ_COMMIT'>wrf_open_for_read_commit</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_OPEN_FOR_READ_COMMIT_1"> ( id ,                        &amp;<a name='117'>
+                                       ierr )<a name='118'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_io_domain.F.html#OPEN_U_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_249"> ( 0 , 'back from wrf_open_for_read_commit in open_u_dataset' )<a name='119'>
+   ENDIF<a name='120'>
+<a name='121'>
+   write(unit=*, fmt='(2a,2x,a,i6)') 'file:', __FILE__, 'line:', __LINE__<a name='122'>
+   write(unit=*, fmt='(a,i6)') 'ierr:', ierr<a name='123'>
+<a name='124'>
+  END SUBROUTINE open_u_dataset<a name='125'>
+<a name='126'>
+<A NAME='CLOSE_DATASET'><A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='127'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>close_dataset</font>( id , config_flags, sysdepinfo )  <A href='../../call_to/CLOSE_DATASET.html' TARGET='index'>43</A>,<A href='../../call_from/CLOSE_DATASET.html' TARGET='index'>1</A><a name='128'>
+   IMPLICIT NONE<a name='129'>
+   INTEGER id , ierr<a name='130'>
+   LOGICAL , EXTERNAL :: wrf_dm_on_monitor<a name='131'>
+   TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='132'>
+   CHARACTER*(*) :: sysdepinfo<a name='133'>
+   CHARACTER*128             :: DataSet<a name='134'>
+   LOGICAL                   :: anyway<a name='135'>
+   CALL <A href='../../html_code/frame/module_io.F.html#WRF_IOCLOSE'>wrf_ioclose</A><A href='../../html_code/share/module_io_domain.F.html#CLOSE_DATASET' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_IOCLOSE_1">( id , ierr )<a name='136'>
+  END SUBROUTINE close_dataset<a name='137'>
+<a name='138'>
+<a name='139'>
+<font color=#447700>! ------------  Output model input data sets<a name='140'></font>
+<a name='141'>
+<A NAME='OUTPUT_MODEL_INPUT'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_MODEL_INPUT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='142'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_model_input</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_MODEL_INPUT.html' TARGET='index'>6</A>,<A href='../../call_from/OUTPUT_MODEL_INPUT.html' TARGET='index'>1</A><a name='143'>
+    IMPLICIT NONE<a name='144'>
+    TYPE(domain) :: grid<a name='145'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='146'>
+    INTEGER, INTENT(IN) :: fid <a name='147'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='148'>
+    IF ( config_flags%io_form_input .GT. 0 ) THEN<a name='149'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_MODEL_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_1"> ( fid , grid , config_flags , model_input_only , ierr )<a name='150'>
+    ENDIF<a name='151'>
+    RETURN<a name='152'>
+  END SUBROUTINE output_model_input<a name='153'>
+<a name='154'>
+<A NAME='OUTPUT_AUX_MODEL_INPUT1'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='155'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_model_input1</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/OUTPUT_AUX_MODEL_INPUT1.html' TARGET='index'>1</A><a name='156'>
+    IMPLICIT NONE<a name='157'>
+    TYPE(domain) :: grid<a name='158'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='159'>
+    INTEGER, INTENT(IN) :: fid <a name='160'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='161'>
+    IF ( config_flags%io_form_auxinput1 .GT. 0 ) THEN<a name='162'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_2"> ( fid , grid , config_flags , aux_model_input1_only , ierr )<a name='163'>
+    ENDIF<a name='164'>
+    RETURN<a name='165'>
+  END SUBROUTINE output_aux_model_input1<a name='166'>
+<a name='167'>
+<A NAME='OUTPUT_AUX_MODEL_INPUT2'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='168'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_model_input2</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/OUTPUT_AUX_MODEL_INPUT2.html' TARGET='index'>1</A><a name='169'>
+    IMPLICIT NONE<a name='170'>
+    TYPE(domain) :: grid<a name='171'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='172'>
+    INTEGER, INTENT(IN) :: fid <a name='173'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='174'>
+    IF ( config_flags%io_form_auxinput2 .GT. 0 ) THEN<a name='175'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_3"> ( fid , grid , config_flags , aux_model_input2_only , ierr )<a name='176'>
+    ENDIF<a name='177'>
+    RETURN<a name='178'>
+  END SUBROUTINE output_aux_model_input2<a name='179'>
+<a name='180'>
+<A NAME='OUTPUT_AUX_MODEL_INPUT3'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT3' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='181'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_model_input3</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/OUTPUT_AUX_MODEL_INPUT3.html' TARGET='index'>1</A><a name='182'>
+    IMPLICIT NONE<a name='183'>
+    TYPE(domain) :: grid<a name='184'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='185'>
+    INTEGER, INTENT(IN) :: fid <a name='186'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='187'>
+    IF ( config_flags%io_form_auxinput3 .GT. 0 ) THEN<a name='188'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_4"> ( fid , grid , config_flags , aux_model_input3_only , ierr )<a name='189'>
+    ENDIF<a name='190'>
+    RETURN<a name='191'>
+  END SUBROUTINE output_aux_model_input3<a name='192'>
+<a name='193'>
+<A NAME='OUTPUT_AUX_MODEL_INPUT4'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT4' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='194'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_model_input4</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/OUTPUT_AUX_MODEL_INPUT4.html' TARGET='index'>1</A><a name='195'>
+    IMPLICIT NONE<a name='196'>
+    TYPE(domain) :: grid<a name='197'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='198'>
+    INTEGER, INTENT(IN) :: fid <a name='199'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='200'>
+    IF ( config_flags%io_form_auxinput4 .GT. 0 ) THEN<a name='201'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT4' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_5"> ( fid , grid , config_flags , aux_model_input4_only , ierr )<a name='202'>
+    ENDIF<a name='203'>
+    RETURN<a name='204'>
+  END SUBROUTINE output_aux_model_input4<a name='205'>
+<a name='206'>
+<A NAME='OUTPUT_AUX_MODEL_INPUT5'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT5' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='207'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_model_input5</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/OUTPUT_AUX_MODEL_INPUT5.html' TARGET='index'>1</A><a name='208'>
+    IMPLICIT NONE<a name='209'>
+    TYPE(domain) :: grid<a name='210'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='211'>
+    INTEGER, INTENT(IN) :: fid <a name='212'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='213'>
+    IF ( config_flags%io_form_auxinput5 .GT. 0 ) THEN<a name='214'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_MODEL_INPUT5' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_6"> ( fid , grid , config_flags , aux_model_input5_only , ierr )<a name='215'>
+    ENDIF<a name='216'>
+    RETURN<a name='217'>
+  END SUBROUTINE output_aux_model_input5<a name='218'>
+<a name='219'>
+<font color=#447700>!  ------------ Output model history data sets<a name='220'></font>
+<a name='221'>
+<A NAME='OUTPUT_HISTORY'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_HISTORY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='222'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_history</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_HISTORY.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_HISTORY.html' TARGET='index'>1</A><a name='223'>
+    IMPLICIT NONE<a name='224'>
+    TYPE(domain) :: grid<a name='225'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='226'>
+    INTEGER, INTENT(IN) :: fid<a name='227'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='228'>
+    IF ( config_flags%io_form_history .GT. 0 ) THEN<a name='229'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_HISTORY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_7"> ( fid , grid , config_flags , history_only , ierr )<a name='230'>
+    ENDIF<a name='231'>
+    RETURN<a name='232'>
+  END SUBROUTINE output_history<a name='233'>
+<a name='234'>
+<A NAME='OUTPUT_AUX_HIST1'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='235'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_hist1</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_AUX_HIST1.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_AUX_HIST1.html' TARGET='index'>1</A><a name='236'>
+    IMPLICIT NONE<a name='237'>
+    TYPE(domain) :: grid<a name='238'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='239'>
+    INTEGER, INTENT(IN) :: fid<a name='240'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='241'>
+    IF ( config_flags%io_form_auxhist1 .GT. 0 ) THEN<a name='242'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_8"> ( fid , grid , config_flags , aux_hist1_only , ierr )<a name='243'>
+    ENDIF<a name='244'>
+    RETURN<a name='245'>
+  END SUBROUTINE output_aux_hist1<a name='246'>
+<a name='247'>
+<A NAME='OUTPUT_AUX_HIST2'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='248'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_hist2</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_AUX_HIST2.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_AUX_HIST2.html' TARGET='index'>1</A><a name='249'>
+    IMPLICIT NONE<a name='250'>
+    TYPE(domain) :: grid<a name='251'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='252'>
+    INTEGER, INTENT(IN) :: fid<a name='253'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='254'>
+    IF ( config_flags%io_form_auxhist1 .GT. 0 ) THEN<a name='255'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_9"> ( fid , grid , config_flags , aux_hist2_only , ierr )<a name='256'>
+    ENDIF<a name='257'>
+    RETURN<a name='258'>
+  END SUBROUTINE output_aux_hist2<a name='259'>
+<a name='260'>
+<A NAME='OUTPUT_AUX_HIST3'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST3' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='261'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_hist3</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_AUX_HIST3.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_AUX_HIST3.html' TARGET='index'>1</A><a name='262'>
+    IMPLICIT NONE<a name='263'>
+    TYPE(domain) :: grid<a name='264'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='265'>
+    INTEGER, INTENT(IN) :: fid<a name='266'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='267'>
+    IF ( config_flags%io_form_auxhist1 .GT. 0 ) THEN<a name='268'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_10"> ( fid , grid , config_flags , aux_hist3_only , ierr )<a name='269'>
+    ENDIF<a name='270'>
+    RETURN<a name='271'>
+  END SUBROUTINE output_aux_hist3<a name='272'>
+<a name='273'>
+<A NAME='OUTPUT_AUX_HIST4'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST4' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='274'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_hist4</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_AUX_HIST4.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_AUX_HIST4.html' TARGET='index'>1</A><a name='275'>
+    IMPLICIT NONE<a name='276'>
+    TYPE(domain) :: grid<a name='277'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='278'>
+    INTEGER, INTENT(IN) :: fid<a name='279'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='280'>
+    IF ( config_flags%io_form_auxhist1 .GT. 0 ) THEN<a name='281'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST4' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_11"> ( fid , grid , config_flags , aux_hist4_only , ierr )<a name='282'>
+    ENDIF<a name='283'>
+    RETURN<a name='284'>
+  END SUBROUTINE output_aux_hist4<a name='285'>
+<a name='286'>
+<A NAME='OUTPUT_AUX_HIST5'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST5' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='287'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_aux_hist5</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_AUX_HIST5.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_AUX_HIST5.html' TARGET='index'>1</A><a name='288'>
+    IMPLICIT NONE<a name='289'>
+    TYPE(domain) :: grid<a name='290'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='291'>
+    INTEGER, INTENT(IN) :: fid<a name='292'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='293'>
+    IF ( config_flags%io_form_auxhist1 .GT. 0 ) THEN<a name='294'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_AUX_HIST5' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_12"> ( fid , grid , config_flags , aux_hist5_only , ierr )<a name='295'>
+    ENDIF<a name='296'>
+    RETURN<a name='297'>
+  END SUBROUTINE output_aux_hist5<a name='298'>
+<a name='299'>
+<font color=#447700>!  ------------ Output model restart data sets<a name='300'></font>
+<a name='301'>
+<A NAME='OUTPUT_RESTART'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_RESTART' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='302'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_restart</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_RESTART.html' TARGET='index'>1</A>,<A href='../../call_from/OUTPUT_RESTART.html' TARGET='index'>1</A><a name='303'>
+    IMPLICIT NONE<a name='304'>
+    TYPE(domain) :: grid<a name='305'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='306'>
+    INTEGER, INTENT(IN) :: fid<a name='307'>
+    INTEGER, INTENT(INOUT) :: ierr <a name='308'>
+    IF ( config_flags%io_form_restart .GT. 0 ) THEN<a name='309'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_RESTART' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_13"> ( fid , grid , config_flags , restart_only , ierr )<a name='310'>
+    ENDIF<a name='311'>
+    RETURN<a name='312'>
+  END SUBROUTINE output_restart<a name='313'>
+<a name='314'>
+<font color=#447700>!  ------------ Output model boundary data sets<a name='315'></font>
+<a name='316'>
+<A NAME='OUTPUT_BOUNDARY'><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_BOUNDARY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='317'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>output_boundary</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/OUTPUT_BOUNDARY.html' TARGET='index'>6</A>,<A href='../../call_from/OUTPUT_BOUNDARY.html' TARGET='index'>1</A><a name='318'>
+    IMPLICIT NONE<a name='319'>
+    TYPE(domain) :: grid<a name='320'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='321'>
+    INTEGER, INTENT(IN) :: fid <a name='322'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='323'>
+    IF ( config_flags%io_form_boundary .GT. 0 ) THEN<a name='324'>
+      CALL <A href='../../html_code/share/output_wrf.F.html#OUTPUT_WRF'>output_wrf</A><A href='../../html_code/share/module_io_domain.F.html#OUTPUT_BOUNDARY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="OUTPUT_WRF_14"> ( fid , grid , config_flags , boundary_only , ierr )<a name='325'>
+    ENDIF<a name='326'>
+    RETURN<a name='327'>
+  END SUBROUTINE output_boundary<a name='328'>
+<a name='329'>
+<font color=#447700>!  ------------ Input model input data sets<a name='330'></font>
+<a name='331'>
+<A NAME='INPUT_MODEL_INPUT'><A href='../../html_code/share/module_io_domain.F.html#INPUT_MODEL_INPUT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='332'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_model_input</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_MODEL_INPUT.html' TARGET='index'>1</A>,<A href='../../call_from/INPUT_MODEL_INPUT.html' TARGET='index'>1</A><a name='333'>
+    IMPLICIT NONE<a name='334'>
+    TYPE(domain) :: grid<a name='335'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='336'>
+    INTEGER, INTENT(IN) :: fid<a name='337'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='338'>
+    IF ( config_flags%io_form_input .GT. 0 ) THEN<a name='339'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_MODEL_INPUT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_1"> ( fid , grid , config_flags , model_input_only , ierr )<a name='340'>
+    ENDIF<a name='341'>
+    RETURN<a name='342'>
+  END SUBROUTINE input_model_input<a name='343'>
+<a name='344'>
+<A NAME='INPUT_AUX_MODEL_INPUT1'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='345'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_model_input1</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_AUX_MODEL_INPUT1.html' TARGET='index'>4</A>,<A href='../../call_from/INPUT_AUX_MODEL_INPUT1.html' TARGET='index'>1</A><a name='346'>
+    IMPLICIT NONE<a name='347'>
+    TYPE(domain) :: grid<a name='348'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='349'>
+    INTEGER, INTENT(IN) :: fid<a name='350'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='351'>
+    IF ( config_flags%io_form_auxinput1 .GT. 0 ) THEN<a name='352'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_2"> ( fid , grid , config_flags , aux_model_input1_only , ierr )<a name='353'>
+    ENDIF<a name='354'>
+    RETURN<a name='355'>
+  END SUBROUTINE input_aux_model_input1<a name='356'>
+<a name='357'>
+<A NAME='INPUT_AUX_MODEL_INPUT2'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='358'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_model_input2</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_AUX_MODEL_INPUT2.html' TARGET='index'>6</A>,<A href='../../call_from/INPUT_AUX_MODEL_INPUT2.html' TARGET='index'>1</A><a name='359'>
+    IMPLICIT NONE<a name='360'>
+    TYPE(domain) :: grid<a name='361'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='362'>
+    INTEGER, INTENT(IN) :: fid<a name='363'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='364'>
+    IF ( config_flags%io_form_auxinput2 .GT. 0 ) THEN<a name='365'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_3"> ( fid , grid , config_flags , aux_model_input2_only , ierr )<a name='366'>
+    ENDIF<a name='367'>
+    RETURN<a name='368'>
+  END SUBROUTINE input_aux_model_input2<a name='369'>
+<a name='370'>
+<A NAME='INPUT_AUX_MODEL_INPUT3'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT3' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='371'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_model_input3</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_AUX_MODEL_INPUT3.html' TARGET='index'>4</A>,<A href='../../call_from/INPUT_AUX_MODEL_INPUT3.html' TARGET='index'>1</A><a name='372'>
+    IMPLICIT NONE<a name='373'>
+    TYPE(domain) :: grid<a name='374'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='375'>
+    INTEGER, INTENT(IN) :: fid<a name='376'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='377'>
+    IF ( config_flags%io_form_auxinput3 .GT. 0 ) THEN<a name='378'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_4"> ( fid , grid , config_flags , aux_model_input3_only , ierr )<a name='379'>
+    ENDIF<a name='380'>
+    RETURN<a name='381'>
+  END SUBROUTINE input_aux_model_input3<a name='382'>
+<a name='383'>
+<A NAME='INPUT_AUX_MODEL_INPUT4'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT4' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='384'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_model_input4</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_AUX_MODEL_INPUT4.html' TARGET='index'>3</A>,<A href='../../call_from/INPUT_AUX_MODEL_INPUT4.html' TARGET='index'>1</A><a name='385'>
+    IMPLICIT NONE<a name='386'>
+    TYPE(domain) :: grid<a name='387'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='388'>
+    INTEGER, INTENT(IN) :: fid<a name='389'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='390'>
+    IF ( config_flags%io_form_auxinput4 .GT. 0 ) THEN<a name='391'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT4' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_5"> ( fid , grid , config_flags , aux_model_input4_only , ierr )<a name='392'>
+    ENDIF<a name='393'>
+    RETURN<a name='394'>
+  END SUBROUTINE input_aux_model_input4<a name='395'>
+<a name='396'>
+<A NAME='INPUT_AUX_MODEL_INPUT5'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT5' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='397'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_model_input5</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_AUX_MODEL_INPUT5.html' TARGET='index'>3</A>,<A href='../../call_from/INPUT_AUX_MODEL_INPUT5.html' TARGET='index'>1</A><a name='398'>
+    IMPLICIT NONE<a name='399'>
+    TYPE(domain) :: grid<a name='400'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='401'>
+    INTEGER, INTENT(IN) :: fid<a name='402'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='403'>
+    IF ( config_flags%io_form_auxinput5 .GT. 0 ) THEN<a name='404'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_MODEL_INPUT5' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_6"> ( fid , grid , config_flags , aux_model_input5_only , ierr )<a name='405'>
+    ENDIF<a name='406'>
+    RETURN<a name='407'>
+  END SUBROUTINE input_aux_model_input5<a name='408'>
+<a name='409'>
+<font color=#447700>!  ------------ Input model history data sets<a name='410'></font>
+<a name='411'>
+<A NAME='INPUT_HISTORY'><A href='../../html_code/share/module_io_domain.F.html#INPUT_HISTORY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='412'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_history</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_HISTORY.html' TARGET='index'>1</A>,<A href='../../call_from/INPUT_HISTORY.html' TARGET='index'>1</A><a name='413'>
+    IMPLICIT NONE<a name='414'>
+    TYPE(domain) :: grid<a name='415'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='416'>
+    INTEGER, INTENT(IN) :: fid<a name='417'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='418'>
+    IF ( config_flags%io_form_history .GT. 0 ) THEN<a name='419'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_HISTORY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_7"> ( fid , grid , config_flags , history_only , ierr )<a name='420'>
+    ENDIF<a name='421'>
+    RETURN<a name='422'>
+  END SUBROUTINE input_history<a name='423'>
+<a name='424'>
+<A NAME='INPUT_AUX_HIST1'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='425'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_hist1</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/INPUT_AUX_HIST1.html' TARGET='index'>1</A><a name='426'>
+    IMPLICIT NONE<a name='427'>
+    TYPE(domain) :: grid<a name='428'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='429'>
+    INTEGER, INTENT(IN) :: fid<a name='430'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='431'>
+    IF ( config_flags%io_form_auxhist1 .GT. 0 ) THEN<a name='432'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_8"> ( fid , grid , config_flags , aux_hist1_only , ierr )<a name='433'>
+    ENDIF<a name='434'>
+    RETURN<a name='435'>
+  END SUBROUTINE input_aux_hist1<a name='436'>
+<a name='437'>
+<A NAME='INPUT_AUX_HIST2'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='438'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_hist2</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/INPUT_AUX_HIST2.html' TARGET='index'>1</A><a name='439'>
+    IMPLICIT NONE<a name='440'>
+    TYPE(domain) :: grid<a name='441'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='442'>
+    INTEGER, INTENT(IN) :: fid<a name='443'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='444'>
+    IF ( config_flags%io_form_auxhist2 .GT. 0 ) THEN<a name='445'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_9"> ( fid , grid , config_flags , aux_hist2_only , ierr )<a name='446'>
+    ENDIF<a name='447'>
+    RETURN<a name='448'>
+  END SUBROUTINE input_aux_hist2<a name='449'>
+<a name='450'>
+<A NAME='INPUT_AUX_HIST3'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST3' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='451'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_hist3</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/INPUT_AUX_HIST3.html' TARGET='index'>1</A><a name='452'>
+    IMPLICIT NONE<a name='453'>
+    TYPE(domain) :: grid<a name='454'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='455'>
+    INTEGER, INTENT(IN) :: fid<a name='456'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='457'>
+    IF ( config_flags%io_form_auxhist3 .GT. 0 ) THEN<a name='458'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_10"> ( fid , grid , config_flags , aux_hist3_only , ierr )<a name='459'>
+    ENDIF<a name='460'>
+    RETURN<a name='461'>
+  END SUBROUTINE input_aux_hist3<a name='462'>
+<a name='463'>
+<A NAME='INPUT_AUX_HIST4'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST4' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='464'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_hist4</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/INPUT_AUX_HIST4.html' TARGET='index'>1</A><a name='465'>
+    IMPLICIT NONE<a name='466'>
+    TYPE(domain) :: grid<a name='467'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='468'>
+    INTEGER, INTENT(IN) :: fid<a name='469'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='470'>
+    IF ( config_flags%io_form_auxhist4 .GT. 0 ) THEN<a name='471'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST4' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_11"> ( fid , grid , config_flags , aux_hist4_only , ierr )<a name='472'>
+    ENDIF<a name='473'>
+    RETURN<a name='474'>
+  END SUBROUTINE input_aux_hist4<a name='475'>
+<a name='476'>
+<A NAME='INPUT_AUX_HIST5'><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST5' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='477'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_aux_hist5</font> ( fid , grid , config_flags , ierr ),<A href='../../call_from/INPUT_AUX_HIST5.html' TARGET='index'>1</A><a name='478'>
+    IMPLICIT NONE<a name='479'>
+    TYPE(domain) :: grid<a name='480'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='481'>
+    INTEGER, INTENT(IN) :: fid<a name='482'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='483'>
+    IF ( config_flags%io_form_auxhist5 .GT. 0 ) THEN<a name='484'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_AUX_HIST5' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_12"> ( fid , grid , config_flags , aux_hist5_only , ierr )<a name='485'>
+    ENDIF<a name='486'>
+    RETURN<a name='487'>
+  END SUBROUTINE input_aux_hist5<a name='488'>
+<a name='489'>
+<font color=#447700>!  ------------ Input model restart data sets<a name='490'></font>
+<a name='491'>
+<A NAME='INPUT_RESTART'><A href='../../html_code/share/module_io_domain.F.html#INPUT_RESTART' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='492'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_restart</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_RESTART.html' TARGET='index'>2</A>,<A href='../../call_from/INPUT_RESTART.html' TARGET='index'>1</A><a name='493'>
+    IMPLICIT NONE<a name='494'>
+    TYPE(domain) :: grid<a name='495'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='496'>
+    INTEGER, INTENT(IN) :: fid<a name='497'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='498'>
+    IF ( config_flags%io_form_restart .GT. 0 ) THEN<a name='499'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_RESTART' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_13"> ( fid , grid , config_flags , restart_only , ierr )<a name='500'>
+    ENDIF<a name='501'>
+    RETURN<a name='502'>
+  END SUBROUTINE input_restart<a name='503'>
+<a name='504'>
+<font color=#447700>!  ------------ Input model boundary data sets<a name='505'></font>
+<a name='506'>
+<A NAME='INPUT_BOUNDARY'><A href='../../html_code/share/module_io_domain.F.html#INPUT_BOUNDARY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='507'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>input_boundary</font> ( fid , grid , config_flags , ierr ) <A href='../../call_to/INPUT_BOUNDARY.html' TARGET='index'>2</A>,<A href='../../call_from/INPUT_BOUNDARY.html' TARGET='index'>1</A><a name='508'>
+    IMPLICIT NONE<a name='509'>
+    TYPE(domain) :: grid<a name='510'>
+    TYPE(grid_config_rec_type),  INTENT(IN   )    :: config_flags<a name='511'>
+    INTEGER, INTENT(IN) :: fid<a name='512'>
+    INTEGER, INTENT(INOUT) :: ierr<a name='513'>
+    IF ( config_flags%io_form_boundary .GT. 0 ) THEN<a name='514'>
+      CALL <A href='../../html_code/share/input_wrf.F.html#INPUT_WRF'>input_wrf</A><A href='../../html_code/share/module_io_domain.F.html#INPUT_BOUNDARY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INPUT_WRF_14"> ( fid , grid , config_flags , boundary_only , ierr )<a name='515'>
+    ENDIF<a name='516'>
+    RETURN<a name='517'>
+  END SUBROUTINE input_boundary<a name='518'>
+<a name='519'>
+END MODULE module_io_domain<a name='520'>
+<a name='521'>
+<font color=#447700>! move outside module so callable without USE of module<a name='522'></font>
+<A NAME='CONSTRUCT_FILENAME1'><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='523'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>construct_filename1</font>( result , basename , fld1 , len1 ) <A href='../../call_to/CONSTRUCT_FILENAME1.html' TARGET='index'>15</A>,<A href='../../call_from/CONSTRUCT_FILENAME1.html' TARGET='index'>1</A><a name='524'>
+  IMPLICIT NONE<a name='525'>
+  CHARACTER*(*) :: result<a name='526'>
+  CHARACTER*(*) :: basename<a name='527'>
+  INTEGER , INTENT(IN) :: fld1 , len1<a name='528'>
+  CHARACTER*64         :: t1, zeros<a name='529'>
+  <a name='530'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_1"> ( t1 , fld1 , len1 )<a name='531'>
+  result = TRIM(basename) // "_d" // TRIM(t1)<a name='532'>
+  RETURN<a name='533'>
+END SUBROUTINE construct_filename1<a name='534'>
+<a name='535'>
+<A NAME='CONSTRUCT_FILENAME2'><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='536'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>construct_filename2</font>( result , basename , fld1 , len1 , date_char ) <A href='../../call_to/CONSTRUCT_FILENAME2.html' TARGET='index'>3</A>,<A href='../../call_from/CONSTRUCT_FILENAME2.html' TARGET='index'>1</A><a name='537'>
+  IMPLICIT NONE<a name='538'>
+  CHARACTER*(*) :: result<a name='539'>
+  CHARACTER*(*) :: basename<a name='540'>
+  CHARACTER*(*) :: date_char<a name='541'>
+<a name='542'>
+  INTEGER , INTENT(IN) :: fld1 , len1<a name='543'>
+  CHARACTER*64         :: t1, zeros<a name='544'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_2"> ( t1 , fld1 , len1 )<a name='545'>
+  result = TRIM(basename) // ".d" // TRIM(t1) // "." // TRIM(date_char)<a name='546'>
+  RETURN<a name='547'>
+END SUBROUTINE construct_filename2<a name='548'>
+<a name='549'>
+<font color=#447700>! this version looks for &lt;date&gt; and &lt;domain&gt; in the basenmae and replaces with the arguments<a name='550'></font>
+<a name='551'>
+<A NAME='CONSTRUCT_FILENAME2A'><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME2A' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='552'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>construct_filename2a</font>( result , basename , fld1 , len1 , date_char ) <A href='../../call_to/CONSTRUCT_FILENAME2A.html' TARGET='index'>27</A>,<A href='../../call_from/CONSTRUCT_FILENAME2A.html' TARGET='index'>1</A><a name='553'>
+  IMPLICIT NONE<a name='554'>
+  CHARACTER*(*) :: result<a name='555'>
+  CHARACTER*(*) :: basename<a name='556'>
+  CHARACTER*(*) :: date_char<a name='557'>
+<a name='558'>
+  INTEGER , INTENT(IN) :: fld1 , len1<a name='559'>
+  CHARACTER*64         :: t1, zeros<a name='560'>
+  INTEGER   i, j, l<a name='561'>
+  result=basename<a name='562'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME2A' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_3"> ( t1 , fld1 , len1 )<a name='563'>
+  i = index( basename , '&lt;domain&gt;' )<a name='564'>
+  l = len(trim(basename))<a name='565'>
+  IF ( i .GT. 0 ) THEN<a name='566'>
+    result = basename(1:i-1) // TRIM(t1) // basename(i+8:l)<a name='567'>
+  ENDIF<a name='568'>
+  i = index( result , '&lt;date&gt;' )<a name='569'>
+  l = len(trim(result))<a name='570'>
+  IF ( i .GT. 0 ) THEN<a name='571'>
+    result = result(1:i-1) // TRIM(date_char) // result(i+6:l)<a name='572'>
+  ENDIF<a name='573'>
+  RETURN<a name='574'>
+END SUBROUTINE construct_filename2a<a name='575'>
+<a name='576'>
+<A NAME='CONSTRUCT_FILENAME'><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='577'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>construct_filename</font> ( result , basename , fld1 , len1 , fld2 , len2 ),<A href='../../call_from/CONSTRUCT_FILENAME.html' TARGET='index'>2</A><a name='578'>
+  IMPLICIT NONE<a name='579'>
+  CHARACTER*(*) :: result<a name='580'>
+  CHARACTER*(*) :: basename<a name='581'>
+  INTEGER , INTENT(IN) :: fld1 , len1 , fld2 , len2<a name='582'>
+  CHARACTER*64         :: t1, t2, zeros<a name='583'>
+  <a name='584'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_4"> ( t1 , fld1 , len1 )<a name='585'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_5"> ( t2 , fld2 , len2 )<a name='586'>
+  result = TRIM(basename) // "_d" // TRIM(t1) // "_" // TRIM(t2)<a name='587'>
+  RETURN<a name='588'>
+END SUBROUTINE construct_filename<a name='589'>
+<a name='590'>
+<A NAME='CONSTRUCT_FILENAME3'><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME3' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='591'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>construct_filename3</font> ( result , basename , fld1 , len1 , fld2 , len2, fld3, len3 ),<A href='../../call_from/CONSTRUCT_FILENAME3.html' TARGET='index'>3</A><a name='592'>
+  IMPLICIT NONE<a name='593'>
+  CHARACTER*(*) :: result<a name='594'>
+  CHARACTER*(*) :: basename<a name='595'>
+  INTEGER , INTENT(IN) :: fld1 , len1 , fld2 , len2, fld3, len3<a name='596'>
+  CHARACTER*64         :: t1, t2, t3, zeros<a name='597'>
+<a name='598'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_6"> ( t1 , fld1 , len1 )<a name='599'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_7"> ( t2 , fld2 , len2 )<a name='600'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#CONSTRUCT_FILENAME3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_8"> ( t3 , fld3 , len3 )<a name='601'>
+  result = TRIM(basename) // "_d" // TRIM(t1) // "_" // TRIM(t2) // "_" // TRIM(t3)<a name='602'>
+  RETURN<a name='603'>
+END SUBROUTINE construct_filename3<a name='604'>
+<a name='605'>
+<A NAME='APPEND_TO_FILENAME'><A href='../../html_code/share/module_io_domain.F.html#APPEND_TO_FILENAME' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='606'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>append_to_filename</font> ( result , basename , fld1 , len1 ) <A href='../../call_to/APPEND_TO_FILENAME.html' TARGET='index'>6</A>,<A href='../../call_from/APPEND_TO_FILENAME.html' TARGET='index'>1</A><a name='607'>
+  IMPLICIT NONE<a name='608'>
+  CHARACTER*(*) :: result<a name='609'>
+  CHARACTER*(*) :: basename<a name='610'>
+  INTEGER , INTENT(IN) :: fld1 , len1<a name='611'>
+  CHARACTER*64         :: t1, zeros<a name='612'>
+  <a name='613'>
+  CALL <A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD'>zero_pad</A><A href='../../html_code/share/module_io_domain.F.html#APPEND_TO_FILENAME' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ZERO_PAD_9"> ( t1 , fld1 , len1 )<a name='614'>
+  result = TRIM(basename) // "_" // TRIM(t1)<a name='615'>
+  RETURN<a name='616'>
+END SUBROUTINE append_to_filename<a name='617'>
+<a name='618'>
+<a name='619'>
+<A NAME='ZERO_PAD'><A href='../../html_code/share/module_io_domain.F.html#ZERO_PAD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='620'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>zero_pad</font> ( result , fld1 , len1 ) <A href='../../call_to/ZERO_PAD.html' TARGET='index'>9</A><a name='621'>
+  IMPLICIT NONE<a name='622'>
+  CHARACTER*(*) :: result<a name='623'>
+  INTEGER , INTENT (IN)      :: fld1 , len1<a name='624'>
+  INTEGER                    :: d , x<a name='625'>
+  CHARACTER*64         :: t2, zeros<a name='626'>
+  x = fld1 ; d = 0<a name='627'>
+  DO WHILE ( x &gt; 0 )<a name='628'>
+    x = x / 10<a name='629'>
+    d = d + 1<a name='630'>
+  END DO<a name='631'>
+  write(t2,'(I9)')fld1<a name='632'>
+  zeros = '0000000000000000000000000000000'<a name='633'>
+  result = zeros(1:len1-d) // t2(9-d+1:9)<a name='634'>
+  RETURN<a name='635'>
+END SUBROUTINE zero_pad<a name='636'>
+<a name='637'>
+<A NAME='INIT_WRFIO'><A href='../../html_code/share/module_io_domain.F.html#INIT_WRFIO' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='638'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>init_wrfio</font> <A href='../../call_to/INIT_WRFIO.html' TARGET='index'>9</A>,<A href='../../call_from/INIT_WRFIO.html' TARGET='index'>2</A><a name='639'>
+   USE <A href='../../html_code/frame/module_io.F.html#MODULE_IO'>module_io</A><A href='../../html_code/share/module_io_domain.F.html#INIT_WRFIO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_IO_7"><a name='640'>
+   CALL <A href='../../html_code/frame/module_io.F.html#WRF_IOINIT'>wrf_ioinit</A><A href='../../html_code/share/module_io_domain.F.html#INIT_WRFIO' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_IOINIT_1">(ierr)<a name='641'>
+END SUBROUTINE init_wrfio<a name='642'>
+<a name='643'>
+</pre></body></html>

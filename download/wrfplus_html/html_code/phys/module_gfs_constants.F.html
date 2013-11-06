@@ -1,0 +1,240 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='MODULE_GFS_CONSTANTS'><A href='../../html_code/phys/module_gfs_constants.F.html#MODULE_GFS_CONSTANTS' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>module </font><font color=#cc0000>module_gfs_constants</font> <A href='../../call_to/MODULE_GFS_CONSTANTS.html' TARGET='index'>7</A><a name='3'>
+  use <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/phys/module_gfs_constants.F.html#module_gfs_constants.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_35">, only:c_p=&gt;cp,g,r_d,xlv,xlf,rovg,ep_1,r_v, &amp;<a name='4'>
+                                   cliq,cice,psat<a name='5'>
+<a name='6'>
+  IMPLICIT NONE<a name='7'>
+<font color=#447700>! SAVE<a name='8'></font>
+<a name='9'>
+<font color=#447700>! Machine dependant constants<a name='10'></font>
+<a name='11'>
+  integer kind_io4,kind_io8,kind_phys,kind_rad<a name='12'>
+  parameter (kind_rad = selected_real_kind(13,60)) <font color=#447700>! the '60' maps to 64-bit real<a name='13'></font>
+  parameter (kind_phys = selected_real_kind(13,60)) <font color=#447700>! the '60' maps to 64-bit real<a name='14'></font>
+  parameter (kind_io4 = 4)<a name='15'>
+  parameter (kind_io8 = 8)<a name='16'>
+<a name='17'>
+<a name='18'>
+<font color=#447700>!Math constants<a name='19'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_pi      =3.1415926535897931 ! pi<a name='20'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_sqrt2   =1.414214e+0 ! square root of 2<a name='21'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_sqrt3   =1.732051e+0 ! square root of 3<a name='22'></font>
+<font color=#447700>!Primary constants<a name='23'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_rerth   =6.3712e+6 ! radius of earth     (m)<a name='24'></font>
+  real(kind=kind_phys),parameter:: con_g        = g        <font color=#447700>! gravity             (m/s2)<a name='25'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_omega   =7.2921e-5 ! ang vel of earth    (1/s)<a name='26'></font>
+  real(kind=kind_phys),parameter:: con_rd       = r_d      <font color=#447700>! gas constant air    (J/kg/K)<a name='27'></font>
+  real(kind=kind_phys),parameter:: con_rv       = r_v      <font color=#447700>! gas constant H2O    (J/kg/K)<a name='28'></font>
+  real(kind=kind_phys),parameter:: con_cp       = c_p      <font color=#447700>! spec heat air @p    (J/kg/K)<a name='29'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_cv      =7.1760e+2 ! spec heat air @v    (J/kg/K)<a name='30'></font>
+  real(kind=kind_phys),parameter:: con_cvap     =1.8460e+3 <font color=#447700>! spec heat H2O gas   (J/kg/K)<a name='31'></font>
+  real(kind=kind_phys),parameter:: con_cliq     = cliq     <font color=#447700>! spec heat H2O liq   (J/kg/K)<a name='32'></font>
+  real(kind=kind_phys),parameter:: con_csol     = cice     <font color=#447700>! spec heat H2O ice   (J/kg/K)<a name='33'></font>
+  real(kind=kind_phys),parameter:: con_hvap     = xlv      <font color=#447700>! lat heat H2O cond   (J/kg)<a name='34'></font>
+  real(kind=kind_phys),parameter:: con_hfus     = xlf      <font color=#447700>! lat heat H2O fusion (J/kg)<a name='35'></font>
+  real(kind=kind_phys),parameter:: con_psat     = psat     <font color=#447700>! pres at H2O 3pt     (Pa)  <a name='36'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_sbc     =5.6730e-8 ! stefan-boltzmann    (W/m2/K4)<a name='37'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_solr    =1.3533e+3 ! solar constant      (W/m2)<a name='38'></font>
+  real(kind=kind_phys),parameter:: con_t0c      =2.7315e+2 <font color=#447700>! temp at 0C          (K)<a name='39'></font>
+  real(kind=kind_phys),parameter:: con_ttp      =2.7316e+2  <font color=#447700>! temp at H2O 3pt     (K)<a name='40'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_jcal    =4.1855E+0 ! JOULES PER CALORIE  ()<a name='41'></font>
+<font color=#447700>!Secondary constants<a name='42'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_rocp    =con_rd/con_cp<a name='43'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_cpor    =con_cp/con_rd<a name='44'></font>
+  real(kind=kind_phys),parameter:: con_rog      = rovg<a name='45'>
+  real(kind=kind_phys),parameter:: con_fvirt    = ep_1<a name='46'>
+  real(kind=kind_phys),parameter:: con_eps      =con_rd/con_rv<a name='47'>
+  real(kind=kind_phys),parameter:: con_epsm1    =con_rd/con_rv-1.<a name='48'>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_dldt    =con_cvap-con_cliq<a name='49'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_xpona   =-con_dldt/con_rv<a name='50'></font>
+<font color=#447700>!  real(kind=kind_phys),parameter:: con_xponb   =-con_dldt/con_rv+con_hvap/(con_rv*con_ttp)<a name='51'></font>
+<a name='52'>
+<font color=#447700>! ---------------------------------------------------------------------------------------------<a name='53'></font>
+<font color=#447700>!                     GFS FUNCTIONS/SUBROUTINES<a name='54'></font>
+<a name='55'>
+<font color=#447700>!   fpvs            Elementally compute saturation vapor pressure<a name='56'></font>
+<font color=#447700>!     function result Real(krealfp) saturation vapor pressure in Pascals<a name='57'></font>
+<font color=#447700>!     t               Real(krealfp) temperature in Kelvin<a name='58'></font>
+<font color=#447700>!                                                          <a name='59'></font>
+<font color=#447700>!   gpvs            Compute saturation vapor pressure table<a name='60'></font>
+<a name='61'>
+<font color=#447700>!    private<a name='62'></font>
+    integer,public,parameter:: krealfp=kind_phys<a name='63'>
+    integer,parameter:: nxpvs=7501<a name='64'>
+    real(krealfp) c1xpvs,c2xpvs,tbpvs(nxpvs)<a name='65'>
+    public gpvs,fpvs<a name='66'>
+    contains<a name='67'>
+<a name='68'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='69'></font>
+<font color=#447700>!  elemental function fpvs(t)<a name='70'></font>
+<A NAME='FPVS'><A href='../../html_code/phys/module_gfs_constants.F.html#FPVS' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='71'>
+  <font color=#993300>function </font><font color=#cc0000>fpvs</font>(t) <A href='../../call_to/FPVS.html' TARGET='index'>17</A><a name='72'>
+<a name='73'>
+<font color=#447700>!$$$     Subprogram Documentation Block<a name='74'></font>
+<font color=#447700>!<a name='75'></font>
+<font color=#447700>! Subprogram: fpvs         Compute saturation vapor pressure<a name='76'></font>
+<font color=#447700>!   Author: N Phillips            w/NMC2X2   Date: 30 dec 82<a name='77'></font>
+<font color=#447700>!<a name='78'></font>
+<font color=#447700>! Abstract: Compute saturation vapor pressure from the temperature.<a name='79'></font>
+<font color=#447700>!   A linear interpolation is done between values in a lookup table<a name='80'></font>
+<font color=#447700>!   computed in gpvs. See documentation for fpvsx for details.<a name='81'></font>
+<font color=#447700>!   Input values outside table range are reset to table extrema.<a name='82'></font>
+<font color=#447700>!   The interpolation accuracy is almost 6 decimal places.<a name='83'></font>
+<font color=#447700>!   On the Cray, fpvs is about 4 times faster than exact calculation.<a name='84'></font>
+<font color=#447700>!   This function should be expanded inline in the calling routine.<a name='85'></font>
+<font color=#447700>!<a name='86'></font>
+<font color=#447700>! Program History Log:<a name='87'></font>
+<font color=#447700>!   91-05-07  Iredell             made into inlinable function<a name='88'></font>
+<font color=#447700>!   94-12-30  Iredell             expand table<a name='89'></font>
+<font color=#447700>! 1999-03-01  Iredell             f90 module<a name='90'></font>
+<font color=#447700>! 2001-02-26  Iredell             ice phase<a name='91'></font>
+<font color=#447700>!<a name='92'></font>
+<font color=#447700>! Usage:   pvs=fpvs(t)<a name='93'></font>
+<font color=#447700>!<a name='94'></font>
+<font color=#447700>!   Input argument list:<a name='95'></font>
+<font color=#447700>!     t          Real(krealfp) temperature in Kelvin<a name='96'></font>
+<font color=#447700>!<a name='97'></font>
+<font color=#447700>!   Output argument list:<a name='98'></font>
+<font color=#447700>!     fpvs       Real(krealfp) saturation vapor pressure in Pascals<a name='99'></font>
+<font color=#447700>!<a name='100'></font>
+<font color=#447700>! Attributes:<a name='101'></font>
+<font color=#447700>!   Language: Fortran 90.<a name='102'></font>
+<font color=#447700>!<a name='103'></font>
+<font color=#447700>!$$$<a name='104'></font>
+    implicit none<a name='105'>
+    real(krealfp) fpvs<a name='106'>
+    real(krealfp),intent(in):: t<a name='107'>
+    integer jx<a name='108'>
+    real(krealfp) xj<a name='109'>
+<a name='110'>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='111'></font>
+    xj=min(max(c1xpvs+c2xpvs*t,1._krealfp),real(nxpvs,krealfp)) <a name='112'>
+    jx=min(xj,nxpvs-1._krealfp)<a name='113'>
+    fpvs=tbpvs(jx)+(xj-jx)*(tbpvs(jx+1)-tbpvs(jx))<a name='114'>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='115'></font>
+  end function fpvs<a name='116'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='117'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='118'></font>
+<font color=#447700>! elemental function fpvsx(t)<a name='119'></font>
+<A NAME='FPVSX'><A href='../../html_code/phys/module_gfs_constants.F.html#FPVSX' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='120'>
+   <font color=#993300>function </font><font color=#cc0000>fpvsx</font>(t) <A href='../../call_to/FPVSX.html' TARGET='index'>2</A><a name='121'>
+<font color=#447700>!$$$     Subprogram Documentation Block<a name='122'></font>
+<font color=#447700>!<a name='123'></font>
+<font color=#447700>! Subprogram: fpvsx        Compute saturation vapor pressure<a name='124'></font>
+<font color=#447700>!   Author: N Phillips            w/NMC2X2   Date: 30 dec 82<a name='125'></font>
+<font color=#447700>!<a name='126'></font>
+<font color=#447700>! Abstract: Exactly compute saturation vapor pressure from temperature.<a name='127'></font>
+<font color=#447700>!   The saturation vapor pressure over either liquid and ice is computed<a name='128'></font>
+<font color=#447700>!   over liquid for temperatures above the triple point,<a name='129'></font>
+<font color=#447700>!   over ice for temperatures 20 degress below the triple point,<a name='130'></font>
+<font color=#447700>!   and a linear combination of the two for temperatures in between.<a name='131'></font>
+<font color=#447700>!   The water model assumes a perfect gas, constant specific heats<a name='132'></font>
+<font color=#447700>!   for gas, liquid and ice, and neglects the volume of the condensate.<a name='133'></font>
+<font color=#447700>!   The model does account for the variation of the latent heat<a name='134'></font>
+<font color=#447700>!   of condensation and sublimation with temperature.<a name='135'></font>
+<font color=#447700>!   The Clausius-Clapeyron equation is integrated from the triple point<a name='136'></font>
+<font color=#447700>!   to get the formula<a name='137'></font>
+<font color=#447700>!       pvsl=con_psat*(tr**xa)*exp(xb*(1.-tr))<a name='138'></font>
+<font color=#447700>!   where tr is ttp/t and other values are physical constants.<a name='139'></font>
+<font color=#447700>!   The reference for this computation is Emanuel(1994), pages 116-117.<a name='140'></font>
+<font color=#447700>!   This function should be expanded inline in the calling routine.<a name='141'></font>
+<font color=#447700>!<a name='142'></font>
+<font color=#447700>! Program History Log:<a name='143'></font>
+<font color=#447700>!   91-05-07  Iredell             made into inlinable function<a name='144'></font>
+<font color=#447700>!   94-12-30  Iredell             exact computation<a name='145'></font>
+<font color=#447700>! 1999-03-01  Iredell             f90 module<a name='146'></font>
+<font color=#447700>! 2001-02-26  Iredell             ice phase<a name='147'></font>
+<font color=#447700>!<a name='148'></font>
+<font color=#447700>! Usage:   pvs=fpvsx(t)<a name='149'></font>
+<font color=#447700>!<a name='150'></font>
+<font color=#447700>!   Input argument list:<a name='151'></font>
+<font color=#447700>!     t          Real(krealfp) temperature in Kelvin<a name='152'></font>
+<font color=#447700>!<a name='153'></font>
+<font color=#447700>!   Output argument list:<a name='154'></font>
+<font color=#447700>!     fpvsx      Real(krealfp) saturation vapor pressure in Pascals<a name='155'></font>
+<font color=#447700>!<a name='156'></font>
+<font color=#447700>! Attributes:<a name='157'></font>
+<font color=#447700>!   Language: Fortran 90.<a name='158'></font>
+<font color=#447700>!<a name='159'></font>
+<font color=#447700>!$$$<a name='160'></font>
+    implicit none<a name='161'>
+    real(krealfp) fpvsx<a name='162'>
+    real(krealfp),intent(in):: t<a name='163'>
+    real(krealfp),parameter:: tliq=con_ttp<a name='164'>
+    real(krealfp),parameter:: tice=con_ttp-20.0<a name='165'>
+    real(krealfp),parameter:: dldtl=con_cvap-con_cliq<a name='166'>
+    real(krealfp),parameter:: heatl=con_hvap<a name='167'>
+    real(krealfp),parameter:: xponal=-dldtl/con_rv<a name='168'>
+    real(krealfp),parameter:: xponbl=-dldtl/con_rv+heatl/(con_rv*con_ttp)<a name='169'>
+    real(krealfp),parameter:: dldti=con_cvap-con_csol<a name='170'>
+    real(krealfp),parameter:: heati=con_hvap+con_hfus<a name='171'>
+    real(krealfp),parameter:: xponai=-dldti/con_rv<a name='172'>
+    real(krealfp),parameter:: xponbi=-dldti/con_rv+heati/(con_rv*con_ttp)<a name='173'>
+    real(krealfp) tr,w,pvl,pvi<a name='174'>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='175'></font>
+    tr=con_ttp/t<a name='176'>
+    if(t.ge.tliq) then<a name='177'>
+      fpvsx=con_psat*(tr**xponal)*exp(xponbl*(1.-tr))<a name='178'>
+    elseif(t.lt.tice) then<a name='179'>
+      fpvsx=con_psat*(tr**xponai)*exp(xponbi*(1.-tr))<a name='180'>
+    else<a name='181'>
+      w=(t-tice)/(tliq-tice)<a name='182'>
+      pvl=con_psat*(tr**xponal)*exp(xponbl*(1.-tr))<a name='183'>
+      pvi=con_psat*(tr**xponai)*exp(xponbi*(1.-tr))<a name='184'>
+      fpvsx=w*pvl+(1.-w)*pvi<a name='185'>
+    endif<a name='186'>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='187'></font>
+  end function fpvsx<a name='188'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='189'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='190'></font>
+<A NAME='GPVS'><A href='../../html_code/phys/module_gfs_constants.F.html#GPVS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='191'>
+  <font color=#993300>subroutine </font><font color=#cc0000>gpvs</font> <A href='../../call_to/GPVS.html' TARGET='index'>2</A>,<A href='../../call_from/GPVS.html' TARGET='index'>3</A><a name='192'>
+<font color=#447700>!$$$     Subprogram Documentation Block<a name='193'></font>
+<font color=#447700>!<a name='194'></font>
+<font color=#447700>! Subprogram: gpvs         Compute saturation vapor pressure table<a name='195'></font>
+<font color=#447700>!   Author: N Phillips            W/NMC2X2   Date: 30 dec 82<a name='196'></font>
+<font color=#447700>!<a name='197'></font>
+<font color=#447700>! Abstract: Computes saturation vapor pressure table as a function of<a name='198'></font>
+<font color=#447700>!   temperature for the table lookup function fpvs.<a name='199'></font>
+<font color=#447700>!   Exact saturation vapor pressures are calculated in subprogram fpvsx.<a name='200'></font>
+<font color=#447700>!   The current implementation computes a table with a length<a name='201'></font>
+<font color=#447700>!   of 7501 for temperatures ranging from 180. to 330. Kelvin.<a name='202'></font>
+<font color=#447700>!<a name='203'></font>
+<font color=#447700>! Program History Log:<a name='204'></font>
+<font color=#447700>!   91-05-07  Iredell<a name='205'></font>
+<font color=#447700>!   94-12-30  Iredell             expand table<a name='206'></font>
+<font color=#447700>! 1999-03-01  Iredell             f90 module<a name='207'></font>
+<font color=#447700>! 2001-02-26  Iredell             ice phase<a name='208'></font>
+<font color=#447700>!<a name='209'></font>
+<font color=#447700>! Usage:  call gpvs<a name='210'></font>
+<font color=#447700>!<a name='211'></font>
+<font color=#447700>! Subprograms called:<a name='212'></font>
+<font color=#447700>!   (fpvsx)    inlinable function to compute saturation vapor pressure<a name='213'></font>
+<font color=#447700>!<a name='214'></font>
+<font color=#447700>! Attributes:<a name='215'></font>
+<font color=#447700>!   Language: Fortran 90.<a name='216'></font>
+<font color=#447700>!<a name='217'></font>
+<font color=#447700>!$$$<a name='218'></font>
+    implicit none<a name='219'>
+    integer jx<a name='220'>
+    real(krealfp) xmin,xmax,xinc,x,t<a name='221'>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='222'></font>
+    xmin=180.0_krealfp<a name='223'>
+    xmax=330.0_krealfp<a name='224'>
+    xinc=(xmax-xmin)/(nxpvs-1)<a name='225'>
+<font color=#447700>!   c1xpvs=1.-xmin/xinc<a name='226'></font>
+    c2xpvs=1./xinc<a name='227'>
+    c1xpvs=1.-xmin*c2xpvs<a name='228'>
+    do jx=1,nxpvs<a name='229'>
+      x=xmin+(jx-1)*xinc<a name='230'>
+      t=x<a name='231'>
+      tbpvs(jx)=<A href='../../html_code/phys/module_mp_etanew.F.html#FPVSX'>fpvsx</A><A href='../../html_code/phys/module_mp_etanew.F.html#GPVS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="FPVSX_1">(t)<a name='232'>
+    enddo<a name='233'>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='234'></font>
+  end subroutine gpvs<a name='235'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='236'></font>
+<a name='237'>
+<a name='238'>
+end module module_gfs_constants<a name='239'>
+</pre></body></html>

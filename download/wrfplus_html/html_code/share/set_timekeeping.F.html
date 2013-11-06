@@ -1,0 +1,1196 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='SETUP_TIMEKEEPING'><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>Setup_Timekeeping</font> ( grid ) <A href='../../call_to/SETUP_TIMEKEEPING.html' TARGET='index'>10</A>,<A href='../../call_from/SETUP_TIMEKEEPING.html' TARGET='index'>73</A><a name='3'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_175"><a name='4'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_187"><a name='5'>
+   USE WRF_ESMF_MOD<a name='6'>
+   IMPLICIT NONE<a name='7'>
+   TYPE(domain), POINTER :: grid<a name='8'>
+<font color=#447700>! Local<a name='9'></font>
+   TYPE(ESMF_TimeInterval) :: begin_time, end_time, zero_time, one_minute<a name='10'>
+   TYPE(ESMF_TimeInterval) :: interval, run_length, chem_interval<a name='11'>
+   INTEGER :: start_year,start_month,start_day,start_hour,start_minute,start_second<a name='12'>
+   INTEGER :: end_year,end_month,end_day,end_hour,end_minute,end_second<a name='13'>
+<a name='14'>
+   INTEGER :: history_interval  , restart_interval  ,  &amp;<a name='15'>
+              history_interval_mo, restart_interval_mo,  &amp;<a name='16'>
+              history_interval_d, restart_interval_d,  &amp;<a name='17'>
+              history_interval_h, restart_interval_h,  &amp;<a name='18'>
+              history_interval_m, restart_interval_m,  &amp;<a name='19'>
+              history_interval_s, restart_interval_s<a name='20'>
+<a name='21'>
+   INTEGER :: auxhist1_interval  , auxhist2_interval  , auxhist3_interval  , &amp;<a name='22'>
+              auxhist1_interval_mo, auxhist2_interval_mo, auxhist3_interval_mo, &amp;<a name='23'>
+              auxhist1_interval_d, auxhist2_interval_d, auxhist3_interval_d, &amp;<a name='24'>
+              auxhist1_interval_h, auxhist2_interval_h, auxhist3_interval_h, &amp;<a name='25'>
+              auxhist1_interval_m, auxhist2_interval_m, auxhist3_interval_m, &amp;<a name='26'>
+              auxhist1_interval_s, auxhist2_interval_s, auxhist3_interval_s<a name='27'>
+<a name='28'>
+   INTEGER :: auxhist4_interval  , auxhist5_interval,   &amp;<a name='29'>
+              auxhist4_interval_mo, auxhist5_interval_mo, &amp;<a name='30'>
+              auxhist4_interval_d, auxhist5_interval_d, &amp;<a name='31'>
+              auxhist4_interval_h, auxhist5_interval_h, &amp;<a name='32'>
+              auxhist4_interval_m, auxhist5_interval_m, &amp;<a name='33'>
+              auxhist4_interval_s, auxhist5_interval_s<a name='34'>
+<a name='35'>
+   INTEGER :: auxinput1_interval  , auxinput2_interval  , auxinput3_interval  , &amp;<a name='36'>
+              auxinput1_interval_mo, auxinput2_interval_mo, auxinput3_interval_mo, &amp;<a name='37'>
+              auxinput1_interval_d, auxinput2_interval_d, auxinput3_interval_d, &amp;<a name='38'>
+              auxinput1_interval_h, auxinput2_interval_h, auxinput3_interval_h, &amp;<a name='39'>
+              auxinput1_interval_m, auxinput2_interval_m, auxinput3_interval_m, &amp;<a name='40'>
+              auxinput1_interval_s, auxinput2_interval_s, auxinput3_interval_s<a name='41'>
+<a name='42'>
+   INTEGER :: auxinput4_interval  , auxinput5_interval  , &amp;<a name='43'>
+              auxinput4_interval_mo, auxinput5_interval_mo, &amp;<a name='44'>
+              auxinput4_interval_d, auxinput5_interval_d, &amp;<a name='45'>
+              auxinput4_interval_h, auxinput5_interval_h, &amp;<a name='46'>
+              auxinput4_interval_m, auxinput5_interval_m, &amp;<a name='47'>
+              auxinput4_interval_s, auxinput5_interval_s<a name='48'>
+<a name='49'>
+   INTEGER :: history_begin  , restart_begin  ,  &amp;<a name='50'>
+              history_begin_y, restart_begin_y,  &amp;<a name='51'>
+              history_begin_mo, restart_begin_mo,  &amp;<a name='52'>
+              history_begin_d, restart_begin_d,  &amp;<a name='53'>
+              history_begin_h, restart_begin_h,  &amp;<a name='54'>
+              history_begin_m, restart_begin_m,  &amp;<a name='55'>
+              history_begin_s, restart_begin_s<a name='56'>
+<a name='57'>
+   INTEGER :: auxhist1_begin  , auxhist2_begin  , auxhist3_begin  , &amp;<a name='58'>
+              auxhist1_begin_y, auxhist2_begin_y, auxhist3_begin_y, &amp;<a name='59'>
+              auxhist1_begin_mo, auxhist2_begin_mo, auxhist3_begin_mo, &amp;<a name='60'>
+              auxhist1_begin_d, auxhist2_begin_d, auxhist3_begin_d, &amp;<a name='61'>
+              auxhist1_begin_h, auxhist2_begin_h, auxhist3_begin_h, &amp;<a name='62'>
+              auxhist1_begin_m, auxhist2_begin_m, auxhist3_begin_m, &amp;<a name='63'>
+              auxhist1_begin_s, auxhist2_begin_s, auxhist3_begin_s<a name='64'>
+<a name='65'>
+   INTEGER :: auxhist4_begin  , auxhist5_begin,   &amp;<a name='66'>
+              auxhist4_begin_y, auxhist5_begin_y, &amp;<a name='67'>
+              auxhist4_begin_mo, auxhist5_begin_mo, &amp;<a name='68'>
+              auxhist4_begin_d, auxhist5_begin_d, &amp;<a name='69'>
+              auxhist4_begin_h, auxhist5_begin_h, &amp;<a name='70'>
+              auxhist4_begin_m, auxhist5_begin_m, &amp;<a name='71'>
+              auxhist4_begin_s, auxhist5_begin_s<a name='72'>
+<a name='73'>
+   INTEGER :: inputout_begin  ,  inputout_end,    inputout_interval ,    &amp;<a name='74'>
+              inputout_begin_y,  inputout_end_y,  inputout_interval_y ,    &amp;<a name='75'>
+              inputout_begin_mo, inputout_end_mo, inputout_interval_mo ,   &amp;<a name='76'>
+              inputout_begin_d,  inputout_end_d,  inputout_interval_d ,    &amp;<a name='77'>
+              inputout_begin_h,  inputout_end_h,  inputout_interval_h ,    &amp;<a name='78'>
+              inputout_begin_m,  inputout_end_m,  inputout_interval_m ,    &amp;<a name='79'>
+              inputout_begin_s,  inputout_end_s,  inputout_interval_s<a name='80'>
+<a name='81'>
+   INTEGER :: auxinput1_begin  , auxinput2_begin  , auxinput3_begin  , &amp;<a name='82'>
+              auxinput1_begin_y, auxinput2_begin_y, auxinput3_begin_y, &amp;<a name='83'>
+              auxinput1_begin_mo, auxinput2_begin_mo, auxinput3_begin_mo, &amp;<a name='84'>
+              auxinput1_begin_d, auxinput2_begin_d, auxinput3_begin_d, &amp;<a name='85'>
+              auxinput1_begin_h, auxinput2_begin_h, auxinput3_begin_h, &amp;<a name='86'>
+              auxinput1_begin_m, auxinput2_begin_m, auxinput3_begin_m, &amp;<a name='87'>
+              auxinput1_begin_s, auxinput2_begin_s, auxinput3_begin_s<a name='88'>
+<a name='89'>
+   INTEGER :: auxinput4_begin  , auxinput5_begin  , &amp;<a name='90'>
+              auxinput4_begin_y, auxinput5_begin_y, &amp;<a name='91'>
+              auxinput4_begin_mo, auxinput5_begin_mo, &amp;<a name='92'>
+              auxinput4_begin_d, auxinput5_begin_d, &amp;<a name='93'>
+              auxinput4_begin_h, auxinput5_begin_h, &amp;<a name='94'>
+              auxinput4_begin_m, auxinput5_begin_m, &amp;<a name='95'>
+              auxinput4_begin_s, auxinput5_begin_s<a name='96'>
+<a name='97'>
+   INTEGER :: history_end  , restart_end  ,  &amp;<a name='98'>
+              history_end_y, restart_end_y,  &amp;<a name='99'>
+              history_end_mo, restart_end_mo,  &amp;<a name='100'>
+              history_end_d, restart_end_d,  &amp;<a name='101'>
+              history_end_h, restart_end_h,  &amp;<a name='102'>
+              history_end_m, restart_end_m,  &amp;<a name='103'>
+              history_end_s, restart_end_s<a name='104'>
+<a name='105'>
+   INTEGER :: auxhist1_end  , auxhist2_end  , auxhist3_end  , &amp;<a name='106'>
+              auxhist1_end_y, auxhist2_end_y, auxhist3_end_y, &amp;<a name='107'>
+              auxhist1_end_mo, auxhist2_end_mo, auxhist3_end_mo, &amp;<a name='108'>
+              auxhist1_end_d, auxhist2_end_d, auxhist3_end_d, &amp;<a name='109'>
+              auxhist1_end_h, auxhist2_end_h, auxhist3_end_h, &amp;<a name='110'>
+              auxhist1_end_m, auxhist2_end_m, auxhist3_end_m, &amp;<a name='111'>
+              auxhist1_end_s, auxhist2_end_s, auxhist3_end_s<a name='112'>
+<a name='113'>
+   INTEGER :: auxhist4_end  , auxhist5_end,   &amp;<a name='114'>
+              auxhist4_end_y, auxhist5_end_y, &amp;<a name='115'>
+              auxhist4_end_mo, auxhist5_end_mo, &amp;<a name='116'>
+              auxhist4_end_d, auxhist5_end_d, &amp;<a name='117'>
+              auxhist4_end_h, auxhist5_end_h, &amp;<a name='118'>
+              auxhist4_end_m, auxhist5_end_m, &amp;<a name='119'>
+              auxhist4_end_s, auxhist5_end_s<a name='120'>
+<a name='121'>
+   INTEGER :: auxinput1_end  , auxinput2_end  , auxinput3_end  , &amp;<a name='122'>
+              auxinput1_end_y, auxinput2_end_y, auxinput3_end_y, &amp;<a name='123'>
+              auxinput1_end_mo, auxinput2_end_mo, auxinput3_end_mo, &amp;<a name='124'>
+              auxinput1_end_d, auxinput2_end_d, auxinput3_end_d, &amp;<a name='125'>
+              auxinput1_end_h, auxinput2_end_h, auxinput3_end_h, &amp;<a name='126'>
+              auxinput1_end_m, auxinput2_end_m, auxinput3_end_m, &amp;<a name='127'>
+              auxinput1_end_s, auxinput2_end_s, auxinput3_end_s<a name='128'>
+<a name='129'>
+   INTEGER :: auxinput4_end  , auxinput5_end  , &amp;<a name='130'>
+              auxinput4_end_y, auxinput5_end_y, &amp;<a name='131'>
+              auxinput4_end_mo, auxinput5_end_mo, &amp;<a name='132'>
+              auxinput4_end_d, auxinput5_end_d, &amp;<a name='133'>
+              auxinput4_end_h, auxinput5_end_h, &amp;<a name='134'>
+              auxinput4_end_m, auxinput5_end_m, &amp;<a name='135'>
+              auxinput4_end_s, auxinput5_end_s<a name='136'>
+<a name='137'>
+   INTEGER :: run_days, run_hours, run_minutes, run_seconds<a name='138'>
+   INTEGER :: time_step, time_step_fract_num, time_step_fract_den<a name='139'>
+   INTEGER :: rc<a name='140'>
+   REAL    :: dt<a name='141'>
+<a name='142'>
+   INTERFACE<a name='143'>
+      SUBROUTINE set_timekeeping_create_alarm( grid, alarm_id, interval, begin_time, end_time )<a name='144'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_176"><a name='145'>
+         USE WRF_ESMF_MOD<a name='146'>
+         IMPLICIT NONE<a name='147'>
+         TYPE(domain), POINTER :: grid<a name='148'>
+         INTEGER, INTENT(IN) :: alarm_id<a name='149'>
+         TYPE(ESMF_TimeInterval), INTENT(IN), OPTIONAL :: interval<a name='150'>
+         TYPE(ESMF_TimeInterval), INTENT(IN), OPTIONAL :: begin_time<a name='151'>
+         TYPE(ESMF_TimeInterval), INTENT(IN), OPTIONAL :: end_time<a name='152'>
+      END SUBROUTINE set_timekeeping_create_alarm<a name='153'>
+   END INTERFACE<a name='154'>
+<a name='155'>
+   CALL ESMF_TimeIntervalSet ( zero_time, rc=rc )<a name='156'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_18">( ESMF_SUCCESS, rc, &amp;<a name='157'>
+                         'ESMF_TimeIntervalSet(zero_time) FAILED', &amp;<a name='158'>
+                         __FILE__ , &amp;<a name='159'>
+                         __LINE__  )<a name='160'>
+   CALL ESMF_TimeIntervalSet ( one_minute, M=1, rc=rc )<a name='161'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_19">( ESMF_SUCCESS, rc, &amp;<a name='162'>
+                         'ESMF_TimeIntervalSet(one_minute) FAILED', &amp;<a name='163'>
+                         __FILE__ , &amp;<a name='164'>
+                         __LINE__  )<a name='165'>
+<a name='166'>
+   CALL nl_get_start_year(grid%id,start_year)<a name='167'>
+   CALL nl_get_start_month(grid%id,start_month)<a name='168'>
+   CALL nl_get_start_day(grid%id,start_day)<a name='169'>
+   CALL nl_get_start_hour(grid%id,start_hour)<a name='170'>
+   CALL nl_get_start_minute(grid%id,start_minute)<a name='171'>
+   CALL nl_get_start_second(grid%id,start_second)<a name='172'>
+   CALL ESMF_TimeSet(grid%start_time, YY=start_year, MM=start_month, DD=start_day, &amp;<a name='173'>
+                                      H=start_hour, M=start_minute, S=start_second,&amp;<a name='174'>
+                                      rc=rc)<a name='175'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_20">( ESMF_SUCCESS, rc, &amp;<a name='176'>
+                         'ESMF_TimeSet(grid%start_time) FAILED', &amp;<a name='177'>
+                         __FILE__ , &amp;<a name='178'>
+                         __LINE__  )<a name='179'>
+   CALL nl_get_run_days(1,run_days)<a name='180'>
+   CALL nl_get_run_hours(1,run_hours)<a name='181'>
+   CALL nl_get_run_minutes(1,run_minutes)<a name='182'>
+   CALL nl_get_run_seconds(1,run_seconds)<a name='183'>
+<a name='184'>
+   IF ( grid%id .EQ. head_grid%id .AND. &amp;<a name='185'>
+        ( run_days .gt. 0 .or. run_hours .gt. 0 .or. run_minutes .gt. 0 .or. run_seconds .gt. 0 )) THEN<a name='186'>
+     CALL ESMF_TimeIntervalSet ( run_length , D=run_days, H=run_hours, M=run_minutes, S=run_seconds, rc=rc )<a name='187'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_21">( ESMF_SUCCESS, rc, &amp;<a name='188'>
+                           'ESMF_TimeIntervalSet(run_length) FAILED', &amp;<a name='189'>
+                           __FILE__ , &amp;<a name='190'>
+                           __LINE__  )<a name='191'>
+     grid%stop_time = grid%start_time + run_length<a name='192'>
+   ELSE<a name='193'>
+     CALL nl_get_end_year(grid%id,end_year)<a name='194'>
+     CALL nl_get_end_month(grid%id,end_month)<a name='195'>
+     CALL nl_get_end_day(grid%id,end_day)<a name='196'>
+     CALL nl_get_end_hour(grid%id,end_hour)<a name='197'>
+     CALL nl_get_end_minute(grid%id,end_minute)<a name='198'>
+     CALL nl_get_end_second(grid%id,end_second)<a name='199'>
+     CALL ESMF_TimeSet(grid%stop_time, YY=end_year, MM=end_month, DD=end_day, &amp;<a name='200'>
+                                       H=end_hour, M=end_minute, S=end_second,&amp;<a name='201'>
+                                       rc=rc )<a name='202'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_22">( ESMF_SUCCESS, rc, &amp;<a name='203'>
+                           'ESMF_TimeSet(grid%stop_time) FAILED', &amp;<a name='204'>
+                           __FILE__ , &amp;<a name='205'>
+                           __LINE__  )<a name='206'>
+     run_length = grid%stop_time - grid%start_time<a name='207'>
+   ENDIF<a name='208'>
+<a name='209'>
+   IF ( grid%id .EQ. head_grid%id ) THEN<a name='210'>
+      CALL nl_get_time_step ( 1, time_step )<a name='211'>
+      CALL nl_get_time_step_fract_num( 1, time_step_fract_num )<a name='212'>
+      CALL nl_get_time_step_fract_den( 1, time_step_fract_den )<a name='213'>
+      dt = real(time_step) + real(time_step_fract_num) / real(time_step_fract_den)<a name='214'>
+      CALL nl_set_dt( grid%id, dt )<a name='215'>
+      grid%dt = dt<a name='216'>
+      CALL ESMF_TimeIntervalSet(grid%step_time, S=time_step, Sn=time_step_fract_num, Sd=time_step_fract_den, rc=rc)<a name='217'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_23">( ESMF_SUCCESS, rc, &amp;<a name='218'>
+                            'ESMF_TimeIntervalSet(grid%step_time) FAILED', &amp;<a name='219'>
+                            __FILE__ , &amp;<a name='220'>
+                            __LINE__  )<a name='221'>
+   ELSE<a name='222'>
+      grid%step_time = grid%parents(1)%ptr%step_time / grid%parent_time_step_ratio<a name='223'>
+      grid%dt = grid%parents(1)%ptr%dt / grid%parent_time_step_ratio<a name='224'>
+      CALL nl_set_dt( grid%id, grid%dt )<a name='225'>
+   ENDIF<a name='226'>
+<a name='227'>
+#ifdef WRF_ESMF_MOD<a name='228'>
+   grid%domain_clock = ESMF_ClockCreate( TimeStep= grid%step_time,  &amp;<a name='229'>
+                                         StartTime=grid%start_time, &amp;<a name='230'>
+                                         StopTime= grid%stop_time,  &amp;<a name='231'>
+                                         rc=rc)<a name='232'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_24">( ESMF_SUCCESS, rc, &amp;<a name='233'>
+                         'grid%domain_clock = ESMF_ClockCreate() FAILED', &amp;<a name='234'>
+                         __FILE__ , &amp;<a name='235'>
+                         __LINE__  )<a name='236'>
+#else<a name='237'>
+   CALL ESMF_ClockSetOLD( grid%domain_clock,         &amp;<a name='238'>
+                          TimeStep= grid%step_time,  &amp;<a name='239'>
+                          StartTime=grid%start_time, &amp;<a name='240'>
+                          StopTime= grid%stop_time,  &amp;<a name='241'>
+                          rc=rc)<a name='242'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_25">( ESMF_SUCCESS, rc, &amp;<a name='243'>
+                         'ESMF_ClockSetOLD(grid%domain_clock) FAILED', &amp;<a name='244'>
+                         __FILE__ , &amp;<a name='245'>
+                         __LINE__  )<a name='246'>
+   CALL ESMF_ClockGetAlarmList( grid%domain_clock, grid%alarms, rc )<a name='247'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_26">( ESMF_SUCCESS, rc, &amp;<a name='248'>
+                         'ESMF_ClockGetAlarmList(grid%domain_clock) FAILED', &amp;<a name='249'>
+                         __FILE__ , &amp;<a name='250'>
+                         __LINE__  )<a name='251'>
+#endif<a name='252'>
+   CALL <A href='../../html_code/share/module_date_time.F.html#WRF_CLOCKPRINT'>wrf_clockprint</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CLOCKPRINT_32"> ( 150, grid%domain_clock, &amp;<a name='253'>
+                         'DEBUG setup_timekeeping():  grid%domain_clock after creation,' )<a name='254'>
+<a name='255'>
+<font color=#447700>! HISTORY INTERVAL<a name='256'></font>
+<font color=#447700>! history_interval is left there (and means minutes) for consistency, but <a name='257'></font>
+<font color=#447700>! history_interval_m will take precedence if specified<a name='258'></font>
+<a name='259'>
+   CALL nl_get_history_interval( grid%id, history_interval )   <font color=#447700>! same as minutes<a name='260'></font>
+   CALL nl_get_history_interval_mo( grid%id, history_interval_mo )<a name='261'>
+   CALL nl_get_history_interval_d( grid%id, history_interval_d )<a name='262'>
+   CALL nl_get_history_interval_h( grid%id, history_interval_h )<a name='263'>
+   CALL nl_get_history_interval_m( grid%id, history_interval_m )<a name='264'>
+   CALL nl_get_history_interval_s( grid%id, history_interval_s )<a name='265'>
+   IF ( history_interval_m .EQ. 0 ) history_interval_m = history_interval<a name='266'>
+<a name='267'>
+   IF ( MAX( history_interval_mo, history_interval_d,   &amp;<a name='268'>
+             history_interval_h, history_interval_m , history_interval_s   ) .GT. 0 ) THEN<a name='269'>
+     CALL ESMF_TimeIntervalSet( interval, MM=history_interval_mo, D=history_interval_d, &amp;<a name='270'>
+                                          H=history_interval_h, M=history_interval_m, S=history_interval_s, rc=rc )<a name='271'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_27">( ESMF_SUCCESS, rc, &amp;<a name='272'>
+                           'ESMF_TimeIntervalSet(history_interval) FAILED', &amp;<a name='273'>
+                           __FILE__ , &amp;<a name='274'>
+                           __LINE__  )<a name='275'>
+   ELSE<a name='276'>
+     interval = run_length + one_minute<a name='277'>
+   ENDIF<a name='278'>
+<a name='279'>
+   CALL nl_get_history_begin_y( grid%id, history_begin_y )<a name='280'>
+   CALL nl_get_history_begin_mo( grid%id, history_begin_mo )<a name='281'>
+   CALL nl_get_history_begin_d( grid%id, history_begin_d )<a name='282'>
+   CALL nl_get_history_begin_h( grid%id, history_begin_h )<a name='283'>
+   CALL nl_get_history_begin_m( grid%id, history_begin_m )<a name='284'>
+   CALL nl_get_history_begin_s( grid%id, history_begin_s )<a name='285'>
+   IF ( MAX( history_begin_y, history_begin_mo, history_begin_d,   &amp;<a name='286'>
+             history_begin_h, history_begin_m , history_begin_s   ) .GT. 0 ) THEN<a name='287'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=history_begin_mo, D=history_begin_d, &amp;<a name='288'>
+                                              H=history_begin_h, M=history_begin_m, S=history_begin_s, rc=rc )<a name='289'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_28">( ESMF_SUCCESS, rc, &amp;<a name='290'>
+                            'ESMF_TimeIntervalSet(history_begin) FAILED', &amp;<a name='291'>
+                            __FILE__ , &amp;<a name='292'>
+                            __LINE__  )<a name='293'>
+   ELSE<a name='294'>
+      begin_time = zero_time<a name='295'>
+   ENDIF<a name='296'>
+<a name='297'>
+   CALL nl_get_history_end_y( grid%id, history_end_y )<a name='298'>
+   CALL nl_get_history_end_mo( grid%id, history_end_mo )<a name='299'>
+   CALL nl_get_history_end_d( grid%id, history_end_d )<a name='300'>
+   CALL nl_get_history_end_h( grid%id, history_end_h )<a name='301'>
+   CALL nl_get_history_end_m( grid%id, history_end_m )<a name='302'>
+   CALL nl_get_history_end_s( grid%id, history_end_s )<a name='303'>
+   IF ( MAX( history_end_y, history_end_mo, history_end_d,   &amp;<a name='304'>
+             history_end_h, history_end_m , history_end_s   ) .GT. 0 ) THEN<a name='305'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=history_end_mo, D=history_end_d, &amp;<a name='306'>
+                                     H=history_end_h, M=history_end_m, S=history_end_s, rc=rc )<a name='307'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_29">( ESMF_SUCCESS, rc, &amp;<a name='308'>
+                            'ESMF_TimeIntervalSet(history_end) FAILED', &amp;<a name='309'>
+                            __FILE__ , &amp;<a name='310'>
+                            __LINE__  )<a name='311'>
+   ELSE<a name='312'>
+      end_time = run_length + one_minute<a name='313'>
+   ENDIF<a name='314'>
+<a name='315'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_1">( grid, HISTORY_ALARM, interval, begin_time, end_time )<a name='316'>
+<a name='317'>
+   IF ( begin_time .EQ. zero_time ) THEN<a name='318'>
+      CALL ESMF_AlarmRingerOn( grid%alarms( HISTORY_ALARM ),  rc=rc )<a name='319'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_30">( ESMF_SUCCESS, rc, &amp;<a name='320'>
+                            'ESMF_AlarmRingerOn(HISTORY_ALARM) FAILED', &amp;<a name='321'>
+                            __FILE__ , &amp;<a name='322'>
+                            __LINE__  )<a name='323'>
+   ENDIF<a name='324'>
+<a name='325'>
+<a name='326'>
+<font color=#447700>! RESTART INTERVAL<a name='327'></font>
+<font color=#447700>! restart_interval is left there (and means minutes) for consistency, but<a name='328'></font>
+<font color=#447700>! restart_interval_m will take precedence if specified<a name='329'></font>
+   CALL nl_get_restart_interval( 1, restart_interval )   <font color=#447700>! same as minutes<a name='330'></font>
+   CALL nl_get_restart_interval_mo( 1, restart_interval_mo )<a name='331'>
+   CALL nl_get_restart_interval_d( 1, restart_interval_d )<a name='332'>
+   CALL nl_get_restart_interval_h( 1, restart_interval_h )<a name='333'>
+   CALL nl_get_restart_interval_m( 1, restart_interval_m )<a name='334'>
+   CALL nl_get_restart_interval_s( 1, restart_interval_s )<a name='335'>
+   IF ( restart_interval_m .EQ. 0 ) restart_interval_m = restart_interval<a name='336'>
+   IF ( MAX( restart_interval_mo, restart_interval_d,   &amp;<a name='337'>
+             restart_interval_h, restart_interval_m , restart_interval_s   ) .GT. 0 ) THEN<a name='338'>
+     CALL ESMF_TimeIntervalSet( interval, MM=restart_interval_mo, D=restart_interval_d, &amp;<a name='339'>
+                                        H=restart_interval_h, M=restart_interval_m, S=restart_interval_s, rc=rc )<a name='340'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_31">( ESMF_SUCCESS, rc, &amp;<a name='341'>
+                           'ESMF_TimeIntervalSet(restart_interval) FAILED', &amp;<a name='342'>
+                           __FILE__ , &amp;<a name='343'>
+                           __LINE__  )<a name='344'>
+   ELSE<a name='345'>
+     interval = run_length + one_minute<a name='346'>
+   ENDIF<a name='347'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_2">( grid, RESTART_ALARM, interval )<a name='348'>
+<a name='349'>
+<font color=#447700>! INPUTOUT INTERVAL<a name='350'></font>
+   CALL nl_get_inputout_interval( grid%id, inputout_interval )   <font color=#447700>! same as minutes<a name='351'></font>
+   CALL nl_get_inputout_interval_mo( grid%id, inputout_interval_mo )<a name='352'>
+   CALL nl_get_inputout_interval_d( grid%id, inputout_interval_d )<a name='353'>
+   CALL nl_get_inputout_interval_h( grid%id, inputout_interval_h )<a name='354'>
+   CALL nl_get_inputout_interval_m( grid%id, inputout_interval_m )<a name='355'>
+   CALL nl_get_inputout_interval_s( grid%id, inputout_interval_s )<a name='356'>
+   IF ( inputout_interval_m .EQ. 0 ) inputout_interval_m = inputout_interval<a name='357'>
+<a name='358'>
+   IF ( MAX( inputout_interval_mo, inputout_interval_d,   &amp;<a name='359'>
+             inputout_interval_h, inputout_interval_m , inputout_interval_s   ) .GT. 0 ) THEN<a name='360'>
+     CALL ESMF_TimeIntervalSet( interval, MM=inputout_interval_mo, D=inputout_interval_d, &amp;<a name='361'>
+                                        H=inputout_interval_h, M=inputout_interval_m, S=inputout_interval_s, rc=rc )<a name='362'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_32">( ESMF_SUCCESS, rc, &amp;<a name='363'>
+                           'ESMF_TimeIntervalSet(inputout_interval) FAILED', &amp;<a name='364'>
+                           __FILE__ , &amp;<a name='365'>
+                           __LINE__  )<a name='366'>
+   ELSE<a name='367'>
+     interval = run_length + one_minute<a name='368'>
+   ENDIF<a name='369'>
+<a name='370'>
+   CALL nl_get_inputout_begin_y( grid%id, inputout_begin_y )<a name='371'>
+   CALL nl_get_inputout_begin_mo( grid%id, inputout_begin_mo )<a name='372'>
+   CALL nl_get_inputout_begin_d( grid%id, inputout_begin_d )<a name='373'>
+   CALL nl_get_inputout_begin_h( grid%id, inputout_begin_h )<a name='374'>
+   CALL nl_get_inputout_begin_m( grid%id, inputout_begin_m )<a name='375'>
+   CALL nl_get_inputout_begin_s( grid%id, inputout_begin_s )<a name='376'>
+   IF ( MAX( inputout_begin_y, inputout_begin_mo, inputout_begin_d,   &amp;<a name='377'>
+             inputout_begin_h, inputout_begin_m , inputout_begin_s   ) .GT. 0 ) THEN<a name='378'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=inputout_begin_mo, D=inputout_begin_d, &amp;<a name='379'>
+                                      H=inputout_begin_h, M=inputout_begin_m, S=inputout_begin_s, rc=rc )<a name='380'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_33">( ESMF_SUCCESS, rc, &amp;<a name='381'>
+                            'ESMF_TimeIntervalSet(inputout_begin) FAILED', &amp;<a name='382'>
+                            __FILE__ , &amp;<a name='383'>
+                            __LINE__  )<a name='384'>
+   ELSE<a name='385'>
+      begin_time = zero_time<a name='386'>
+   ENDIF<a name='387'>
+<a name='388'>
+   CALL nl_get_inputout_end_y( grid%id, inputout_end_y )<a name='389'>
+   CALL nl_get_inputout_end_mo( grid%id, inputout_end_mo )<a name='390'>
+   CALL nl_get_inputout_end_d( grid%id, inputout_end_d )<a name='391'>
+   CALL nl_get_inputout_end_h( grid%id, inputout_end_h )<a name='392'>
+   CALL nl_get_inputout_end_m( grid%id, inputout_end_m )<a name='393'>
+   CALL nl_get_inputout_end_s( grid%id, inputout_end_s )<a name='394'>
+   IF ( MAX( inputout_end_y, inputout_end_mo, inputout_end_d,   &amp;<a name='395'>
+             inputout_end_h, inputout_end_m , inputout_end_s   ) .GT. 0 ) THEN<a name='396'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=inputout_end_mo, D=inputout_end_d, &amp;<a name='397'>
+                                     H=inputout_end_h, M=inputout_end_m, S=inputout_end_s, rc=rc )<a name='398'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_34">( ESMF_SUCCESS, rc, &amp;<a name='399'>
+                            'ESMF_TimeIntervalSet(inputout_end) FAILED', &amp;<a name='400'>
+                            __FILE__ , &amp;<a name='401'>
+                            __LINE__  )<a name='402'>
+   ELSE<a name='403'>
+      end_time = run_length + one_minute<a name='404'>
+   ENDIF<a name='405'>
+<a name='406'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_3">( grid, INPUTOUT_ALARM, interval, begin_time, end_time )<a name='407'>
+<a name='408'>
+<font color=#447700>! AUXHIST1 INTERVAL<a name='409'></font>
+<font color=#447700>! auxhist1_interval is left there (and means minutes) for consistency, but<a name='410'></font>
+<font color=#447700>! auxhist1_interval_m will take precedence if specified<a name='411'></font>
+   CALL nl_get_auxhist1_interval( grid%id, auxhist1_interval )   <font color=#447700>! same as minutes<a name='412'></font>
+   CALL nl_get_auxhist1_interval_mo( grid%id, auxhist1_interval_mo )<a name='413'>
+   CALL nl_get_auxhist1_interval_d( grid%id, auxhist1_interval_d )<a name='414'>
+   CALL nl_get_auxhist1_interval_h( grid%id, auxhist1_interval_h )<a name='415'>
+   CALL nl_get_auxhist1_interval_m( grid%id, auxhist1_interval_m )<a name='416'>
+   CALL nl_get_auxhist1_interval_s( grid%id, auxhist1_interval_s )<a name='417'>
+   IF ( auxhist1_interval_m .EQ. 0 ) auxhist1_interval_m = auxhist1_interval<a name='418'>
+<a name='419'>
+   IF ( MAX( auxhist1_interval_mo, auxhist1_interval_d,   &amp;<a name='420'>
+             auxhist1_interval_h, auxhist1_interval_m , auxhist1_interval_s   ) .GT. 0 ) THEN<a name='421'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxhist1_interval_mo, D=auxhist1_interval_d, &amp;<a name='422'>
+                                        H=auxhist1_interval_h, M=auxhist1_interval_m, S=auxhist1_interval_s, rc=rc )<a name='423'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_35">( ESMF_SUCCESS, rc, &amp;<a name='424'>
+                           'ESMF_TimeIntervalSet(auxhist1_interval) FAILED', &amp;<a name='425'>
+                           __FILE__ , &amp;<a name='426'>
+                           __LINE__  )<a name='427'>
+   ELSE<a name='428'>
+     interval = run_length + one_minute<a name='429'>
+   ENDIF<a name='430'>
+<a name='431'>
+   CALL nl_get_auxhist1_begin_y( grid%id, auxhist1_begin_y )<a name='432'>
+   CALL nl_get_auxhist1_begin_mo( grid%id, auxhist1_begin_mo )<a name='433'>
+   CALL nl_get_auxhist1_begin_d( grid%id, auxhist1_begin_d )<a name='434'>
+   CALL nl_get_auxhist1_begin_h( grid%id, auxhist1_begin_h )<a name='435'>
+   CALL nl_get_auxhist1_begin_m( grid%id, auxhist1_begin_m )<a name='436'>
+   CALL nl_get_auxhist1_begin_s( grid%id, auxhist1_begin_s )<a name='437'>
+   IF ( MAX( auxhist1_begin_y, auxhist1_begin_mo, auxhist1_begin_d,   &amp;<a name='438'>
+             auxhist1_begin_h, auxhist1_begin_m , auxhist1_begin_s   ) .GT. 0 ) THEN<a name='439'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxhist1_begin_mo, D=auxhist1_begin_d, &amp;<a name='440'>
+                                      H=auxhist1_begin_h, M=auxhist1_begin_m, S=auxhist1_begin_s, rc=rc )<a name='441'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_36">( ESMF_SUCCESS, rc, &amp;<a name='442'>
+                            'ESMF_TimeIntervalSet(auxhist1_begin) FAILED', &amp;<a name='443'>
+                            __FILE__ , &amp;<a name='444'>
+                            __LINE__  )<a name='445'>
+   ELSE<a name='446'>
+      begin_time = zero_time<a name='447'>
+   ENDIF<a name='448'>
+<a name='449'>
+   CALL nl_get_auxhist1_end_y( grid%id, auxhist1_end_y )<a name='450'>
+   CALL nl_get_auxhist1_end_mo( grid%id, auxhist1_end_mo )<a name='451'>
+   CALL nl_get_auxhist1_end_d( grid%id, auxhist1_end_d )<a name='452'>
+   CALL nl_get_auxhist1_end_h( grid%id, auxhist1_end_h )<a name='453'>
+   CALL nl_get_auxhist1_end_m( grid%id, auxhist1_end_m )<a name='454'>
+   CALL nl_get_auxhist1_end_s( grid%id, auxhist1_end_s )<a name='455'>
+   IF ( MAX( auxhist1_end_y, auxhist1_end_mo, auxhist1_end_d,   &amp;<a name='456'>
+             auxhist1_end_h, auxhist1_end_m , auxhist1_end_s   ) .GT. 0 ) THEN<a name='457'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxhist1_end_mo, D=auxhist1_end_d, &amp;<a name='458'>
+                                     H=auxhist1_end_h, M=auxhist1_end_m, S=auxhist1_end_s, rc=rc )<a name='459'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_37">( ESMF_SUCCESS, rc, &amp;<a name='460'>
+                            'ESMF_TimeIntervalSet(auxhist1_end) FAILED', &amp;<a name='461'>
+                            __FILE__ , &amp;<a name='462'>
+                            __LINE__  )<a name='463'>
+   ELSE<a name='464'>
+      end_time = run_length + one_minute<a name='465'>
+   ENDIF<a name='466'>
+<a name='467'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_4">( grid, AUXHIST1_ALARM, interval, begin_time, end_time )<a name='468'>
+<a name='469'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='470'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXHIST1_ALARM ),  rc=rc )<a name='471'>
+   ENDIF<a name='472'>
+<a name='473'>
+<a name='474'>
+<font color=#447700>! AUXHIST2_ INTERVAL<a name='475'></font>
+<font color=#447700>! auxhist2_interval is left there (and means minutes) for consistency, but<a name='476'></font>
+<font color=#447700>! auxhist2_interval_m will take precedence if specified<a name='477'></font>
+   CALL nl_get_auxhist2_interval( grid%id, auxhist2_interval )   <font color=#447700>! same as minutes<a name='478'></font>
+   CALL nl_get_auxhist2_interval_mo( grid%id, auxhist2_interval_mo )<a name='479'>
+   CALL nl_get_auxhist2_interval_d( grid%id, auxhist2_interval_d )<a name='480'>
+   CALL nl_get_auxhist2_interval_h( grid%id, auxhist2_interval_h )<a name='481'>
+   CALL nl_get_auxhist2_interval_m( grid%id, auxhist2_interval_m )<a name='482'>
+   CALL nl_get_auxhist2_interval_s( grid%id, auxhist2_interval_s )<a name='483'>
+   IF ( auxhist2_interval_m .EQ. 0) auxhist2_interval_m = auxhist2_interval<a name='484'>
+<a name='485'>
+   IF ( MAX( auxhist2_interval_mo, auxhist2_interval_d,   &amp;<a name='486'>
+             auxhist2_interval_h, auxhist2_interval_m , auxhist2_interval_s   ) .GT. 0 ) THEN<a name='487'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxhist2_interval_mo, D=auxhist2_interval_d, &amp;<a name='488'>
+                                        H=auxhist2_interval_h, M=auxhist2_interval_m, S=auxhist2_interval_s, rc=rc )<a name='489'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_38">( ESMF_SUCCESS, rc, &amp;<a name='490'>
+                           'ESMF_TimeIntervalSet(auxhist2_interval) FAILED', &amp;<a name='491'>
+                           __FILE__ , &amp;<a name='492'>
+                           __LINE__  )<a name='493'>
+   ELSE<a name='494'>
+     interval = run_length + one_minute<a name='495'>
+   ENDIF<a name='496'>
+<a name='497'>
+   CALL nl_get_auxhist2_begin_y( grid%id, auxhist2_begin_y )<a name='498'>
+   CALL nl_get_auxhist2_begin_mo( grid%id, auxhist2_begin_mo )<a name='499'>
+   CALL nl_get_auxhist2_begin_d( grid%id, auxhist2_begin_d )<a name='500'>
+   CALL nl_get_auxhist2_begin_h( grid%id, auxhist2_begin_h )<a name='501'>
+   CALL nl_get_auxhist2_begin_m( grid%id, auxhist2_begin_m )<a name='502'>
+   CALL nl_get_auxhist2_begin_s( grid%id, auxhist2_begin_s )<a name='503'>
+   IF ( MAX( auxhist2_begin_y, auxhist2_begin_mo, auxhist2_begin_d,   &amp;<a name='504'>
+             auxhist2_begin_h, auxhist2_begin_m , auxhist2_begin_s   ) .GT. 0 ) THEN<a name='505'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxhist2_begin_mo, D=auxhist2_begin_d, &amp;<a name='506'>
+                                      H=auxhist2_begin_h, M=auxhist2_begin_m, S=auxhist2_begin_s, rc=rc )<a name='507'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_39">( ESMF_SUCCESS, rc, &amp;<a name='508'>
+                            'ESMF_TimeIntervalSet(auxhist2_begin) FAILED', &amp;<a name='509'>
+                            __FILE__ , &amp;<a name='510'>
+                            __LINE__  )<a name='511'>
+   ELSE<a name='512'>
+      begin_time = zero_time<a name='513'>
+   ENDIF<a name='514'>
+<a name='515'>
+   CALL nl_get_auxhist2_end_y( grid%id, auxhist2_end_y )<a name='516'>
+   CALL nl_get_auxhist2_end_mo( grid%id, auxhist2_end_mo )<a name='517'>
+   CALL nl_get_auxhist2_end_d( grid%id, auxhist2_end_d )<a name='518'>
+   CALL nl_get_auxhist2_end_h( grid%id, auxhist2_end_h )<a name='519'>
+   CALL nl_get_auxhist2_end_m( grid%id, auxhist2_end_m )<a name='520'>
+   CALL nl_get_auxhist2_end_s( grid%id, auxhist2_end_s )<a name='521'>
+   IF ( MAX( auxhist2_end_y, auxhist2_end_mo, auxhist2_end_d,   &amp;<a name='522'>
+             auxhist2_end_h, auxhist2_end_m , auxhist2_end_s   ) .GT. 0 ) THEN<a name='523'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxhist2_end_mo, D=auxhist2_end_d, &amp;<a name='524'>
+                                     H=auxhist2_end_h, M=auxhist2_end_m, S=auxhist2_end_s, rc=rc )<a name='525'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_40">( ESMF_SUCCESS, rc, &amp;<a name='526'>
+                            'ESMF_TimeIntervalSet(auxhist2_end) FAILED', &amp;<a name='527'>
+                            __FILE__ , &amp;<a name='528'>
+                            __LINE__  )<a name='529'>
+   ELSE<a name='530'>
+      end_time = run_length + one_minute<a name='531'>
+   ENDIF<a name='532'>
+<a name='533'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_5">( grid, AUXHIST2_ALARM, interval, begin_time, end_time )<a name='534'>
+<a name='535'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='536'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXHIST2_ALARM ),  rc=rc )<a name='537'>
+   ENDIF<a name='538'>
+<a name='539'>
+<font color=#447700>! AUXHIST3_ INTERVAL<a name='540'></font>
+<font color=#447700>! auxhist3_interval is left there (and means minutes) for consistency, but<a name='541'></font>
+<font color=#447700>! auxhist3_interval_m will take precedence if specified<a name='542'></font>
+   CALL nl_get_auxhist3_interval( grid%id, auxhist3_interval )   <font color=#447700>! same as minutes<a name='543'></font>
+   CALL nl_get_auxhist3_interval_mo( grid%id, auxhist3_interval_mo )<a name='544'>
+   CALL nl_get_auxhist3_interval_d( grid%id, auxhist3_interval_d )<a name='545'>
+   CALL nl_get_auxhist3_interval_h( grid%id, auxhist3_interval_h )<a name='546'>
+   CALL nl_get_auxhist3_interval_m( grid%id, auxhist3_interval_m )<a name='547'>
+   CALL nl_get_auxhist3_interval_s( grid%id, auxhist3_interval_s )<a name='548'>
+   IF ( auxhist3_interval_m .EQ. 0 ) auxhist3_interval_m = auxhist3_interval<a name='549'>
+<a name='550'>
+   IF ( MAX( auxhist3_interval_mo, auxhist3_interval_d,   &amp;<a name='551'>
+             auxhist3_interval_h, auxhist3_interval_m , auxhist3_interval_s   ) .GT. 0 ) THEN<a name='552'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxhist3_interval_mo, D=auxhist3_interval_d, &amp;<a name='553'>
+                                        H=auxhist3_interval_h, M=auxhist3_interval_m, S=auxhist3_interval_s, rc=rc )<a name='554'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_41">( ESMF_SUCCESS, rc, &amp;<a name='555'>
+                           'ESMF_TimeIntervalSet(auxhist3_interval) FAILED', &amp;<a name='556'>
+                           __FILE__ , &amp;<a name='557'>
+                           __LINE__  )<a name='558'>
+   ELSE<a name='559'>
+     interval = run_length + one_minute<a name='560'>
+   ENDIF<a name='561'>
+<a name='562'>
+   CALL nl_get_auxhist3_begin_y( grid%id, auxhist3_begin_y )<a name='563'>
+   CALL nl_get_auxhist3_begin_mo( grid%id, auxhist3_begin_mo )<a name='564'>
+   CALL nl_get_auxhist3_begin_d( grid%id, auxhist3_begin_d )<a name='565'>
+   CALL nl_get_auxhist3_begin_h( grid%id, auxhist3_begin_h )<a name='566'>
+   CALL nl_get_auxhist3_begin_m( grid%id, auxhist3_begin_m )<a name='567'>
+   CALL nl_get_auxhist3_begin_s( grid%id, auxhist3_begin_s )<a name='568'>
+   IF ( MAX( auxhist3_begin_y, auxhist3_begin_mo, auxhist3_begin_d,   &amp;<a name='569'>
+             auxhist3_begin_h, auxhist3_begin_m , auxhist3_begin_s   ) .GT. 0 ) THEN<a name='570'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxhist3_begin_mo, D=auxhist3_begin_d, &amp;<a name='571'>
+                                      H=auxhist3_begin_h, M=auxhist3_begin_m, S=auxhist3_begin_s, rc=rc )<a name='572'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_42">( ESMF_SUCCESS, rc, &amp;<a name='573'>
+                            'ESMF_TimeIntervalSet(auxhist3_begin) FAILED', &amp;<a name='574'>
+                            __FILE__ , &amp;<a name='575'>
+                            __LINE__  )<a name='576'>
+   ELSE<a name='577'>
+      begin_time = zero_time<a name='578'>
+   ENDIF<a name='579'>
+<a name='580'>
+   CALL nl_get_auxhist3_end_y( grid%id, auxhist3_end_y )<a name='581'>
+   CALL nl_get_auxhist3_end_mo( grid%id, auxhist3_end_mo )<a name='582'>
+   CALL nl_get_auxhist3_end_d( grid%id, auxhist3_end_d )<a name='583'>
+   CALL nl_get_auxhist3_end_h( grid%id, auxhist3_end_h )<a name='584'>
+   CALL nl_get_auxhist3_end_m( grid%id, auxhist3_end_m )<a name='585'>
+   CALL nl_get_auxhist3_end_s( grid%id, auxhist3_end_s )<a name='586'>
+   IF ( MAX( auxhist3_end_y, auxhist3_end_mo, auxhist3_end_d,   &amp;<a name='587'>
+             auxhist3_end_h, auxhist3_end_m , auxhist3_end_s   ) .GT. 0 ) THEN<a name='588'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxhist3_end_mo, D=auxhist3_end_d, &amp;<a name='589'>
+                                     H=auxhist3_end_h, M=auxhist3_end_m, S=auxhist3_end_s, rc=rc )<a name='590'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_43">( ESMF_SUCCESS, rc, &amp;<a name='591'>
+                            'ESMF_TimeIntervalSet(auxhist3_end) FAILED', &amp;<a name='592'>
+                            __FILE__ , &amp;<a name='593'>
+                            __LINE__  )<a name='594'>
+   ELSE<a name='595'>
+      end_time = run_length + one_minute<a name='596'>
+   ENDIF<a name='597'>
+<a name='598'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_6">( grid, AUXHIST3_ALARM, interval, begin_time, end_time )<a name='599'>
+<a name='600'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='601'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXHIST3_ALARM ),  rc=rc )<a name='602'>
+   ENDIF<a name='603'>
+<a name='604'>
+<font color=#447700>! AUXHIST4_ INTERVAL<a name='605'></font>
+<font color=#447700>! auxhist4_interval is left there (and means minutes) for consistency, but<a name='606'></font>
+<font color=#447700>! auxhist4_interval_m will take precedence if specified<a name='607'></font>
+   CALL nl_get_auxhist4_interval( grid%id, auxhist4_interval )   <font color=#447700>! same as minutes<a name='608'></font>
+   CALL nl_get_auxhist4_interval_mo( grid%id, auxhist4_interval_mo )<a name='609'>
+   CALL nl_get_auxhist4_interval_d( grid%id, auxhist4_interval_d )<a name='610'>
+   CALL nl_get_auxhist4_interval_h( grid%id, auxhist4_interval_h )<a name='611'>
+   CALL nl_get_auxhist4_interval_m( grid%id, auxhist4_interval_m )<a name='612'>
+   CALL nl_get_auxhist4_interval_s( grid%id, auxhist4_interval_s )<a name='613'>
+   IF ( auxhist4_interval_m .EQ. 0 ) auxhist4_interval_m = auxhist4_interval<a name='614'>
+<a name='615'>
+   IF ( MAX( auxhist4_interval_mo, auxhist4_interval_d,   &amp;<a name='616'>
+             auxhist4_interval_h, auxhist4_interval_m , auxhist4_interval_s   ) .GT. 0 ) THEN<a name='617'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxhist4_interval_mo, D=auxhist4_interval_d, &amp;<a name='618'>
+                                        H=auxhist4_interval_h, M=auxhist4_interval_m, S=auxhist4_interval_s, rc=rc )<a name='619'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_44">( ESMF_SUCCESS, rc, &amp;<a name='620'>
+                           'ESMF_TimeIntervalSet(auxhist4_interval) FAILED', &amp;<a name='621'>
+                           __FILE__ , &amp;<a name='622'>
+                           __LINE__  )<a name='623'>
+   ELSE<a name='624'>
+     interval = run_length + one_minute<a name='625'>
+   ENDIF<a name='626'>
+<a name='627'>
+   CALL nl_get_auxhist4_begin_y( grid%id, auxhist4_begin_y )<a name='628'>
+   CALL nl_get_auxhist4_begin_mo( grid%id, auxhist4_begin_mo )<a name='629'>
+   CALL nl_get_auxhist4_begin_d( grid%id, auxhist4_begin_d )<a name='630'>
+   CALL nl_get_auxhist4_begin_h( grid%id, auxhist4_begin_h )<a name='631'>
+   CALL nl_get_auxhist4_begin_m( grid%id, auxhist4_begin_m )<a name='632'>
+   CALL nl_get_auxhist4_begin_s( grid%id, auxhist4_begin_s )<a name='633'>
+   IF ( MAX( auxhist4_begin_y, auxhist4_begin_mo, auxhist4_begin_d,   &amp;<a name='634'>
+             auxhist4_begin_h, auxhist4_begin_m , auxhist4_begin_s   ) .GT. 0 ) THEN<a name='635'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxhist4_begin_mo, D=auxhist4_begin_d, &amp;<a name='636'>
+                                      H=auxhist4_begin_h, M=auxhist4_begin_m, S=auxhist4_begin_s, rc=rc )<a name='637'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_45">( ESMF_SUCCESS, rc, &amp;<a name='638'>
+                            'ESMF_TimeIntervalSet(auxhist4_begin) FAILED', &amp;<a name='639'>
+                            __FILE__ , &amp;<a name='640'>
+                            __LINE__  )<a name='641'>
+   ELSE<a name='642'>
+      begin_time = zero_time<a name='643'>
+   ENDIF<a name='644'>
+<a name='645'>
+   CALL nl_get_auxhist4_end_y( grid%id, auxhist4_end_y )<a name='646'>
+   CALL nl_get_auxhist4_end_mo( grid%id, auxhist4_end_mo )<a name='647'>
+   CALL nl_get_auxhist4_end_d( grid%id, auxhist4_end_d )<a name='648'>
+   CALL nl_get_auxhist4_end_h( grid%id, auxhist4_end_h )<a name='649'>
+   CALL nl_get_auxhist4_end_m( grid%id, auxhist4_end_m )<a name='650'>
+   CALL nl_get_auxhist4_end_s( grid%id, auxhist4_end_s )<a name='651'>
+   IF ( MAX( auxhist4_end_y, auxhist4_end_mo, auxhist4_end_d,   &amp;<a name='652'>
+             auxhist4_end_h, auxhist4_end_m , auxhist4_end_s   ) .GT. 0 ) THEN<a name='653'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxhist4_end_mo, D=auxhist4_end_d, &amp;<a name='654'>
+                                     H=auxhist4_end_h, M=auxhist4_end_m, S=auxhist4_end_s, rc=rc )<a name='655'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_46">( ESMF_SUCCESS, rc, &amp;<a name='656'>
+                            'ESMF_TimeIntervalSet(auxhist4_end) FAILED', &amp;<a name='657'>
+                            __FILE__ , &amp;<a name='658'>
+                            __LINE__  )<a name='659'>
+   ELSE<a name='660'>
+      end_time = run_length + one_minute<a name='661'>
+   ENDIF<a name='662'>
+<a name='663'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_7">( grid, AUXHIST4_ALARM, interval, begin_time, end_time )<a name='664'>
+<a name='665'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='666'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXHIST4_ALARM ),  rc=rc )<a name='667'>
+   ENDIF<a name='668'>
+<a name='669'>
+<font color=#447700>! AUXHIST5_ INTERVAL<a name='670'></font>
+<font color=#447700>! auxhist5_interval is left there (and means minutes) for consistency, but<a name='671'></font>
+<font color=#447700>! auxhist5_interval_m will take precedence if specified<a name='672'></font>
+   CALL nl_get_auxhist5_interval( grid%id, auxhist5_interval )   <font color=#447700>! same as minutes<a name='673'></font>
+   CALL nl_get_auxhist5_interval_mo( grid%id, auxhist5_interval_mo )<a name='674'>
+   CALL nl_get_auxhist5_interval_d( grid%id, auxhist5_interval_d )<a name='675'>
+   CALL nl_get_auxhist5_interval_h( grid%id, auxhist5_interval_h )<a name='676'>
+   CALL nl_get_auxhist5_interval_m( grid%id, auxhist5_interval_m )<a name='677'>
+   CALL nl_get_auxhist5_interval_s( grid%id, auxhist5_interval_s )<a name='678'>
+   IF ( auxhist5_interval_m .EQ. 0 ) auxhist5_interval_m = auxhist5_interval<a name='679'>
+<a name='680'>
+   IF ( MAX( auxhist5_interval_mo, auxhist5_interval_d,   &amp;<a name='681'>
+             auxhist5_interval_h, auxhist5_interval_m , auxhist5_interval_s   ) .GT. 0 ) THEN<a name='682'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxhist5_interval_mo, D=auxhist5_interval_d, &amp;<a name='683'>
+                                        H=auxhist5_interval_h, M=auxhist5_interval_m, S=auxhist5_interval_s, rc=rc )<a name='684'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_47">( ESMF_SUCCESS, rc, &amp;<a name='685'>
+                           'ESMF_TimeIntervalSet(auxhist5_interval) FAILED', &amp;<a name='686'>
+                           __FILE__ , &amp;<a name='687'>
+                           __LINE__  )<a name='688'>
+   ELSE<a name='689'>
+     interval = run_length + one_minute<a name='690'>
+   ENDIF<a name='691'>
+<a name='692'>
+   CALL nl_get_auxhist5_begin_y( grid%id, auxhist5_begin_y )<a name='693'>
+   CALL nl_get_auxhist5_begin_mo( grid%id, auxhist5_begin_mo )<a name='694'>
+   CALL nl_get_auxhist5_begin_d( grid%id, auxhist5_begin_d )<a name='695'>
+   CALL nl_get_auxhist5_begin_h( grid%id, auxhist5_begin_h )<a name='696'>
+   CALL nl_get_auxhist5_begin_m( grid%id, auxhist5_begin_m )<a name='697'>
+   CALL nl_get_auxhist5_begin_s( grid%id, auxhist5_begin_s )<a name='698'>
+   IF ( MAX( auxhist5_begin_y, auxhist5_begin_mo, auxhist5_begin_d,   &amp;<a name='699'>
+             auxhist5_begin_h, auxhist5_begin_m , auxhist5_begin_s   ) .GT. 0 ) THEN<a name='700'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxhist5_begin_mo, D=auxhist5_begin_d, &amp;<a name='701'>
+                                      H=auxhist5_begin_h, M=auxhist5_begin_m, S=auxhist5_begin_s, rc=rc )<a name='702'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_48">( ESMF_SUCCESS, rc, &amp;<a name='703'>
+                            'ESMF_TimeIntervalSet(auxhist5_begin) FAILED', &amp;<a name='704'>
+                            __FILE__ , &amp;<a name='705'>
+                            __LINE__  )<a name='706'>
+   ELSE<a name='707'>
+      begin_time = zero_time<a name='708'>
+   ENDIF<a name='709'>
+<a name='710'>
+   CALL nl_get_auxhist5_end_y( grid%id, auxhist5_end_y )<a name='711'>
+   CALL nl_get_auxhist5_end_mo( grid%id, auxhist5_end_mo )<a name='712'>
+   CALL nl_get_auxhist5_end_d( grid%id, auxhist5_end_d )<a name='713'>
+   CALL nl_get_auxhist5_end_h( grid%id, auxhist5_end_h )<a name='714'>
+   CALL nl_get_auxhist5_end_m( grid%id, auxhist5_end_m )<a name='715'>
+   CALL nl_get_auxhist5_end_s( grid%id, auxhist5_end_s )<a name='716'>
+   IF ( MAX( auxhist5_end_y, auxhist5_end_mo, auxhist5_end_d,   &amp;<a name='717'>
+             auxhist5_end_h, auxhist5_end_m , auxhist5_end_s   ) .GT. 0 ) THEN<a name='718'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxhist5_end_mo, D=auxhist5_end_d, &amp;<a name='719'>
+                                     H=auxhist5_end_h, M=auxhist5_end_m, S=auxhist5_end_s, rc=rc )<a name='720'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_49">( ESMF_SUCCESS, rc, &amp;<a name='721'>
+                            'ESMF_TimeIntervalSet(auxhist5_end) FAILED', &amp;<a name='722'>
+                            __FILE__ , &amp;<a name='723'>
+                            __LINE__  )<a name='724'>
+   ELSE<a name='725'>
+      end_time = run_length + one_minute<a name='726'>
+   ENDIF<a name='727'>
+<a name='728'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_8">( grid, AUXHIST5_ALARM, interval, begin_time, end_time )<a name='729'>
+<a name='730'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='731'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXHIST5_ALARM ),  rc=rc )<a name='732'>
+   ENDIF<a name='733'>
+<a name='734'>
+<font color=#447700>! AUXINPUT1_ INTERVAL<a name='735'></font>
+<font color=#447700>! auxinput1_interval is left there (and means minutes) for consistency, but<a name='736'></font>
+<font color=#447700>! auxinput1_interval_m will take precedence if specified<a name='737'></font>
+   CALL nl_get_auxinput1_interval( grid%id, auxinput1_interval )   <font color=#447700>! same as minutes<a name='738'></font>
+   CALL nl_get_auxinput1_interval_mo( grid%id, auxinput1_interval_mo )<a name='739'>
+   CALL nl_get_auxinput1_interval_d( grid%id, auxinput1_interval_d )<a name='740'>
+   CALL nl_get_auxinput1_interval_h( grid%id, auxinput1_interval_h )<a name='741'>
+   CALL nl_get_auxinput1_interval_m( grid%id, auxinput1_interval_m )<a name='742'>
+   CALL nl_get_auxinput1_interval_s( grid%id, auxinput1_interval_s )<a name='743'>
+   IF ( auxinput1_interval_m .EQ. 0 ) auxinput1_interval_m = auxinput1_interval<a name='744'>
+<a name='745'>
+   IF ( MAX( auxinput1_interval_mo, auxinput1_interval_d,   &amp;<a name='746'>
+             auxinput1_interval_h, auxinput1_interval_m , auxinput1_interval_s   ) .GT. 0 ) THEN<a name='747'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxinput1_interval_mo, D=auxinput1_interval_d, &amp;<a name='748'>
+                                        H=auxinput1_interval_h, M=auxinput1_interval_m, S=auxinput1_interval_s, rc=rc )<a name='749'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_50">( ESMF_SUCCESS, rc, &amp;<a name='750'>
+                           'ESMF_TimeIntervalSet(auxinput1_interval) FAILED', &amp;<a name='751'>
+                           __FILE__ , &amp;<a name='752'>
+                           __LINE__  )<a name='753'>
+   ELSE<a name='754'>
+     interval = run_length + one_minute<a name='755'>
+   ENDIF<a name='756'>
+<a name='757'>
+   CALL nl_get_auxinput1_begin_y( grid%id, auxinput1_begin_y )<a name='758'>
+   CALL nl_get_auxinput1_begin_mo( grid%id, auxinput1_begin_mo )<a name='759'>
+   CALL nl_get_auxinput1_begin_d( grid%id, auxinput1_begin_d )<a name='760'>
+   CALL nl_get_auxinput1_begin_h( grid%id, auxinput1_begin_h )<a name='761'>
+   CALL nl_get_auxinput1_begin_m( grid%id, auxinput1_begin_m )<a name='762'>
+   CALL nl_get_auxinput1_begin_s( grid%id, auxinput1_begin_s )<a name='763'>
+   IF ( MAX( auxinput1_begin_y, auxinput1_begin_mo, auxinput1_begin_d,   &amp;<a name='764'>
+             auxinput1_begin_h, auxinput1_begin_m , auxinput1_begin_s   ) .GT. 0 ) THEN<a name='765'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxinput1_begin_mo, D=auxinput1_begin_d, &amp;<a name='766'>
+                                      H=auxinput1_begin_h, M=auxinput1_begin_m, S=auxinput1_begin_s, rc=rc )<a name='767'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_51">( ESMF_SUCCESS, rc, &amp;<a name='768'>
+                            'ESMF_TimeIntervalSet(auxinput1_begin) FAILED', &amp;<a name='769'>
+                            __FILE__ , &amp;<a name='770'>
+                            __LINE__  )<a name='771'>
+   ELSE<a name='772'>
+      begin_time = zero_time<a name='773'>
+   ENDIF<a name='774'>
+<a name='775'>
+   CALL nl_get_auxinput1_end_y( grid%id, auxinput1_end_y )<a name='776'>
+   CALL nl_get_auxinput1_end_mo( grid%id, auxinput1_end_mo )<a name='777'>
+   CALL nl_get_auxinput1_end_d( grid%id, auxinput1_end_d )<a name='778'>
+   CALL nl_get_auxinput1_end_h( grid%id, auxinput1_end_h )<a name='779'>
+   CALL nl_get_auxinput1_end_m( grid%id, auxinput1_end_m )<a name='780'>
+   CALL nl_get_auxinput1_end_s( grid%id, auxinput1_end_s )<a name='781'>
+   IF ( MAX( auxinput1_end_y, auxinput1_end_mo, auxinput1_end_d,   &amp;<a name='782'>
+             auxinput1_end_h, auxinput1_end_m , auxinput1_end_s   ) .GT. 0 ) THEN<a name='783'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxinput1_end_mo, D=auxinput1_end_d, &amp;<a name='784'>
+                                     H=auxinput1_end_h, M=auxinput1_end_m, S=auxinput1_end_s, rc=rc )<a name='785'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_52">( ESMF_SUCCESS, rc, &amp;<a name='786'>
+                            'ESMF_TimeIntervalSet(auxinput1_end) FAILED', &amp;<a name='787'>
+                            __FILE__ , &amp;<a name='788'>
+                            __LINE__  )<a name='789'>
+   ELSE<a name='790'>
+      end_time = run_length + one_minute<a name='791'>
+   ENDIF<a name='792'>
+<a name='793'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_9">( grid, AUXINPUT1_ALARM, interval, begin_time, end_time )<a name='794'>
+<a name='795'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='796'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT1_ALARM ),  rc=rc )<a name='797'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_53">( ESMF_SUCCESS, rc, &amp;<a name='798'>
+                           'ESMF_AlarmRingerOn(AUXINPUT1_ALARM) FAILED', &amp;<a name='799'>
+                           __FILE__ , &amp;<a name='800'>
+                           __LINE__  )<a name='801'>
+   ENDIF<a name='802'>
+<a name='803'>
+<font color=#447700>! AUXINPUT2_ INTERVAL<a name='804'></font>
+<font color=#447700>! auxinput2_interval is left there (and means minutes) for consistency, but<a name='805'></font>
+<font color=#447700>! auxinput2_interval_m will take precedence if specified<a name='806'></font>
+   CALL nl_get_auxinput2_interval( grid%id, auxinput2_interval )   <font color=#447700>! same as minutes<a name='807'></font>
+   CALL nl_get_auxinput2_interval_mo( grid%id, auxinput2_interval_mo )<a name='808'>
+   CALL nl_get_auxinput2_interval_d( grid%id, auxinput2_interval_d )<a name='809'>
+   CALL nl_get_auxinput2_interval_h( grid%id, auxinput2_interval_h )<a name='810'>
+   CALL nl_get_auxinput2_interval_m( grid%id, auxinput2_interval_m )<a name='811'>
+   CALL nl_get_auxinput2_interval_s( grid%id, auxinput2_interval_s )<a name='812'>
+   IF ( auxinput2_interval_m .EQ. 0 ) auxinput2_interval_m = auxinput2_interval<a name='813'>
+<a name='814'>
+   IF ( MAX( auxinput2_interval_mo, auxinput2_interval_d,   &amp;<a name='815'>
+             auxinput2_interval_h, auxinput2_interval_m , auxinput2_interval_s   ) .GT. 0 ) THEN<a name='816'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxinput2_interval_mo, D=auxinput2_interval_d, &amp;<a name='817'>
+                                        H=auxinput2_interval_h, M=auxinput2_interval_m, S=auxinput2_interval_s, rc=rc )<a name='818'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_54">( ESMF_SUCCESS, rc, &amp;<a name='819'>
+                           'ESMF_TimeIntervalSet(auxinput2_interval) FAILED', &amp;<a name='820'>
+                           __FILE__ , &amp;<a name='821'>
+                           __LINE__  )<a name='822'>
+   ELSE<a name='823'>
+     interval = run_length + one_minute<a name='824'>
+   ENDIF<a name='825'>
+<a name='826'>
+   CALL nl_get_auxinput2_begin_y( grid%id, auxinput2_begin_y )<a name='827'>
+   CALL nl_get_auxinput2_begin_mo( grid%id, auxinput2_begin_mo )<a name='828'>
+   CALL nl_get_auxinput2_begin_d( grid%id, auxinput2_begin_d )<a name='829'>
+   CALL nl_get_auxinput2_begin_h( grid%id, auxinput2_begin_h )<a name='830'>
+   CALL nl_get_auxinput2_begin_m( grid%id, auxinput2_begin_m )<a name='831'>
+   CALL nl_get_auxinput2_begin_s( grid%id, auxinput2_begin_s )<a name='832'>
+   IF ( MAX( auxinput2_begin_y, auxinput2_begin_mo, auxinput2_begin_d,   &amp;<a name='833'>
+             auxinput2_begin_h, auxinput2_begin_m , auxinput2_begin_s   ) .GT. 0 ) THEN<a name='834'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxinput2_begin_mo, D=auxinput2_begin_d, &amp;<a name='835'>
+                                      H=auxinput2_begin_h, M=auxinput2_begin_m, S=auxinput2_begin_s, rc=rc )<a name='836'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_55">( ESMF_SUCCESS, rc, &amp;<a name='837'>
+                            'ESMF_TimeIntervalSet(auxinput2_begin) FAILED', &amp;<a name='838'>
+                            __FILE__ , &amp;<a name='839'>
+                            __LINE__  )<a name='840'>
+   ELSE<a name='841'>
+      begin_time = zero_time<a name='842'>
+   ENDIF<a name='843'>
+<a name='844'>
+   CALL nl_get_auxinput2_end_y( grid%id, auxinput2_end_y )<a name='845'>
+   CALL nl_get_auxinput2_end_mo( grid%id, auxinput2_end_mo )<a name='846'>
+   CALL nl_get_auxinput2_end_d( grid%id, auxinput2_end_d )<a name='847'>
+   CALL nl_get_auxinput2_end_h( grid%id, auxinput2_end_h )<a name='848'>
+   CALL nl_get_auxinput2_end_m( grid%id, auxinput2_end_m )<a name='849'>
+   CALL nl_get_auxinput2_end_s( grid%id, auxinput2_end_s )<a name='850'>
+   IF ( MAX( auxinput2_end_y, auxinput2_end_mo, auxinput2_end_d,   &amp;<a name='851'>
+             auxinput2_end_h, auxinput2_end_m , auxinput2_end_s   ) .GT. 0 ) THEN<a name='852'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxinput2_end_mo, D=auxinput2_end_d, &amp;<a name='853'>
+                                     H=auxinput2_end_h, M=auxinput2_end_m, S=auxinput2_end_s, rc=rc )<a name='854'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_56">( ESMF_SUCCESS, rc, &amp;<a name='855'>
+                            'ESMF_TimeIntervalSet(auxinput2_end) FAILED', &amp;<a name='856'>
+                            __FILE__ , &amp;<a name='857'>
+                            __LINE__  )<a name='858'>
+   ELSE<a name='859'>
+      end_time = run_length + one_minute<a name='860'>
+   ENDIF<a name='861'>
+<a name='862'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_10">( grid, AUXINPUT2_ALARM, interval, begin_time, end_time )<a name='863'>
+<a name='864'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='865'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT2_ALARM ),  rc=rc )<a name='866'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_57">( ESMF_SUCCESS, rc, &amp;<a name='867'>
+                           'ESMF_AlarmRingerOn(AUXINPUT2_ALARM) FAILED', &amp;<a name='868'>
+                           __FILE__ , &amp;<a name='869'>
+                           __LINE__  )<a name='870'>
+   ENDIF<a name='871'>
+<a name='872'>
+<font color=#447700>! AUXINPUT3_ INTERVAL<a name='873'></font>
+<font color=#447700>! auxinput3_interval is left there (and means minutes) for consistency, but<a name='874'></font>
+<font color=#447700>! auxinput3_interval_m will take precedence if specified<a name='875'></font>
+   CALL nl_get_auxinput3_interval( grid%id, auxinput3_interval )   <font color=#447700>! same as minutes<a name='876'></font>
+   CALL nl_get_auxinput3_interval_mo( grid%id, auxinput3_interval_mo )<a name='877'>
+   CALL nl_get_auxinput3_interval_d( grid%id, auxinput3_interval_d )<a name='878'>
+   CALL nl_get_auxinput3_interval_h( grid%id, auxinput3_interval_h )<a name='879'>
+   CALL nl_get_auxinput3_interval_m( grid%id, auxinput3_interval_m )<a name='880'>
+   CALL nl_get_auxinput3_interval_s( grid%id, auxinput3_interval_s )<a name='881'>
+   IF ( auxinput3_interval_m .EQ. 0 ) auxinput3_interval_m = auxinput3_interval<a name='882'>
+<a name='883'>
+   IF ( MAX( auxinput3_interval_mo, auxinput3_interval_d,   &amp;<a name='884'>
+             auxinput3_interval_h, auxinput3_interval_m , auxinput3_interval_s   ) .GT. 0 ) THEN<a name='885'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxinput3_interval_mo, D=auxinput3_interval_d, &amp;<a name='886'>
+                                        H=auxinput3_interval_h, M=auxinput3_interval_m, S=auxinput3_interval_s, rc=rc )<a name='887'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_58">( ESMF_SUCCESS, rc, &amp;<a name='888'>
+                           'ESMF_TimeIntervalSet(auxinput3_interval) FAILED', &amp;<a name='889'>
+                           __FILE__ , &amp;<a name='890'>
+                           __LINE__  )<a name='891'>
+   ELSE<a name='892'>
+     interval = run_length + one_minute<a name='893'>
+   ENDIF<a name='894'>
+<a name='895'>
+   CALL nl_get_auxinput3_begin_y( grid%id, auxinput3_begin_y )<a name='896'>
+   CALL nl_get_auxinput3_begin_mo( grid%id, auxinput3_begin_mo )<a name='897'>
+   CALL nl_get_auxinput3_begin_d( grid%id, auxinput3_begin_d )<a name='898'>
+   CALL nl_get_auxinput3_begin_h( grid%id, auxinput3_begin_h )<a name='899'>
+   CALL nl_get_auxinput3_begin_m( grid%id, auxinput3_begin_m )<a name='900'>
+   CALL nl_get_auxinput3_begin_s( grid%id, auxinput3_begin_s )<a name='901'>
+   IF ( MAX( auxinput3_begin_y, auxinput3_begin_mo, auxinput3_begin_d,   &amp;<a name='902'>
+             auxinput3_begin_h, auxinput3_begin_m , auxinput3_begin_s   ) .GT. 0 ) THEN<a name='903'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxinput3_begin_mo, D=auxinput3_begin_d, &amp;<a name='904'>
+                                      H=auxinput3_begin_h, M=auxinput3_begin_m, S=auxinput3_begin_s, rc=rc )<a name='905'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_59">( ESMF_SUCCESS, rc, &amp;<a name='906'>
+                            'ESMF_TimeIntervalSet(auxinput3_begin) FAILED', &amp;<a name='907'>
+                            __FILE__ , &amp;<a name='908'>
+                            __LINE__  )<a name='909'>
+   ELSE<a name='910'>
+      begin_time = zero_time<a name='911'>
+   ENDIF<a name='912'>
+<a name='913'>
+   CALL nl_get_auxinput3_end_y( grid%id, auxinput3_end_y )<a name='914'>
+   CALL nl_get_auxinput3_end_mo( grid%id, auxinput3_end_mo )<a name='915'>
+   CALL nl_get_auxinput3_end_d( grid%id, auxinput3_end_d )<a name='916'>
+   CALL nl_get_auxinput3_end_h( grid%id, auxinput3_end_h )<a name='917'>
+   CALL nl_get_auxinput3_end_m( grid%id, auxinput3_end_m )<a name='918'>
+   CALL nl_get_auxinput3_end_s( grid%id, auxinput3_end_s )<a name='919'>
+   IF ( MAX( auxinput3_end_y, auxinput3_end_mo, auxinput3_end_d,   &amp;<a name='920'>
+             auxinput3_end_h, auxinput3_end_m , auxinput3_end_s   ) .GT. 0 ) THEN<a name='921'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxinput3_end_mo, D=auxinput3_end_d, &amp;<a name='922'>
+                                     H=auxinput3_end_h, M=auxinput3_end_m, S=auxinput3_end_s, rc=rc )<a name='923'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_60">( ESMF_SUCCESS, rc, &amp;<a name='924'>
+                            'ESMF_TimeIntervalSet(auxinput3_end) FAILED', &amp;<a name='925'>
+                            __FILE__ , &amp;<a name='926'>
+                            __LINE__  )<a name='927'>
+   ELSE<a name='928'>
+      end_time = run_length + one_minute<a name='929'>
+   ENDIF<a name='930'>
+<a name='931'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_11">( grid, AUXINPUT3_ALARM, interval, begin_time, end_time )<a name='932'>
+<a name='933'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='934'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT3_ALARM ),  rc=rc )<a name='935'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_61">( ESMF_SUCCESS, rc, &amp;<a name='936'>
+                           'ESMF_AlarmRingerOn(AUXINPUT3_ALARM) FAILED', &amp;<a name='937'>
+                           __FILE__ , &amp;<a name='938'>
+                           __LINE__  )<a name='939'>
+   ENDIF<a name='940'>
+<a name='941'>
+<font color=#447700>! AUXINPUT4_ INTERVAL<a name='942'></font>
+<font color=#447700>! auxinput4_interval is left there (and means minutes) for consistency, but<a name='943'></font>
+<font color=#447700>! auxinput4_interval_m will take precedence if specified<a name='944'></font>
+   CALL nl_get_auxinput4_interval( grid%id, auxinput4_interval )   <font color=#447700>! same as minutes<a name='945'></font>
+   CALL nl_get_auxinput4_interval_mo( grid%id, auxinput4_interval_mo )<a name='946'>
+   CALL nl_get_auxinput4_interval_d( grid%id, auxinput4_interval_d )<a name='947'>
+   CALL nl_get_auxinput4_interval_h( grid%id, auxinput4_interval_h )<a name='948'>
+   CALL nl_get_auxinput4_interval_m( grid%id, auxinput4_interval_m )<a name='949'>
+   CALL nl_get_auxinput4_interval_s( grid%id, auxinput4_interval_s )<a name='950'>
+   IF ( auxinput4_interval_m .EQ. 0 ) auxinput4_interval_m = auxinput4_interval<a name='951'>
+<a name='952'>
+   IF ( MAX( auxinput4_interval_mo, auxinput4_interval_d,   &amp;<a name='953'>
+             auxinput4_interval_h, auxinput4_interval_m , auxinput4_interval_s   ) .GT. 0 ) THEN<a name='954'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxinput4_interval_mo, D=auxinput4_interval_d, &amp;<a name='955'>
+                                        H=auxinput4_interval_h, M=auxinput4_interval_m, S=auxinput4_interval_s, rc=rc )<a name='956'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_62">( ESMF_SUCCESS, rc, &amp;<a name='957'>
+                           'ESMF_TimeIntervalSet(auxinput4_interval) FAILED', &amp;<a name='958'>
+                           __FILE__ , &amp;<a name='959'>
+                           __LINE__  )<a name='960'>
+   ELSE<a name='961'>
+     interval = run_length + one_minute<a name='962'>
+   ENDIF<a name='963'>
+<a name='964'>
+   CALL nl_get_auxinput4_begin_y( grid%id, auxinput4_begin_y )<a name='965'>
+   CALL nl_get_auxinput4_begin_mo( grid%id, auxinput4_begin_mo )<a name='966'>
+   CALL nl_get_auxinput4_begin_d( grid%id, auxinput4_begin_d )<a name='967'>
+   CALL nl_get_auxinput4_begin_h( grid%id, auxinput4_begin_h )<a name='968'>
+   CALL nl_get_auxinput4_begin_m( grid%id, auxinput4_begin_m )<a name='969'>
+   CALL nl_get_auxinput4_begin_s( grid%id, auxinput4_begin_s )<a name='970'>
+   IF ( MAX( auxinput4_begin_y, auxinput4_begin_mo, auxinput4_begin_d,   &amp;<a name='971'>
+             auxinput4_begin_h, auxinput4_begin_m , auxinput4_begin_s   ) .GT. 0 ) THEN<a name='972'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxinput4_begin_mo, D=auxinput4_begin_d, &amp;<a name='973'>
+                                      H=auxinput4_begin_h, M=auxinput4_begin_m, S=auxinput4_begin_s, rc=rc )<a name='974'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_63">( ESMF_SUCCESS, rc, &amp;<a name='975'>
+                            'ESMF_TimeIntervalSet(auxinput4_begin) FAILED', &amp;<a name='976'>
+                            __FILE__ , &amp;<a name='977'>
+                            __LINE__  )<a name='978'>
+   ELSE<a name='979'>
+      begin_time = zero_time<a name='980'>
+   ENDIF<a name='981'>
+<a name='982'>
+   CALL nl_get_auxinput4_end_y( grid%id, auxinput4_end_y )<a name='983'>
+   CALL nl_get_auxinput4_end_mo( grid%id, auxinput4_end_mo )<a name='984'>
+   CALL nl_get_auxinput4_end_d( grid%id, auxinput4_end_d )<a name='985'>
+   CALL nl_get_auxinput4_end_h( grid%id, auxinput4_end_h )<a name='986'>
+   CALL nl_get_auxinput4_end_m( grid%id, auxinput4_end_m )<a name='987'>
+   CALL nl_get_auxinput4_end_s( grid%id, auxinput4_end_s )<a name='988'>
+   IF ( MAX( auxinput4_end_y, auxinput4_end_mo, auxinput4_end_d,   &amp;<a name='989'>
+             auxinput4_end_h, auxinput4_end_m , auxinput4_end_s   ) .GT. 0 ) THEN<a name='990'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxinput4_end_mo, D=auxinput4_end_d, &amp;<a name='991'>
+                                     H=auxinput4_end_h, M=auxinput4_end_m, S=auxinput4_end_s, rc=rc )<a name='992'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_64">( ESMF_SUCCESS, rc, &amp;<a name='993'>
+                            'ESMF_TimeIntervalSet(auxinput4_end) FAILED', &amp;<a name='994'>
+                            __FILE__ , &amp;<a name='995'>
+                            __LINE__  )<a name='996'>
+   ELSE<a name='997'>
+      end_time = run_length + one_minute<a name='998'>
+   ENDIF<a name='999'>
+<a name='1000'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_12">( grid, AUXINPUT4_ALARM, interval, begin_time, end_time )<a name='1001'>
+<a name='1002'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='1003'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT4_ALARM ),  rc=rc )<a name='1004'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_65">( ESMF_SUCCESS, rc, &amp;<a name='1005'>
+                           'ESMF_AlarmRingerOn(AUXINPUT4_ALARM) FAILED', &amp;<a name='1006'>
+                           __FILE__ , &amp;<a name='1007'>
+                           __LINE__  )<a name='1008'>
+   ENDIF<a name='1009'>
+<a name='1010'>
+<font color=#447700>! AUXINPUT5_ INTERVAL<a name='1011'></font>
+<font color=#447700>! auxinput5_interval is left there (and means minutes) for consistency, but<a name='1012'></font>
+<font color=#447700>! auxinput5_interval_m will take precedence if specified<a name='1013'></font>
+   CALL nl_get_auxinput5_interval( grid%id, auxinput5_interval )   <font color=#447700>! same as minutes<a name='1014'></font>
+   CALL nl_get_auxinput5_interval_mo( grid%id, auxinput5_interval_mo )<a name='1015'>
+   CALL nl_get_auxinput5_interval_d( grid%id, auxinput5_interval_d )<a name='1016'>
+   CALL nl_get_auxinput5_interval_h( grid%id, auxinput5_interval_h )<a name='1017'>
+   CALL nl_get_auxinput5_interval_m( grid%id, auxinput5_interval_m )<a name='1018'>
+   CALL nl_get_auxinput5_interval_s( grid%id, auxinput5_interval_s )<a name='1019'>
+   IF ( auxinput5_interval_m .EQ. 0 ) auxinput5_interval_m = auxinput5_interval<a name='1020'>
+<a name='1021'>
+   IF ( MAX( auxinput5_interval_mo, auxinput5_interval_d,   &amp;<a name='1022'>
+             auxinput5_interval_h, auxinput5_interval_m , auxinput5_interval_s   ) .GT. 0 ) THEN<a name='1023'>
+     CALL ESMF_TimeIntervalSet( interval, MM=auxinput5_interval_mo, D=auxinput5_interval_d, &amp;<a name='1024'>
+                                        H=auxinput5_interval_h, M=auxinput5_interval_m, S=auxinput5_interval_s, rc=rc )<a name='1025'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_66">( ESMF_SUCCESS, rc, &amp;<a name='1026'>
+                           'ESMF_TimeIntervalSet(auxinput5_interval) FAILED', &amp;<a name='1027'>
+                           __FILE__ , &amp;<a name='1028'>
+                           __LINE__  )<a name='1029'>
+   ELSE<a name='1030'>
+     interval = run_length + one_minute<a name='1031'>
+   ENDIF<a name='1032'>
+<a name='1033'>
+   CALL nl_get_auxinput5_begin_y( grid%id, auxinput5_begin_y )<a name='1034'>
+   CALL nl_get_auxinput5_begin_mo( grid%id, auxinput5_begin_mo )<a name='1035'>
+   CALL nl_get_auxinput5_begin_d( grid%id, auxinput5_begin_d )<a name='1036'>
+   CALL nl_get_auxinput5_begin_h( grid%id, auxinput5_begin_h )<a name='1037'>
+   CALL nl_get_auxinput5_begin_m( grid%id, auxinput5_begin_m )<a name='1038'>
+   CALL nl_get_auxinput5_begin_s( grid%id, auxinput5_begin_s )<a name='1039'>
+   IF ( MAX( auxinput5_begin_y, auxinput5_begin_mo, auxinput5_begin_d,   &amp;<a name='1040'>
+             auxinput5_begin_h, auxinput5_begin_m , auxinput5_begin_s   ) .GT. 0 ) THEN<a name='1041'>
+      CALL ESMF_TimeIntervalSet( begin_time , MM=auxinput5_begin_mo, D=auxinput5_begin_d, &amp;<a name='1042'>
+                                      H=auxinput5_begin_h, M=auxinput5_begin_m, S=auxinput5_begin_s, rc=rc )<a name='1043'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_67">( ESMF_SUCCESS, rc, &amp;<a name='1044'>
+                            'ESMF_TimeIntervalSet(auxinput5_begin) FAILED', &amp;<a name='1045'>
+                            __FILE__ , &amp;<a name='1046'>
+                            __LINE__  )<a name='1047'>
+   ELSE<a name='1048'>
+      begin_time = zero_time<a name='1049'>
+   ENDIF<a name='1050'>
+<a name='1051'>
+   CALL nl_get_auxinput5_end_y( grid%id, auxinput5_end_y )<a name='1052'>
+   CALL nl_get_auxinput5_end_mo( grid%id, auxinput5_end_mo )<a name='1053'>
+   CALL nl_get_auxinput5_end_d( grid%id, auxinput5_end_d )<a name='1054'>
+   CALL nl_get_auxinput5_end_h( grid%id, auxinput5_end_h )<a name='1055'>
+   CALL nl_get_auxinput5_end_m( grid%id, auxinput5_end_m )<a name='1056'>
+   CALL nl_get_auxinput5_end_s( grid%id, auxinput5_end_s )<a name='1057'>
+   IF ( MAX( auxinput5_end_y, auxinput5_end_mo, auxinput5_end_d,   &amp;<a name='1058'>
+             auxinput5_end_h, auxinput5_end_m , auxinput5_end_s   ) .GT. 0 ) THEN<a name='1059'>
+      CALL ESMF_TimeIntervalSet( end_time , MM=auxinput5_end_mo, D=auxinput5_end_d, &amp;<a name='1060'>
+                                     H=auxinput5_end_h, M=auxinput5_end_m, S=auxinput5_end_s, rc=rc )<a name='1061'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_68">( ESMF_SUCCESS, rc, &amp;<a name='1062'>
+                            'ESMF_TimeIntervalSet(auxinput5_end) FAILED', &amp;<a name='1063'>
+                            __FILE__ , &amp;<a name='1064'>
+                            __LINE__  )<a name='1065'>
+   ELSE<a name='1066'>
+      end_time = run_length + one_minute<a name='1067'>
+   ENDIF<a name='1068'>
+<a name='1069'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_13">( grid, AUXINPUT5_ALARM, interval, begin_time, end_time )<a name='1070'>
+<a name='1071'>
+<font color=#447700>!TBH:  Should be OK to remove the "#ifndef WRF_CHEM" and the code it contains <a name='1072'></font>
+<font color=#447700>!TBH:  because later code overwrites grid%alarms( AUXINPUT5_ALARM )...  <a name='1073'></font>
+<font color=#447700>!TBH:  In fact, by setting namelist values for auxinput5 correctly, it ought <a name='1074'></font>
+<font color=#447700>!TBH:  to be possible to get rid of all WRF_CHEM bits...  <a name='1075'></font>
+#ifndef WRF_CHEM<a name='1076'>
+   IF ( interval .NE. run_length + one_minute .AND. begin_time .EQ. zero_time ) THEN<a name='1077'>
+     CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT5_ALARM ),  rc=rc )<a name='1078'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_69">( ESMF_SUCCESS, rc, &amp;<a name='1079'>
+                           'ESMF_AlarmRingerOn(AUXINPUT5_ALARM) FAILED', &amp;<a name='1080'>
+                           __FILE__ , &amp;<a name='1081'>
+                           __LINE__  )<a name='1082'>
+   ENDIF<a name='1083'>
+#else<a name='1084'>
+   CALL ESMF_AlarmEnable( grid%alarms( AUXINPUT5_ALARM ), rc=rc )<a name='1085'>
+   CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT5_ALARM ), rc=rc )<a name='1086'>
+#endif<a name='1087'>
+<a name='1088'>
+   CALL <A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM'>set_timekeeping_create_alarm</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TIMEKEEPING_CREATE_ALARM_14">( grid, BOUNDARY_ALARM )<a name='1089'>
+<a name='1090'>
+   CALL ESMF_AlarmEnable( grid%alarms( BOUNDARY_ALARM ), rc=rc )<a name='1091'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_70">( ESMF_SUCCESS, rc, &amp;<a name='1092'>
+                         'ESMF_AlarmEnable(BOUNDARY_ALARM) FAILED', &amp;<a name='1093'>
+                         __FILE__ , &amp;<a name='1094'>
+                         __LINE__  )<a name='1095'>
+   CALL ESMF_AlarmRingerOn( grid%alarms( BOUNDARY_ALARM ), rc=rc )<a name='1096'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_71">( ESMF_SUCCESS, rc, &amp;<a name='1097'>
+                         'ESMF_AlarmRingerOn(BOUNDARY_ALARM) FAILED', &amp;<a name='1098'>
+                         __FILE__ , &amp;<a name='1099'>
+                         __LINE__  )<a name='1100'>
+<a name='1101'>
+#ifdef WRF_CHEM<a name='1102'>
+<font color=#447700>! TBH:  NOTE:  Proper setting of namelist variables for auxinput5 ought to <a name='1103'></font>
+<font color=#447700>! TBH:         make this hard-coded bit unnecessary.  <a name='1104'></font>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='1105'></font>
+<font color=#447700>! add for wrf_chem emiss input<a name='1106'></font>
+   CALL ESMF_AlarmEnable( grid%alarms( AUXINPUT5_ALARM ), rc=rc )<a name='1107'>
+   CALL ESMF_AlarmRingerOn( grid%alarms( AUXINPUT5_ALARM ), rc=rc )<a name='1108'>
+<font color=#447700>! end for wrf chem emiss input<a name='1109'></font>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='1110'></font>
+#endif<a name='1111'>
+<a name='1112'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_275"> ( 100 , 'setup_timekeeping:  returning...' )<a name='1113'>
+<a name='1114'>
+END SUBROUTINE Setup_Timekeeping<a name='1115'>
+<a name='1116'>
+<a name='1117'>
+<A NAME='SET_TIMEKEEPING_CREATE_ALARM'><A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1118'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>set_timekeeping_create_alarm</font>( grid, alarm_id, interval, begin_time, end_time ) <A href='../../call_to/SET_TIMEKEEPING_CREATE_ALARM.html' TARGET='index'>14</A>,<A href='../../call_from/SET_TIMEKEEPING_CREATE_ALARM.html' TARGET='index'>5</A><a name='1119'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_177"><a name='1120'>
+   USE WRF_ESMF_MOD<a name='1121'>
+   IMPLICIT NONE<a name='1122'>
+   TYPE(domain), POINTER :: grid<a name='1123'>
+   INTEGER, INTENT(IN) :: alarm_id<a name='1124'>
+   TYPE(ESMF_TimeInterval), INTENT(IN), OPTIONAL :: interval<a name='1125'>
+   TYPE(ESMF_TimeInterval), INTENT(IN), OPTIONAL :: begin_time<a name='1126'>
+   TYPE(ESMF_TimeInterval), INTENT(IN), OPTIONAL :: end_time<a name='1127'>
+   INTEGER :: rc<a name='1128'>
+   LOGICAL :: interval_only, all_args, no_args<a name='1129'>
+   interval_only = .FALSE.<a name='1130'>
+   all_args = .FALSE.<a name='1131'>
+   no_args = .FALSE.<a name='1132'>
+   IF ( ( .NOT. PRESENT( begin_time ) ) .AND. &amp;<a name='1133'>
+        ( .NOT. PRESENT( end_time   ) ) .AND. &amp;<a name='1134'>
+        (       PRESENT( interval   ) ) ) THEN<a name='1135'>
+      interval_only = .TRUE.<a name='1136'>
+   ELSE IF ( ( .NOT. PRESENT( begin_time ) ) .AND. &amp;<a name='1137'>
+             ( .NOT. PRESENT( end_time   ) ) .AND. &amp;<a name='1138'>
+             ( .NOT. PRESENT( interval   ) ) ) THEN<a name='1139'>
+      no_args = .TRUE.<a name='1140'>
+   ELSE IF ( (       PRESENT( begin_time ) ) .AND. &amp;<a name='1141'>
+             (       PRESENT( end_time   ) ) .AND. &amp;<a name='1142'>
+             (       PRESENT( interval   ) ) ) THEN<a name='1143'>
+      all_args = .TRUE.<a name='1144'>
+   ELSE<a name='1145'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_255"> ( &amp;<a name='1146'>
+        'ERROR in set_timekeeping_create_alarm:  bad argument list' )<a name='1147'>
+   ENDIF<a name='1148'>
+#ifdef WRF_ESMF_MOD<a name='1149'>
+   IF ( interval_only ) THEN<a name='1150'>
+      grid%alarms( alarm_id ) = ESMF_AlarmCreate( clock=grid%domain_clock, &amp;<a name='1151'>
+                                                  RingInterval=interval,   &amp;<a name='1152'>
+                                                  rc=rc )<a name='1153'>
+   ELSE IF ( no_args ) THEN<a name='1154'>
+      grid%alarms( alarm_id ) = ESMF_AlarmCreate( clock=grid%domain_clock,  &amp;<a name='1155'>
+                                                  RingTime=grid%start_time, &amp;<a name='1156'>
+                                                  rc=rc )<a name='1157'>
+   ELSE IF ( all_args ) THEN<a name='1158'>
+      grid%alarms( alarm_id ) = ESMF_AlarmCreate( clock=grid%domain_clock,               &amp;<a name='1159'>
+                                                  RingTime=grid%start_time + begin_time, &amp;<a name='1160'>
+                                                  RingInterval=interval,                 &amp;<a name='1161'>
+                                                  StopTime=grid%start_time + end_time,   &amp;<a name='1162'>
+                                                  rc=rc )<a name='1163'>
+   ENDIF<a name='1164'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_72">( ESMF_SUCCESS, rc, &amp;<a name='1165'>
+                         'ESMF_AlarmCreate() FAILED', &amp;<a name='1166'>
+                         __FILE__ , &amp;<a name='1167'>
+                         __LINE__  )<a name='1168'>
+#else<a name='1169'>
+   IF ( interval_only ) THEN<a name='1170'>
+      CALL ESMF_AlarmSet( grid%alarms( alarm_id ), &amp;<a name='1171'>
+                          RingInterval=interval, rc=rc )<a name='1172'>
+   ELSE IF ( no_args ) THEN<a name='1173'>
+      CALL ESMF_AlarmSet( grid%alarms( alarm_id ),  &amp;<a name='1174'>
+                          RingTime=grid%start_time, &amp;<a name='1175'>
+                          rc=rc )<a name='1176'>
+   ELSE IF ( all_args ) THEN<a name='1177'>
+      CALL ESMF_AlarmSet( grid%alarms( alarm_id ),               &amp;<a name='1178'>
+                          RingTime=grid%start_time + begin_time, &amp;<a name='1179'>
+                          RingInterval=interval,                 &amp;<a name='1180'>
+                          StopTime=grid%start_time + end_time,   &amp;<a name='1181'>
+                          rc=rc )<a name='1182'>
+   ENDIF<a name='1183'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_73">( ESMF_SUCCESS, rc, &amp;<a name='1184'>
+                         'ESMF_AlarmSet FAILED', &amp;<a name='1185'>
+                         __FILE__ , &amp;<a name='1186'>
+                         __LINE__  )<a name='1187'>
+   CALL ESMF_ClockAddAlarm( grid%domain_clock, grid%alarms( alarm_id ), rc=rc )<a name='1188'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/share/set_timekeeping.F.html#SET_TIMEKEEPING_CREATE_ALARM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_74">( ESMF_SUCCESS, rc, &amp;<a name='1189'>
+                         'ESMF_ClockAddAlarm FAILED', &amp;<a name='1190'>
+                         __FILE__ , &amp;<a name='1191'>
+                         __LINE__  )<a name='1192'>
+#endif<a name='1193'>
+END SUBROUTINE set_timekeeping_create_alarm<a name='1194'>
+<a name='1195'>
+</pre></body></html>

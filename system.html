@@ -1,0 +1,196 @@
+<html>
+
+<head>
+
+<title>WRF MODELING SYSTEM</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<style type="text/css">
+<!--
+.style2 {
+	font-size: 8pt;
+	color: #141518;
+}
+.style8 {
+	color: #FFFFFF;
+	font-size: 9pt;
+}
+-->
+</style>
+</head>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="images/goldrule.jpg" bgcolor="#009933"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td height="1155" valign="top" bgcolor="#CBFFCD"><table width="1122" height="1155" border="0" cellpadding="0" cellspacing="0"><tr valign="top"><td width="117" height="1155" bgcolor="#009933"><table width="1122" border="0" cellpadding="0" cellspacing="0">
+      <tr valign="top">
+        <td width="117" height="1155" bgcolor="#009933"><table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td height="316" align="right" valign="top"><p align="right">&nbsp;</p>
+           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">System Overview</p>
+           <p align="center"><a href="updates-3.5.1.html" class="leftnavlink">WRFDA V3.5.1</a></p>
+           <p align="center"><a href="updates-3.5.html" class="leftnavlink">WRFDA V3.5</a></p>
+           <p align="center"><a href="updates-3.4.1.html" class="leftnavlink">WRFDA V3.4.1</a></p>
+           <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
+           <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
+           <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
+           <p align="center"><a href="updates-3.2.1.html" class="leftnavlink">WRFDA V3.2.1</a></p>
+           <p align="center"><a href="updates-3.2.html" class="leftnavlink">WRFDA V3.2</a></p>
+           <p align="center"><a href="updates-older.html" class="leftnavlink">Older versions</a></p>
+           <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
+           <p align="center"><a href="download/tools.html" class="leftnavlink">Tools</a></p>
+           <p align="center"><a href="known-prob.html" class="leftnavlink">Known Problems and Fixes</a></p></td>
+                </td>
+            </tr>
+          </table>
+            <p>&nbsp;</p>
+          <p>&nbsp;</p>
+          <img src="images/shim112.gif" width="112" height="1"></td>
+        <td bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle">WRFDA System Overview</p>
+          <p class="bodytext">Data assimilation is the technique by which <b>observations</b> are combined with an NWP product (the <b>first guess</b> or background forecast) and their respective error statistics to provide an improved estimate (the <b>analysis</b>) of the atmospheric (or oceanic, Jovian, etc.) state. Variational (Var) data assimilation achieves this through the iterative minimization of a prescribed cost (or penalty) function. Differences between the analysis and observations/first guess are penalized (damped) according to their perceived error. The difference between three-dimensional (3D-Var) and four-dimensional (4D-Var) data assimilation is the use of a numerical forecast model in the latter.</p>
+          <p class="bodytext">The MMM Division of NCAR supports a unified (global/regional, multi-model, 3/4D-Var) model-space data assimilation system (WRFDA) for use by the NCAR staff and collaborators, and is also freely available to the general community, together with further documentation, test results, plans etc.</p>
+          <p class="bodytext">Various components of the WRFDA system are shown in blue in the sketch below, together with their relationship with the rest of the WRF system.</p>
+          <table width="586" border="0" align="center" cellpadding="0" cellspacing="0">
+              <tr>
+                <td width="757" height="600" class="bodytext"><div align="center"><a href="images/wrfda_flowchart_white_bg.png"><img src="images/wrfda_flowchart_white_bg_small.png" alt="WRFDA Flowchart. Click to view larger version."></a></div></td>
+              </tr>
+            </table>
+          <blockquote>
+            <p><strong>System overview</strong></p>
+            <blockquote>
+              <p><i><b>x<sup>b</sup></b></i>	first guess, either from a previous WRF forecast or from WPS/REAL output</p>
+              <p><i><b>x<sup>lbc</sup></b></i>	lateral boundary from WPS/REAL output</p>
+              <p><i><b>x<sup>a</sup></b></i>	analysis from the WRFDA system</p>
+              <p><i><b>x<sup>f</sup></b></i>	WRF forecast output</p>
+              <p><i><b>y<sup>o</sup></b></i>	observations processed by OBSPROC (NOTE: PREPBUFR input, radar, radiance, and rainfall data are not processed through OBSPROC)</p>
+              <p><i><b>B<sub>0</sub></b></i>    background error statistics from generic BE data (CV3) or gen_be</p>
+              <p><i><b>R</b></i>    observational and representative error statistics</p>
+
+            <p class="bodytext">Before using your own data, we suggest that you start by running through the WRFDA-related programs using the supplied test case (can be downloaded <a href="./download/testdata.html">here</a>). This serves two purposes: First, you can learn how to run the programs with data we have tested ourselves, and second you can test whether your computer is capable of running the entire modeling system. After you have done the tutorial, you can try running other, more computationally intensive, case studies and experimenting with some of the many namelist variables. </p> 
+            <p><strong>Platforms capable of running WRFDA</strong></p>
+            <p class="bodytext">Running WRFDA requires a Fortran 90 compiler. We have tested the WRFDA on the following platforms: IBM (XLF), SGI Altix (INTEL), PC/Linux (PGI, INTEL, GFORTRAN), and Apple (G95/PGI). Please let us know if this does not meet your requirements, and we will attempt to add other machines to our list of supported architectures, as resources allow. Although we are interested in hearing about your experiences in modifying compiler options, we do not recommend making changes to the configure file used to compile WRFDA.</p>
+            <p class="bodytext"><strong>WARNING:</strong> It is impossible to test every permutation of computer, compiler, number of processors, case, namelist option, etc. for every WRFDA release. The namelist options that are supported are indicated in the <kbd>WRFDA/var/README.namelist</kbd> file of the source code, and these are the default options. </p>
+            <p class="bodytext">We hope our test cases will prepare you for the variety of ways in which you may wish to run your own WRFDA experiments. Please inform us about your experiences.</p>
+            <p class="bodytext">As a professional courtesy, we request that you include the following reference in any publication that uses the community WRFDA system, in whole or in part:</p>
+<blockquote>
+            <p class="citetext">Barker, D., X.-Y. Huang, Z. Liu, T. Aulign&eacute;, X. Zhang, S. Rugg, R. Ajjaji, A. Bourgeois, J. Bray, Y. Chen, M. Demirtas, Y.-R. Guo, T. Henderson, W. Huang, H.-C. Lin, J. Michalakes, S. Rizvi, and X. Zhang, 2012: <a href="http://journals.ametsoc.org/doi/abs/10.1175/BAMS-D-11-00167.1">The Weather Research and Forecasting Model's Community Variational/Ensemble Data Assimilation System: WRFDA</a>. <i>Bull. Amer. Meteor. Soc.</i>, <b>93</b>, 831&ndash;843.</p>
+</blockquote>
+            <p class="bodytext">You can find additional publications on specific portions of the WRFDA system at our <a href="pub-doc.html">Publications Page</a>.</p>
+</blockquote>
+            <p><br></p>
+</blockquote>
+            <p class="bodytext"><big>A more complete introduction to WRFDA, along with instructions on how to compile and run the various components, can be found in the <a href="./Docs/user_guide_V3.4/users_guide_chap6.htm">WRFDA User Guide</a>.</big></p>
+          <p class="bodytext">
+<p class="bodytext">&nbsp;</p>
+            <p align="center" class="detailtextRed">
+
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+            </p>
+
+          <p align="center" class="bodytext">&nbsp;</p>
+          <img src="images/transgif.gif" width="1" height="1"><img src="images/shim162.gif" width="162" height="1"></td>
+
+      </tr>
+    </table></td>
+
+          </tr>
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" valign="bottom" bgcolor="#009933">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

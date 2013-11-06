@@ -1,0 +1,64 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!<a name='2'></font>
+<A NAME='MODULE_MPP'><A href='../../html_code/share/module_MPP.F.html#MODULE_MPP' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='3'>
+      <font color=#993300>MODULE </font><font color=#cc0000>MODULE_MPP</font> <A href='../../call_to/MODULE_MPP.html' TARGET='index'>1</A><a name='4'>
+<font color=#447700>!----------------------------------------------------------------------<a name='5'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='6'></font>
+<font color=#447700>!<a name='7'></font>
+<font color=#447700>!***  THE RANK OF THIS TASK<a name='8'></font>
+<font color=#447700>!<a name='9'></font>
+      INTEGER :: MYPE<a name='10'>
+<font color=#447700>!----------------------------------------------------------------------<a name='11'></font>
+<font color=#447700>!<a name='12'></font>
+<font color=#447700>!***  NUMBER OF TASKS<a name='13'></font>
+<font color=#447700>!<a name='14'></font>
+      INTEGER :: INPES,JNPES,NPES<a name='15'>
+<font color=#447700>!<a name='16'></font>
+<font color=#447700>!***  FUNDAMENTAL GLOBAL AND LOCAL ARRAY EXTENTS ON EACH TASK<a name='17'></font>
+<font color=#447700>!<a name='18'></font>
+      INTEGER :: MY_IS_GLB,MY_IE_GLB,MY_JS_GLB,MY_JE_GLB               &amp;<a name='19'>
+                ,MY_IS_LOC,MY_IE_LOC,MY_JS_LOC,MY_JE_LOC<a name='20'>
+<font color=#447700>!----------------------------------------------------------------------<a name='21'></font>
+<font color=#447700>!<a name='22'></font>
+<font color=#447700>!***  SUB-DOMAIN LOOP LIMITS THAT PENETRATE HALOES<a name='23'></font>
+<font color=#447700>!<a name='24'></font>
+      INTEGER :: MYIS,MYIE,MYJS,MYJE                                   &amp;<a name='25'>
+                ,MYIS1,MYIS2,MYIS3,MYIS4,MYIS5                         &amp;<a name='26'>
+                ,MYIE1,MYIE2,MYIE3,MYIE4,MYIE5                         &amp;<a name='27'>
+                ,MYIS_P1,MYIS_P2,MYIS_P3,MYIS_P4,MYIS_P5               &amp;<a name='28'>
+                ,MYIS1_P1,MYIS1_P2,MYIS1_P3,MYIS1_P4,MYIS1_P5          &amp;<a name='29'>
+                ,MYIS2_P1,MYIS2_P2,MYIS2_P3,MYIS2_P4,MYIS2_P5          &amp;<a name='30'>
+                ,MYIS3_P1,MYIS3_P2,MYIS3_P3,MYIS3_P4,MYIS3_P5          &amp;<a name='31'>
+                ,MYIS4_P1,MYIS4_P2,MYIS4_P3,MYIS4_P4,MYIS4_P5          &amp;<a name='32'>
+                ,MYIS5_P1,MYIS5_P2,MYIS5_P3,MYIS5_P4,MYIS5_P5          &amp;<a name='33'>
+                ,MYIE_P1,MYIE_P2,MYIE_P3,MYIE_P4,MYIE_P5               &amp;<a name='34'>
+                ,MYIE1_P1,MYIE1_P2,MYIE1_P3,MYIE1_P4,MYIE1_P5          &amp;<a name='35'>
+                ,MYIE2_P1,MYIE2_P2,MYIE2_P3,MYIE2_P4,MYIE2_P5          &amp;<a name='36'>
+                ,MYIE3_P1,MYIE3_P2,MYIE3_P3,MYIE3_P4,MYIE3_P5          &amp;<a name='37'>
+                ,MYIE4_P1,MYIE4_P2,MYIE4_P3,MYIE4_P4,MYIE4_P5          &amp;<a name='38'>
+                ,MYIE5_P1,MYIE5_P2,MYIE5_P3,MYIE5_P4,MYIE5_P5          &amp;<a name='39'>
+                ,MYJS1,MYJS2,MYJS3,MYJS4,MYJS5                         &amp;<a name='40'>
+                ,MYJE1,MYJE2,MYJE3,MYJE4,MYJE5                         &amp;<a name='41'>
+                ,MYJS_P1,MYJS_P2,MYJS_P3,MYJS_P4,MYJS_P5               &amp;<a name='42'>
+                ,MYJS1_P1,MYJS1_P2,MYJS1_P3,MYJS1_P4,MYJS1_P5          &amp;<a name='43'>
+                ,MYJS2_P1,MYJS2_P2,MYJS2_P3,MYJS2_P4,MYJS2_P5          &amp;<a name='44'>
+                ,MYJS3_P1,MYJS3_P2,MYJS3_P3,MYJS3_P4,MYJS3_P5          &amp;<a name='45'>
+                ,MYJS4_P1,MYJS4_P2,MYJS4_P3,MYJS4_P4,MYJS4_P5          &amp;<a name='46'>
+                ,MYJS5_P1,MYJS5_P2,MYJS5_P3,MYJS5_P4,MYJS5_P5          &amp;<a name='47'>
+                ,MYJE_P1,MYJE_P2,MYJE_P3,MYJE_P4,MYJE_P5               &amp;<a name='48'>
+                ,MYJE1_P1,MYJE1_P2,MYJE1_P3,MYJE1_P4,MYJE1_P5          &amp;<a name='49'>
+                ,MYJE2_P1,MYJE2_P2,MYJE2_P3,MYJE2_P4,MYJE2_P5          &amp;<a name='50'>
+                ,MYJE3_P1,MYJE3_P2,MYJE3_P3,MYJE3_P4,MYJE3_P5          &amp;<a name='51'>
+                ,MYJE4_P1,MYJE4_P2,MYJE4_P3,MYJE4_P4,MYJE4_P5          &amp;<a name='52'>
+                ,MYJE5_P1,MYJE5_P2,MYJE5_P3,MYJE5_P4,MYJE5_P5<a name='53'>
+<a name='54'>
+<font color=#447700>!<a name='55'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='56'></font>
+<font color=#447700>!<a name='57'></font>
+<font color=#447700>!***  MPI_COMM_COMP IS THE INTRACOMMUNICATOR FOR ALL TASKS.<a name='58'></font>
+<font color=#447700>!<a name='59'></font>
+      INTEGER :: MPI_COMM_COMP<a name='60'>
+<a name='61'>
+<font color=#447700>!----------------------------------------------------------------------<a name='62'></font>
+      END MODULE MODULE_MPP<a name='63'>
+</pre></body></html>

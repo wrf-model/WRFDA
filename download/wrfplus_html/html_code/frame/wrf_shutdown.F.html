@@ -1,0 +1,18 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:DRIVER_LAYER:UTIL<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='WRF_SHUTDOWN'><A href='../../html_code/frame/wrf_shutdown.F.html#WRF_SHUTDOWN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='4'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>wrf_shutdown</font> <A href='../../call_to/WRF_SHUTDOWN.html' TARGET='index'>9</A>,<A href='../../call_from/WRF_SHUTDOWN.html' TARGET='index'>1</A><a name='5'>
+#ifdef DM_PARALLEL<a name='6'>
+    LOGICAL wrf_dm_on_monitor<a name='7'>
+    EXTERNAL wrf_dm_on_monitor<a name='8'>
+    EXTERNAL wrf_dm_shutdown<a name='9'>
+#endif<a name='10'>
+#ifdef DM_PARALLEL<a name='11'>
+    CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_SHUTDOWN'>wrf_dm_shutdown</A><A href='../../html_code/frame/wrf_shutdown.F.html#WRF_SHUTDOWN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_SHUTDOWN_1"><a name='12'>
+#else<a name='13'>
+    STOP<a name='14'>
+#endif<a name='15'>
+END SUBROUTINE wrf_shutdown<a name='16'>
+<a name='17'>
+</pre></body></html>

@@ -1,0 +1,474 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MEDIATION_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_MICROPHYSICS_DRIVER'><A href='../../html_code/phys/module_microphysics_driver.F.html#MODULE_MICROPHYSICS_DRIVER' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_microphysics_driver</font> <A href='../../call_to/MODULE_MICROPHYSICS_DRIVER.html' TARGET='index'>5</A><a name='5'>
+CONTAINS<a name='6'>
+<a name='7'>
+<A NAME='MICROPHYSICS_DRIVER'><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='8'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>microphysics_driver</font>(th_phy, moist_new, moist_old, w,        &amp; <A href='../../call_to/MICROPHYSICS_DRIVER.html' TARGET='index'>1</A>,<A href='../../call_from/MICROPHYSICS_DRIVER.html' TARGET='index'>24</A><a name='9'>
+                               rho, pi_phy, p_phy, RAINNC, RAINNCV,    &amp;<a name='10'>
+                               z, ht, dz8w, p8w, dt,dx,dy,             &amp;<a name='11'>
+                               config_flags, spec_zone, n_moist,       &amp;<a name='12'>
+                               warm_rain,                              &amp;<a name='13'>
+                               XLAND,itimestep,                        &amp;<a name='14'>
+                               F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,       &amp;<a name='15'>
+                               LOWLYR,SR,                              &amp;<a name='16'>
+                               ids,ide, jds,jde, kds,kde,              &amp; <a name='17'>
+                               ims,ime, jms,jme, kms,kme,              &amp;<a name='18'>
+                               i_start,i_end,j_start,j_end,kts,kte,num_tiles   )<a name='19'>
+<font color=#447700>! Framework<a name='20'></font>
+   USE module_state_description<a name='21'>
+<font color=#447700>! Model Layer<a name='22'></font>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_104"><a name='23'>
+   USE <A href='../../html_code/share/module_model_constants.F.html#MODULE_MODEL_CONSTANTS'>module_model_constants</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MODEL_CONSTANTS_36"><a name='24'>
+   USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_35"><a name='25'>
+<a name='26'>
+<font color=#447700>! *** add new modules of schemes here<a name='27'></font>
+<a name='28'>
+   USE <A href='../../html_code/phys/module_mp_kessler.F.html#MODULE_MP_KESSLER'>module_mp_kessler</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_KESSLER_1"><a name='29'>
+   USE <A href='../../html_code/phys/module_mp_lin.F.html#MODULE_MP_LIN'>module_mp_lin</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_LIN_1"><a name='30'>
+   USE <A href='../../html_code/phys/module_mp_ncloud3.F.html#MODULE_MP_NCLOUD3'>module_mp_ncloud3</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_NCLOUD3_1"><a name='31'>
+   USE <A href='../../html_code/phys/module_mp_ncloud5.F.html#MODULE_MP_NCLOUD5'>module_mp_ncloud5</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_NCLOUD5_1"><a name='32'>
+   USE <A href='../../html_code/phys/module_mp_wsm3.F.html#MODULE_MP_WSM3'>module_mp_wsm3</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_WSM3_1"><a name='33'>
+   USE <A href='../../html_code/phys/module_mp_wsm5.F.html#MODULE_MP_WSM5'>module_mp_wsm5</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_WSM5_1"><a name='34'>
+   USE <A href='../../html_code/phys/module_mp_wsm6.F.html#MODULE_MP_WSM6'>module_mp_wsm6</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_WSM6_1"><a name='35'>
+   USE <A href='../../html_code/phys/module_mp_etanew.F.html#MODULE_MP_ETANEW'>module_mp_etanew</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MP_ETANEW_1"><a name='36'>
+    <a name='37'>
+<font color=#447700>!----------------------------------------------------------------------<a name='38'></font>
+   <font color=#447700>! This driver calls subroutines for the microphys.<a name='39'></font>
+   <font color=#447700>!<a name='40'></font>
+   <font color=#447700>! Schemes<a name='41'></font>
+   <font color=#447700>!<a name='42'></font>
+   <font color=#447700>! Kessler scheme<a name='43'></font>
+   <font color=#447700>! Lin et al. (1983), Rutledge and Hobbs (1984)<a name='44'></font>
+   <font color=#447700>! WRF Single-Moment 3-class, Hong, Dudhia and Chen (2004)<a name='45'></font>
+   <font color=#447700>! WRF Single-Moment 5-class, Hong, Dudhia and Chen (2004)<a name='46'></font>
+   <font color=#447700>! WRF Single-Moment 6-class, Lim and Hong (2003 WRF workshop)<a name='47'></font>
+   <font color=#447700>! Eta Grid-scale Cloud and Precipitation scheme (EGCP01, Ferrier)<a name='48'></font>
+   <font color=#447700>! NCEP cloud3, Hong et al. (1998) with some mod, Dudhia (1989)<a name='49'></font>
+   <font color=#447700>! NCEP cloud5, Hong et al. (1998) with some mod, Rutledge and Hobbs (1984)<a name='50'></font>
+   <font color=#447700>! <a name='51'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='52'></font>
+   IMPLICIT NONE<a name='53'>
+<font color=#447700>!======================================================================<a name='54'></font>
+<font color=#447700>! Grid structure in physics part of WRF<a name='55'></font>
+<font color=#447700>!----------------------------------------------------------------------  <a name='56'></font>
+<font color=#447700>! The horizontal velocities used in the physics are unstaggered<a name='57'></font>
+<font color=#447700>! relative to temperature/moisture variables. All predicted<a name='58'></font>
+<font color=#447700>! variables are carried at half levels except w, which is at full<a name='59'></font>
+<font color=#447700>! levels. Some arrays with names (*8w) are at w (full) levels.<a name='60'></font>
+<font color=#447700>!<a name='61'></font>
+<font color=#447700>!----------------------------------------------------------------------  <a name='62'></font>
+<font color=#447700>! In WRF, kms (smallest number) is the bottom level and kme (largest <a name='63'></font>
+<font color=#447700>! number) is the top level.  In your scheme, if 1 is at the top level, <a name='64'></font>
+<font color=#447700>! then you have to reverse the order in the k direction.<a name='65'></font>
+<font color=#447700>!                 <a name='66'></font>
+<font color=#447700>!         kme      -   half level (no data at this level)<a name='67'></font>
+<font color=#447700>!         kme    ----- full level<a name='68'></font>
+<font color=#447700>!         kme-1    -   half level<a name='69'></font>
+<font color=#447700>!         kme-1  ----- full level<a name='70'></font>
+<font color=#447700>!         .<a name='71'></font>
+<font color=#447700>!         .<a name='72'></font>
+<font color=#447700>!         .<a name='73'></font>
+<font color=#447700>!         kms+2    -   half level<a name='74'></font>
+<font color=#447700>!         kms+2  ----- full level<a name='75'></font>
+<font color=#447700>!         kms+1    -   half level<a name='76'></font>
+<font color=#447700>!         kms+1  ----- full level<a name='77'></font>
+<font color=#447700>!         kms      -   half level<a name='78'></font>
+<font color=#447700>!         kms    ----- full level<a name='79'></font>
+<font color=#447700>!<a name='80'></font>
+<font color=#447700>!======================================================================<a name='81'></font>
+<font color=#447700>! Definitions<a name='82'></font>
+<font color=#447700>!-----------<a name='83'></font>
+<font color=#447700>! Rho_d      dry density (kg/m^3)<a name='84'></font>
+<font color=#447700>! Theta_m    moist potential temperature (K)<a name='85'></font>
+<font color=#447700>! Qv         water vapor mixing ratio (kg/kg)<a name='86'></font>
+<font color=#447700>! Qc         cloud water mixing ratio (kg/kg)<a name='87'></font>
+<font color=#447700>! Qr         rain water mixing ratio (kg/kg)<a name='88'></font>
+<font color=#447700>! Qi         cloud ice mixing ratio (kg/kg)<a name='89'></font>
+<font color=#447700>! Qs         snow mixing ratio (kg/kg)<a name='90'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='91'></font>
+<font color=#447700>!-- th_phy        potential temperature    (K)<a name='92'></font>
+<font color=#447700>!-- moist_new     updated moisture array   (kg/kg)<a name='93'></font>
+<font color=#447700>!-- moist_old     Old moisture array       (kg/kg)<a name='94'></font>
+<font color=#447700>!-- rho           density of air           (kg/m^3)<a name='95'></font>
+<font color=#447700>!-- pi            exner function           (dimensionless)<a name='96'></font>
+<font color=#447700>!-- p             pressure                 (Pa)<a name='97'></font>
+<font color=#447700>!-- RAINNC        grid scale precipitation (mm)<a name='98'></font>
+<font color=#447700>!-- RAINNCV       one time step grid scale precipitation (mm/step)<a name='99'></font>
+<font color=#447700>!-- SR            one time step mass ratio of snow to total precip<a name='100'></font>
+<font color=#447700>!-- z             Height above sea level   (m)<a name='101'></font>
+<font color=#447700>!-- dt            Time step              (s)<a name='102'></font>
+<font color=#447700>!-- config_flags  flag for configuration      ! change ---  ?????   <a name='103'></font>
+<font color=#447700>!-- n_moist       number of water substances   (integer)<a name='104'></font>
+<font color=#447700>!-- G             acceleration due to gravity  (m/s^2)<a name='105'></font>
+<font color=#447700>!-- CP            heat capacity at constant pressure for dry air (J/kg/K)<a name='106'></font>
+<font color=#447700>!-- R_d           gas constant for dry air (J/kg/K)<a name='107'></font>
+<font color=#447700>!-- R_v           gas constant for water vapor (J/kg/K)<a name='108'></font>
+<font color=#447700>!-- XLS           latent heat of sublimation   (J/kg)<a name='109'></font>
+<font color=#447700>!-- XLV           latent heat of vaporization  (J/kg)<a name='110'></font>
+<font color=#447700>!-- XLF           latent heat of melting       (J/kg)<a name='111'></font>
+<font color=#447700>!-- rhowater      water density                      (kg/m^3)<a name='112'></font>
+<font color=#447700>!-- rhosnow       snow density               (kg/m^3)<a name='113'></font>
+<font color=#447700>!-- F_ICE_PHY     Fraction of ice.<a name='114'></font>
+<font color=#447700>!-- F_RAIN_PHY    Fraction of rain.<a name='115'></font>
+<font color=#447700>!-- F_RIMEF_PHY   Mass ratio of rimed ice (rime factor)<a name='116'></font>
+<font color=#447700>!-- P_QV          species index for water vapor<a name='117'></font>
+<font color=#447700>!-- P_QC          species index for cloud water<a name='118'></font>
+<font color=#447700>!-- P_QR          species index for rain water<a name='119'></font>
+<font color=#447700>!-- P_QI          species index for cloud ice<a name='120'></font>
+<font color=#447700>!-- P_QS          species index for snow<a name='121'></font>
+<font color=#447700>!-- P_QG          species index for graupel<a name='122'></font>
+<font color=#447700>!-- ids           start index for i in domain<a name='123'></font>
+<font color=#447700>!-- ide           end index for i in domain<a name='124'></font>
+<font color=#447700>!-- jds           start index for j in domain<a name='125'></font>
+<font color=#447700>!-- jde           end index for j in domain<a name='126'></font>
+<font color=#447700>!-- kds           start index for k in domain<a name='127'></font>
+<font color=#447700>!-- kde           end index for k in domain<a name='128'></font>
+<font color=#447700>!-- ims           start index for i in memory<a name='129'></font>
+<font color=#447700>!-- ime           end index for i in memory<a name='130'></font>
+<font color=#447700>!-- jms           start index for j in memory<a name='131'></font>
+<font color=#447700>!-- jme           end index for j in memory<a name='132'></font>
+<font color=#447700>!-- kms           start index for k in memory<a name='133'></font>
+<font color=#447700>!-- kme           end index for k in memory<a name='134'></font>
+<font color=#447700>!-- i_start       start indices for i in tile<a name='135'></font>
+<font color=#447700>!-- i_end         end indices for i in tile<a name='136'></font>
+<font color=#447700>!-- j_start       start indices for j in tile<a name='137'></font>
+<font color=#447700>!-- j_end         end indices for j in tile<a name='138'></font>
+<font color=#447700>!-- its           start index for i in tile<a name='139'></font>
+<font color=#447700>!-- ite           end index for i in tile<a name='140'></font>
+<font color=#447700>!-- jts           start index for j in tile<a name='141'></font>
+<font color=#447700>!-- jte           end index for j in tile<a name='142'></font>
+<font color=#447700>!-- kts           start index for k in tile<a name='143'></font>
+<font color=#447700>!-- kte           end index for k in tile<a name='144'></font>
+<font color=#447700>!-- num_tiles     number of tiles<a name='145'></font>
+<font color=#447700>!<a name='146'></font>
+<font color=#447700>!======================================================================<a name='147'></font>
+<a name='148'>
+   TYPE(grid_config_rec_type),    INTENT(IN   )    :: config_flags<a name='149'>
+<font color=#447700>!<a name='150'></font>
+   INTEGER,      INTENT(IN   )    ::       ids,ide, jds,jde, kds,kde<a name='151'>
+   INTEGER,      INTENT(IN   )    ::       ims,ime, jms,jme, kms,kme<a name='152'>
+   INTEGER,      INTENT(IN   )    ::                         kts,kte<a name='153'>
+   INTEGER,      INTENT(IN   )    ::     n_moist,itimestep,num_tiles,spec_zone<a name='154'>
+   INTEGER, DIMENSION(num_tiles), INTENT(IN) ::                       &amp;<a name='155'>
+     &amp;           i_start,i_end,j_start,j_end<a name='156'>
+<a name='157'>
+   LOGICAL,      INTENT(IN   )    ::   warm_rain<a name='158'>
+<font color=#447700>!<a name='159'></font>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                    &amp;<a name='160'>
+         INTENT(INOUT) ::                                     th_phy<a name='161'>
+<font color=#447700>!<a name='162'></font>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme, n_moist ),           &amp;<a name='163'>
+         INTENT(INOUT) ::                                  moist_new<a name='164'>
+<a name='165'>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),                    &amp;<a name='166'>
+         INTENT(IN   ) ::                                          z, &amp;<a name='167'>
+                                                                 rho, &amp;<a name='168'>
+                                                                dz8w, &amp;<a name='169'>
+                                                                   w, &amp;<a name='170'>
+                                                                 p8w, &amp;<a name='171'>
+                                                              pi_phy, &amp;<a name='172'>
+                                                               p_phy<a name='173'>
+<font color=#447700>!<a name='174'></font>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme, n_moist ),           &amp;<a name='175'>
+         INTENT(IN   ) ::                                  moist_old<a name='176'>
+<font color=#447700>!<a name='177'></font>
+   REAL, DIMENSION( ims:ime , jms:jme ),  INTENT(INOUT) ::    RAINNC, &amp;<a name='178'>
+                                                              RAINNCV<a name='179'>
+<font color=#447700>!<a name='180'></font>
+<a name='181'>
+   REAL, INTENT(INOUT),  DIMENSION(ims:ime, kms:kme, jms:jme ) ::     &amp;<a name='182'>
+                                     F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY<a name='183'>
+<a name='184'>
+<font color=#447700>!<a name='185'></font>
+<a name='186'>
+   REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(IN)   :: ht,XLAND<a name='187'>
+<a name='188'>
+   REAL , DIMENSION( ims:ime , jms:jme ) , INTENT(OUT)   :: SR<a name='189'>
+<a name='190'>
+   REAL, INTENT(IN   ) :: dt,dx,dy<a name='191'>
+<a name='192'>
+   INTEGER, DIMENSION( ims:ime , jms:jme ), INTENT(INOUT) :: LOWLYR<a name='193'>
+<a name='194'>
+ <a name='195'>
+<font color=#447700>! LOCAL  VAR<a name='196'></font>
+<a name='197'>
+   INTEGER :: i,j,k,its,ite,jts,jte,ij,sz,n<a name='198'>
+<a name='199'>
+<font color=#447700>!---------------------------------------------------------------------<a name='200'></font>
+<font color=#447700>!  check for microphysics type.  We need a clean way to <a name='201'></font>
+<font color=#447700>!  specify these things!<a name='202'></font>
+<font color=#447700>!---------------------------------------------------------------------<a name='203'></font>
+<a name='204'>
+   if (config_flags%mp_physics .eq. 0) return<a name='205'>
+   IF( config_flags%specified .or. config_flags%nested ) THEN<a name='206'>
+     sz = spec_zone<a name='207'>
+   ELSE<a name='208'>
+     sz = 0<a name='209'>
+   ENDIF<a name='210'>
+<a name='211'>
+   <font color=#447700>!$OMP PARALLEL DO   &amp;<a name='212'></font>
+   <font color=#447700>!$OMP PRIVATE ( ij, its, ite, jts, jte, i,j,k,n )<a name='213'></font>
+<a name='214'>
+   DO ij = 1 , num_tiles<a name='215'>
+<a name='216'>
+       its = max(i_start(ij),ids+sz)<a name='217'>
+       ite = min(i_end(ij),ide-1-sz)<a name='218'>
+       jts = max(j_start(ij),jds+sz)<a name='219'>
+       jte = min(j_end(ij),jde-1-sz)<a name='220'>
+<a name='221'>
+<font color=#447700>!-----------<a name='222'></font>
+   IF ( n_moist &gt;= PARAM_FIRST_SCALAR ) THEN<a name='223'>
+<a name='224'>
+     micro_select: SELECT CASE(config_flags%mp_physics)<a name='225'>
+<a name='226'>
+        CASE (KESSLERSCHEME)<a name='227'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling kessler' )<a name='228'>
+             CALL <A href='../../html_code/phys/module_mp_kessler.F.html#KESSLER'>kessler</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="KESSLER_1">( th_phy,                       &amp;<a name='229'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='230'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='231'>
+                     moist_old(ims,kms,jms,P_QC),        &amp;<a name='232'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='233'>
+                     moist_old(ims,kms,jms,P_QR),        &amp;<a name='234'>
+                     rho, pi_phy, RAINNC,                &amp;<a name='235'>
+                     RAINNCV, dt, z, xlv, cp,            &amp;<a name='236'>
+                     EP_2,SVP1,SVP2,SVP3,SVPT0,rhowater, &amp;<a name='237'>
+                     dz8w,                               &amp;<a name='238'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='239'>
+                     ims,ime, jms,jme, kms,kme,          &amp;<a name='240'>
+                     its,ite, jts,jte, kts,kte           )<a name='241'>
+<a name='242'>
+        CASE (LINSCHEME)<a name='243'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling lin_et_al' )<a name='244'>
+             CALL <A href='../../html_code/phys/module_mp_lin.F.html#LIN_ET_AL'>lin_et_al</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LIN_ET_AL_1">( th_phy,                     &amp;<a name='245'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='246'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='247'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='248'>
+                     moist_new(ims,kms,jms,P_QI),        &amp;<a name='249'>
+                     moist_new(ims,kms,jms,P_QS),        &amp;<a name='250'>
+                     moist_new(ims,kms,jms,P_QG),        &amp;<a name='251'>
+                     moist_old(ims,kms,jms,P_QR),        &amp;<a name='252'>
+                     moist_old(ims,kms,jms,P_QS),        &amp;<a name='253'>
+                     moist_old(ims,kms,jms,P_QG),        &amp;<a name='254'>
+                     rho, pi_phy, p_phy, RAINNC,         &amp;<a name='255'>
+                     RAINNCV,dt, z,                      &amp;<a name='256'>
+                     ht, dz8w, G, cp, R_d, R_v,          &amp;<a name='257'>
+                     XLS, XLV, XLF, rhowater, rhosnow,   &amp;<a name='258'>
+                     EP_2,SVP1,SVP2,SVP3,SVPT0,          &amp;<a name='259'>
+                     P_QI, P_QS, P_QG,                   &amp;<a name='260'>
+                     PARAM_FIRST_SCALAR,                 &amp;<a name='261'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='262'>
+                     ims,ime, jms,jme, kms,kme,          &amp; <a name='263'>
+                     its,ite, jts,jte, kts,kte           )<a name='264'>
+<a name='265'>
+        CASE (WSM3SCHEME)<a name='266'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling wsm3' )<a name='267'>
+             CALL <A href='../../html_code/phys/module_mp_wsm3.F.html#WSM3'>wsm3</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WSM3_1">(th_phy,                           &amp;<a name='268'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='269'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='270'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='271'>
+                     w, rho, pi_phy, p_phy, dz8w, RAINNC,&amp;<a name='272'>
+                     RAINNCV,dt,g,cp,cpv,r_d,r_v,SVPT0,  &amp;<a name='273'>
+                     ep_1, ep_2, epsilon,                &amp;<a name='274'>
+                     XLS, XLV, XLF, rhoair0, rhowater,   &amp;<a name='275'>
+                     cliq,cice,psat,                     &amp;<a name='276'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='277'>
+                     ims,ime, jms,jme, kms,kme,          &amp;<a name='278'>
+                     its,ite, jts,jte, kts,kte           )<a name='279'>
+<a name='280'>
+        CASE (WSM5SCHEME)<a name='281'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling wsm5' )<a name='282'>
+             CALL  <A href='../../html_code/phys/module_mp_wsm5.F.html#WSM5'>wsm5</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WSM5_1">(th_phy,                          &amp;<a name='283'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='284'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='285'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='286'>
+                     moist_new(ims,kms,jms,P_QI),        &amp;<a name='287'>
+                     moist_new(ims,kms,jms,P_QS),        &amp;<a name='288'>
+                     w, rho, pi_phy, p_phy, dz8w, RAINNC,&amp;<a name='289'>
+                     RAINNCV,dt,g,cp,cpv,r_d,r_v,SVPT0,  &amp;<a name='290'>
+                     ep_1, ep_2, epsilon,                &amp;<a name='291'>
+                     XLS, XLV, XLF, rhoair0, rhowater,   &amp;<a name='292'>
+                     cliq,cice,psat,                     &amp;<a name='293'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='294'>
+                     ims,ime, jms,jme, kms,kme,          &amp;<a name='295'>
+                     its,ite, jts,jte, kts,kte           )<a name='296'>
+<a name='297'>
+        CASE (WSM6SCHEME)<a name='298'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling wsm6' )<a name='299'>
+             CALL  <A href='../../html_code/phys/module_mp_wsm6.F.html#WSM6'>wsm6</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WSM6_1">(th_phy,                          &amp;<a name='300'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='301'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='302'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='303'>
+                     moist_new(ims,kms,jms,P_QI),        &amp;<a name='304'>
+                     moist_new(ims,kms,jms,P_QS),        &amp;<a name='305'>
+                     moist_new(ims,kms,jms,P_QG),        &amp;<a name='306'>
+                     w, rho, pi_phy, p_phy, dz8w, RAINNC,&amp;<a name='307'>
+                     RAINNCV,dt,g,cp,cpv,r_d,r_v,SVPT0,  &amp;<a name='308'>
+                     ep_1, ep_2, epsilon,                &amp;<a name='309'>
+                     XLS, XLV, XLF, rhoair0, rhowater,   &amp;<a name='310'>
+                     cliq,cice,psat,                     &amp;<a name='311'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='312'>
+                     ims,ime, jms,jme, kms,kme,          &amp;<a name='313'>
+                     its,ite, jts,jte, kts,kte           )<a name='314'>
+<a name='315'>
+        CASE (ETAMPNEW)<a name='316'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling etampnew')<a name='317'>
+<a name='318'>
+               CALL <A href='../../html_code/phys/module_mp_etanew.F.html#ETAMP_NEW'>ETAMP_NEW</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ETAMP_NEW_1">(itimestep,DT,DX,DY,RAINNC,RAINNCV,     &amp;<a name='319'>
+                              dz8w,rho,p_phy,pi_phy,th_phy,          &amp;<a name='320'>
+                              moist_new(ims,kms,jms,P_QV),           &amp;<a name='321'>
+                              moist_new(ims,kms,jms,P_QC),           &amp;<a name='322'>
+                              LOWLYR,SR,                             &amp;<a name='323'>
+                              F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,      &amp;<a name='324'>
+                              ids,ide, jds,jde, kds,kde,             &amp;<a name='325'>
+                              ims,ime, jms,jme, kms,kme,             &amp;<a name='326'>
+                              its,ite, jts,jte, kts,kte             )<a name='327'>
+<a name='328'>
+        CASE (NCEPCLOUD3)<a name='329'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling ncloud3' )<a name='330'>
+             CALL <A href='../../html_code/phys/module_mp_ncloud3.F.html#NCLOUD3'>ncloud3</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NCLOUD3_1">(th_phy,                        &amp;<a name='331'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='332'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='333'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='334'>
+                     w, rho, pi_phy, p_phy, dz8w, RAINNC,&amp;<a name='335'>
+                     RAINNCV,dt,g,cp,cpv,r_d,r_v,SVPT0,  &amp;<a name='336'>
+                     ep_1, ep_2, epsilon,                &amp;<a name='337'>
+                     XLS, XLV, XLF, rhoair0, rhowater,   &amp;<a name='338'>
+                     cliq,cice,psat,                     &amp;<a name='339'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='340'>
+                     ims,ime, jms,jme, kms,kme,          &amp;<a name='341'>
+                     its,ite, jts,jte, kts,kte           )<a name='342'>
+<a name='343'>
+        CASE (NCEPCLOUD5)<a name='344'>
+             CALL wrf_debug ( 100 , 'microphysics_driver: calling ncloud5' )<a name='345'>
+             CALL  <A href='../../html_code/phys/module_mp_ncloud5.F.html#NCLOUD5'>ncloud5</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NCLOUD5_1">(th_phy,                       &amp;<a name='346'>
+                     moist_new(ims,kms,jms,P_QV),        &amp;<a name='347'>
+                     moist_new(ims,kms,jms,P_QC),        &amp;<a name='348'>
+                     moist_new(ims,kms,jms,P_QR),        &amp;<a name='349'>
+                     moist_new(ims,kms,jms,P_QI),        &amp;<a name='350'>
+                     moist_new(ims,kms,jms,P_QS),        &amp;<a name='351'>
+                     w, rho, pi_phy, p_phy, dz8w, RAINNC,&amp;<a name='352'>
+                     RAINNCV,dt,g,cp,cpv,r_d,r_v,SVPT0,  &amp;<a name='353'>
+                     ep_1, ep_2, epsilon,                &amp;<a name='354'>
+                     XLS, XLV, XLF, rhoair0, rhowater,   &amp;<a name='355'>
+                     cliq,cice,psat,                     &amp;<a name='356'>
+                     ids,ide, jds,jde, kds,kde,          &amp;<a name='357'>
+                     ims,ime, jms,jme, kms,kme,          &amp;<a name='358'>
+                     its,ite, jts,jte, kts,kte           )<a name='359'>
+<a name='360'>
+<a name='361'>
+      CASE DEFAULT <a name='362'>
+<a name='363'>
+         WRITE( wrf_err_message , * ) 'The microphysics option does not exist: mp_physics = ', config_flags%mp_physics<a name='364'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_147"> ( wrf_err_message )<a name='365'>
+<a name='366'>
+      END SELECT micro_select <a name='367'>
+<a name='368'>
+         <font color=#447700>! Zero out small condensate values  FSL-BLS-12-JUL-2004<a name='369'></font>
+<a name='370'>
+         IF ( config_flags%mp_zero_out .EQ. 0 ) THEN<a name='371'>
+            <font color=#447700>!  do nothing<a name='372'></font>
+         ELSE IF ( config_flags%mp_zero_out .EQ. 1 ) THEN<a name='373'>
+            <font color=#447700>!  All of the "moist" fields, except for vapor, that are below a critical<a name='374'></font>
+            <font color=#447700>!  threshold are set to zero.<a name='375'></font>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_153"> ( 100 , 'zero out small condensates, vapor not included')<a name='376'>
+            DO n = PARAM_FIRST_SCALAR,n_moist<a name='377'>
+               IF ( n .NE. P_QV ) THEN<a name='378'>
+                  DO j = jts, jte<a name='379'>
+                  DO k = kts, kte<a name='380'>
+                  DO i = its, ite<a name='381'>
+                     IF ( moist_new(i,k,j,n) .LT. config_flags%mp_zero_out_thresh )  moist_new(i,k,j,n) =0.<a name='382'>
+                  ENDDO<a name='383'>
+                  ENDDO<a name='384'>
+                  ENDDO<a name='385'>
+               END IF<a name='386'>
+            ENDDO<a name='387'>
+         ELSE IF ( config_flags%mp_zero_out .EQ. 2 ) then<a name='388'>
+            <font color=#447700>!  All of the non-Qv "moist" fields that are below a critical threshold are set to <a name='389'></font>
+            <font color=#447700>!  zero.  The vapor is constrained to be non-negative.<a name='390'></font>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_154"> ( 100 , 'zero out small condensates, zero out negative vapor')<a name='391'>
+            DO n = PARAM_FIRST_SCALAR,n_moist<a name='392'>
+               IF ( n .NE. P_QV ) THEN<a name='393'>
+                  DO j = jts, jte<a name='394'>
+                  DO k = kts, kte<a name='395'>
+                  DO i = its, ite<a name='396'>
+                     IF ( moist_new(i,k,j,n) .LT. config_flags%mp_zero_out_thresh )  moist_new(i,k,j,n) =0.<a name='397'>
+                  ENDDO<a name='398'>
+                  ENDDO<a name='399'>
+                  ENDDO<a name='400'>
+               ELSE IF ( n .EQ. P_QV ) THEN<a name='401'>
+                  DO j = jts, jte<a name='402'>
+                  DO k = kts, kte<a name='403'>
+                  DO i = its, ite<a name='404'>
+                     moist_new(i,k,j,n) = MAX ( moist_new(i,k,j,n) , 0. )<a name='405'>
+                  ENDDO<a name='406'>
+                  ENDDO<a name='407'>
+                  ENDDO<a name='408'>
+               END IF<a name='409'>
+            ENDDO<a name='410'>
+         END IF<a name='411'>
+<a name='412'>
+         <font color=#447700>! Make sure that the boundary is .GE. 0 if the mp_zero_out option is selected (1 or 2)<a name='413'></font>
+         <font color=#447700>! Just do the outer row/col, no interior points.<a name='414'></font>
+<a name='415'>
+         IF ( config_flags%mp_zero_out .NE. 0 ) THEN<a name='416'>
+            DO n = PARAM_FIRST_SCALAR,n_moist<a name='417'>
+               <font color=#447700>!  bottom row<a name='418'></font>
+               j = jds<a name='419'>
+               IF ( ( j .GE. j_start(ij) ) .AND. ( j .LE. MIN( j_end(ij) , jde-1) ) ) THEN<a name='420'>
+                  DO k = kts, kte<a name='421'>
+                  DO i = i_start(ij) , MIN ( i_end(ij) , ide-1 )<a name='422'>
+                     moist_new(i,k,j,n) = MAX ( moist_new(i,k,j,n) , 0. )<a name='423'>
+                  ENDDO<a name='424'>
+                  ENDDO<a name='425'>
+               END IF<a name='426'>
+               <font color=#447700>!  top row<a name='427'></font>
+               j = jde-1<a name='428'>
+               IF ( ( j .GE. j_start(ij) ) .AND. ( j .LE. MIN( j_end(ij) , jde-1) ) ) THEN<a name='429'>
+                  DO k = kts, kte<a name='430'>
+                  DO i = i_start(ij) , MIN ( i_end(ij) , ide-1 )<a name='431'>
+                     moist_new(i,k,j,n) = MAX ( moist_new(i,k,j,n) , 0. )<a name='432'>
+                  ENDDO<a name='433'>
+                  ENDDO<a name='434'>
+               END IF<a name='435'>
+               <font color=#447700>!  left column<a name='436'></font>
+               i = ids<a name='437'>
+               IF ( ( i .GE. i_start(ij) ) .AND. ( i .LE. MIN( i_end(ij) , ide-1) ) ) THEN<a name='438'>
+                  DO j = j_start(ij) , MIN ( j_end(ij) , jde-1 )<a name='439'>
+                  DO k = kts, kte<a name='440'>
+                     moist_new(i,k,j,n) = MAX ( moist_new(i,k,j,n) , 0. )<a name='441'>
+                  ENDDO<a name='442'>
+                  ENDDO<a name='443'>
+               END IF<a name='444'>
+               <font color=#447700>!  right column<a name='445'></font>
+               i = ide-1<a name='446'>
+               IF ( ( i .GE. i_start(ij) ) .AND. ( i .LE. MIN( i_end(ij) , ide-1) ) ) THEN<a name='447'>
+                  DO j = j_start(ij) , MIN ( j_end(ij) , jde-1 )<a name='448'>
+                  DO k = kts, kte<a name='449'>
+                     moist_new(i,k,j,n) = MAX ( moist_new(i,k,j,n) , 0. )<a name='450'>
+                  ENDDO<a name='451'>
+                  ENDDO<a name='452'>
+               END IF<a name='453'>
+            ENDDO<a name='454'>
+         END IF<a name='455'>
+   ELSE<a name='456'>
+<a name='457'>
+      WRITE( wrf_err_message , * ) 'The microphysics option does not exist: mp_physics = ', config_flags%mp_physics<a name='458'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_148"> ( wrf_err_message )<a name='459'>
+<a name='460'>
+   ENDIF<a name='461'>
+<a name='462'>
+   ENDDO<a name='463'>
+   <font color=#447700>!$OMP END PARALLEL DO<a name='464'></font>
+<a name='465'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/phys/module_microphysics_driver.F.html#MICROPHYSICS_DRIVER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_155"> ( 200 , 'microphysics_driver: returning from' )<a name='466'>
+<a name='467'>
+   RETURN<a name='468'>
+<a name='469'>
+   END SUBROUTINE microphysics_driver<a name='470'>
+<a name='471'>
+END MODULE module_microphysics_driver<a name='472'>
+<a name='473'>
+</pre></body></html>

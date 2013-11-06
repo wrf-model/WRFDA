@@ -1,0 +1,247 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_MP_KESSLER'><A href='../../html_code/phys/module_mp_kessler.F.html#MODULE_MP_KESSLER' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_mp_kessler</font> <A href='../../call_to/MODULE_MP_KESSLER.html' TARGET='index'>1</A><a name='6'>
+<a name='7'>
+CONTAINS<a name='8'>
+<font color=#447700>!----------------------------------------------------------------<a name='9'></font>
+<A NAME='KESSLER'><A href='../../html_code/phys/module_mp_kessler.F.html#KESSLER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='10'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>kessler</font>( t, qv, qc, qcold, qr, qrold, rho, pii,   &amp; <A href='../../call_to/KESSLER.html' TARGET='index'>1</A><a name='11'>
+                       RAINNC, RAINNCV, dt_in, z, xlv, cp,      &amp;<a name='12'>
+                       EP2,SVP1,SVP2,SVP3,SVPT0,rhowater,       &amp;<a name='13'>
+                       dz8w,                                    &amp;<a name='14'>
+                       ids,ide, jds,jde, kds,kde,               &amp; <font color=#447700>! domain dims<a name='15'></font>
+                       ims,ime, jms,jme, kms,kme,               &amp; <font color=#447700>! memory dims<a name='16'></font>
+                       its,ite, jts,jte, kts,kte                ) <font color=#447700>! tile   dims<a name='17'></font>
+<font color=#447700>!----------------------------------------------------------------<a name='18'></font>
+   IMPLICIT NONE<a name='19'>
+<font color=#447700>!----------------------------------------------------------------<a name='20'></font>
+   <font color=#447700>!  taken from the COMMAS code - WCS 10 May 1999.<a name='21'></font>
+   <font color=#447700>!  converted from FORTRAN 77 to 90, tiled, WCS 10 May 1999.<a name='22'></font>
+<font color=#447700>!----------------------------------------------------------------<a name='23'></font>
+   REAL    , PARAMETER ::  c1 = .001 <a name='24'>
+   REAL    , PARAMETER ::  c2 = .001 <a name='25'>
+   REAL    , PARAMETER ::  c3 = 2.2 <a name='26'>
+   REAL    , PARAMETER ::  c4 = .875 <a name='27'>
+   REAL    , PARAMETER ::  fudge = 1.0 <a name='28'>
+   REAL    , PARAMETER ::  mxfall = 10.0 <a name='29'>
+<font color=#447700>!----------------------------------------------------------------<a name='30'></font>
+   INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde, &amp;<a name='31'>
+                                     ims,ime, jms,jme, kms,kme, &amp;<a name='32'>
+                                     its,ite, jts,jte, kts,kte<a name='33'>
+   REAL   ,      INTENT(IN   )    :: xlv, cp<a name='34'>
+   REAL   ,      INTENT(IN   )    :: EP2,SVP1,SVP2,SVP3,SVPT0<a name='35'>
+   REAL   ,      INTENT(IN   )    :: rhowater<a name='36'>
+<a name='37'>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),              &amp;<a name='38'>
+         INTENT(INOUT) ::                                       &amp;<a name='39'>
+                                                            t , &amp;<a name='40'>
+                                                            qv, &amp;<a name='41'>
+                                                            qc, &amp;<a name='42'>
+                                                            qr<a name='43'>
+<a name='44'>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),              &amp;<a name='45'>
+         INTENT(IN   ) ::                                       &amp;<a name='46'>
+                                                         qcold, &amp;<a name='47'>
+                                                         qrold, &amp;<a name='48'>
+                                                           rho, &amp;<a name='49'>
+                                                           pii, &amp;<a name='50'>
+                                                          dz8w <a name='51'>
+<a name='52'>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),              &amp;<a name='53'>
+         INTENT(IN   ) ::                                    z<a name='54'>
+<a name='55'>
+   REAL, DIMENSION( ims:ime , jms:jme ),                        &amp;<a name='56'>
+         INTENT(INOUT) ::                               RAINNC, &amp;<a name='57'>
+                                                       RAINNCV<a name='58'>
+<a name='59'>
+<a name='60'>
+   REAL, INTENT(IN   ) :: dt_in<a name='61'>
+<a name='62'>
+   <font color=#447700>! local variables<a name='63'></font>
+<a name='64'>
+   REAL :: qrprod, ern, gam, rcgs, rcgsi<a name='65'>
+   REAL, DIMENSION( its:ite , kts:kte, jts:jte ) ::     prod<a name='66'>
+   REAL, DIMENSION(kts:kte) :: vt, prodk, vtden,rdzk,rhok,factor,rdzw<a name='67'>
+   INTEGER :: i,j,k<a name='68'>
+   INTEGER :: nfall, n, nfall_new<a name='69'>
+   REAL    :: qrr, pressure, temp, es, qvs, dz, dt<a name='70'>
+   REAL    :: f5, dtfall, rdz, product<a name='71'>
+   REAL    :: max_heating, max_condense, max_rain, maxqrp<a name='72'>
+   REAL    :: vtmax, ernmax, crmax, factorn, time_sediment<a name='73'>
+   REAL    :: qcr, qroldr, qcoldr, factorr, maxqrold, minqrold, ppt<a name='74'>
+   REAL, PARAMETER :: max_cr_sedimentation = 0.75<a name='75'>
+<font color=#447700>!----------------------------------------------------------------<a name='76'></font>
+<a name='77'>
+   INTEGER :: imax, kmax<a name='78'>
+<a name='79'>
+    dt = dt_in<a name='80'>
+<a name='81'>
+<font color=#447700>!   f5 = 237.3 * 17.27 * 2.5e6 / cp <a name='82'></font>
+    f5 = svp2*(svpt0-svp3)*xlv/cp<a name='83'>
+    ernmax = 0.<a name='84'>
+    maxqrp = -100.<a name='85'>
+<a name='86'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='87'></font>
+<font color=#447700>! parameters for the time split terminal advection<a name='88'></font>
+<font color=#447700>!------------------------------------------------------------------------------<a name='89'></font>
+<a name='90'>
+      max_heating = 0.<a name='91'>
+      max_condense = 0.<a name='92'>
+      max_rain = 0.<a name='93'>
+<a name='94'>
+<font color=#447700>!-----------------------------------------------------------------------------<a name='95'></font>
+<font color=#447700>! outer J loop for entire microphysics, outer i loop for sedimentation<a name='96'></font>
+<font color=#447700>!-----------------------------------------------------------------------------<a name='97'></font>
+<a name='98'>
+  microphysics_outer_j_loop: DO j = jts, jte<a name='99'>
+<a name='100'>
+  sedimentation_outer_i_loop: DO i = its,ite<a name='101'>
+<a name='102'>
+<font color=#447700>!   vtmax = 0.<a name='103'></font>
+   crmax = 0.<a name='104'>
+<a name='105'>
+<a name='106'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='107'></font>
+<font color=#447700>! Terminal velocity calculation and advection, set up coefficients and<a name='108'></font>
+<font color=#447700>! compute stable timestep<a name='109'></font>
+<font color=#447700>!------------------------------------------------------------------------------<a name='110'></font>
+<a name='111'>
+   DO k = 1, kte<a name='112'>
+     prodk(k)   = qr(i,k,j)<a name='113'>
+     rhok(k) = rho(i,k,j)<a name='114'>
+     qrr = amax1(0.,qr(i,k,j)*0.001*rhok(k))<a name='115'>
+     vtden(k) = sqrt(rhok(1)/rhok(k))<a name='116'>
+     vt(k) = 36.34*(qrr**0.1364) * vtden(k)<a name='117'>
+<font color=#447700>!     vtmax = amax1(vt(k), vtmax)<a name='118'></font>
+     rdzw(k) = 1./dz8w(i,k,j)<a name='119'>
+     crmax = amax1(vt(k)*dt*rdzw(k),crmax)<a name='120'>
+   ENDDO<a name='121'>
+   DO k = 1, kte-1<a name='122'>
+     rdzk(k) = 1./(z(i,k+1,j) - z(i,k,j))<a name='123'>
+   ENDDO<a name='124'>
+   rdzk(kte) = 1./(z(i,kte,j) - z(i,kte-1,j))<a name='125'>
+<a name='126'>
+   nfall = max(1,nint(0.5+crmax/max_cr_sedimentation))  <font color=#447700>! courant number for big timestep.<a name='127'></font>
+   dtfall = dt / float(nfall)                           <font color=#447700>! splitting so courant number for sedimentation<a name='128'></font>
+   time_sediment = dt                                   <font color=#447700>! is stable<a name='129'></font>
+<a name='130'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='131'></font>
+<font color=#447700>! Terminal velocity calculation and advection<a name='132'></font>
+<font color=#447700>! Do a time split loop on this for stability.<a name='133'></font>
+<font color=#447700>!------------------------------------------------------------------------------<a name='134'></font>
+<a name='135'>
+   column_sedimentation: DO WHILE ( nfall &gt; 0 )<a name='136'>
+<a name='137'>
+   time_sediment = time_sediment - dtfall<a name='138'>
+   DO k = 1, kte-1<a name='139'>
+     factor(k) = dtfall*rdzk(k)/rhok(k)<a name='140'>
+   ENDDO<a name='141'>
+   factor(kte) = dtfall*rdzk(kte)<a name='142'>
+<a name='143'>
+   ppt=0.<a name='144'>
+<a name='145'>
+      k = 1<a name='146'>
+      ppt=rhok(k)*prodk(k)*vt(k)*dtfall/rhowater<a name='147'>
+      RAINNCV(i,j)=ppt*1000.<a name='148'>
+      RAINNC(i,j)=RAINNC(i,j)+ppt*1000.  <font color=#447700>! unit = mm<a name='149'></font>
+ <a name='150'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='151'></font>
+<font color=#447700>! Time split loop, Fallout done with flux upstream<a name='152'></font>
+<font color=#447700>!------------------------------------------------------------------------------<a name='153'></font>
+<a name='154'>
+      DO k = kts, kte-1<a name='155'>
+        prodk(k) = prodk(k) - factor(k)           &amp;<a name='156'>
+                  * (rhok(k)*prodk(k)*vt(k)       &amp;<a name='157'>
+                    -rhok(k+1)*prodk(k+1)*vt(k+1))<a name='158'>
+      ENDDO<a name='159'>
+<a name='160'>
+      k = kte<a name='161'>
+      prodk(k) = prodk(k) - factor(k)*prodk(k)*vt(k)<a name='162'>
+<a name='163'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='164'></font>
+<font color=#447700>! compute new sedimentation velocity, and check/recompute new <a name='165'></font>
+<font color=#447700>! sedimentation timestep if this isn't the last split step.<a name='166'></font>
+<font color=#447700>!------------------------------------------------------------------------------<a name='167'></font>
+<a name='168'>
+      IF( nfall &gt; 1 ) THEN <font color=#447700>! this wasn't the last split sedimentation timestep<a name='169'></font>
+<a name='170'>
+        nfall = nfall - 1<a name='171'>
+        crmax = 0.<a name='172'>
+        DO k = kts, kte <a name='173'>
+          qrr = amax1(0.,prodk(k)*0.001*rhok(k))<a name='174'>
+          vt(k) = 36.34*(qrr**0.1364) * vtden(k)<a name='175'>
+<font color=#447700>!          vtmax = amax1(vt(k), vtmax)<a name='176'></font>
+          crmax = amax1(vt(k)*time_sediment*rdzw(k),crmax)<a name='177'>
+        ENDDO<a name='178'>
+<a name='179'>
+        nfall_new = max(1,nint(0.5+crmax/max_cr_sedimentation))<a name='180'>
+        if (nfall_new /= nfall ) then<a name='181'>
+          nfall = nfall_new<a name='182'>
+          dtfall = time_sediment/nfall<a name='183'>
+        end if<a name='184'>
+<a name='185'>
+      ELSE  <font color=#447700>! this was the last timestep<a name='186'></font>
+<a name='187'>
+        DO k=kts,kte<a name='188'>
+          prod(i,k,j) = prodk(k)<a name='189'>
+        ENDDO<a name='190'>
+        nfall = 0  <font color=#447700>! exit condition for sedimentation loop<a name='191'></font>
+<a name='192'>
+      END IF<a name='193'>
+<a name='194'>
+   ENDDO column_sedimentation<a name='195'>
+<a name='196'>
+   ENDDO sedimentation_outer_i_loop<a name='197'>
+<a name='198'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='199'></font>
+<font color=#447700>! Production of rain and deletion of qc<a name='200'></font>
+<font color=#447700>! Production of qc from supersaturation<a name='201'></font>
+<font color=#447700>! Evaporation of QR<a name='202'></font>
+<font color=#447700>!------------------------------------------------------------------------------<a name='203'></font>
+<a name='204'>
+     DO k = kts, kte<a name='205'>
+     DO i = its, ite<a name='206'>
+       factorn = 1.0 / (1.+c3*dt*amax1(0.,qr(i,k,j))**c4)<a name='207'>
+       qrprod = qc(i,k,j) * (1.0 - factorn)           &amp;<a name='208'>
+             + factorn*c1*dt*amax1(qc(i,k,j)-c2,0.)      <a name='209'>
+       rcgs = 0.001*rho(i,k,j)<a name='210'>
+<a name='211'>
+       qc(i,k,j) = amax1(qc(i,k,j) - qrprod,0.)<a name='212'>
+       qr(i,k,j) = (qr(i,k,j) + prod(i,k,j)-qr(i,k,j))<a name='213'>
+       qr(i,k,j) = amax1(qr(i,k,j) + qrprod,0.)<a name='214'>
+<a name='215'>
+       temp      = pii(i,k,j)*t(i,k,j)<a name='216'>
+       pressure = 1.000e+05 * (pii(i,k,j)**(1004./287.))<a name='217'>
+       gam = 2.5e+06/(1004.*pii(i,k,j))<a name='218'>
+<font color=#447700>!      qvs       = 380.*exp(17.27*(temp-273.)/(temp- 36.))/pressure<a name='219'></font>
+       es        = 1000.*svp1*exp(svp2*(temp-svpt0)/(temp-svp3))<a name='220'>
+       qvs       = ep2*es/(pressure-es)<a name='221'>
+<font color=#447700>!      prod(i,k,j) = (qv(i,k,j)-qvs) / (1.+qvs*f5/(temp-36.)**2)<a name='222'></font>
+       prod(i,k,j) = (qv(i,k,j)-qvs) / (1.+pressure/(pressure-es)*qvs*f5/(temp-svp3)**2)<a name='223'>
+       ern  = amin1(dt*(((1.6+124.9*(rcgs*qr(i,k,j))**.2046)   &amp;<a name='224'>
+          *(rcgs*qr(i,k,j))**.525)/(2.55e8/(pressure*qvs)       &amp;<a name='225'>
+          +5.4e5))*(dim(qvs,qv(i,k,j))/(rcgs*qvs)),             &amp;<a name='226'>
+          amax1(-prod(i,k,j)-qc(i,k,j),0.),qr(i,k,j))<a name='227'>
+<a name='228'>
+<font color=#447700>! Update all variables<a name='229'></font>
+<a name='230'>
+       product = amax1(prod(i,k,j),-qc(i,k,j))<a name='231'>
+       t (i,k,j) = t(i,k,j) + gam*(product - ern)<a name='232'>
+       qv(i,k,j) = amax1(qv(i,k,j) - product + ern,0.)<a name='233'>
+       qc(i,k,j) =       qc(i,k,j) + product<a name='234'>
+       qr(i,k,j) = qr(i,k,j) - ern<a name='235'>
+<a name='236'>
+     ENDDO<a name='237'>
+     ENDDO<a name='238'>
+<a name='239'>
+  ENDDO  microphysics_outer_j_loop<a name='240'>
+<a name='241'>
+  RETURN<a name='242'>
+<a name='243'>
+  END SUBROUTINE kessler<a name='244'>
+<a name='245'>
+END MODULE module_mp_kessler<a name='246'>
+</pre></body></html>

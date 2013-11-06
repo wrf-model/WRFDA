@@ -1,0 +1,207 @@
+<html>
+
+<head>
+
+<title>WRFDA V3</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+.style2 {font-family: Georgia, "Times New Roman", Times, serif}
+-->
+</style>
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style3 {line-height: 14pt; color: #000000; text-align: justify; padding-right: 45px; padding-left: 45px; font-size: 80%;}
+-->
+</style>
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#FFFFFF"><img src="images/header.jpg" width="566" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="images/goldrule.jpg" bgcolor="#009933"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td height="943" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+        <td width="115" height="975" bgcolor="#009933"><p align="right">&nbsp;</p>
+          <p align="center"><a href="Docs/user_guide_V3.1/users_guide_chap6.htm#_Installing_WRF-Var" class="leftnavlink">How 
+            
+            to Compile?</a></p>
+          <p align="center"><a href="http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Running_WRF-Var_1" class="leftnavlink">How 
+            
+            to Run?</a></p>
+          <p align="center" class="leftnavlink"><a href="updates-3.1.html" class="leftnavlink">WRF-Var
+            Updates</a></p>
+          <p align="center"><a href="known-prob.html" class="leftnavlink">Known 
+          Problems</a><a href="known-prob-V3_1.html" class="leftnavlink"> and Fixes</a></p></td>
+
+        <td width="665" height="975" bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle style2">WRFDA Version 3</p>
+            <blockquote>
+              <p><strong>System overview</strong></p>
+                    <p class="bodytext">- It is based on incremental variational data assimilation technique<br>
+                    - Conjugate gradient method is utilized to minimized the cost function in analysis control variable space<br>
+                    - Analysis is performed on un-staggered Arakawa A-grid<br>
+                    - Analysis increments are interpolated to staggered Arakawa C-grid and it gets added to the background (first guess) to get final analysis at WRF-model grid<br>
+                    - Conventional observation data input may be supplied both in ASCII or &ldquo;PREPBUFR&rdquo; format via &ldquo;obsproc&rdquo; utility<br>
+                    - Multiple radar data (reflectivity &amp; radial velocity) input is supplied through ASCII format<br>
+                    - Horizontal component of the background (first guess) error is represented via recursive filter (for regional) or power spectrum (for global). The vertical component is applied through projections on climatologically generated averaged eigenvectors and its corresponding eigenvalues<br>
+                    - Horizontal and vertical background errors are non-separable. Each eigen vector has its own horizontal climatologically determined length scale<br>
+                    - Preconditioning of background part of the cost function is done via control variable transform U defined as B= UUT<br>
+                    - It includes &ldquo;gen_be&rdquo; utility to generate the climatological background error covariance estimate via the NMC-method or ensemble perturbations<br>
+                    - A utility program to update WRF boundary condition file after WRF-Var</p>
+              <p><strong>Platforms it runs on</strong></p>
+              <p class="bodytext">- IBM SP systems (e.g. NCAR blackvista/blueice, Power5-based systems)<br>
+                - IBM Blue Gene <br>
+                - SGI: Origin 2000 and Altix<br>
+                - Linux: PGI, Intel ifort, Pathscale, gfortran and g95 compilers</p>
+              <blockquote>
+                <p class="bodytext">Pentium 3/4 clusters and SMPs<br>
+                  Pentium 4 cluster iJet system at NOAA FSL<br>
+                  Intel Xeon IA32<br>
+                  IA64/Linux MPP (SGI Altix)<br>
+                  IA64/Linux MPP (HP Superdome at PNNL)<br>
+                  IA64/Linux MPP (NCSA)<br>
+                  IA64/Linux SMP (local)<br>
+                  AMD Opteron</p>
+              </blockquote>
+              <p class="bodytext">- Mac Intel/PPC, PGI/ifort/g95 <br>
+                - Sun (single and SMP)<br>
+                - Cray: Unicos/X1, X1e (vector), and XD1 (Opteron) series<br>
+                - HP-UX <br>
+                - NEC: SX/8<br>
+                - Fujitsu: VPP 5000</p>
+              <p><strong>Software Architecture</strong></p>
+              <p class="bodytext">- Hierarchical software architecture that insulates scientific code (Model Layer) from computer architecture (Driver Layer). <br>
+                - Multi-level parallelism supporting shared-memory (OpenMP), distributed-memory (MPI), and hybrid share/distributed modes of execution. <br>
+                - Active data registry: defines and manages model state fields, I/O, nesting, configuration, and numerous other aspects of WRFDA through a single file, called the Registry.<br>
+                - <a href="http://www.mmm.ucar.edu/wrf/WG2/software_2.0/">Documentation</a>, both on-line (web based browsing tools) and in-line.</p>
+              <p class="bodytext">- Efficient execution on a range of computing platforms:</p>
+              <p class="bodytext">* IBM SP systems, (e.g. NCAR &quot;bluevista/blueice&quot; Power5-based system) <br>
+                * HP/Compaq Alpha/OSF workstation, SMP, and MPP systems (e.g. Pittsburgh Supercomputing Center TCS) <br>
+                * SGI Origin and Altix <br>
+                * Linux/Intel</p>
+              <p class="bodytext">. IA64 MPP (HP Superdome, SGI Altix, NCSA Teragrid systems) . IA64 SMP<br>
+                . AMD Opteron<br>
+                . Pentium 3/4 SMP and SMP clusters (NOAA/FSL iJet system) <br>
+                . PGI and Intel compilers supported</p>
+              <p class="bodytext">* Sun Solaris (single threaded and SMP)<br>
+                * Cray X1, X1e (vector), and XD1 (Opteron) series<br>
+                * NEC SX/8<br>
+                * Fujitsu VPP 5000</p>
+              <p><strong>Features new in version 3 of WRFDA software:</strong></p>
+              <p class="bodytext">- RSL_LITE: communication layer, scalable to very large domains, nest support.</p>
+              <p class="bodytext">- Memory usage improvement.</p>
+            </blockquote>            
+            <p align="center" class="detailtextRed"><br>
+              - 
+                <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+              <br>
+              <br>
+          </p></td>
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

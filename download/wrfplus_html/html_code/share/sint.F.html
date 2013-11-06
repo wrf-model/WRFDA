@@ -1,0 +1,420 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<a name='2'>
+<A NAME='SINT'><A href='../../html_code/share/sint.F.html#SINT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='3'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>SINT</font>(XF,                        &amp; <A href='../../call_to/SINT.html' TARGET='index'>1</A><a name='4'>
+                   ims, ime, jms, jme, icmask ,  &amp;<a name='5'>
+                   its, ite, jts, jte, nf, xstag, ystag )<a name='6'>
+      IMPLICIT NONE<a name='7'>
+      INTEGER ims, ime, jms, jme, &amp;<a name='8'>
+              its, ite, jts, jte<a name='9'>
+<a name='10'>
+      LOGICAL icmask( ims:ime, jms:jme )<a name='11'>
+      LOGICAL xstag, ystag<a name='12'>
+<a name='13'>
+      INTEGER nf, ior<a name='14'>
+      REAL    one12, one24, ep<a name='15'>
+      PARAMETER(one12=1./12.,one24=1./24.)                              <a name='16'>
+      PARAMETER(ior=2)                        <a name='17'>
+<font color=#447700>!                                                                       <a name='18'></font>
+      REAL XF(ims:ime,jms:jme,NF)<a name='19'>
+<font color=#447700>!                                                                       <a name='20'></font>
+      REAL Y(ims:ime,jms:jme,-IOR:IOR),    &amp;<a name='21'>
+           Z(ims:ime,jms:jme,-IOR:IOR),    &amp;<a name='22'>
+           F(ims:ime,jms:jme,0:1)                                       <a name='23'>
+<font color=#447700>!<a name='24'></font>
+      INTEGER I,J,II,JJ,IIM<a name='25'>
+      INTEGER N2STAR, N2END, N1STAR, N1END<a name='26'>
+<font color=#447700>!                                                                       <a name='27'></font>
+      DATA  EP/ 1.E-10/                                                 <a name='28'>
+<font color=#447700>!                                                                       <a name='29'></font>
+<font color=#447700>!      PARAMETER(NONOS=1)                                                <a name='30'></font>
+<font color=#447700>!      PARAMETER(N1OS=N1*NONOS+1-NONOS,N2OS=N2*NONOS+1-NONOS)            <a name='31'></font>
+<font color=#447700>!                                                                       <a name='32'></font>
+      REAL W(ims:ime,jms:jme),OV(ims:ime,jms:jme),UN(ims:ime,jms:jme)                     <a name='33'>
+      REAL MXM(ims:ime,jms:jme),MN(ims:ime,jms:jme)                                 <a name='34'>
+      REAL FL(ims:ime,jms:jme,0:1)                                            <a name='35'>
+      REAL XIG(81), XJG(81)  <font color=#447700>! won't use but nine of these fellers.<a name='36'></font>
+      INTEGER IFRST<a name='37'>
+      integer rr<a name='38'>
+      COMMON /DEPAR2/ XIG,XJG,IFRST<a name='39'>
+      DATA IFRST /1/<a name='40'>
+<a name='41'>
+      REAL rioff, rjoff<a name='42'>
+<font color=#447700>!                                                                       <a name='43'></font>
+      REAL donor, y1, y2, a<a name='44'>
+      DONOR(Y1,Y2,A)=(Y1*AMAX1(0.,SIGN(1.,A))-Y2*AMIN1(0.,SIGN(1.,A)))*A<a name='45'>
+      REAL tr4, ym1, y0, yp1, yp2<a name='46'>
+      TR4(YM1,Y0,YP1,YP2,A)=A*ONE12*(7.*(YP1+Y0)-(YP2+YM1))               &amp;<a name='47'>
+       -A*A*ONE24*(15.*(YP1-Y0)-(YP2-YM1))-A*A*A*ONE12*((YP1+Y0)          &amp; <a name='48'>
+       -(YP2+YM1))+A*A*A*A*ONE24*(3.*(YP1-Y0)-(YP2-YM1))                <a name='49'>
+      REAL pp, pn, x<a name='50'>
+      PP(X)=AMAX1(0.,X)                                                 <a name='51'>
+      PN(X)=AMIN1(0.,X)                                                 <a name='52'>
+<font color=#447700>!!      XIG(I) = 1./3.-FLOAT(I-1)*1./3<a name='53'></font>
+<font color=#447700>!!      XJG(J) = 1./3.-FLOAT(J-1)*1./3<a name='54'></font>
+<a name='55'>
+      rr = nint(sqrt(float(nf)))<a name='56'>
+<font color=#447700>!!      write(6,*) ' nf, rr are ',nf,rr<a name='57'></font>
+<font color=#447700>!!      IF ( IFRST .EQ. 1 ) THEN<a name='58'></font>
+<a name='59'>
+        rioff = 0<a name='60'>
+        rjoff = 0<a name='61'>
+        if(xstag .and. (mod(rr,2) .eq. 0)) rioff = 1.<a name='62'>
+        if(ystag .and. (mod(rr,2) .eq. 0)) rjoff = 1.<a name='63'>
+<a name='64'>
+        DO I=1,rr<a name='65'>
+          DO J=1,rr<a name='66'>
+            XIG(J+(I-1)*rr)=(float(rr)-1.-rioff)/float(2*rr)-FLOAT(J-1)*1./float(rr)<a name='67'>
+            XJG(J+(I-1)*rr)=(float(rr)-1.-rjoff)/float(2*rr)-FLOAT(I-1)*1./float(rr)   <a name='68'>
+          ENDDO<a name='69'>
+        ENDDO<a name='70'>
+        IFRST = 0<a name='71'>
+<a name='72'>
+<font color=#447700>!!      ENDIF<a name='73'></font>
+<a name='74'>
+<font color=#447700>!      IF ( IFRST .EQ. 1 ) THEN<a name='75'></font>
+<font color=#447700>!        DO I=1,3   <a name='76'></font>
+<font color=#447700>!          DO J=1,3 <a name='77'></font>
+<font color=#447700>!            XIG(J+(I-1)*3)=1./3.-FLOAT(J-1)*1./3.   <a name='78'></font>
+<font color=#447700>!            XJG(J+(I-1)*3)=1./3.-FLOAT(I-1)*1./3.   <a name='79'></font>
+<font color=#447700>!          ENDDO<a name='80'></font>
+<font color=#447700>!        ENDDO<a name='81'></font>
+<font color=#447700>!        IFRST = 0<a name='82'></font>
+<font color=#447700>!      ENDIF<a name='83'></font>
+<font color=#447700>!<a name='84'></font>
+      N2STAR = jts<a name='85'>
+      N2END  = jte<a name='86'>
+      N1STAR = its<a name='87'>
+      N1END  = ite<a name='88'>
+<a name='89'>
+      DO 2000 IIM=1,NF                                                  <a name='90'>
+<font color=#447700>!                                                                       <a name='91'></font>
+<font color=#447700>!  HERE STARTS RESIDUAL ADVECTION                                       <a name='92'></font>
+<font color=#447700>!                                                                       <a name='93'></font>
+        DO 9000 JJ=N2STAR,N2END                                         <a name='94'>
+          DO 50 J=-IOR,IOR                                              <a name='95'>
+<a name='96'>
+            DO 51 I=-IOR,IOR                                            <a name='97'>
+              DO 511 II=N1STAR,N1END                                    <a name='98'>
+                IF ( icmask(II,JJ) ) Y(II,JJ,I)=XF(II+I,JJ+J,IIM)              <a name='99'>
+  511         CONTINUE<a name='100'>
+   51       CONTINUE                                                    <a name='101'>
+<a name='102'>
+            DO 811 II=N1STAR,N1END                                      <a name='103'>
+              IF ( icmask(II,JJ) ) THEN<a name='104'>
+                FL(II,JJ,0)=DONOR(Y(II,JJ,-1),Y(II,JJ,0),XIG(IIM))        <a name='105'>
+                FL(II,JJ,1)=DONOR(Y(II,JJ,0),Y(II,JJ,1),XIG(IIM))           <a name='106'>
+              ENDIF<a name='107'>
+  811         CONTINUE<a name='108'>
+            DO 812 II=N1STAR,N1END                                      <a name='109'>
+              IF ( icmask(II,JJ) ) W(II,JJ)=Y(II,JJ,0)-(FL(II,JJ,1)-FL(II,JJ,0))               <a name='110'>
+  812         CONTINUE<a name='111'>
+            DO 813 II=N1STAR,N1END                                      <a name='112'>
+              IF ( icmask(II,JJ) ) THEN<a name='113'>
+                MXM(II,JJ)=                                             &amp;<a name='114'>
+                         AMAX1(Y(II,JJ,-1),Y(II,JJ,0),Y(II,JJ,1),       &amp;<a name='115'>
+                         W(II,JJ))                                      <a name='116'>
+                MN(II,JJ)=AMIN1(Y(II,JJ,-1),Y(II,JJ,0),Y(II,JJ,1),W(II,JJ)) <a name='117'>
+              ENDIF<a name='118'>
+  813         CONTINUE<a name='119'>
+            DO 312 II=N1STAR,N1END                                      <a name='120'>
+              IF ( icmask(II,JJ) ) THEN<a name='121'>
+                F(II,JJ,0)=                                               &amp;<a name='122'>
+                           TR4(Y(II,JJ,-2),Y(II,JJ,-1),Y(II,JJ,0),        &amp;<a name='123'>
+                           Y(II,JJ,1),XIG(IIM))                           <a name='124'>
+                F(II,JJ,1)=                                                 &amp;<a name='125'>
+                         TR4(Y(II,JJ,-1),Y(II,JJ,0),Y(II,JJ,1),Y(II,JJ,2),&amp;<a name='126'>
+                         XIG(IIM))                                        <a name='127'>
+                ENDIF<a name='128'>
+  312         CONTINUE<a name='129'>
+            DO 822 II=N1STAR,N1END                                      <a name='130'>
+              IF ( icmask(II,JJ) ) THEN<a name='131'>
+                F(II,JJ,0)=F(II,JJ,0)-FL(II,JJ,0)                         <a name='132'>
+                F(II,JJ,1)=F(II,JJ,1)-FL(II,JJ,1)                           <a name='133'>
+              ENDIF<a name='134'>
+  822         CONTINUE<a name='135'>
+            DO 823 II=N1STAR,N1END                                      <a name='136'>
+              IF ( icmask(II,JJ) ) THEN<a name='137'>
+                OV(II,JJ)=(MXM(II,JJ)-W(II,JJ))/(-PN(F(II,JJ,1))+         &amp;<a name='138'>
+                        PP(F(II,JJ,0))+EP)                              <a name='139'>
+                UN(II,JJ)=(W(II,JJ)-MN(II,JJ))/(PP(F(II,JJ,1))-             &amp;<a name='140'>
+                      PN(F(II,JJ,0))+EP)                                <a name='141'>
+              ENDIF<a name='142'>
+  823         CONTINUE<a name='143'>
+            DO 824 II=N1STAR,N1END                                      <a name='144'>
+              IF ( icmask(II,JJ) ) THEN<a name='145'>
+                F(II,JJ,0)=PP(F(II,JJ,0))*AMIN1(1.,OV(II,JJ))+            &amp;<a name='146'>
+                           PN(F(II,JJ,0))*AMIN1(1.,UN(II,JJ))             <a name='147'>
+                F(II,JJ,1)=PP(F(II,JJ,1))*AMIN1(1.,UN(II,JJ))+            &amp;<a name='148'>
+                           PN(F(II,JJ,1))*AMIN1(1.,OV(II,JJ))             <a name='149'>
+              ENDIF                                                    <a name='150'>
+  824         CONTINUE                                                    <a name='151'>
+            DO 825 II=N1STAR,N1END                                      <a name='152'>
+              IF ( icmask(II,JJ) ) THEN<a name='153'>
+                Y(II,JJ,0)=W(II,JJ)-(F(II,JJ,1)-F(II,JJ,0))                 <a name='154'>
+              ENDIF<a name='155'>
+  825         CONTINUE<a name='156'>
+            DO 361 II=N1STAR,N1END                                      <a name='157'>
+              IF ( icmask(II,JJ) ) Z(II,JJ,J)=Y(II,JJ,0)                                       <a name='158'>
+  361         CONTINUE<a name='159'>
+<font color=#447700>!                                                                       <a name='160'></font>
+<font color=#447700>!  END IF FIRST J LOOP                                                  <a name='161'></font>
+<font color=#447700>!                                                                       <a name='162'></font>
+ 8000       CONTINUE                                                    <a name='163'>
+   50     CONTINUE                                                      <a name='164'>
+<a name='165'>
+          DO 911 II=N1STAR,N1END                                        <a name='166'>
+            IF ( icmask(II,JJ) ) THEN<a name='167'>
+              FL(II,JJ,0)=DONOR(Z(II,JJ,-1),Z(II,JJ,0),XJG(IIM))          <a name='168'>
+              FL(II,JJ,1)=DONOR(Z(II,JJ,0),Z(II,JJ,1),XJG(IIM))             <a name='169'>
+            ENDIF<a name='170'>
+  911       CONTINUE<a name='171'>
+          DO 912 II=N1STAR,N1END                                        <a name='172'>
+            IF ( icmask(II,JJ) ) W(II,JJ)=Z(II,JJ,0)-(FL(II,JJ,1)-FL(II,JJ,0))                 <a name='173'>
+  912       CONTINUE<a name='174'>
+          DO 913 II=N1STAR,N1END                                        <a name='175'>
+            IF ( icmask(II,JJ) ) THEN<a name='176'>
+              MXM(II,JJ)=AMAX1(Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1),W(II,JJ))<a name='177'>
+              MN(II,JJ)=AMIN1(Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1),W(II,JJ))   <a name='178'>
+            ENDIF<a name='179'>
+  913       CONTINUE<a name='180'>
+          DO 412 II=N1STAR,N1END                                        <a name='181'>
+            IF ( icmask(II,JJ) ) THEN<a name='182'>
+              F(II,JJ,0)=                                                 &amp;<a name='183'>
+                         TR4(Z(II,JJ,-2),Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1)&amp;<a name='184'>
+                         ,XJG(IIM))                                       <a name='185'>
+              F(II,JJ,1)=                                                   &amp;<a name='186'>
+                         TR4(Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1),Z(II,JJ,2),  &amp;<a name='187'>
+                         XJG(IIM))                                          <a name='188'>
+            ENDIF<a name='189'>
+  412       CONTINUE<a name='190'>
+          DO 922 II=N1STAR,N1END                                        <a name='191'>
+            IF ( icmask(II,JJ) ) THEN<a name='192'>
+              F(II,JJ,0)=F(II,JJ,0)-FL(II,JJ,0)                           <a name='193'>
+              F(II,JJ,1)=F(II,JJ,1)-FL(II,JJ,1)                             <a name='194'>
+            ENDIF<a name='195'>
+  922       CONTINUE<a name='196'>
+          DO 923 II=N1STAR,N1END                                        <a name='197'>
+            IF ( icmask(II,JJ) ) THEN<a name='198'>
+              OV(II,JJ)=(MXM(II,JJ)-W(II,JJ))/(-PN(F(II,JJ,1))+           &amp;<a name='199'>
+                        PP(F(II,JJ,0))+EP)                                <a name='200'>
+              UN(II,JJ)=(W(II,JJ)-MN(II,JJ))/(PP(F(II,JJ,1))-PN(F(II,JJ,0))+ &amp;<a name='201'>
+                      EP)                                                 <a name='202'>
+            ENDIF<a name='203'>
+  923       CONTINUE<a name='204'>
+          DO 924 II=N1STAR,N1END                                        <a name='205'>
+            IF ( icmask(II,JJ) ) THEN<a name='206'>
+              F(II,JJ,0)=PP(F(II,JJ,0))*AMIN1(1.,OV(II,JJ))+PN(F(II,JJ,0))  &amp;<a name='207'>
+                         *AMIN1(1.,UN(II,JJ))                             <a name='208'>
+              F(II,JJ,1)=PP(F(II,JJ,1))*AMIN1(1.,UN(II,JJ))+PN(F(II,JJ,1))  &amp;<a name='209'>
+                         *AMIN1(1.,OV(II,JJ))                             <a name='210'>
+            ENDIF<a name='211'>
+  924     CONTINUE                                                      <a name='212'>
+ 9000   CONTINUE                                                        <a name='213'>
+        DO 925 JJ=N2STAR,N2END                                          <a name='214'>
+          DO 925 II=N1STAR,N1END                                        <a name='215'>
+            IF ( icmask(II,JJ) ) XF(II,JJ,IIM)=W(II,JJ)-(F(II,JJ,1)-F(II,JJ,0))                <a name='216'>
+  925     CONTINUE<a name='217'>
+                                                                        <a name='218'>
+<font color=#447700>!                                                                       <a name='219'></font>
+ 2000 CONTINUE                                                          <a name='220'>
+      RETURN                                                            <a name='221'>
+      END                                                               <a name='222'>
+                                                                        <a name='223'>
+<font color=#447700>! Version of sint that replaces mask with detailed ranges for avoiding boundaries<a name='224'></font>
+<font color=#447700>! may help performance by getting the conditionals out of innner loops<a name='225'></font>
+<a name='226'>
+<A NAME='SINTB'><A href='../../html_code/share/sint.F.html#SINTB' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='227'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>SINTB</font>(XF1, XF ,                  &amp; <A href='../../call_to/SINTB.html' TARGET='index'>6</A><a name='228'>
+                   ims, ime, jms, jme, icmask ,  &amp;<a name='229'>
+                   its, ite, jts, jte, nf, xstag, ystag )<a name='230'>
+      IMPLICIT NONE<a name='231'>
+      INTEGER ims, ime, jms, jme, &amp;<a name='232'>
+              its, ite, jts, jte<a name='233'>
+<a name='234'>
+      LOGICAL icmask( ims:ime, jms:jme )<a name='235'>
+      LOGICAL xstag, ystag<a name='236'>
+<a name='237'>
+      INTEGER nf, ior<a name='238'>
+      REAL    one12, one24, ep<a name='239'>
+      PARAMETER(one12=1./12.,one24=1./24.)                              <a name='240'>
+      PARAMETER(ior=2)                        <a name='241'>
+<font color=#447700>!                                                                       <a name='242'></font>
+      REAL XF(ims:ime,jms:jme,NF)<a name='243'>
+      REAL XF1(ims:ime,jms:jme,NF)<a name='244'>
+<font color=#447700>!                                                                       <a name='245'></font>
+      REAL Y(ims:ime,jms:jme,-IOR:IOR),    &amp;<a name='246'>
+           Z(ims:ime,jms:jme,-IOR:IOR),    &amp;<a name='247'>
+           F(ims:ime,jms:jme,0:1)                                       <a name='248'>
+<font color=#447700>!<a name='249'></font>
+      INTEGER I,J,II,JJ,IIM<a name='250'>
+      INTEGER N2STAR, N2END, N1STAR, N1END<a name='251'>
+<font color=#447700>!                                                                       <a name='252'></font>
+      DATA  EP/ 1.E-10/                                                 <a name='253'>
+<font color=#447700>!                                                                       <a name='254'></font>
+<font color=#447700>!      PARAMETER(NONOS=1)                                                <a name='255'></font>
+<font color=#447700>!      PARAMETER(N1OS=N1*NONOS+1-NONOS,N2OS=N2*NONOS+1-NONOS)            <a name='256'></font>
+<font color=#447700>!                                                                       <a name='257'></font>
+      REAL W(ims:ime,jms:jme),OV(ims:ime,jms:jme),UN(ims:ime,jms:jme)                     <a name='258'>
+      REAL MXM(ims:ime,jms:jme),MN(ims:ime,jms:jme)                                 <a name='259'>
+      REAL FL(ims:ime,jms:jme,0:1)                                            <a name='260'>
+      REAL XIG(81), XJG(81)  <font color=#447700>! won't use but nine of these fellers.<a name='261'></font>
+      INTEGER IFRST<a name='262'>
+      integer rr<a name='263'>
+      COMMON /DEPAR2B/ XIG,XJG,IFRST<a name='264'>
+      DATA IFRST /1/<a name='265'>
+<a name='266'>
+      REAL rioff, rjoff<a name='267'>
+<font color=#447700>!                                                                       <a name='268'></font>
+      REAL donor, y1, y2, a<a name='269'>
+      DONOR(Y1,Y2,A)=(Y1*AMAX1(0.,SIGN(1.,A))-Y2*AMIN1(0.,SIGN(1.,A)))*A<a name='270'>
+      REAL tr4, ym1, y0, yp1, yp2<a name='271'>
+      TR4(YM1,Y0,YP1,YP2,A)=A*ONE12*(7.*(YP1+Y0)-(YP2+YM1))               &amp;<a name='272'>
+       -A*A*ONE24*(15.*(YP1-Y0)-(YP2-YM1))-A*A*A*ONE12*((YP1+Y0)          &amp; <a name='273'>
+       -(YP2+YM1))+A*A*A*A*ONE24*(3.*(YP1-Y0)-(YP2-YM1))                <a name='274'>
+      REAL pp, pn, x<a name='275'>
+      PP(X)=AMAX1(0.,X)                                                 <a name='276'>
+      PN(X)=AMIN1(0.,X)                                                 <a name='277'>
+<a name='278'>
+      rr = nint(sqrt(float(nf)))<a name='279'>
+<a name='280'>
+        rioff = 0<a name='281'>
+        rjoff = 0<a name='282'>
+        if(xstag .and. (mod(rr,2) .eq. 0)) rioff = 1.<a name='283'>
+        if(ystag .and. (mod(rr,2) .eq. 0)) rjoff = 1.<a name='284'>
+<a name='285'>
+        DO I=1,rr<a name='286'>
+          DO J=1,rr<a name='287'>
+            XIG(J+(I-1)*rr)=(float(rr)-1.-rioff)/float(2*rr)-FLOAT(J-1)*1./float(rr)<a name='288'>
+            XJG(J+(I-1)*rr)=(float(rr)-1.-rjoff)/float(2*rr)-FLOAT(I-1)*1./float(rr)   <a name='289'>
+          ENDDO<a name='290'>
+        ENDDO<a name='291'>
+        IFRST = 0<a name='292'>
+<a name='293'>
+<font color=#447700>!!      ENDIF<a name='294'></font>
+<a name='295'>
+<font color=#447700>!      IF ( IFRST .EQ. 1 ) THEN<a name='296'></font>
+<font color=#447700>!        DO I=1,3   <a name='297'></font>
+<font color=#447700>!          DO J=1,3 <a name='298'></font>
+<font color=#447700>!            XIG(J+(I-1)*3)=1./3.-FLOAT(J-1)*1./3.   <a name='299'></font>
+<font color=#447700>!            XJG(J+(I-1)*3)=1./3.-FLOAT(I-1)*1./3.   <a name='300'></font>
+<font color=#447700>!          ENDDO<a name='301'></font>
+<font color=#447700>!        ENDDO<a name='302'></font>
+<font color=#447700>!        IFRST = 0<a name='303'></font>
+<font color=#447700>!      ENDIF<a name='304'></font>
+<font color=#447700>!<a name='305'></font>
+      N2STAR = jts<a name='306'>
+      N2END  = jte<a name='307'>
+      N1STAR = its<a name='308'>
+      N1END  = ite<a name='309'>
+<a name='310'>
+      DO 2000 IIM=1,NF                                                  <a name='311'>
+<font color=#447700>!                                                                       <a name='312'></font>
+<font color=#447700>!  HERE STARTS RESIDUAL ADVECTION                                       <a name='313'></font>
+<font color=#447700>!                                                                       <a name='314'></font>
+        DO 9000 JJ=N2STAR,N2END                                         <a name='315'>
+          DO 50 J=-IOR,IOR                                              <a name='316'>
+<a name='317'>
+            DO 51 I=-IOR,IOR                                            <a name='318'>
+              DO 511 II=N1STAR,N1END                                    <a name='319'>
+                Y(II,JJ,I)=XF1(II+I,JJ+J,IIM)              <a name='320'>
+  511         CONTINUE<a name='321'>
+   51       CONTINUE                                                    <a name='322'>
+<a name='323'>
+            DO 811 II=N1STAR,N1END                                      <a name='324'>
+              FL(II,JJ,0)=DONOR(Y(II,JJ,-1),Y(II,JJ,0),XIG(IIM))        <a name='325'>
+              FL(II,JJ,1)=DONOR(Y(II,JJ,0),Y(II,JJ,1),XIG(IIM))           <a name='326'>
+  811         CONTINUE<a name='327'>
+            DO 812 II=N1STAR,N1END                                      <a name='328'>
+              W(II,JJ)=Y(II,JJ,0)-(FL(II,JJ,1)-FL(II,JJ,0))               <a name='329'>
+  812         CONTINUE<a name='330'>
+            DO 813 II=N1STAR,N1END                                      <a name='331'>
+              MXM(II,JJ)=                                             &amp;<a name='332'>
+                       AMAX1(Y(II,JJ,-1),Y(II,JJ,0),Y(II,JJ,1),       &amp;<a name='333'>
+                       W(II,JJ))                                      <a name='334'>
+              MN(II,JJ)=AMIN1(Y(II,JJ,-1),Y(II,JJ,0),Y(II,JJ,1),W(II,JJ)) <a name='335'>
+  813         CONTINUE<a name='336'>
+            DO 312 II=N1STAR,N1END                                      <a name='337'>
+              F(II,JJ,0)=                                               &amp;<a name='338'>
+                         TR4(Y(II,JJ,-2),Y(II,JJ,-1),Y(II,JJ,0),        &amp;<a name='339'>
+                         Y(II,JJ,1),XIG(IIM))                           <a name='340'>
+              F(II,JJ,1)=                                                 &amp;<a name='341'>
+                       TR4(Y(II,JJ,-1),Y(II,JJ,0),Y(II,JJ,1),Y(II,JJ,2),&amp;<a name='342'>
+                       XIG(IIM))                                        <a name='343'>
+  312         CONTINUE<a name='344'>
+            DO 822 II=N1STAR,N1END                                      <a name='345'>
+              F(II,JJ,0)=F(II,JJ,0)-FL(II,JJ,0)                         <a name='346'>
+              F(II,JJ,1)=F(II,JJ,1)-FL(II,JJ,1)                           <a name='347'>
+  822         CONTINUE<a name='348'>
+            DO 823 II=N1STAR,N1END                                      <a name='349'>
+              OV(II,JJ)=(MXM(II,JJ)-W(II,JJ))/(-PN(F(II,JJ,1))+         &amp;<a name='350'>
+                      PP(F(II,JJ,0))+EP)                              <a name='351'>
+              UN(II,JJ)=(W(II,JJ)-MN(II,JJ))/(PP(F(II,JJ,1))-             &amp;<a name='352'>
+                    PN(F(II,JJ,0))+EP)                                <a name='353'>
+  823         CONTINUE<a name='354'>
+            DO 824 II=N1STAR,N1END                                      <a name='355'>
+              F(II,JJ,0)=PP(F(II,JJ,0))*AMIN1(1.,OV(II,JJ))+            &amp;<a name='356'>
+                         PN(F(II,JJ,0))*AMIN1(1.,UN(II,JJ))             <a name='357'>
+              F(II,JJ,1)=PP(F(II,JJ,1))*AMIN1(1.,UN(II,JJ))+            &amp;<a name='358'>
+                         PN(F(II,JJ,1))*AMIN1(1.,OV(II,JJ))             <a name='359'>
+  824         CONTINUE                                                    <a name='360'>
+            DO 825 II=N1STAR,N1END                                      <a name='361'>
+              Y(II,JJ,0)=W(II,JJ)-(F(II,JJ,1)-F(II,JJ,0))                 <a name='362'>
+  825         CONTINUE<a name='363'>
+            DO 361 II=N1STAR,N1END                                      <a name='364'>
+              Z(II,JJ,J)=Y(II,JJ,0)                                       <a name='365'>
+  361         CONTINUE<a name='366'>
+<font color=#447700>!                                                                       <a name='367'></font>
+<font color=#447700>!  END IF FIRST J LOOP                                                  <a name='368'></font>
+<font color=#447700>!                                                                       <a name='369'></font>
+ 8000       CONTINUE                                                    <a name='370'>
+   50     CONTINUE                                                      <a name='371'>
+<a name='372'>
+          DO 911 II=N1STAR,N1END                                        <a name='373'>
+            FL(II,JJ,0)=DONOR(Z(II,JJ,-1),Z(II,JJ,0),XJG(IIM))          <a name='374'>
+            FL(II,JJ,1)=DONOR(Z(II,JJ,0),Z(II,JJ,1),XJG(IIM))             <a name='375'>
+  911       CONTINUE<a name='376'>
+          DO 912 II=N1STAR,N1END                                        <a name='377'>
+            W(II,JJ)=Z(II,JJ,0)-(FL(II,JJ,1)-FL(II,JJ,0))                 <a name='378'>
+  912       CONTINUE<a name='379'>
+          DO 913 II=N1STAR,N1END                                        <a name='380'>
+            MXM(II,JJ)=AMAX1(Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1),W(II,JJ))<a name='381'>
+            MN(II,JJ)=AMIN1(Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1),W(II,JJ))   <a name='382'>
+  913       CONTINUE<a name='383'>
+          DO 412 II=N1STAR,N1END                                        <a name='384'>
+            F(II,JJ,0)=                                                 &amp;<a name='385'>
+                       TR4(Z(II,JJ,-2),Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1)&amp;<a name='386'>
+                       ,XJG(IIM))                                       <a name='387'>
+            F(II,JJ,1)=                                                   &amp;<a name='388'>
+                       TR4(Z(II,JJ,-1),Z(II,JJ,0),Z(II,JJ,1),Z(II,JJ,2),  &amp;<a name='389'>
+                       XJG(IIM))                                          <a name='390'>
+  412       CONTINUE<a name='391'>
+          DO 922 II=N1STAR,N1END                                        <a name='392'>
+            F(II,JJ,0)=F(II,JJ,0)-FL(II,JJ,0)                           <a name='393'>
+            F(II,JJ,1)=F(II,JJ,1)-FL(II,JJ,1)                             <a name='394'>
+  922       CONTINUE<a name='395'>
+          DO 923 II=N1STAR,N1END                                        <a name='396'>
+            OV(II,JJ)=(MXM(II,JJ)-W(II,JJ))/(-PN(F(II,JJ,1))+           &amp;<a name='397'>
+                      PP(F(II,JJ,0))+EP)                                <a name='398'>
+            UN(II,JJ)=(W(II,JJ)-MN(II,JJ))/(PP(F(II,JJ,1))-PN(F(II,JJ,0))+ &amp;<a name='399'>
+                    EP)                                                 <a name='400'>
+  923       CONTINUE<a name='401'>
+          DO 924 II=N1STAR,N1END                                        <a name='402'>
+            F(II,JJ,0)=PP(F(II,JJ,0))*AMIN1(1.,OV(II,JJ))+PN(F(II,JJ,0))  &amp;<a name='403'>
+                       *AMIN1(1.,UN(II,JJ))                             <a name='404'>
+            F(II,JJ,1)=PP(F(II,JJ,1))*AMIN1(1.,UN(II,JJ))+PN(F(II,JJ,1))  &amp;<a name='405'>
+                       *AMIN1(1.,OV(II,JJ))                             <a name='406'>
+  924     CONTINUE                                                      <a name='407'>
+ 9000   CONTINUE                                                        <a name='408'>
+        DO 925 JJ=N2STAR,N2END                                          <a name='409'>
+          DO 925 II=N1STAR,N1END                                        <a name='410'>
+            XF(II,JJ,IIM)=W(II,JJ)-(F(II,JJ,1)-F(II,JJ,0))                <a name='411'>
+  925     CONTINUE<a name='412'>
+                                                                        <a name='413'>
+<font color=#447700>!                                                                       <a name='414'></font>
+ 2000 CONTINUE                                                          <a name='415'>
+      RETURN                                                            <a name='416'>
+      END                                                               <a name='417'>
+                                                                        <a name='418'>
+<a name='419'>
+</pre></body></html>

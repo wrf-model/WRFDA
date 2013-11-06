@@ -1,0 +1,293 @@
+<html xmlns:v="urn:schemas-microsoft-com:vml"
+xmlns:o="urn:schemas-microsoft-com:office:office"
+xmlns:w="urn:schemas-microsoft-com:office:word"
+xmlns="http://www.w3.org/TR/REC-html40">
+<head>
+<title>BUFR reading in WRFDA</title>
+<style>
+<!--
+h1 {
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:Arial;
+}
+h2 {
+	page-break-after:avoid;
+	font-size:14.0pt;
+	font-family:Arial;
+	font-style:italic;
+}
+h3 {
+	page-break-after:avoid;
+	font-size:13.0pt;
+	font-family:"Times New Roman";
+}
+h4 {
+	page-break-after:avoid;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	font-weight:normal;
+	font-style:italic;
+}
+h5 {
+	page-break-after:avoid;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+}
+h6 {
+	text-align:center;
+	page-break-after:avoid;
+	font-size:16.0pt;
+	font-family:"Times New Roman";
+}
+p.MsoHeading7, li.MsoHeading7, div.MsoHeading7 {
+	text-indent:-.25in;
+	page-break-after:avoid;
+	tab-stops:list .75in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	text-decoration:underline;
+	text-underline:single;
+}
+p.MsoToc1, li.MsoToc1, div.MsoToc1 {
+	line-height:150%;
+	tab-stops:right dotted 431.5pt;
+	font-size:10.0pt;
+	font-family:Times;
+	text-transform:uppercase;
+	font-weight:bold;
+}
+p.MsoToc2, li.MsoToc2, div.MsoToc2 {
+	line-height:150%;
+	tab-stops:right dotted 431.5pt;
+	font-size:12.0pt;
+	font-family:Times;
+	font-variant:small-caps;
+}
+p.MsoToc3, li.MsoToc3, div.MsoToc3 {
+	font-size:10.0pt;
+	font-family:Times;
+	font-style:italic;
+}
+p.MsoToc4, li.MsoToc4, div.MsoToc4 {
+	font-size:9.0pt;
+	font-family:Times;
+}
+p.MsoToc5, li.MsoToc5, div.MsoToc5 {
+	font-size:9.0pt;
+	font-family:Times;
+}
+p.MsoToc6, li.MsoToc6, div.MsoToc6 {
+	font-size:9.0pt;
+	font-family:Times;
+}
+p.MsoToc7, li.MsoToc7, div.MsoToc7 {
+	font-size:9.0pt;
+	font-family:Times;
+}
+p.MsoToc8, li.MsoToc8, div.MsoToc8 {
+	font-size:9.0pt;
+	font-family:Times;
+}
+p.MsoToc9, li.MsoToc9, div.MsoToc9 {
+	font-size:9.0pt;
+	font-family:Times;
+}
+p.MsoHeader, li.MsoHeader, div.MsoHeader {
+	tab-stops:center 3.0in right 6.0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+}
+p.MsoFooter, li.MsoFooter, div.MsoFooter {
+	tab-stops:center 3.0in right 6.0in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+}
+p.MsoCaption, li.MsoCaption, div.MsoCaption {
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	font-weight:bold;
+}
+p.MsoTitle, li.MsoTitle, div.MsoTitle {
+	text-align:center;
+	font-size:10.0pt;
+	font-family:"Times New Roman";
+	font-weight:bold;
+}
+p.MsoBodyText, li.MsoBodyText, div.MsoBodyText {
+	text-autospace:none;
+	font-size:10.0pt;
+	font-family:"Courier New";
+}
+p.MsoBodyText2, li.MsoBodyText2, div.MsoBodyText2 {
+	text-align:justify;
+	font-size:10.0pt;
+	font-family:"Courier New";
+}
+p.MsoBodyText3, li.MsoBodyText3, div.MsoBodyText3 {
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+	font-weight:bold;
+}
+p.MsoBodyTextIndent2, li.MsoBodyTextIndent2, div.MsoBodyTextIndent2 {
+	text-indent:-1.25in;
+	tab-stops:2.0in right 427.5pt;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+}
+p.MsoBodyTextIndent3, li.MsoBodyTextIndent3, div.MsoBodyTextIndent3 {
+	text-align:justify;
+	text-indent:-.25in;
+	font-size:12.0pt;
+	font-family:"Times New Roman";
+}
+a:link, span.MsoHyperlink {
+	color:blue;
+	text-decoration:underline;
+	text-underline:single;
+}
+a:visited, span.MsoHyperlinkFollowed {
+	color:purple;
+	text-decoration:underline;
+	text-underline:single;
+}
+p.MsoPlainText, li.MsoPlainText, div.MsoPlainText {
+	font-size:10.0pt;
+	font-family:"Courier New";
+}
+p.data, li.data, div.data {
+	text-indent:-1.5in;
+	tab-stops:1.75in;
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:Times;
+	color:black;
+}
+p.body1, li.body1, div.body1 {
+	text-align:justify;
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:Times;
+	color:black;
+}
+p.CVParaSpacer, li.CVParaSpacer, div.CVParaSpacer {
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:13.0pt;
+	font-family:Bookman;
+	color:black;
+	font-weight:bold;
+}
+p.Name, li.Name, div.Name {
+	text-align:center;
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:18.0pt;
+	font-family:Bookman;
+	color:black;
+	font-weight:bold;
+}
+p.CVreferences, li.CVreferences, div.CVreferences {
+	text-indent:-.5in;
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:13.0pt;
+	font-family:Times;
+	color:black;
+}
+p.Body, li.Body, div.Body {
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:12.0pt;
+	font-family:Times;
+	color:black;
+}
+p.Header1, li.Header1, div.Header1 {
+	page-break-after:avoid;
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:16.0pt;
+	font-family:Bookman;
+	color:black;
+	font-weight:bold;
+}
+p.CVdata, li.CVdata, div.CVdata {
+	text-indent:-1.5in;
+	tab-stops:1.5in;
+	punctuation-wrap:simple;
+	text-autospace:none;
+	font-size:13.0pt;
+	font-family:Times;
+	color:black
+}
+body {
+	background-color: #B7E6B9;
+}
+-->
+</style>
+</head>
+<body lang=EN-US link=blue vlink=purple>
+<div class=Section1>
+  <h1>Issues with reading PREPBUFR  and BUFR radiance data with gfortran and intel compilers</h1>
+  <p><strong>Symptoms</strong></p>
+  <p>WRFDA compiled with gfotran or ifort will get the following error message when trying to read the file unblocked and re-blocked by the &quot;cwordsh&quot; program</p>
+  <p>**************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+    BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26 WHEN<br>
+    CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+    **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
+  <p><strong>For WRFDA v3.2.1 or eariler</strong>: Adding convert='little_endian' to the open statement</p>
+  <p> 1. da/da_obs_io/da_read_obs_bufr.inc</p>
+  <p> At the section &quot;bufrfile:&quot;, add convert='little_endian' to the open statement</p>
+  <p> open(unit   = iunit, FILE   = trim(filename), &amp;<br>
+    iostat =  iost, form = 'unformatted', STATUS = 'OLD' &amp;<br>
+    convert='little_endian')</p>
+  <p> 2. da/da_radiance/da_read_obs_bufrairs.inc</p>
+  <p> At the section &quot;Open BUFR file&quot; , add convert='little_endian' to the open statement<br>
+    <br>
+    open(unit   = lnbufr, FILE   = trim(infile), &amp;<br>
+    form = 'unformatted', iostat =  iost,  &amp;<br>
+    convert='little_endian')</p>
+  <p> 3. da/da_radiance/da_read_obs_bufrtovs.inc</p>
+  <p> At the section &quot;! 0.0  Open unit to satellite bufr file and read file header&quot;, add convert='little_endian' to the open statement<br>
+    <br>
+    open(unit   = lnbufr, FILE   = trim(infile), &amp;<br>
+    form = 'unformatted', iostat =  iost, status = 'old',  &amp;<br>
+    convert='little_endian')</p>
+  <p> 4. da/da_radiance/da_read_obs_bufrssmis.inc </p>
+  <p> At the section &quot;! 0.0  Open unit to satellite bufr file and read file header&quot;, add convert='little_endian' to the open statement<br>
+    <br>
+    open(unit   = lnbufr, FILE   = trim(infile), &amp;<br>
+    form = 'unformatted', iostat =  iost, status = 'old',  &amp;<br>
+    convert='little_endian')<br>
+  </p>
+  <p> 5. da/da_obs_io/da_read_obs_bufrgpsro.inc</p>
+  <p> At the section &quot;! open file &quot; add convert='little_endian' to the open statement<br>
+<br>
+open(unit = iunit, FILE = trim(filename), &amp;<br>
+    iostat = iost, form = 'unformatted', STATUS ='OLD' , &amp; <br>
+    convert='little_endian')<br>
+  </p>
+  <p>Side effect: After the modification, the code will work just for gfortran and ifort compilers<br>
+  </p>
+  <p><strong>For WRFDA 3.3 or later</strong> : Set environment variable</p>
+  <p> GFORTRAN_CONVERT_UNIT (Gfortran) and F_UFMTENDIAN (ifort) environment variables will override the CONVERT specifier in the open statement. It just needs to reserve and fix the units used to open bufr file by the following files. It is not necessary to amend the open statement for different compilers.</p>
+  <p> For Csh</p>
+  <p> gfortran: setenv GFORTRAN_CONVERT_UNIT &quot;little_endian:94-99&quot;<br>
+    ifort: setenv F_UFMTENDIAN &quot;little:94-99&quot;<br>
+  </p>
+  <p> For Bash</p>
+  <p> gfortran: export GFORTRAN_CONVERT_UNIT=&quot;little_endian:94-99&quot;<br>
+    ifort: export F_UFMTENDIAN=&quot;little:94-99&quot;<br>
+  </p>
+  <p>Side effect: In order not to interfere with other applications, it's better to unset the environment<br>
+    variable after da_wrfvar.exe is completed. <br>
+  </p>
+  <p>For the reblocking utility, reblock.c writen by Baoyu YIN is recommended. <br>
+    (http://www.math.ucdavis.edu/~cheung/PROJECTS/DAO_Projects/halem/iret/reblock.c)<br>
+    It reads a blocked BUFR file, byteswap the f77 control words and <br>
+    writes out the file directly, no bufrlib is needed.</p>
+</div>
+</body>
+</html>

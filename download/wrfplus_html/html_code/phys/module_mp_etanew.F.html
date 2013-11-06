@@ -1,0 +1,2564 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_MP:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_MP_ETANEW'><A href='../../html_code/phys/module_mp_etanew.F.html#MODULE_MP_ETANEW' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_mp_etanew</font> <A href='../../call_to/MODULE_MP_ETANEW.html' TARGET='index'>3</A><a name='5'>
+<font color=#447700>!<a name='6'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='7'></font>
+      REAL,PRIVATE,SAVE ::  ABFR, CBFR, CIACW, CIACR, C_N0r0,           &amp;<a name='8'>
+     &amp;  CN0r0, CN0r_DMRmin, CN0r_DMRmax, CRACW, CRAUT, ESW0,            &amp;<a name='9'>
+     &amp;  QAUT0, RFmax, RQR_DR1, RQR_DR2, RQR_DR3, RQR_DRmin,             &amp;<a name='10'>
+     &amp;  RQR_DRmax, RR_DRmin, RR_DR1, RR_DR2, RR_DR3, RR_DRmax<a name='11'>
+<font color=#447700>!<a name='12'></font>
+      INTEGER, PRIVATE,PARAMETER :: MY_T1=1, MY_T2=35<a name='13'>
+      REAL,PRIVATE,DIMENSION(MY_T1:MY_T2),SAVE :: MY_GROWTH<a name='14'>
+<font color=#447700>!<a name='15'></font>
+      REAL, PRIVATE,PARAMETER :: DMImin=.05e-3, DMImax=1.e-3,           &amp;<a name='16'>
+     &amp;      DelDMI=1.e-6,XMImin=1.e6*DMImin, XMImax=1.e6*DMImax    <a name='17'>
+      INTEGER, PRIVATE,PARAMETER :: MDImin=XMImin, MDImax=XMImax<a name='18'>
+      REAL, PRIVATE,DIMENSION(MDImin:MDImax) ::                         &amp;<a name='19'>
+     &amp;      ACCRI,MASSI,SDENS,VSNOWI,VENTI1,VENTI2<a name='20'>
+<font color=#447700>!<a name='21'></font>
+      REAL, PRIVATE,PARAMETER :: DMRmin=.05e-3, DMRmax=.45e-3,          &amp;<a name='22'>
+     &amp;      DelDMR=1.e-6,XMRmin=1.e6*DMRmin, XMRmax=1.e6*DMRmax<a name='23'>
+      INTEGER, PRIVATE,PARAMETER :: MDRmin=XMRmin, MDRmax=XMRmax                   <a name='24'>
+      REAL, PRIVATE,DIMENSION(MDRmin:MDRmax)::                          &amp;<a name='25'>
+     &amp;      ACCRR,MASSR,RRATE,VRAIN,VENTR1,VENTR2<a name='26'>
+<font color=#447700>!<a name='27'></font>
+      INTEGER, PRIVATE,PARAMETER :: Nrime=40<a name='28'>
+      REAL, DIMENSION(2:9,0:Nrime),PRIVATE,SAVE :: VEL_RF<a name='29'>
+<font color=#447700>!<a name='30'></font>
+      INTEGER,PARAMETER :: NX=7501<a name='31'>
+      REAL, PARAMETER :: XMIN=180.0,XMAX=330.0<a name='32'>
+      REAL, DIMENSION(NX),PRIVATE,SAVE :: TBPVS,TBPVS0<a name='33'>
+      REAL, PRIVATE,SAVE :: C1XPVS0,C2XPVS0,C1XPVS,C2XPVS<a name='34'>
+      REAL, PUBLIC,SAVE :: RHgrd<a name='35'>
+<font color=#447700>!<a name='36'></font>
+      CONTAINS<a name='37'>
+<a name='38'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='39'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='40'></font>
+<A NAME='ETAMP_NEW'><A href='../../html_code/phys/module_mp_etanew.F.html#ETAMP_NEW' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='41'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>ETAMP_NEW</font> (itimestep,DT,DX,DY,RAINNC,RAINNCV,          &amp; <A href='../../call_to/ETAMP_NEW.html' TARGET='index'>1</A>,<A href='../../call_from/ETAMP_NEW.html' TARGET='index'>1</A><a name='42'>
+     &amp;                      dz8w,rho_phy,p_phy,pi_phy,th_phy,qv,qc,     &amp;<a name='43'>
+     &amp;                      LOWLYR,SR,                                  &amp;<a name='44'>
+     &amp;                      F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,           &amp;<a name='45'>
+     &amp;                      ids,ide, jds,jde, kds,kde,		        &amp;<a name='46'>
+     &amp;                      ims,ime, jms,jme, kms,kme,		        &amp;<a name='47'>
+     &amp;                      its,ite, jts,jte, kts,kte		     )<a name='48'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='49'></font>
+      IMPLICIT NONE<a name='50'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='51'></font>
+      INTEGER, PARAMETER :: ITLO=-60, ITHI=40<a name='52'>
+<a name='53'>
+      INTEGER,INTENT(IN) :: IDS,IDE,JDS,JDE,KDS,KDE                     &amp;<a name='54'>
+     &amp;                     ,IMS,IME,JMS,JME,KMS,KME                     &amp;<a name='55'>
+     &amp;                     ,ITS,ITE,JTS,JTE,KTS,KTE                     &amp;<a name='56'>
+     &amp;                     ,ITIMESTEP<a name='57'>
+<a name='58'>
+      REAL, INTENT(IN) 	    :: DT,DX,DY<a name='59'>
+      REAL, INTENT(IN),     DIMENSION(ims:ime, kms:kme, jms:jme)::      &amp;<a name='60'>
+     &amp;                      dz8w,p_phy,pi_phy,rho_phy<a name='61'>
+      REAL, INTENT(INOUT),  DIMENSION(ims:ime, kms:kme, jms:jme)::      &amp;<a name='62'>
+     &amp;                      th_phy,qv,qc<a name='63'>
+      REAL, INTENT(INOUT),  DIMENSION(ims:ime,jms:jme):: RAINNC,RAINNCV<a name='64'>
+      REAL, INTENT(INOUT),  DIMENSION(ims:ime, kms:kme, jms:jme ) ::    &amp;<a name='65'>
+     &amp;                      F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY<a name='66'>
+      REAL, INTENT(OUT),    DIMENSION(ims:ime,jms:jme):: SR<a name='67'>
+      INTEGER, DIMENSION( ims:ime, jms:jme ),INTENT(INOUT) :: LOWLYR<a name='68'>
+<a name='69'>
+<a name='70'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='71'></font>
+<font color=#447700>!     LOCAL VARS<a name='72'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='73'></font>
+<a name='74'>
+<font color=#447700>!     NSTATS,QMAX,QTOT are diagnostic vars<a name='75'></font>
+<a name='76'>
+      INTEGER,DIMENSION(ITLO:ITHI,4) :: NSTATS<a name='77'>
+      REAL,   DIMENSION(ITLO:ITHI,5) :: QMAX<a name='78'>
+      REAL,   DIMENSION(ITLO:ITHI,22):: QTOT<a name='79'>
+<a name='80'>
+<font color=#447700>!     SOME VARS WILL BE USED FOR DATA ASSIMILATION (DON'T NEED THEM NOW). <a name='81'></font>
+<font color=#447700>!     THEY ARE TREATED AS LOCAL VARS, BUT WILL BECOME STATE VARS IN THE <a name='82'></font>
+<font color=#447700>!     FUTURE. SO, WE DECLARED THEM AS MEMORY SIZES FOR THE FUTURE USE<a name='83'></font>
+<a name='84'>
+<font color=#447700>!     TLATGS_PHY,TRAIN_PHY,APREC,PREC,ACPREC,SR are not directly related <a name='85'></font>
+<font color=#447700>!     the microphysics scheme. Instead, they will be used by Eta precip <a name='86'></font>
+<font color=#447700>!     assimilation.<a name='87'></font>
+<a name='88'>
+      REAL,  DIMENSION( ims:ime, kms:kme, jms:jme ) ::                  &amp;<a name='89'>
+     &amp;       TLATGS_PHY,TRAIN_PHY<a name='90'>
+      REAL,  DIMENSION(ims:ime,jms:jme):: APREC,PREC,ACPREC<a name='91'>
+      REAL,  DIMENSION(its:ite, kts:kte, jts:jte):: t_phy<a name='92'>
+<a name='93'>
+      INTEGER :: I,J,K,KFLIP<a name='94'>
+<a name='95'>
+      DO j = jts,jte<a name='96'>
+      DO k = kts,kte<a name='97'>
+      DO i = its,ite<a name='98'>
+        t_phy(i,k,j) = th_phy(i,k,j)*pi_phy(i,k,j)<a name='99'>
+        qv(i,k,j)=qv(i,k,j)/(1.+qv(i,k,j)) <font color=#447700>!Convert to specific humidity<a name='100'></font>
+      ENDDO<a name='101'>
+      ENDDO<a name='102'>
+      ENDDO<a name='103'>
+<a name='104'>
+<font color=#447700>!     initial diagnostic variables and data assimilation vars<a name='105'></font>
+<font color=#447700>!     (will need to delete this part in the future)<a name='106'></font>
+<a name='107'>
+      DO k = 1,4<a name='108'>
+      DO i = ITLO,ITHI<a name='109'>
+         NSTATS(i,k)=0. <a name='110'>
+      ENDDO<a name='111'>
+      ENDDO<a name='112'>
+<a name='113'>
+      DO k = 1,5<a name='114'>
+      DO i = ITLO,ITHI<a name='115'>
+         QMAX(i,k)=0.<a name='116'>
+      ENDDO<a name='117'>
+      ENDDO<a name='118'>
+<a name='119'>
+      DO k = 1,22<a name='120'>
+      DO i = ITLO,ITHI<a name='121'>
+         QTOT(i,k)=0.<a name='122'>
+      ENDDO<a name='123'>
+      ENDDO<a name='124'>
+<a name='125'>
+<font color=#447700>! initial data assimilation vars (will need to delete this part in the future)<a name='126'></font>
+<a name='127'>
+      DO j = jts,jte<a name='128'>
+      DO k = kts,kte<a name='129'>
+      DO i = its,ite<a name='130'>
+	 TLATGS_PHY (i,k,j)=0.<a name='131'>
+	 TRAIN_PHY  (i,k,j)=0.<a name='132'>
+      ENDDO<a name='133'>
+      ENDDO<a name='134'>
+      ENDDO<a name='135'>
+<a name='136'>
+      DO j = jts,jte<a name='137'>
+      DO i = its,ite<a name='138'>
+         ACPREC(i,j)=0.<a name='139'>
+         APREC (i,j)=0.<a name='140'>
+         PREC  (i,j)=0.<a name='141'>
+         SR    (i,j)=0.<a name='142'>
+      ENDDO<a name='143'>
+      ENDDO<a name='144'>
+<a name='145'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='146'></font>
+<font color=#447700>!     if (itimestep .eq. 0)                                             &amp;<a name='147'></font>
+<font color=#447700>!   	 CALL etanewinit (DT,DX,DY,LOWLYR,               	        &amp;<a name='148'></font>
+<font color=#447700>!    &amp;                    F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,             &amp;<a name='149'></font>
+<font color=#447700>!    &amp;                    ids, ide, jds, jde, kds, kde,	                &amp;<a name='150'></font>
+<font color=#447700>!    &amp;                    ims, ime, jms, jme, kms, kme,	                &amp;<a name='151'></font>
+<font color=#447700>!    &amp;                    its, ite, jts, jte, kts, kte)<a name='152'></font>
+<a name='153'>
+<a name='154'>
+      CALL <A href='../../html_code/phys/module_mp_etanew.F.html#EGCP01DRV'>EGCP01DRV</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETAMP_NEW' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="EGCP01DRV_1">(DT,LOWLYR,                                         &amp;<a name='155'>
+     &amp;               APREC,PREC,ACPREC,SR,NSTATS,QMAX,QTOT,	        &amp;<a name='156'>
+     &amp;               dz8w,rho_phy,qc,t_phy,qv,F_ICE_PHY,P_PHY,          &amp;<a name='157'>
+     &amp;               F_RAIN_PHY,F_RIMEF_PHY,TLATGS_PHY,TRAIN_PHY,       &amp;<a name='158'>
+     &amp;               ids,ide, jds,jde, kds,kde,		                &amp;<a name='159'>
+     &amp;               ims,ime, jms,jme, kms,kme,		                &amp;<a name='160'>
+     &amp;               its,ite, jts,jte, kts,kte		          )<a name='161'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='162'></font>
+<a name='163'>
+     DO j = jts,jte<a name='164'>
+        DO k = kts,kte<a name='165'>
+	DO i = its,ite<a name='166'>
+  	   th_phy(i,k,j) = t_phy(i,k,j)/pi_phy(i,k,j)<a name='167'>
+           qv(i,k,j)=qv(i,k,j)/(1.-qv(i,k,j))  <font color=#447700>!Convert to mixing ratio<a name='168'></font>
+	ENDDO<a name='169'>
+        ENDDO<a name='170'>
+     ENDDO<a name='171'>
+<font color=#447700>! <a name='172'></font>
+<font color=#447700>! update rain (from m to mm)<a name='173'></font>
+<a name='174'>
+     DO j = jts,jte<a name='175'>
+     DO i = its,ite<a name='176'>
+        RAINNC (i,j)=APREC(i,j)*1000. + RAINNC(i,j)<a name='177'>
+        RAINNCV(i,j)=APREC(i,j)*1000.<a name='178'>
+      ENDDO<a name='179'>
+      ENDDO<a name='180'>
+<a name='181'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='182'></font>
+<a name='183'>
+  END SUBROUTINE ETAMP_NEW<a name='184'>
+<a name='185'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='186'></font>
+<a name='187'>
+<A NAME='EGCP01DRV'><A href='../../html_code/phys/module_mp_etanew.F.html#EGCP01DRV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='188'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>EGCP01DRV</font>(                                             &amp; <A href='../../call_to/EGCP01DRV.html' TARGET='index'>1</A>,<A href='../../call_from/EGCP01DRV.html' TARGET='index'>1</A><a name='189'>
+     &amp;  DTPH,LOWLYR,APREC,PREC,ACPREC,SR,                               &amp;<a name='190'>
+     &amp;  NSTATS,QMAX,QTOT,                                               &amp;<a name='191'>
+     &amp;  dz8w,RHO_PHY,CWM_PHY,T_PHY,Q_PHY,F_ICE_PHY,P_PHY,               &amp;<a name='192'>
+     &amp;  F_RAIN_PHY,F_RIMEF_PHY,TLATGS_PHY,TRAIN_PHY,                    &amp;<a name='193'>
+     &amp;  ids,ide, jds,jde, kds,kde,                                      &amp;<a name='194'>
+     &amp;  ims,ime, jms,jme, kms,kme,                                      &amp;<a name='195'>
+     &amp;  its,ite, jts,jte, kts,kte)<a name='196'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='197'></font>
+<font color=#447700>! DTPH           Physics time step (s)<a name='198'></font>
+<font color=#447700>! CWM_PHY (qc)   Mixing ratio of the total condensate. kg/kg<a name='199'></font>
+<font color=#447700>! Q_PHY          Mixing ratio of water vapor. kg/kg<a name='200'></font>
+<font color=#447700>! F_RAIN_PHY     Fraction of rain. <a name='201'></font>
+<font color=#447700>! F_ICE_PHY      Fraction of ice.<a name='202'></font>
+<font color=#447700>! F_RIMEF_PHY    Mass ratio of rimed ice (rime factor).<a name='203'></font>
+<font color=#447700>!<a name='204'></font>
+<font color=#447700>!TLATGS_PHY,TRAIN_PHY,APREC,PREC,ACPREC,SR are not directly related the<a name='205'></font>
+<font color=#447700>!micrphysics sechme. Instead, they will be used by Eta precip assimilation.<a name='206'></font>
+<font color=#447700>!<a name='207'></font>
+<font color=#447700>!NSTATS,QMAX,QTOT are used for diagnosis purposes.<a name='208'></font>
+<font color=#447700>!<a name='209'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='210'></font>
+<font color=#447700>!--- Variables APREC,PREC,ACPREC,SR are calculated for precip assimilation<a name='211'></font>
+<font color=#447700>!    and/or ZHAO's scheme in Eta and are not required by this microphysics <a name='212'></font>
+<font color=#447700>!    scheme itself.  <a name='213'></font>
+<font color=#447700>!--- NSTATS,QMAX,QTOT are used for diagnosis purposes only.  They will be <a name='214'></font>
+<font color=#447700>!    printed out when PRINT_diag is true.<a name='215'></font>
+<font color=#447700>!<a name='216'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='217'></font>
+      IMPLICIT NONE<a name='218'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='219'></font>
+<font color=#447700>!<a name='220'></font>
+      REAL, PARAMETER    :: EPSQ=1.E-20,GRAV=9.81,RHOL=1000.,T0C=273.15,&amp;<a name='221'>
+     &amp;                      T_ICE=-10.,T_ICEK=T0C+T_ICE,RRHOL=1./RHOL,  &amp;<a name='222'>
+     &amp;                      CLIMIT=1.E-12 <a name='223'>
+      INTEGER, PARAMETER :: ITLO=-60, ITHI=40<a name='224'>
+      LOGICAL, PARAMETER :: PRINT_diag=.FALSE.<a name='225'>
+<a name='226'>
+      <a name='227'>
+<font color=#447700>!     VARIABLES PASSED IN/OUT<a name='228'></font>
+      INTEGER,INTENT(IN ) :: ids,ide, jds,jde, kds,kde                  &amp;<a name='229'>
+     &amp;                      ,ims,ime, jms,jme, kms,kme                  &amp;<a name='230'>
+     &amp;                      ,its,ite, jts,jte, kts,kte<a name='231'>
+      REAL,INTENT(IN) :: DTPH<a name='232'>
+      INTEGER, DIMENSION( ims:ime, jms:jme ),INTENT(INOUT) :: LOWLYR<a name='233'>
+      INTEGER,DIMENSION(ITLO:ITHI,4),INTENT(INOUT) :: NSTATS<a name='234'>
+      REAL,DIMENSION(ITLO:ITHI,5),INTENT(INOUT) :: QMAX<a name='235'>
+      REAL,DIMENSION(ITLO:ITHI,22),INTENT(INOUT) :: QTOT<a name='236'>
+      REAL,DIMENSION(ims:ime,jms:jme),INTENT(INOUT) ::                  &amp;<a name='237'>
+     &amp;                         APREC,PREC,ACPREC,SR<a name='238'>
+      REAL,DIMENSION( its:ite, kts:kte, jts:jte ),INTENT(INOUT) :: t_phy<a name='239'>
+      REAL,DIMENSION( ims:ime, kms:kme, jms:jme ),INTENT(IN) ::         &amp;<a name='240'>
+     &amp;                                             dz8w,P_PHY,RHO_PHY<a name='241'>
+      REAL,DIMENSION( ims:ime, kms:kme, jms:jme ),INTENT(INOUT) ::      &amp;<a name='242'>
+     &amp;   CWM_PHY, F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,TLATGS_PHY           &amp;<a name='243'>
+     &amp;   ,Q_PHY,TRAIN_PHY<a name='244'>
+<font color=#447700>!<a name='245'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='246'></font>
+<font color=#447700>!LOCAL VARIABLES<a name='247'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='248'></font>
+      INTEGER :: LSFC,I,J,I_index,J_index,L,K,KFLIP<a name='249'>
+      REAL,DIMENSION(its:ite,jts:jte,kts:kte) ::                        &amp;<a name='250'>
+     &amp;   CWM,T,Q,TRAIN,TLATGS,P                                               <a name='251'>
+      REAL,DIMENSION(kts:kte,its:ite,jts:jte) :: F_ice,F_rain,F_RimeF       <a name='252'>
+      INTEGER,DIMENSION(its:ite,jts:jte) :: LMH<a name='253'>
+      REAL :: TC,WC,QI,QR,QW,Fice,Frain,DUM,ASNOW,ARAIN<a name='254'>
+      REAL,DIMENSION(kts:kte) :: P_col,Q_col,T_col,QV_col,WC_col,       &amp;<a name='255'>
+         RimeF_col,QI_col,QR_col,QW_col, THICK_col,DPCOL <a name='256'>
+      REAL,DIMENSION(2) :: PRECtot,PRECmax<a name='257'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='258'></font>
+<font color=#447700>!<a name='259'></font>
+        DO J=JTS,JTE    <a name='260'>
+        DO I=ITS,ITE  <a name='261'>
+           LMH(I,J) = KTE-LOWLYR(I,J)+1<a name='262'>
+        ENDDO<a name='263'>
+        ENDDO<a name='264'>
+<a name='265'>
+        DO 98  J=JTS,JTE    <a name='266'>
+        DO 98  I=ITS,ITE  <a name='267'>
+           DO L=KTS,KTE<a name='268'>
+             KFLIP=KTE+1-L<a name='269'>
+             CWM(I,J,L)=CWM_PHY(I,KFLIP,J)<a name='270'>
+             T(I,J,L)=T_PHY(I,KFLIP,J)<a name='271'>
+             Q(I,J,L)=Q_PHY(I,KFLIP,J)<a name='272'>
+             P(I,J,L)=P_PHY(I,KFLIP,J)<a name='273'>
+             TLATGS(I,J,L)=TLATGS_PHY(I,KFLIP,J)<a name='274'>
+             TRAIN(I,J,L)=TRAIN_PHY(I,KFLIP,J)<a name='275'>
+             F_ice(L,I,J)=F_ice_PHY(I,KFLIP,J)<a name='276'>
+             F_rain(L,I,J)=F_rain_PHY(I,KFLIP,J)<a name='277'>
+             F_RimeF(L,I,J)=F_RimeF_PHY(I,KFLIP,J)<a name='278'>
+           ENDDO<a name='279'>
+98      CONTINUE<a name='280'>
+     <a name='281'>
+       DO 100 J=JTS,JTE    <a name='282'>
+        DO 100 I=ITS,ITE  <a name='283'>
+          LSFC=LMH(I,J)                      <font color=#447700>! "L" of surface<a name='284'></font>
+<font color=#447700>!<a name='285'></font>
+          DO K=KTS,KTE<a name='286'>
+            KFLIP=KTE+1-K<a name='287'>
+            DPCOL(K)=RHO_PHY(I,KFLIP,J)*GRAV*dz8w(I,KFLIP,J)<a name='288'>
+          ENDDO<a name='289'>
+<font color=#447700>!   <a name='290'></font>
+   <font color=#447700>!<a name='291'></font>
+   <font color=#447700>!--- Initialize column data (1D arrays)<a name='292'></font>
+   <font color=#447700>!<a name='293'></font>
+        IF (CWM(I,J,1) .LE. CLIMIT) CWM(I,J,1)=EPSQ<a name='294'>
+          F_ice(1,I,J)=1.<a name='295'>
+          F_rain(1,I,J)=0.<a name='296'>
+          F_RimeF(1,I,J)=1.<a name='297'>
+          DO L=1,LSFC<a name='298'>
+      <font color=#447700>!<a name='299'></font>
+      <font color=#447700>!--- Pressure (Pa) = (Psfc-Ptop)*(ETA/ETA_sfc)+Ptop<a name='300'></font>
+      <font color=#447700>!<a name='301'></font>
+            P_col(L)=P(I,J,L)<a name='302'>
+      <font color=#447700>!<a name='303'></font>
+      <font color=#447700>!--- Layer thickness = RHO*DZ = -DP/G = (Psfc-Ptop)*D_ETA/(G*ETA_sfc)<a name='304'></font>
+      <font color=#447700>!<a name='305'></font>
+            THICK_col(L)=DPCOL(L)/GRAV<a name='306'>
+            T_col(L)=T(I,J,L)<a name='307'>
+            TC=T_col(L)-T0C<a name='308'>
+            QV_col(L)=max(EPSQ, Q(I,J,L))<a name='309'>
+            IF (CWM(I,J,L) .LE. CLIMIT) THEN<a name='310'>
+              WC_col(L)=0.<a name='311'>
+              IF (TC .LT. T_ICE) THEN<a name='312'>
+                F_ice(L,I,J)=1.<a name='313'>
+              ELSE<a name='314'>
+                F_ice(L,I,J)=0.<a name='315'>
+              ENDIF<a name='316'>
+              F_rain(L,I,J)=0.<a name='317'>
+              F_RimeF(L,I,J)=1.<a name='318'>
+            ELSE<a name='319'>
+              WC_col(L)=CWM(I,J,L)<a name='320'>
+            ENDIF<a name='321'>
+      <font color=#447700>!<a name='322'></font>
+      <font color=#447700>!--- Determine composition of condensate in terms of <a name='323'></font>
+      <font color=#447700>!      cloud water, ice, &amp; rain<a name='324'></font>
+      <font color=#447700>!<a name='325'></font>
+            WC=WC_col(L)<a name='326'>
+            QI=0.<a name='327'>
+            QR=0.<a name='328'>
+            QW=0.<a name='329'>
+            Fice=F_ice(L,I,J)<a name='330'>
+            Frain=F_rain(L,I,J)<a name='331'>
+<a name='332'>
+<a name='333'>
+      <font color=#447700>!<a name='334'></font>
+      <font color=#447700>!--- REAL*4 array storage<a name='335'></font>
+      <font color=#447700>!<a name='336'></font>
+            IF (Fice .GE. 1.) THEN<a name='337'>
+              QI=WC<a name='338'>
+            ELSE IF (Fice .LE. 0.) THEN<a name='339'>
+              QW=WC<a name='340'>
+            ELSE<a name='341'>
+              QI=Fice*WC<a name='342'>
+              QW=WC-QI<a name='343'>
+            ENDIF<a name='344'>
+            IF (QW.GT.0. .AND. Frain.GT.0.) THEN<a name='345'>
+              IF (Frain .GE. 1.) THEN<a name='346'>
+                QR=QW<a name='347'>
+                QW=0.<a name='348'>
+              ELSE<a name='349'>
+                QR=Frain*QW<a name='350'>
+                QW=QW-QR<a name='351'>
+              ENDIF<a name='352'>
+            ENDIF<a name='353'>
+            RimeF_col(L)=F_RimeF(L,I,J)               <font color=#447700>! (real)<a name='354'></font>
+        <font color=#447700>!<a name='355'></font>
+        <font color=#447700>!--- INTEGER*2 array storage<a name='356'></font>
+<font color=#447700>!!      !<a name='357'></font>
+<font color=#447700>!!            IF (TC.LE.T_ICE .OR. Fice.GE.IFMAX) THEN<a name='358'></font>
+<font color=#447700>!!              QI=WC<a name='359'></font>
+<font color=#447700>!!            ELSE IF (Fice .LE. IFMIN) THEN<a name='360'></font>
+<font color=#447700>!!              QW=WC<a name='361'></font>
+<font color=#447700>!!            ELSE<a name='362'></font>
+<font color=#447700>!!              QI=RFSCALE*Fice*WC<a name='363'></font>
+<font color=#447700>!!              QW=WC-QI<a name='364'></font>
+<font color=#447700>!!            ENDIF<a name='365'></font>
+<font color=#447700>!!            IF (QW.GT.0. .AND. Frain.GT.0) THEN<a name='366'></font>
+<font color=#447700>!!              IF (Frain .EQ. IFMAX) THEN<a name='367'></font>
+<font color=#447700>!!                QR=QW<a name='368'></font>
+<font color=#447700>!!                QW=0.<a name='369'></font>
+<font color=#447700>!!              ELSE<a name='370'></font>
+<font color=#447700>!!                QR=RFSCALE*Frain*QW<a name='371'></font>
+<font color=#447700>!!                QW=QW-QR<a name='372'></font>
+<font color=#447700>!!              ENDIF<a name='373'></font>
+<font color=#447700>!!            ENDIF<a name='374'></font>
+<font color=#447700>!!            RimeF_col(L)=F_RimeF(L,I,J)/RIMESCALE<a name='375'></font>
+      <font color=#447700>!<a name='376'></font>
+            QI_col(L)=QI<a name='377'>
+            QR_col(L)=QR<a name='378'>
+            QW_col(L)=QW<a name='379'>
+          ENDDO<a name='380'>
+<font color=#447700>!<a name='381'></font>
+<font color=#447700>!#######################################################################<a name='382'></font>
+   <font color=#447700>!<a name='383'></font>
+   <font color=#447700>!--- Perform the microphysical calculations in this column<a name='384'></font>
+   <font color=#447700>!<a name='385'></font>
+          I_index=I<a name='386'>
+          J_index=J<a name='387'>
+       CALL <A href='../../html_code/phys/module_mp_etanew.F.html#EGCP01COLUMN'>EGCP01COLUMN</A><A href='../../html_code/phys/module_mp_etanew.F.html#EGCP01DRV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="EGCP01COLUMN_1"> ( ARAIN, ASNOW, DTPH, I_index, J_index, LSFC,  &amp;<a name='388'>
+       P_col, QI_col, QR_col, QV_col, QW_col, RimeF_col, T_col,         &amp;<a name='389'>
+       THICK_col, WC_col,KTS,KTE,NSTATS,QMAX,QTOT )<a name='390'>
+<a name='391'>
+<a name='392'>
+   <font color=#447700>!<a name='393'></font>
+<font color=#447700>!#######################################################################<a name='394'></font>
+<font color=#447700>!<a name='395'></font>
+   <font color=#447700>!<a name='396'></font>
+   <font color=#447700>!--- Update storage arrays<a name='397'></font>
+   <font color=#447700>!<a name='398'></font>
+          DO L=1,LSFC<a name='399'>
+            TRAIN(I,J,L)=(T_col(L)-T(I,J,L))/DTPH<a name='400'>
+            TLATGS(I,J,L)=T_col(L)-T(I,J,L)<a name='401'>
+            T(I,J,L)=T_col(L)<a name='402'>
+            Q(I,J,L)=QV_col(L)<a name='403'>
+            CWM(I,J,L)=WC_col(L)<a name='404'>
+      <font color=#447700>!<a name='405'></font>
+      <font color=#447700>!--- REAL*4 array storage<a name='406'></font>
+      <font color=#447700>!<a name='407'></font>
+            F_RimeF(L,I,J)=MAX(1., RimeF_col(L))<a name='408'>
+            IF (QI_col(L) .LE. CLIMIT) THEN<a name='409'>
+              F_ice(L,I,J)=0.<a name='410'>
+              IF (T_col(L) .LT. T_ICEK) F_ice(L,I,J)=1.<a name='411'>
+            ELSE<a name='412'>
+              F_ice(L,I,J)=MAX( 0., MIN(1., QI_col(L)/WC_col(L)) )<a name='413'>
+            ENDIF<a name='414'>
+            IF (QR_col(L) .LE. CLIMIT) THEN<a name='415'>
+              DUM=0<a name='416'>
+            ELSE<a name='417'>
+              DUM=QR_col(L)/(QR_col(L)+QW_col(L))<a name='418'>
+            ENDIF<a name='419'>
+            F_rain(L,I,J)=DUM<a name='420'>
+<font color=#447700>!!      !<a name='421'></font>
+<font color=#447700>!!      !--- INTEGER*2 array storage<a name='422'></font>
+<font color=#447700>!!      !<a name='423'></font>
+<font color=#447700>!!            IF (RimeF_col(L) .LE. 1.) THEN<a name='424'></font>
+<font color=#447700>!!              I2DUM=IRimeF<a name='425'></font>
+<font color=#447700>!!              I2DUM=IRimeF<a name='426'></font>
+<font color=#447700>!!            ELSE<a name='427'></font>
+<font color=#447700>!!              I2DUM=(RimeF_col(L)+RIMEROUND)*RIMESCALE<a name='428'></font>
+<font color=#447700>!!            ENDIF<a name='429'></font>
+<font color=#447700>!!            F_RimeF(L,I,J)=I2DUM<a name='430'></font>
+<font color=#447700>!!            IF (QI_col(L) .LE. CLIMIT) THEN<a name='431'></font>
+<font color=#447700>!!              I2DUM=0<a name='432'></font>
+<font color=#447700>!!            ELSE<a name='433'></font>
+<font color=#447700>!!              I2DUM=FSCALE*QI_col(L)/WC_col(L)<a name='434'></font>
+<font color=#447700>!!              I2DUM=MAX( IFMIN, MIN(IFMAX, I2DUM) )<a name='435'></font>
+<font color=#447700>!!            ENDIF<a name='436'></font>
+<font color=#447700>!!            F_ice(L,I,J)=I2DUM<a name='437'></font>
+<font color=#447700>!!            IF (QR_col(L) .LE. CLIMIT) THEN<a name='438'></font>
+<font color=#447700>!!              I2DUM=0<a name='439'></font>
+<font color=#447700>!!            ELSE<a name='440'></font>
+<font color=#447700>!!              I2DUM=FSCALE*QR_col(L)/(QR_col(L)+QW_col(L))<a name='441'></font>
+<font color=#447700>!!              I2DUM=MAX( IFMIN, MIN(IFMAX, I2DUM) )<a name='442'></font>
+<font color=#447700>!!            ENDIF<a name='443'></font>
+<font color=#447700>!!            F_rain(L,I,J)=I2DUM<a name='444'></font>
+      <font color=#447700>!<a name='445'></font>
+          ENDDO<a name='446'>
+   <font color=#447700>!<a name='447'></font>
+   <font color=#447700>!--- Update accumulated precipitation statistics<a name='448'></font>
+   <font color=#447700>!<a name='449'></font>
+   <font color=#447700>!--- Surface precipitation statistics; SR is fraction of surface <a name='450'></font>
+   <font color=#447700>!    precipitation (if &gt;0) associated with snow<a name='451'></font>
+   <font color=#447700>!<a name='452'></font>
+        APREC(I,J)=(ARAIN+ASNOW)*RRHOL       <font color=#447700>! Accumulated surface precip (depth in m)  !&lt;--- Ying<a name='453'></font>
+        PREC(I,J)=PREC(I,J)+APREC(I,J)<a name='454'>
+        ACPREC(I,J)=ACPREC(I,J)+APREC(I,J)<a name='455'>
+        IF(APREC(I,J) .LT. 1.E-8) THEN<a name='456'>
+          SR(I,J)=0.<a name='457'>
+        ELSE<a name='458'>
+          SR(I,J)=RRHOL*ASNOW/APREC(I,J)<a name='459'>
+        ENDIF<a name='460'>
+   <font color=#447700>!<a name='461'></font>
+   <font color=#447700>!--- Debug statistics <a name='462'></font>
+   <font color=#447700>!<a name='463'></font>
+        IF (PRINT_diag) THEN<a name='464'>
+          PRECtot(1)=PRECtot(1)+ARAIN<a name='465'>
+          PRECtot(2)=PRECtot(2)+ASNOW<a name='466'>
+          PRECmax(1)=MAX(PRECmax(1), ARAIN)<a name='467'>
+          PRECmax(2)=MAX(PRECmax(2), ASNOW)<a name='468'>
+        ENDIF<a name='469'>
+<a name='470'>
+<a name='471'>
+<font color=#447700>!#######################################################################<a name='472'></font>
+<font color=#447700>!#######################################################################<a name='473'></font>
+<font color=#447700>!<a name='474'></font>
+100   CONTINUE                          <font color=#447700>! End "I" &amp; "J" loops<a name='475'></font>
+        DO 101 J=JTS,JTE    <a name='476'>
+        DO 101 I=ITS,ITE  <a name='477'>
+           DO L=KTS,KTE<a name='478'>
+              KFLIP=KTE+1-L<a name='479'>
+             CWM_PHY(I,KFLIP,J)=CWM(I,J,L)<a name='480'>
+             T_PHY(I,KFLIP,J)=T(I,J,L)<a name='481'>
+             Q_PHY(I,KFLIP,J)=Q(I,J,L)<a name='482'>
+             TLATGS_PHY(I,KFLIP,J)=TLATGS(I,J,L)<a name='483'>
+             TRAIN_PHY(I,KFLIP,J)=TRAIN(I,J,L)<a name='484'>
+             F_ice_PHY(I,KFLIP,J)=F_ice(L,I,J)<a name='485'>
+             F_rain_PHY(I,KFLIP,J)=F_rain(L,I,J)<a name='486'>
+             F_RimeF_PHY(I,KFLIP,J)=F_RimeF(L,I,J)<a name='487'>
+           ENDDO<a name='488'>
+101     CONTINUE<a name='489'>
+      END SUBROUTINE EGCP01DRV<a name='490'>
+<font color=#447700>!<a name='491'></font>
+<font color=#447700>!<a name='492'></font>
+<font color=#447700>!###############################################################################<a name='493'></font>
+<font color=#447700>! ***** VERSION OF MICROPHYSICS DESIGNED FOR HIGHER RESOLUTION MESO ETA MODEL<a name='494'></font>
+<font color=#447700>!       (1) Represents sedimentation by preserving a portion of the precipitation<a name='495'></font>
+<font color=#447700>!           through top-down integration from cloud-top.  Modified procedure to<a name='496'></font>
+<font color=#447700>!           Zhao and Carr (1997).<a name='497'></font>
+<font color=#447700>!       (2) Microphysical equations are modified to be less sensitive to time<a name='498'></font>
+<font color=#447700>!           steps by use of Clausius-Clapeyron equation to account for changes in<a name='499'></font>
+<font color=#447700>!           saturation mixing ratios in response to latent heating/cooling.  <a name='500'></font>
+<font color=#447700>!       (3) Prevent spurious temperature oscillations across 0C due to <a name='501'></font>
+<font color=#447700>!           microphysics.<a name='502'></font>
+<font color=#447700>!       (4) Uses lookup tables for: calculating two different ventilation <a name='503'></font>
+<font color=#447700>!           coefficients in condensation and deposition processes; accretion of<a name='504'></font>
+<font color=#447700>!           cloud water by precipitation; precipitation mass; precipitation rate<a name='505'></font>
+<font color=#447700>!           (and mass-weighted precipitation fall speeds).<a name='506'></font>
+<font color=#447700>!       (5) Assumes temperature-dependent variation in mean diameter of large ice<a name='507'></font>
+<font color=#447700>!           (Houze et al., 1979; Ryan et al., 1996).<a name='508'></font>
+<font color=#447700>!        -&gt; 8/22/01: This relationship has been extended to colder temperatures<a name='509'></font>
+<font color=#447700>!           to parameterize smaller large-ice particles down to mean sizes of MDImin,<a name='510'></font>
+<font color=#447700>!           which is 50 microns reached at -55.9C.<a name='511'></font>
+<font color=#447700>!       (6) Attempts to differentiate growth of large and small ice, mainly for<a name='512'></font>
+<font color=#447700>!           improved transition from thin cirrus to thick, precipitating ice<a name='513'></font>
+<font color=#447700>!           anvils.<a name='514'></font>
+<font color=#447700>!        -&gt; 8/22/01: This feature has been diminished by effectively adjusting to<a name='515'></font>
+<font color=#447700>!           ice saturation during depositional growth at temperatures colder than<a name='516'></font>
+<font color=#447700>!           -10C.  Ice sublimation is calculated more explicitly.  The logic is<a name='517'></font>
+<font color=#447700>!           that sources of are either poorly understood (e.g., nucleation for NWP) <a name='518'></font>
+<font color=#447700>!           or are not represented in the Eta model (e.g., detrainment of ice from <a name='519'></font>
+<font color=#447700>!           convection).  Otherwise the model is too wet compared to the radiosonde<a name='520'></font>
+<font color=#447700>!           observations based on 1 Feb - 18 March 2001 retrospective runs.  <a name='521'></font>
+<font color=#447700>!       (7) Top-down integration also attempts to treat mixed-phase processes,<a name='522'></font>
+<font color=#447700>!           allowing a mixture of ice and water.  Based on numerous observational<a name='523'></font>
+<font color=#447700>!           studies, ice growth is based on nucleation at cloud top &amp;<a name='524'></font>
+<font color=#447700>!           subsequent growth by vapor deposition and riming as the ice particles <a name='525'></font>
+<font color=#447700>!           fall through the cloud.  Effective nucleation rates are a function<a name='526'></font>
+<font color=#447700>!           of ice supersaturation following Meyers et al. (JAM, 1992).  <a name='527'></font>
+<font color=#447700>!        -&gt; 8/22/01: The simulated relative humidities were far too moist compared <a name='528'></font>
+<font color=#447700>!           to the rawinsonde observations.  This feature has been substantially <a name='529'></font>
+<font color=#447700>!           diminished, limited to a much narrower temperature range of 0 to -10C.  <a name='530'></font>
+<font color=#447700>!       (8) Depositional growth of newly nucleated ice is calculated for large time<a name='531'></font>
+<font color=#447700>!           steps using Fig. 8 of Miller and Young (JAS, 1979), at 1 deg intervals<a name='532'></font>
+<font color=#447700>!           using their ice crystal masses calculated after 600 s of growth in water<a name='533'></font>
+<font color=#447700>!           saturated conditions.  The growth rates are normalized by time step<a name='534'></font>
+<font color=#447700>!           assuming 3D growth with time**1.5 following eq. (6.3) in Young (1993).<a name='535'></font>
+<font color=#447700>!        -&gt; 8/22/01: This feature has been effectively limited to 0 to -10C.  <a name='536'></font>
+<font color=#447700>!       (9) Ice precipitation rates can increase due to increase in response to<a name='537'></font>
+<font color=#447700>!           cloud water riming due to (a) increased density &amp; mass of the rimed<a name='538'></font>
+<font color=#447700>!           ice, and (b) increased fall speeds of rimed ice.<a name='539'></font>
+<font color=#447700>!        -&gt; 8/22/01: This feature has been effectively limited to 0 to -10C.  <a name='540'></font>
+<font color=#447700>!###############################################################################<a name='541'></font>
+<font color=#447700>!###############################################################################<a name='542'></font>
+<font color=#447700>!<a name='543'></font>
+<A NAME='EGCP01COLUMN'><A href='../../html_code/phys/module_mp_etanew.F.html#EGCP01COLUMN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='544'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>EGCP01COLUMN</font> ( ARAIN, ASNOW, DTPH, I_index, J_index,   &amp; <A href='../../call_to/EGCP01COLUMN.html' TARGET='index'>1</A><a name='545'>
+     &amp; LSFC, P_col, QI_col, QR_col, QV_col, QW_col, RimeF_col, T_col,   &amp;<a name='546'>
+     &amp; THICK_col, WC_col ,KTS,KTE,NSTATS,QMAX,QTOT)                          <a name='547'>
+<font color=#447700>!<a name='548'></font>
+<font color=#447700>!###############################################################################<a name='549'></font>
+<font color=#447700>!###############################################################################<a name='550'></font>
+<font color=#447700>!<a name='551'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='552'></font>
+<font color=#447700>!----- NOTE:  Code is currently set up w/o threading!  <a name='553'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='554'></font>
+<font color=#447700>!$$$  SUBPROGRAM DOCUMENTATION BLOCK<a name='555'></font>
+<font color=#447700>!                .      .    .     <a name='556'></font>
+<font color=#447700>! SUBPROGRAM:  Grid-scale microphysical processes - condensation &amp; precipitation<a name='557'></font>
+<font color=#447700>!   PRGRMMR: Ferrier         ORG: W/NP22     DATE: 08-2001<a name='558'></font>
+<font color=#447700>!   PRGRMMR: Jin  (Modification for WRF structure)<a name='559'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='560'></font>
+<font color=#447700>! ABSTRACT:<a name='561'></font>
+<font color=#447700>!   * Merges original GSCOND &amp; PRECPD subroutines.   <a name='562'></font>
+<font color=#447700>!   * Code has been substantially streamlined and restructured.<a name='563'></font>
+<font color=#447700>!   * Exchange between water vapor &amp; small cloud condensate is calculated using<a name='564'></font>
+<font color=#447700>!     the original Asai (1965, J. Japan) algorithm.  See also references to<a name='565'></font>
+<font color=#447700>!     Yau and Austin (1979, JAS), Rutledge and Hobbs (1983, JAS), and Tao et al.<a name='566'></font>
+<font color=#447700>!     (1989, MWR).  This algorithm replaces the Sundqvist et al. (1989, MWR)<a name='567'></font>
+<font color=#447700>!     parameterization.  <a name='568'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='569'></font>
+<font color=#447700>!     <a name='570'></font>
+<font color=#447700>! USAGE: <a name='571'></font>
+<font color=#447700>!   * CALL EGCP01COLUMN FROM SUBROUTINE EGCP01DRV<a name='572'></font>
+<font color=#447700>!<a name='573'></font>
+<font color=#447700>! INPUT ARGUMENT LIST:<a name='574'></font>
+<font color=#447700>!   DTPH       - physics time step (s)<a name='575'></font>
+<font color=#447700>!   I_index    - I index<a name='576'></font>
+<font color=#447700>!   J_index    - J index<a name='577'></font>
+<font color=#447700>!   LSFC       - Eta level of level above surface, ground<a name='578'></font>
+<font color=#447700>!   P_col      - vertical column of model pressure (Pa)<a name='579'></font>
+<font color=#447700>!   QI_col     - vertical column of model ice mixing ratio (kg/kg)<a name='580'></font>
+<font color=#447700>!   QR_col     - vertical column of model rain ratio (kg/kg)<a name='581'></font>
+<font color=#447700>!   QV_col     - vertical column of model water vapor specific humidity (kg/kg)<a name='582'></font>
+<font color=#447700>!   QW_col     - vertical column of model cloud water mixing ratio (kg/kg)<a name='583'></font>
+<font color=#447700>!   RimeF_col  - vertical column of rime factor for ice in model (ratio, defined below)<a name='584'></font>
+<font color=#447700>!   T_col      - vertical column of model temperature (deg K)<a name='585'></font>
+<font color=#447700>!   THICK_col  - vertical column of model mass thickness (density*height increment)<a name='586'></font>
+<font color=#447700>!   WC_col     - vertical column of model mixing ratio of total condensate (kg/kg)<a name='587'></font>
+<font color=#447700>!   <a name='588'></font>
+<font color=#447700>!<a name='589'></font>
+<font color=#447700>! OUTPUT ARGUMENT LIST: <a name='590'></font>
+<font color=#447700>!   ARAIN      - accumulated rainfall at the surface (kg)<a name='591'></font>
+<font color=#447700>!   ASNOW      - accumulated snowfall at the surface (kg)<a name='592'></font>
+<font color=#447700>!   QV_col     - vertical column of model water vapor specific humidity (kg/kg)<a name='593'></font>
+<font color=#447700>!   WC_col     - vertical column of model mixing ratio of total condensate (kg/kg)<a name='594'></font>
+<font color=#447700>!   QW_col     - vertical column of model cloud water mixing ratio (kg/kg)<a name='595'></font>
+<font color=#447700>!   QI_col     - vertical column of model ice mixing ratio (kg/kg)<a name='596'></font>
+<font color=#447700>!   QR_col     - vertical column of model rain ratio (kg/kg)<a name='597'></font>
+<font color=#447700>!   RimeF_col  - vertical column of rime factor for ice in model (ratio, defined below)<a name='598'></font>
+<font color=#447700>!   T_col      - vertical column of model temperature (deg K)<a name='599'></font>
+<font color=#447700>!     <a name='600'></font>
+<font color=#447700>! OUTPUT FILES:<a name='601'></font>
+<font color=#447700>!     NONE<a name='602'></font>
+<font color=#447700>!     <a name='603'></font>
+<font color=#447700>! Subprograms &amp; Functions called:<a name='604'></font>
+<font color=#447700>!   * Real Function CONDENSE  - cloud water condensation<a name='605'></font>
+<font color=#447700>!   * Real Function DEPOSIT   - ice deposition (not sublimation)<a name='606'></font>
+<font color=#447700>!<a name='607'></font>
+<font color=#447700>! UNIQUE: NONE<a name='608'></font>
+<font color=#447700>!  <a name='609'></font>
+<font color=#447700>! LIBRARY: NONE<a name='610'></font>
+<font color=#447700>!  <a name='611'></font>
+<font color=#447700>! COMMON BLOCKS:  <a name='612'></font>
+<font color=#447700>!     CMICRO_CONS  - key constants initialized in GSMCONST<a name='613'></font>
+<font color=#447700>!     CMICRO_STATS - accumulated and maximum statistics<a name='614'></font>
+<font color=#447700>!     CMY_GROWTH   - lookup table for growth of ice crystals in <a name='615'></font>
+<font color=#447700>!                    water saturated conditions (Miller &amp; Young, 1979)<a name='616'></font>
+<font color=#447700>!     IVENT_TABLES - lookup tables for ventilation effects of ice<a name='617'></font>
+<font color=#447700>!     IACCR_TABLES - lookup tables for accretion rates of ice<a name='618'></font>
+<font color=#447700>!     IMASS_TABLES - lookup tables for mass content of ice<a name='619'></font>
+<font color=#447700>!     IRATE_TABLES - lookup tables for precipitation rates of ice<a name='620'></font>
+<font color=#447700>!     IRIME_TABLES - lookup tables for increase in fall speed of rimed ice<a name='621'></font>
+<font color=#447700>!     RVENT_TABLES - lookup tables for ventilation effects of rain<a name='622'></font>
+<font color=#447700>!     RACCR_TABLES - lookup tables for accretion rates of rain<a name='623'></font>
+<font color=#447700>!     RMASS_TABLES - lookup tables for mass content of rain<a name='624'></font>
+<font color=#447700>!     RVELR_TABLES - lookup tables for fall speeds of rain<a name='625'></font>
+<font color=#447700>!     RRATE_TABLES - lookup tables for precipitation rates of rain<a name='626'></font>
+<font color=#447700>!   <a name='627'></font>
+<font color=#447700>! ATTRIBUTES:<a name='628'></font>
+<font color=#447700>!   LANGUAGE: FORTRAN 90<a name='629'></font>
+<font color=#447700>!   MACHINE : IBM SP<a name='630'></font>
+<font color=#447700>!<a name='631'></font>
+<font color=#447700>!<a name='632'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='633'></font>
+<font color=#447700>!--------------- Arrays &amp; constants in argument list --------------------- <a name='634'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='635'></font>
+<font color=#447700>!<a name='636'></font>
+<font color=#447700>!FEB  use module_GPVS<a name='637'></font>
+      IMPLICIT NONE<a name='638'>
+<font color=#447700>!    <a name='639'></font>
+      INTEGER,INTENT(IN) :: KTS,KTE,I_index, J_index, LSFC<a name='640'>
+      REAL,INTENT(INOUT) ::  ARAIN, ASNOW<a name='641'>
+      REAL,DIMENSION(KTS:KTE),INTENT(INOUT) ::  P_col, QI_col,QR_col    &amp;<a name='642'>
+     &amp; ,QV_col ,QW_col, RimeF_col, T_col, THICK_col,WC_col<a name='643'>
+<font color=#447700>!<a name='644'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='645'></font>
+<font color=#447700>!-------------- Common blocks for microphysical statistics ---------------<a name='646'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='647'></font>
+<font color=#447700>!<a name='648'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='649'></font>
+<font color=#447700>!--------- Common blocks for constants initialized in GSMCONST ----------<a name='650'></font>
+<font color=#447700>!<a name='651'></font>
+      INTEGER, PARAMETER :: ITLO=-60, ITHI=40<a name='652'>
+      INTEGER,INTENT(INOUT) :: NSTATS(ITLO:ITHI,4)<a name='653'>
+      REAL,INTENT(INOUT) :: QMAX(ITLO:ITHI,5),QTOT(ITLO:ITHI,22) <a name='654'>
+<font color=#447700>!<a name='655'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='656'></font>
+<font color=#447700>!--------------- Common blocks for various lookup tables -----------------<a name='657'></font>
+<font color=#447700>!<a name='658'></font>
+<font color=#447700>!--- Discretized growth rates of small ice crystals after their nucleation <a name='659'></font>
+<font color=#447700>!     at 1 C intervals from -1 C to -35 C, based on calculations by Miller <a name='660'></font>
+<font color=#447700>!     and Young (1979, JAS) after 600 s of growth.  Resultant growth rates<a name='661'></font>
+<font color=#447700>!     are multiplied by physics time step in GSMCONST.<a name='662'></font>
+<font color=#447700>!<a name='663'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='664'></font>
+<font color=#447700>!<a name='665'></font>
+<font color=#447700>!--- Mean ice-particle diameters varying from 50 microns to 1000 microns<a name='666'></font>
+<font color=#447700>!      (1 mm), assuming an exponential size distribution.  <a name='667'></font>
+<font color=#447700>!<a name='668'></font>
+<font color=#447700>!---- Meaning of the following arrays: <a name='669'></font>
+<font color=#447700>!        - mdiam - mean diameter (m)<a name='670'></font>
+<font color=#447700>!        - VENTI1 - integrated quantity associated w/ ventilation effects <a name='671'></font>
+<font color=#447700>!                   (capacitance only) for calculating vapor deposition onto ice<a name='672'></font>
+<font color=#447700>!        - VENTI2 - integrated quantity associated w/ ventilation effects <a name='673'></font>
+<font color=#447700>!                   (with fall speed) for calculating vapor deposition onto ice<a name='674'></font>
+<font color=#447700>!        - ACCRI  - integrated quantity associated w/ cloud water collection by ice<a name='675'></font>
+<font color=#447700>!        - MASSI  - integrated quantity associated w/ ice mass <a name='676'></font>
+<font color=#447700>!        - VSNOWI - mass-weighted fall speed of snow (large ice), used to calculate <a name='677'></font>
+<font color=#447700>!                   precipitation rates<a name='678'></font>
+<font color=#447700>!<a name='679'></font>
+<font color=#447700>!<a name='680'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='681'></font>
+<font color=#447700>!<a name='682'></font>
+<font color=#447700>!--- VEL_RF - velocity increase of rimed particles as functions of crude<a name='683'></font>
+<font color=#447700>!      particle size categories (at 0.1 mm intervals of mean ice particle<a name='684'></font>
+<font color=#447700>!      sizes) and rime factor (different values of Rime Factor of 1.1**N, <a name='685'></font>
+<font color=#447700>!      where N=0 to Nrime).<a name='686'></font>
+<font color=#447700>!<a name='687'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='688'></font>
+<font color=#447700>!<a name='689'></font>
+<font color=#447700>!--- Mean rain drop diameters varying from 50 microns (0.05 mm) to 450 microns <a name='690'></font>
+<font color=#447700>!      (0.45 mm), assuming an exponential size distribution.  <a name='691'></font>
+<font color=#447700>!<a name='692'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='693'></font>
+<font color=#447700>!------- Key parameters, local variables, &amp; important comments ---------<a name='694'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='695'></font>
+<font color=#447700>!<a name='696'></font>
+<font color=#447700>!--- KEY Parameters:<a name='697'></font>
+<font color=#447700>!<a name='698'></font>
+<font color=#447700>!---- Comments on 2 August 2000<a name='699'></font>
+<font color=#447700>!    * EPSQ=1.E-20 is the lower limit for specific humidity and cloud <a name='700'></font>
+<font color=#447700>!      condensate.  The value of EPSQ will need to be changed in the other <a name='701'></font>
+<font color=#447700>!      subroutines in order to make it consistent throughout the Eta code.  <a name='702'></font>
+<font color=#447700>!- NLImax - maximum number concentration of large ice crystals (20,000 /m**3, 20 per liter)<a name='703'></font>
+<font color=#447700>!- NLImin - minimum number concentration of large ice crystals (100 /m**3, 0.1 per liter)<a name='704'></font>
+<font color=#447700>!<a name='705'></font>
+      REAL, PARAMETER :: CP=1004.6, EPSQ=1.E-20, EPSW=1.E-12, RD=287.04,&amp;<a name='706'>
+       RHOL=1000., RV=461.5, T0C=273.15, XLS=2.834E6, EPS=RD/RV,        &amp;<a name='707'>
+       NLImax=20.E3, NLImin=100., T_ICE=-10., T_ICE_init=-5.,           &amp;<a name='708'>
+       TOLER=5.E-7,                                                     &amp;<a name='709'>
+       CLIMIT=10.*EPSQ, CLIMIT1=-CLIMIT, EPS1=RV/RD-1., RCP=1./CP,      &amp;<a name='710'>
+       RCPRV=RCP/RV, RRHOL=1./RHOL, XLS1=XLS*RCP, XLS2=XLS*XLS*RCPRV,   &amp;<a name='711'>
+       XLS3=XLS*XLS/RV,                                                 &amp;<a name='712'>
+       C1=1./3., C2=1./6., C3=3.31/6.,                                  &amp; <a name='713'>
+       DMR1=.1E-3, DMR2=.2E-3, DMR3=.32E-3, N0r0=8.E6, N0rmin=1.e4,     &amp;<a name='714'>
+       N0s0=4.E6, RHO0=1.194, XMR1=1.e6*DMR1, XMR2=1.e6*DMR2,           &amp;<a name='715'>
+       XMR3=1.e6*DMR3, Xratio=.025                                           <a name='716'>
+      INTEGER, PARAMETER :: MDR1=XMR1, MDR2=XMR2, MDR3=XMR3<a name='717'>
+<font color=#447700>!<a name='718'></font>
+<font color=#447700>!--- If BLEND=1:<a name='719'></font>
+<font color=#447700>!      precipitation (large) ice amounts are estimated at each level as a <a name='720'></font>
+<font color=#447700>!      blend of ice falling from the grid point above and the precip ice<a name='721'></font>
+<font color=#447700>!      present at the start of the time step (see TOT_ICE below).<a name='722'></font>
+<font color=#447700>!--- If BLEND=0:<a name='723'></font>
+<font color=#447700>!      precipitation (large) ice amounts are estimated to be the precip<a name='724'></font>
+<font color=#447700>!      ice present at the start of the time step.<a name='725'></font>
+<font color=#447700>!<a name='726'></font>
+<font color=#447700>!--- Extended to include sedimentation of rain on 2/5/01 <a name='727'></font>
+<font color=#447700>!<a name='728'></font>
+      REAL, PARAMETER :: BLEND=1.<a name='729'>
+<font color=#447700>!<a name='730'></font>
+<font color=#447700>!--- This variable is for debugging purposes (if .true.)<a name='731'></font>
+<font color=#447700>!<a name='732'></font>
+      LOGICAL, PARAMETER :: PRINT_diag=.FALSE.<a name='733'>
+<font color=#447700>!<a name='734'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='735'></font>
+<font color=#447700>!--- Local variables<a name='736'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='737'></font>
+<font color=#447700>!<a name='738'></font>
+      REAL EMAIRI, N0r, NLICE, NSmICE<a name='739'>
+      LOGICAL CLEAR, ICE_logical, DBG_logical, DIAG_print, RAIN_logical<a name='740'>
+      INTEGER :: IDR,INDEX_MY,INDEXR,INDEXR1,INDEXS,IPASS,ITDX,IXRF,    &amp;<a name='741'>
+     &amp;           IXS,LBEF,L<a name='742'>
+<font color=#447700>!<a name='743'></font>
+      REAL :: ABI,ABW,AIEVP,ARAINNEW,ASNOWNEW,BLDTRH,BUDGET,            &amp;<a name='744'>
+     &amp;        CREVP,DELI,DELR,DELT,DELV,DELW,DENOMF,                    &amp;<a name='745'>
+     &amp;        DENOMI,DENOMW,DENOMWI,DIDEP,                              &amp;<a name='746'>
+     &amp;        DIEVP,DIFFUS,DLI,DTPH,DTRHO,DUM,DUM1,                     &amp;<a name='747'>
+     &amp;        DUM2,DWV0,DWVI,DWVR,DYNVIS,ESI,ESW,FIR,FLARGE,FLIMASS,    &amp;<a name='748'>
+     &amp;        FSMALL,FWR,FWS,GAMMAR,GAMMAS,                             &amp;<a name='749'>
+     &amp;        PCOND,PIACR,PIACW,PIACWI,PIACWR,PICND,PIDEP,PIDEP_max,    &amp;<a name='750'>
+     &amp;        PIEVP,PILOSS,PIMLT,PP,PRACW,PRAUT,PREVP,PRLOSS,           &amp;<a name='751'>
+     &amp;        QI,QINEW,QLICE,QR,QRNEW,QSI,QSIGRD,QSINEW,QSW,QSW0,       &amp;<a name='752'>
+     &amp;        QSWGRD,QSWNEW,QT,QTICE,QTNEW,QTRAIN,QV,QW,QW0,QWNEW,      &amp;<a name='753'>
+     &amp;        RFACTOR,RHO,RIMEF,RIMEF1,RQR,RR,RRHO,SFACTOR,             &amp;<a name='754'>
+     &amp;        TC,TCC,TFACTOR,THERM_COND,THICK,TK,TK2,TNEW,              &amp;<a name='755'>
+     &amp;        TOT_ICE,TOT_ICENEW,TOT_RAIN,TOT_RAINNEW,                  &amp;<a name='756'>
+     &amp;        VEL_INC,VENTR,VENTIL,VENTIS,VRAIN1,VRAIN2,VRIMEF,VSNOW,   &amp;<a name='757'>
+     &amp;        WC,WCNEW,WSGRD,WS,WSNEW,WV,WVNEW,WVQW,                    &amp;<a name='758'>
+     &amp;        XLF,XLF1,XLI,XLV,XLV1,XLV2,XLIMASS,XRF,XSIMASS          <a name='759'>
+<font color=#447700>!<a name='760'></font>
+<font color=#447700>!#######################################################################<a name='761'></font>
+<font color=#447700>!########################## Begin Execution ############################<a name='762'></font>
+<font color=#447700>!#######################################################################<a name='763'></font>
+<font color=#447700>!<a name='764'></font>
+<font color=#447700>!<a name='765'></font>
+      ARAIN=0.                <font color=#447700>! Accumulated rainfall into grid box from above (kg/m**2)<a name='766'></font>
+      ASNOW=0.                <font color=#447700>! Accumulated snowfall into grid box from above (kg/m**2)<a name='767'></font>
+      DIAG_print=.false.<a name='768'>
+<font color=#447700>!<a name='769'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='770'></font>
+<font color=#447700>!------------ Loop from top (L=1) to surface (L=LSFC) ------------------<a name='771'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='772'></font>
+<font color=#447700>!<a name='773'></font>
+<a name='774'>
+      DO 10 L=1,LSFC<a name='775'>
+<a name='776'>
+<font color=#447700>!--- Skip this level and go to the next lower level if no condensate <a name='777'></font>
+<font color=#447700>!      and very low specific humidities<a name='778'></font>
+<font color=#447700>!<a name='779'></font>
+        IF (QV_col(L).LE.EPSQ .AND. WC_col(L).LE.EPSQ) GO TO 10<a name='780'>
+<font color=#447700>!<a name='781'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='782'></font>
+<font color=#447700>!------------ Proceed with cloud microphysics calculations -------------<a name='783'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='784'></font>
+<font color=#447700>!<a name='785'></font>
+          TK=T_col(L)         <font color=#447700>! Temperature (deg K)<a name='786'></font>
+          TC=TK-T0C           <font color=#447700>! Temperature (deg C)<a name='787'></font>
+          PP=P_col(L)         <font color=#447700>! Pressure (Pa)<a name='788'></font>
+          QV=QV_col(L)        <font color=#447700>! Specific humidity of water vapor (kg/kg)<a name='789'></font>
+          WV=QV/(1.-QV)       <font color=#447700>! Water vapor mixing ratio (kg/kg)<a name='790'></font>
+          WC=WC_col(L)        <font color=#447700>! Grid-scale mixing ratio of total condensate (water or ice; kg/kg)<a name='791'></font>
+<font color=#447700>!<a name='792'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='793'></font>
+<font color=#447700>!--- Moisture variables below are mixing ratios &amp; not specifc humidities<a name='794'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='795'></font>
+<font color=#447700>!<a name='796'></font>
+          CLEAR=.TRUE.<a name='797'>
+<font color=#447700>!    <a name='798'></font>
+<font color=#447700>!--- This check is to determine grid-scale saturation when no condensate is present<a name='799'></font>
+<font color=#447700>!    <a name='800'></font>
+          ESW=1000.*FPVS0(TK)              <font color=#447700>! Saturation vapor pressure w/r/t water<a name='801'></font>
+          QSW=EPS*ESW/(PP-ESW)             <font color=#447700>! Saturation mixing ratio w/r/t water<a name='802'></font>
+          WS=QSW                           <font color=#447700>! General saturation mixing ratio (water/ice)<a name='803'></font>
+          IF (TC .LT. 0.) THEN<a name='804'>
+            ESI=1000.*FPVS(TK)             <font color=#447700>! Saturation vapor pressure w/r/t ice<a name='805'></font>
+            QSI=EPS*ESI/(PP-ESI)           <font color=#447700>! Saturation mixing ratio w/r/t water<a name='806'></font>
+            WS=QSI                         <font color=#447700>! General saturation mixing ratio (water/ice)<a name='807'></font>
+          ENDIF<a name='808'>
+<font color=#447700>!<a name='809'></font>
+<font color=#447700>!--- Effective grid-scale Saturation mixing ratios<a name='810'></font>
+<font color=#447700>!<a name='811'></font>
+          QSWgrd=RHgrd*QSW<a name='812'>
+          QSIgrd=RHgrd*QSI<a name='813'>
+          WSgrd=RHgrd*WS<a name='814'>
+<font color=#447700>!<a name='815'></font>
+<font color=#447700>!--- Check if air is subsaturated and w/o condensate<a name='816'></font>
+<font color=#447700>!<a name='817'></font>
+          IF (WV.GT.WSgrd .OR. WC.GT.EPSW) CLEAR=.FALSE.<a name='818'>
+<font color=#447700>!<a name='819'></font>
+<font color=#447700>!--- Check if any rain is falling into layer from above<a name='820'></font>
+<font color=#447700>!<a name='821'></font>
+          IF (ARAIN .GT. CLIMIT) THEN<a name='822'>
+            CLEAR=.FALSE.<a name='823'>
+          ELSE<a name='824'>
+            ARAIN=0.<a name='825'>
+          ENDIF<a name='826'>
+<font color=#447700>!<a name='827'></font>
+<font color=#447700>!--- Check if any ice is falling into layer from above<a name='828'></font>
+<font color=#447700>!<a name='829'></font>
+<font color=#447700>!--- NOTE that "SNOW" in variable names is synonomous with <a name='830'></font>
+<font color=#447700>!    large, precipitation ice particles<a name='831'></font>
+<font color=#447700>!<a name='832'></font>
+          IF (ASNOW .GT. CLIMIT) THEN<a name='833'>
+            CLEAR=.FALSE.<a name='834'>
+          ELSE<a name='835'>
+            ASNOW=0.<a name='836'>
+          ENDIF<a name='837'>
+<font color=#447700>!<a name='838'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='839'></font>
+<font color=#447700>!-- Loop to the end if in clear, subsaturated air free of condensate ---<a name='840'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='841'></font>
+<font color=#447700>!<a name='842'></font>
+          IF (CLEAR) GO TO 10<a name='843'>
+<font color=#447700>!<a name='844'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='845'></font>
+<font color=#447700>!--------- Initialize RHO, THICK &amp; microphysical processes -------------<a name='846'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='847'></font>
+<font color=#447700>!<a name='848'></font>
+<font color=#447700>!<a name='849'></font>
+<font color=#447700>!--- Virtual temperature, TV=T*(1./EPS-1)*Q, Q is specific humidity;<a name='850'></font>
+<font color=#447700>!    (see pp. 63-65 in Fleagle &amp; Businger, 1963)<a name='851'></font>
+<font color=#447700>!<a name='852'></font>
+          RHO=PP/(RD*TK*(1.+EPS1*QV))   <font color=#447700>! Air density (kg/m**3)<a name='853'></font>
+          RRHO=1./RHO                <font color=#447700>! Reciprocal of air density<a name='854'></font>
+          DTRHO=DTPH*RHO             <font color=#447700>! Time step * air density<a name='855'></font>
+          BLDTRH=BLEND*DTRHO         <font color=#447700>! Blend parameter * time step * air density<a name='856'></font>
+          THICK=THICK_col(L)         <font color=#447700>! Layer thickness = RHO*DZ = -DP/G = (Psfc-Ptop)*D_ETA/(G*ETA_sfc)<a name='857'></font>
+<font color=#447700>!<a name='858'></font>
+          ARAINnew=0.                <font color=#447700>! Updated accumulated rainfall<a name='859'></font>
+          ASNOWnew=0.                <font color=#447700>! Updated accumulated snowfall<a name='860'></font>
+          QI=QI_col(L)               <font color=#447700>! Ice mixing ratio<a name='861'></font>
+          QInew=0.                   <font color=#447700>! Updated ice mixing ratio<a name='862'></font>
+          QR=QR_col(L)               <font color=#447700>! Rain mixing ratio<a name='863'></font>
+          QRnew=0.                   <font color=#447700>! Updated rain ratio<a name='864'></font>
+          QW=QW_col(L)               <font color=#447700>! Cloud water mixing ratio<a name='865'></font>
+          QWnew=0.                   <font color=#447700>! Updated cloud water ratio<a name='866'></font>
+<font color=#447700>!<a name='867'></font>
+          PCOND=0.                   <font color=#447700>! Condensation (&gt;0) or evaporation (&lt;0) of cloud water (kg/kg)<a name='868'></font>
+          PIDEP=0.                   <font color=#447700>! Deposition (&gt;0) or sublimation (&lt;0) of ice crystals (kg/kg)<a name='869'></font>
+          PIACW=0.                   <font color=#447700>! Cloud water collection (riming) by precipitation ice (kg/kg; &gt;0)<a name='870'></font>
+          PIACWI=0.                  <font color=#447700>! Growth of precip ice by riming (kg/kg; &gt;0)<a name='871'></font>
+          PIACWR=0.                  <font color=#447700>! Shedding of accreted cloud water to form rain (kg/kg; &gt;0)<a name='872'></font>
+          PIACR=0.                   <font color=#447700>! Freezing of rain onto large ice at supercooled temps (kg/kg; &gt;0)<a name='873'></font>
+          PICND=0.                   <font color=#447700>! Condensation (&gt;0) onto wet, melting ice (kg/kg)<a name='874'></font>
+          PIEVP=0.                   <font color=#447700>! Evaporation (&lt;0) from wet, melting ice (kg/kg)<a name='875'></font>
+          PIMLT=0.                   <font color=#447700>! Melting ice (kg/kg; &gt;0)<a name='876'></font>
+          PRAUT=0.                   <font color=#447700>! Cloud water autoconversion to rain (kg/kg; &gt;0)<a name='877'></font>
+          PRACW=0.                   <font color=#447700>! Cloud water collection (accretion) by rain (kg/kg; &gt;0)<a name='878'></font>
+          PREVP=0.                   <font color=#447700>! Rain evaporation (kg/kg; &lt;0)<a name='879'></font>
+<font color=#447700>!<a name='880'></font>
+<font color=#447700>!--- Double check input hydrometeor mixing ratios<a name='881'></font>
+<font color=#447700>!<a name='882'></font>
+<font color=#447700>!          DUM=WC-(QI+QW+QR)<a name='883'></font>
+<font color=#447700>!          DUM1=ABS(DUM)<a name='884'></font>
+<font color=#447700>!          DUM2=TOLER*MIN(WC, QI+QW+QR)<a name='885'></font>
+<font color=#447700>!          IF (DUM1 .GT. DUM2) THEN<a name='886'></font>
+<font color=#447700>!            WRITE(6,"(/2(a,i4),a,i2)") '{@ i=',I_index,' j=',J_index,<a name='887'></font>
+<font color=#447700>!     &amp;                                 ' L=',L<a name='888'></font>
+<font color=#447700>!            WRITE(6,"(4(a12,g11.4,1x))") <a name='889'></font>
+<font color=#447700>!     &amp; '{@ TCold=',TC,'P=',.01*PP,'DIFF=',DUM,'WCold=',WC,<a name='890'></font>
+<font color=#447700>!     &amp; '{@ QIold=',QI,'QWold=',QW,'QRold=',QR<a name='891'></font>
+<font color=#447700>!          ENDIF<a name='892'></font>
+<font color=#447700>!<a name='893'></font>
+<font color=#447700>!***********************************************************************<a name='894'></font>
+<font color=#447700>!*********** MAIN MICROPHYSICS CALCULATIONS NOW FOLLOW! ****************<a name='895'></font>
+<font color=#447700>!***********************************************************************<a name='896'></font>
+<font color=#447700>!<a name='897'></font>
+<font color=#447700>!--- Calculate a few variables, which are used more than once below<a name='898'></font>
+<font color=#447700>!<a name='899'></font>
+<font color=#447700>!--- Latent heat of vaporization as a function of temperature from<a name='900'></font>
+<font color=#447700>!      Bolton (1980, JAS)<a name='901'></font>
+<font color=#447700>!<a name='902'></font>
+          XLV=3.148E6-2370*TK        <font color=#447700>! Latent heat of vaporization (Lv)<a name='903'></font>
+          XLF=XLS-XLV                <font color=#447700>! Latent heat of fusion (Lf)<a name='904'></font>
+          XLV1=XLV*RCP               <font color=#447700>! Lv/Cp<a name='905'></font>
+          XLF1=XLF*RCP               <font color=#447700>! Lf/Cp<a name='906'></font>
+          TK2=1./(TK*TK)             <font color=#447700>! 1./TK**2<a name='907'></font>
+          XLV2=XLV*XLV*QSW*TK2/RV    <font color=#447700>! Lv**2*Qsw/(Rv*TK**2)<a name='908'></font>
+          DENOMW=1.+XLV2*RCP         <font color=#447700>! Denominator term, Clausius-Clapeyron correction<a name='909'></font>
+<font color=#447700>!<a name='910'></font>
+<font color=#447700>!--- Basic thermodynamic quantities<a name='911'></font>
+<font color=#447700>!      * DYNVIS - dynamic viscosity  [ kg/(m*s) ]<a name='912'></font>
+<font color=#447700>!      * THERM_COND - thermal conductivity  [ J/(m*s*K) ]<a name='913'></font>
+<font color=#447700>!      * DIFFUS - diffusivity of water vapor  [ m**2/s ]<a name='914'></font>
+<font color=#447700>!<a name='915'></font>
+          TFACTOR=TK**1.5/(TK+120.)<a name='916'>
+          DYNVIS=1.496E-6*TFACTOR<a name='917'>
+          THERM_COND=2.116E-3*TFACTOR<a name='918'>
+          DIFFUS=8.794E-5*TK**1.81/PP<a name='919'>
+<font color=#447700>!<a name='920'></font>
+<font color=#447700>!--- Air resistance term for the fall speed of ice following the<a name='921'></font>
+<font color=#447700>!      basic research by Heymsfield, Kajikawa, others <a name='922'></font>
+<font color=#447700>!<a name='923'></font>
+          GAMMAS=(1.E5/PP)**C1<a name='924'>
+<font color=#447700>!<a name='925'></font>
+<font color=#447700>!--- Air resistance for rain fall speed (Beard, 1985, JAS, p.470)<a name='926'></font>
+<font color=#447700>!<a name='927'></font>
+          GAMMAR=(RHO0/RHO)**.4<a name='928'>
+<font color=#447700>!<a name='929'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='930'></font>
+<font color=#447700>!-------------  IMPORTANT MICROPHYSICS DECISION TREE  -----------------<a name='931'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='932'></font>
+<font color=#447700>!<a name='933'></font>
+<font color=#447700>!--- Determine if conditions supporting ice are present<a name='934'></font>
+<font color=#447700>!<a name='935'></font>
+          IF (TC.LT.0. .OR. QI.GT. CLIMIT .OR. ASNOW.GT.CLIMIT) THEN<a name='936'>
+            ICE_logical=.TRUE.<a name='937'>
+          ELSE<a name='938'>
+            ICE_logical=.FALSE.<a name='939'>
+            QLICE=0.<a name='940'>
+            QTICE=0.<a name='941'>
+          ENDIF<a name='942'>
+<font color=#447700>!<a name='943'></font>
+<font color=#447700>!--- Determine if rain is present<a name='944'></font>
+<font color=#447700>!<a name='945'></font>
+          RAIN_logical=.FALSE.<a name='946'>
+          IF (ARAIN.GT.CLIMIT .OR. QR.GT.CLIMIT) RAIN_logical=.TRUE.<a name='947'>
+<font color=#447700>!<a name='948'></font>
+          IF (ICE_logical) THEN<a name='949'>
+<font color=#447700>!<a name='950'></font>
+<font color=#447700>!--- IMPORTANT:  Estimate time-averaged properties.<a name='951'></font>
+<font color=#447700>!<a name='952'></font>
+<font color=#447700>!---<a name='953'></font>
+<font color=#447700>!  * FLARGE  - ratio of number of large ice to total (large &amp; small) ice<a name='954'></font>
+<font color=#447700>!  * FSMALL  - ratio of number of small ice crystals to large ice particles<a name='955'></font>
+<font color=#447700>!  -&gt;  Small ice particles are assumed to have a mean diameter of 50 microns.<a name='956'></font>
+<font color=#447700>!  * XSIMASS - used for calculating small ice mixing ratio<a name='957'></font>
+<font color=#447700>!---<a name='958'></font>
+<font color=#447700>!  * TOT_ICE - total mass (small &amp; large) ice before microphysics,<a name='959'></font>
+<font color=#447700>!              which is the sum of the total mass of large ice in the <a name='960'></font>
+<font color=#447700>!              current layer and the input flux of ice from above<a name='961'></font>
+<font color=#447700>!  * PILOSS  - greatest loss (&lt;0) of total (small &amp; large) ice by<a name='962'></font>
+<font color=#447700>!              sublimation, removing all of the ice falling from above<a name='963'></font>
+<font color=#447700>!              and the ice within the layer<a name='964'></font>
+<font color=#447700>!  * RimeF1  - Rime Factor, which is the mass ratio of total (unrimed &amp; rimed) <a name='965'></font>
+<font color=#447700>!              ice mass to the unrimed ice mass (&gt;=1)<a name='966'></font>
+<font color=#447700>!  * VrimeF  - the velocity increase due to rime factor or melting (ratio, &gt;=1)<a name='967'></font>
+<font color=#447700>!  * VSNOW   - Fall speed of rimed snow w/ air resistance correction<a name='968'></font>
+<font color=#447700>!  * EMAIRI  - equivalent mass of air associated layer and with fall of snow into layer<a name='969'></font>
+<font color=#447700>!  * XLIMASS - used for calculating large ice mixing ratio<a name='970'></font>
+<font color=#447700>!  * FLIMASS - mass fraction of large ice<a name='971'></font>
+<font color=#447700>!  * QTICE   - time-averaged mixing ratio of total ice<a name='972'></font>
+<font color=#447700>!  * QLICE   - time-averaged mixing ratio of large ice<a name='973'></font>
+<font color=#447700>!  * NLICE   - time-averaged number concentration of large ice<a name='974'></font>
+<font color=#447700>!  * NSmICE  - number concentration of small ice crystals at current level<a name='975'></font>
+<font color=#447700>!---<a name='976'></font>
+<font color=#447700>!--- Assumed number fraction of large ice particles to total (large &amp; small) <a name='977'></font>
+<font color=#447700>!    ice particles, which is based on a general impression of the literature.<a name='978'></font>
+<font color=#447700>!<a name='979'></font>
+            WVQW=WV+QW                <font color=#447700>! Water vapor &amp; cloud water<a name='980'></font>
+<font color=#447700>!<a name='981'></font>
+<a name='982'>
+<a name='983'>
+            IF (TC.GE.0. .OR. WVQW.LT.QSIgrd) THEN<a name='984'>
+   <font color=#447700>!<a name='985'></font>
+   <font color=#447700>!--- Eliminate small ice particle contributions for melting &amp; sublimation<a name='986'></font>
+   <font color=#447700>!<a name='987'></font>
+              FLARGE=1.<a name='988'>
+            ELSE<a name='989'>
+   <font color=#447700>!<a name='990'></font>
+   <font color=#447700>!--- Enhanced number of small ice particles during depositional growth<a name='991'></font>
+   <font color=#447700>!    (effective only when 0C &gt; T &gt;= T_ice [-10C] )<a name='992'></font>
+   <font color=#447700>!<a name='993'></font>
+              FLARGE=.2<a name='994'>
+   <font color=#447700>!<a name='995'></font>
+   <font color=#447700>!--- Larger number of small ice particles due to rime splintering<a name='996'></font>
+   <font color=#447700>!<a name='997'></font>
+              IF (TC.GE.-8. .AND. TC.LE.-3.) FLARGE=.5*FLARGE<a name='998'>
+<font color=#447700>!<a name='999'></font>
+            ENDIF            <font color=#447700>! End IF (TC.GE.0. .OR. WVQW.LT.QSIgrd)<a name='1000'></font>
+            FSMALL=(1.-FLARGE)/FLARGE<a name='1001'>
+            XSIMASS=RRHO*MASSI(MDImin)*FSMALL<a name='1002'>
+            IF (QI.LE.CLIMIT .AND. ASNOW.LE.CLIMIT) THEN<a name='1003'>
+              INDEXS=MDImin<a name='1004'>
+              TOT_ICE=0.<a name='1005'>
+              PILOSS=0.<a name='1006'>
+              RimeF1=1.<a name='1007'>
+              VrimeF=1.<a name='1008'>
+              VEL_INC=GAMMAS<a name='1009'>
+              VSNOW=0.<a name='1010'>
+              EMAIRI=THICK<a name='1011'>
+              XLIMASS=RRHO*RimeF1*MASSI(INDEXS)<a name='1012'>
+              FLIMASS=XLIMASS/(XLIMASS+XSIMASS)<a name='1013'>
+              QLICE=0.<a name='1014'>
+              QTICE=0.<a name='1015'>
+              NLICE=0.<a name='1016'>
+              NSmICE=0.<a name='1017'>
+            ELSE<a name='1018'>
+   <font color=#447700>!<a name='1019'></font>
+   <font color=#447700>!--- For T&lt;0C mean particle size follows Houze et al. (JAS, 1979, p. 160), <a name='1020'></font>
+   <font color=#447700>!    converted from Fig. 5 plot of LAMDAs.  Similar set of relationships <a name='1021'></font>
+   <font color=#447700>!    also shown in Fig. 8 of Ryan (BAMS, 1996, p. 66).<a name='1022'></font>
+   <font color=#447700>!<a name='1023'></font>
+              DUM=XMImax*EXP(.0536*TC)<a name='1024'>
+              INDEXS=MIN(MDImax, MAX(MDImin, INT(DUM) ) )<a name='1025'>
+              TOT_ICE=THICK*QI+BLEND*ASNOW<a name='1026'>
+              PILOSS=-TOT_ICE/THICK<a name='1027'>
+              LBEF=MAX(1,L-1)<a name='1028'>
+              DUM1=RimeF_col(LBEF)<a name='1029'>
+              DUM2=RimeF_col(L)<a name='1030'>
+              RimeF1=(DUM2*THICK*QI+DUM1*BLEND*ASNOW)/TOT_ICE<a name='1031'>
+              RimeF1=MIN(RimeF1, RFmax)<a name='1032'>
+              DO IPASS=0,1<a name='1033'>
+                IF (RimeF1 .LE. 1.) THEN<a name='1034'>
+                  RimeF1=1.<a name='1035'>
+                  VrimeF=1.<a name='1036'>
+                ELSE<a name='1037'>
+                  IXS=MAX(2, MIN(INDEXS/100, 9))<a name='1038'>
+                  XRF=10.492*ALOG(RimeF1)<a name='1039'>
+                  IXRF=MAX(0, MIN(INT(XRF), Nrime))<a name='1040'>
+                  IF (IXRF .GE. Nrime) THEN<a name='1041'>
+                    VrimeF=VEL_RF(IXS,Nrime)<a name='1042'>
+                  ELSE<a name='1043'>
+                    VrimeF=VEL_RF(IXS,IXRF)+(XRF-FLOAT(IXRF))*          &amp;<a name='1044'>
+     &amp;                    (VEL_RF(IXS,IXRF+1)-VEL_RF(IXS,IXRF))<a name='1045'>
+                  ENDIF<a name='1046'>
+                ENDIF            <font color=#447700>! End IF (RimeF1 .LE. 1.)<a name='1047'></font>
+                VEL_INC=GAMMAS*VrimeF<a name='1048'>
+                VSNOW=VEL_INC*VSNOWI(INDEXS)<a name='1049'>
+                EMAIRI=THICK+BLDTRH*VSNOW<a name='1050'>
+                XLIMASS=RRHO*RimeF1*MASSI(INDEXS)<a name='1051'>
+                FLIMASS=XLIMASS/(XLIMASS+XSIMASS)<a name='1052'>
+                QTICE=TOT_ICE/EMAIRI<a name='1053'>
+                QLICE=FLIMASS*QTICE<a name='1054'>
+                NLICE=QLICE/XLIMASS<a name='1055'>
+                NSmICE=Fsmall*NLICE<a name='1056'>
+   <font color=#447700>!<a name='1057'></font>
+                IF ( (NLICE.GE.NLImin .AND. NLICE.LE.NLImax)            &amp;<a name='1058'>
+     &amp;                .OR. IPASS.EQ.1) THEN<a name='1059'>
+                  EXIT<a name='1060'>
+                ELSE<a name='1061'>
+        <font color=#447700>!<a name='1062'></font>
+        <font color=#447700>!--- Reduce excessive accumulation of ice at upper levels<a name='1063'></font>
+        <font color=#447700>!    associated with strong grid-resolved ascent<a name='1064'></font>
+        <font color=#447700>!<a name='1065'></font>
+        <font color=#447700>!--- Force NLICE to be between NLImin and NLImax<a name='1066'></font>
+        <font color=#447700>!<a name='1067'></font>
+                  DUM=MAX(NLImin, MIN(NLImax, NLICE) )<a name='1068'>
+                  XLI=RHO*(QTICE/DUM-XSIMASS)/RimeF1<a name='1069'>
+                  IF (XLI .LE. MASSI(MDImin) ) THEN<a name='1070'>
+                    INDEXS=MDImin<a name='1071'>
+                  ELSE IF (XLI .LE. MASSI(450) ) THEN<a name='1072'>
+                    DLI=9.5885E5*XLI**.42066         <font color=#447700>! DLI in microns<a name='1073'></font>
+                    INDEXS=MIN(MDImax, MAX(MDImin, INT(DLI) ) )<a name='1074'>
+                  ELSE IF (XLI .LE. MASSI(MDImax) ) THEN<a name='1075'>
+                    DLI=3.9751E6*XLI**.49870         <font color=#447700>! DLI in microns<a name='1076'></font>
+                    INDEXS=MIN(MDImax, MAX(MDImin, INT(DLI) ) )<a name='1077'>
+                  ELSE <a name='1078'>
+                    INDEXS=MDImax<a name='1079'>
+           <font color=#447700>!<a name='1080'></font>
+           <font color=#447700>!--- 8/22/01: Increase density of large ice if maximum limits <a name='1081'></font>
+           <font color=#447700>!    are reached for number concentration (NLImax) and mean size <a name='1082'></font>
+           <font color=#447700>!    (MDImax).  Done to increase fall out of ice.<a name='1083'></font>
+           <font color=#447700>!<a name='1084'></font>
+                    IF (DUM .GE. NLImax)                                &amp;<a name='1085'>
+     &amp;                RimeF1=RHO*(QTICE/NLImax-XSIMASS)/MASSI(INDEXS)<a name='1086'>
+                  ENDIF             <font color=#447700>! End IF (XLI .LE. MASSI(MDImin) ) <a name='1087'></font>
+<font color=#447700>!            WRITE(6,"(4(a12,g11.4,1x))") <a name='1088'></font>
+<font color=#447700>!     &amp; '{$ TC=',TC,'P=',.01*PP,'NLICE=',NLICE,'DUM=',DUM,<a name='1089'></font>
+<font color=#447700>!     &amp; '{$ XLI=',XLI,'INDEXS=',FLOAT(INDEXS),'RHO=',RHO,'QTICE=',QTICE,<a name='1090'></font>
+<font color=#447700>!     &amp; '{$ XSIMASS=',XSIMASS,'RimeF1=',RimeF1<a name='1091'></font>
+                ENDIF                  <font color=#447700>! End IF ( (NLICE.GE.NLImin .AND. NLICE.LE.NLImax) ...<a name='1092'></font>
+              ENDDO                    <font color=#447700>! End DO IPASS=0,1<a name='1093'></font>
+            ENDIF                      <font color=#447700>! End IF (QI.LE.CLIMIT .AND. ASNOW.LE.CLIMIT)<a name='1094'></font>
+          ENDIF                        <font color=#447700>! End IF (ICE_logical)<a name='1095'></font>
+<font color=#447700>!<a name='1096'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1097'></font>
+<font color=#447700>!--------------- Calculate individual processes -----------------------<a name='1098'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1099'></font>
+<font color=#447700>!<a name='1100'></font>
+<font color=#447700>!--- Cloud water autoconversion to rain and collection by rain<a name='1101'></font>
+<font color=#447700>!<a name='1102'></font>
+          IF (QW.GT.CLIMIT .AND. TC.GE.T_ICE) THEN<a name='1103'>
+   <font color=#447700>!<a name='1104'></font>
+   <font color=#447700>!--- QW0 could be modified based on land/sea properties, <a name='1105'></font>
+   <font color=#447700>!      presence of convection, etc.  This is why QAUT0 and CRAUT<a name='1106'></font>
+   <font color=#447700>!      are passed into the subroutine as externally determined<a name='1107'></font>
+   <font color=#447700>!      parameters.  Can be changed in the future if desired.<a name='1108'></font>
+   <font color=#447700>!<a name='1109'></font>
+            QW0=QAUT0*RRHO<a name='1110'>
+            PRAUT=MAX(0., QW-QW0)*CRAUT<a name='1111'>
+            IF (QLICE .GT. CLIMIT) THEN<a name='1112'>
+      <font color=#447700>!<a name='1113'></font>
+      <font color=#447700>!--- Collection of cloud water by large ice particles ("snow")<a name='1114'></font>
+      <font color=#447700>!    PIACWI=PIACW for riming, PIACWI=0 for shedding<a name='1115'></font>
+      <font color=#447700>!<a name='1116'></font>
+              FWS=MIN(1., CIACW*VEL_INC*NLICE*ACCRI(INDEXS)/PP**C1)<a name='1117'>
+              PIACW=FWS*QW<a name='1118'>
+              IF (TC .LT. 0.) PIACWI=PIACW    <font color=#447700>! Large ice riming<a name='1119'></font>
+            ENDIF           <font color=#447700>! End IF (QLICE .GT. CLIMIT)<a name='1120'></font>
+          ENDIF             <font color=#447700>! End IF (QW.GT.CLIMIT .AND. TC.GE.T_ICE)<a name='1121'></font>
+<font color=#447700>!<a name='1122'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1123'></font>
+<font color=#447700>!--- Loop around some of the ice-phase processes if no ice should be present<a name='1124'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1125'></font>
+<font color=#447700>!<a name='1126'></font>
+          IF (ICE_logical .EQV. .FALSE.) GO TO 20<a name='1127'>
+<font color=#447700>!<a name='1128'></font>
+<font color=#447700>!--- Now the pretzel logic of calculating ice deposition<a name='1129'></font>
+<font color=#447700>!<a name='1130'></font>
+          IF (TC.LT.T_ICE .AND. (WV.GT.QSIgrd .OR. QW.GT.CLIMIT)) THEN<a name='1131'>
+   <font color=#447700>!<a name='1132'></font>
+   <font color=#447700>!--- Adjust to ice saturation at T&lt;T_ICE (-10C) if supersaturated.<a name='1133'></font>
+   <font color=#447700>!    Sources of ice due to nucleation and convective detrainment are<a name='1134'></font>
+   <font color=#447700>!    either poorly understood, poorly resolved at typical NWP <a name='1135'></font>
+   <font color=#447700>!    resolutions, or are not represented (e.g., no detrained <a name='1136'></font>
+   <font color=#447700>!    condensate in BMJ Cu scheme).<a name='1137'></font>
+   <font color=#447700>!    <a name='1138'></font>
+            PCOND=-QW<a name='1139'>
+            DUM1=TK+XLV1*PCOND                 <font color=#447700>! Updated (dummy) temperature (deg K)<a name='1140'></font>
+            DUM2=WV+QW                         <font color=#447700>! Updated (dummy) water vapor mixing ratio<a name='1141'></font>
+            DUM=1000.*FPVS(DUM1)               <font color=#447700>! Updated (dummy) saturation vapor pressure w/r/t ice<a name='1142'></font>
+            DUM=RHgrd*EPS*DUM/(PP-DUM)         <font color=#447700>! Updated (dummy) saturation mixing ratio w/r/t ice<a name='1143'></font>
+            IF (DUM2 .GT. DUM) PIDEP=DEPOSIT (PP, RHgrd, DUM1, DUM2)<a name='1144'>
+            DWVi=0.    <font color=#447700>! Used only for debugging<a name='1145'></font>
+   <font color=#447700>!<a name='1146'></font>
+          ELSE IF (TC .LT. 0.) THEN<a name='1147'>
+   <font color=#447700>!<a name='1148'></font>
+   <font color=#447700>!--- These quantities are handy for ice deposition/sublimation<a name='1149'></font>
+   <font color=#447700>!    PIDEP_max - max deposition or minimum sublimation to ice saturation<a name='1150'></font>
+   <font color=#447700>!<a name='1151'></font>
+            DENOMI=1.+XLS2*QSI*TK2<a name='1152'>
+            DWVi=MIN(WVQW,QSW)-QSI<a name='1153'>
+            PIDEP_max=MAX(PILOSS, DWVi/DENOMI)<a name='1154'>
+            IF (QTICE .GT. 0.) THEN<a name='1155'>
+      <font color=#447700>!<a name='1156'></font>
+      <font color=#447700>!--- Calculate ice deposition/sublimation<a name='1157'></font>
+      <font color=#447700>!      * SFACTOR - [VEL_INC**.5]*[Schmidt**(1./3.)]*[(RHO/DYNVIS)**.5],<a name='1158'></font>
+      <font color=#447700>!        where Schmidt (Schmidt Number) =DYNVIS/(RHO*DIFFUS)<a name='1159'></font>
+      <font color=#447700>!      * Units: SFACTOR - s**.5/m ;  ABI - m**2/s ;  NLICE - m**-3 ;<a name='1160'></font>
+      <font color=#447700>!               VENTIL, VENTIS - m**-2 ;  VENTI1 - m ;  <a name='1161'></font>
+      <font color=#447700>!               VENTI2 - m**2/s**.5 ; DIDEP - unitless<a name='1162'></font>
+      <font color=#447700>!<a name='1163'></font>
+              SFACTOR=VEL_INC**.5*(RHO/(DIFFUS*DIFFUS*DYNVIS))**C2<a name='1164'>
+              ABI=1./(RHO*XLS3*QSI*TK2/THERM_COND+1./DIFFUS)<a name='1165'>
+      <font color=#447700>!<a name='1166'></font>
+      <font color=#447700>!--- VENTIL - Number concentration * ventilation factors for large ice<a name='1167'></font>
+      <font color=#447700>!--- VENTIS - Number concentration * ventilation factors for small ice<a name='1168'></font>
+      <font color=#447700>!<a name='1169'></font>
+      <font color=#447700>!--- Variation in the number concentration of ice with time is not<a name='1170'></font>
+      <font color=#447700>!      accounted for in these calculations (could be in the future).<a name='1171'></font>
+      <font color=#447700>!<a name='1172'></font>
+              VENTIL=(VENTI1(INDEXS)+SFACTOR*VENTI2(INDEXS))*NLICE<a name='1173'>
+              VENTIS=(VENTI1(MDImin)+SFACTOR*VENTI2(MDImin))*NSmICE<a name='1174'>
+              DIDEP=ABI*(VENTIL+VENTIS)*DTPH<a name='1175'>
+      <font color=#447700>!<a name='1176'></font>
+      <font color=#447700>!--- Account for change in water vapor supply w/ time<a name='1177'></font>
+      <font color=#447700>!<a name='1178'></font>
+              IF (DIDEP .GE. Xratio)then<a name='1179'>
+                DIDEP=(1.-EXP(-DIDEP*DENOMI))/DENOMI<a name='1180'>
+              endif<a name='1181'>
+              IF (DWVi .GT. 0.) THEN<a name='1182'>
+                PIDEP=MIN(DWVi*DIDEP, PIDEP_max)<a name='1183'>
+              ELSE IF (DWVi .LT. 0.) THEN<a name='1184'>
+                PIDEP=MAX(DWVi*DIDEP, PIDEP_max)<a name='1185'>
+              ENDIF<a name='1186'>
+      <font color=#447700>!<a name='1187'></font>
+            ELSE IF (WVQW.GT.QSI .AND. TC.LE.T_ICE_init) THEN<a name='1188'>
+      <font color=#447700>!<a name='1189'></font>
+      <font color=#447700>!--- Ice nucleation in near water-saturated conditions.  Ice crystal<a name='1190'></font>
+      <font color=#447700>!    growth during time step calculated using Miller &amp; Young (1979, JAS).<a name='1191'></font>
+      <font color=#447700>!--- These deposition rates could drive conditions below water saturation,<a name='1192'></font>
+      <font color=#447700>!    which is the basis of these calculations.  Intended to approximate<a name='1193'></font>
+      <font color=#447700>!    more complex &amp; computationally intensive calculations.<a name='1194'></font>
+      <font color=#447700>!<a name='1195'></font>
+              INDEX_MY=MAX(MY_T1, MIN( INT(.5-TC), MY_T2 ) )<a name='1196'>
+      <font color=#447700>!<a name='1197'></font>
+      <font color=#447700>!--- DUM1 is the supersaturation w/r/t ice at water-saturated conditions<a name='1198'></font>
+      <font color=#447700>!<a name='1199'></font>
+      <font color=#447700>!--- DUM2 is the number of ice crystals nucleated at water-saturated <a name='1200'></font>
+      <font color=#447700>!    conditions based on Meyers et al. (JAM, 1992).<a name='1201'></font>
+      <font color=#447700>!<a name='1202'></font>
+      <font color=#447700>!--- Prevent unrealistically large ice initiation (limited by PIDEP_max)<a name='1203'></font>
+      <font color=#447700>!      if DUM2 values are increased in future experiments<a name='1204'></font>
+      <font color=#447700>!<a name='1205'></font>
+              DUM1=QSW/QSI-1.      <a name='1206'>
+              DUM2=1.E3*EXP(12.96*DUM1-.639)<a name='1207'>
+              PIDEP=MIN(PIDEP_max, DUM2*MY_GROWTH(INDEX_MY)*RRHO)<a name='1208'>
+      <font color=#447700>!<a name='1209'></font>
+            ENDIF       <font color=#447700>! End IF (QTICE .GT. 0.)<a name='1210'></font>
+   <font color=#447700>!<a name='1211'></font>
+          ENDIF         <font color=#447700>! End IF (TC.LT.T_ICE .AND. (WV.GT.QSIgrd .OR. QW.GT.CLIMIT))<a name='1212'></font>
+<font color=#447700>!<a name='1213'></font>
+<font color=#447700>!------------------------------------------------------------------------<a name='1214'></font>
+<font color=#447700>!<a name='1215'></font>
+20      CONTINUE     <font color=#447700>! Jump here if conditions for ice are not present<a name='1216'></font>
+<a name='1217'>
+<a name='1218'>
+<font color=#447700>!<a name='1219'></font>
+<font color=#447700>!------------------------------------------------------------------------<a name='1220'></font>
+<font color=#447700>!<a name='1221'></font>
+<font color=#447700>!--- Cloud water condensation<a name='1222'></font>
+<font color=#447700>!<a name='1223'></font>
+          IF (TC.GE.T_ICE .AND. (QW.GT.CLIMIT .OR. WV.GT.QSWgrd)) THEN<a name='1224'>
+            IF (PIACWI.EQ.0. .AND. PIDEP.EQ.0.) THEN<a name='1225'>
+              PCOND=CONDENSE (PP, QW, RHgrd, TK, WV)<a name='1226'>
+            ELSE<a name='1227'>
+   <font color=#447700>!<a name='1228'></font>
+   <font color=#447700>!--- Modify cloud condensation in response to ice processes<a name='1229'></font>
+   <font color=#447700>!<a name='1230'></font>
+              DUM=XLV*QSWgrd*RCPRV*TK2<a name='1231'>
+              DENOMWI=1.+XLS*DUM<a name='1232'>
+              DENOMF=XLF*DUM<a name='1233'>
+              DUM=MAX(0., PIDEP)<a name='1234'>
+              PCOND=(WV-QSWgrd-DENOMWI*DUM-DENOMF*PIACWI)/DENOMW<a name='1235'>
+              DUM1=-QW<a name='1236'>
+              DUM2=PCOND-PIACW<a name='1237'>
+              IF (DUM2 .LT. DUM1) THEN<a name='1238'>
+      <font color=#447700>!<a name='1239'></font>
+      <font color=#447700>!--- Limit cloud water sinks<a name='1240'></font>
+      <font color=#447700>!<a name='1241'></font>
+                DUM=DUM1/DUM2<a name='1242'>
+                PCOND=DUM*PCOND<a name='1243'>
+                PIACW=DUM*PIACW<a name='1244'>
+                PIACWI=DUM*PIACWI<a name='1245'>
+              ENDIF        <font color=#447700>! End IF (DUM2 .LT. DUM1)<a name='1246'></font>
+            ENDIF          <font color=#447700>! End IF (PIACWI.EQ.0. .AND. PIDEP.EQ.0.)<a name='1247'></font>
+          ENDIF            <font color=#447700>! End IF (TC.GE.T_ICE .AND. (QW.GT.CLIMIT .OR. WV.GT.QSWgrd))<a name='1248'></font>
+<font color=#447700>!<a name='1249'></font>
+<font color=#447700>!--- Limit freezing of accreted rime to prevent temperature oscillations,<a name='1250'></font>
+<font color=#447700>!    a crude Schumann-Ludlam limit (p. 209 of Young, 1993). <a name='1251'></font>
+<font color=#447700>!<a name='1252'></font>
+          TCC=TC+XLV1*PCOND+XLS1*PIDEP+XLF1*PIACWI<a name='1253'>
+          IF (TCC .GT. 0.) THEN<a name='1254'>
+            PIACWI=0.<a name='1255'>
+            TCC=TC+XLV1*PCOND+XLS1*PIDEP<a name='1256'>
+          ENDIF<a name='1257'>
+          IF (TC.GT.0. .AND. TCC.GT.0. .AND. ICE_logical) THEN<a name='1258'>
+   <font color=#447700>!<a name='1259'></font>
+   <font color=#447700>!--- Calculate melting and evaporation/condensation<a name='1260'></font>
+   <font color=#447700>!      * Units: SFACTOR - s**.5/m ;  ABI - m**2/s ;  NLICE - m**-3 ;<a name='1261'></font>
+   <font color=#447700>!               VENTIL - m**-2 ;  VENTI1 - m ;  <a name='1262'></font>
+   <font color=#447700>!               VENTI2 - m**2/s**.5 ; CIEVP - /s<a name='1263'></font>
+   <font color=#447700>!<a name='1264'></font>
+            SFACTOR=VEL_INC**.5*(RHO/(DIFFUS*DIFFUS*DYNVIS))**C2<a name='1265'>
+            VENTIL=NLICE*(VENTI1(INDEXS)+SFACTOR*VENTI2(INDEXS))<a name='1266'>
+            AIEVP=VENTIL*DIFFUS*DTPH<a name='1267'>
+            IF (AIEVP .LT. Xratio) THEN<a name='1268'>
+              DIEVP=AIEVP<a name='1269'>
+            ELSE<a name='1270'>
+              DIEVP=1.-EXP(-AIEVP)<a name='1271'>
+            ENDIF<a name='1272'>
+            QSW0=EPS*ESW0/(PP-ESW0)<a name='1273'>
+            DWV0=MIN(WV,QSW)-QSW0<a name='1274'>
+            DUM=QW+PCOND<a name='1275'>
+            IF (WV.LT.QSW .AND. DUM.LE.CLIMIT) THEN<a name='1276'>
+   <font color=#447700>!<a name='1277'></font>
+   <font color=#447700>!--- Evaporation from melting snow (sink of snow) or shedding<a name='1278'></font>
+   <font color=#447700>!    of water condensed onto melting snow (source of rain)<a name='1279'></font>
+   <font color=#447700>!<a name='1280'></font>
+              DUM=DWV0*DIEVP<a name='1281'>
+              PIEVP=MAX( MIN(0., DUM), PILOSS)<a name='1282'>
+              PICND=MAX(0., DUM)<a name='1283'>
+            ENDIF            <font color=#447700>! End IF (WV.LT.QSW .AND. DUM.LE.CLIMIT)<a name='1284'></font>
+            PIMLT=THERM_COND*TCC*VENTIL*RRHO*DTPH/XLF<a name='1285'>
+   <font color=#447700>!<a name='1286'></font>
+   <font color=#447700>!--- Limit melting to prevent temperature oscillations across 0C<a name='1287'></font>
+   <font color=#447700>!<a name='1288'></font>
+            DUM1=MAX( 0., (TCC+XLV1*PIEVP)/XLF1 )<a name='1289'>
+            PIMLT=MIN(PIMLT, DUM1)<a name='1290'>
+   <font color=#447700>!<a name='1291'></font>
+   <font color=#447700>!--- Limit loss of snow by melting (&gt;0) and evaporation<a name='1292'></font>
+   <font color=#447700>!<a name='1293'></font>
+            DUM=PIEVP-PIMLT<a name='1294'>
+            IF (DUM .LT. PILOSS) THEN<a name='1295'>
+              DUM1=PILOSS/DUM<a name='1296'>
+              PIMLT=PIMLT*DUM1<a name='1297'>
+              PIEVP=PIEVP*DUM1<a name='1298'>
+            ENDIF           <font color=#447700>! End IF (DUM .GT. QTICE)<a name='1299'></font>
+          ENDIF             <font color=#447700>! End IF (TC.GT.0. .AND. TCC.GT.0. .AND. ICE_logical) <a name='1300'></font>
+<font color=#447700>!<a name='1301'></font>
+<font color=#447700>!--- IMPORTANT:  Estimate time-averaged properties.<a name='1302'></font>
+<font color=#447700>!<a name='1303'></font>
+<font color=#447700>!  * TOT_RAIN - total mass of rain before microphysics, which is the sum of<a name='1304'></font>
+<font color=#447700>!               the total mass of rain in the current layer and the input <a name='1305'></font>
+<font color=#447700>!               flux of rain from above<a name='1306'></font>
+<font color=#447700>!  * VRAIN1   - fall speed of rain into grid from above (with air resistance correction)<a name='1307'></font>
+<font color=#447700>!  * QTRAIN   - time-averaged mixing ratio of rain (kg/kg)<a name='1308'></font>
+<font color=#447700>!  * PRLOSS   - greatest loss (&lt;0) of rain, removing all rain falling from<a name='1309'></font>
+<font color=#447700>!               above and the rain within the layer<a name='1310'></font>
+<font color=#447700>!  * RQR      - rain content (kg/m**3)<a name='1311'></font>
+<font color=#447700>!  * INDEXR   - mean size of rain drops to the nearest 1 micron in size<a name='1312'></font>
+<font color=#447700>!  * N0r      - intercept of rain size distribution (typically 10**6 m**-4)<a name='1313'></font>
+<font color=#447700>!<a name='1314'></font>
+          TOT_RAIN=0.<a name='1315'>
+          VRAIN1=0.<a name='1316'>
+          QTRAIN=0.<a name='1317'>
+          PRLOSS=0.<a name='1318'>
+          RQR=0.<a name='1319'>
+          N0r=0.<a name='1320'>
+          INDEXR1=INDEXR    <font color=#447700>! For debugging only<a name='1321'></font>
+          INDEXR=MDRmin<a name='1322'>
+          IF (RAIN_logical) THEN<a name='1323'>
+            IF (ARAIN .LE. 0.) THEN<a name='1324'>
+              INDEXR=MDRmin<a name='1325'>
+              VRAIN1=0.<a name='1326'>
+            ELSE<a name='1327'>
+   <font color=#447700>!<a name='1328'></font>
+   <font color=#447700>!--- INDEXR (related to mean diameter) &amp; N0r could be modified <a name='1329'></font>
+   <font color=#447700>!      by land/sea properties, presence of convection, etc.<a name='1330'></font>
+   <font color=#447700>!<a name='1331'></font>
+   <font color=#447700>!--- Rain rate normalized to a density of 1.194 kg/m**3<a name='1332'></font>
+   <font color=#447700>!<a name='1333'></font>
+              RR=ARAIN/(DTPH*GAMMAR)<a name='1334'>
+   <font color=#447700>!<a name='1335'></font>
+              IF (RR .LE. RR_DRmin) THEN<a name='1336'>
+        <font color=#447700>!<a name='1337'></font>
+        <font color=#447700>!--- Assume fixed mean diameter of rain (0.2 mm) for low rain rates, <a name='1338'></font>
+        <font color=#447700>!      instead vary N0r with rain rate<a name='1339'></font>
+        <font color=#447700>!<a name='1340'></font>
+                INDEXR=MDRmin<a name='1341'>
+              ELSE IF (RR .LE. RR_DR1) THEN<a name='1342'>
+        <font color=#447700>!<a name='1343'></font>
+        <font color=#447700>!--- Best fit to mass-weighted fall speeds (V) from rain lookup tables <a name='1344'></font>
+        <font color=#447700>!      for mean diameters (Dr) between 0.05 and 0.10 mm:<a name='1345'></font>
+        <font color=#447700>!      V(Dr)=5.6023e4*Dr**1.136, V in m/s and Dr in m<a name='1346'></font>
+        <font color=#447700>!      RR = PI*1000.*N0r0*5.6023e4*Dr**(4+1.136) = 1.408e15*Dr**5.136,<a name='1347'></font>
+        <font color=#447700>!        RR in kg/(m**2*s)<a name='1348'></font>
+        <font color=#447700>!      Dr (m) = 1.123e-3*RR**.1947 -&gt; Dr (microns) = 1.123e3*RR**.1947<a name='1349'></font>
+        <font color=#447700>!<a name='1350'></font>
+                INDEXR=INT( 1.123E3*RR**.1947 + .5 )<a name='1351'>
+                INDEXR=MAX( MDRmin, MIN(INDEXR, MDR1) )<a name='1352'>
+              ELSE IF (RR .LE. RR_DR2) THEN<a name='1353'>
+        <font color=#447700>!<a name='1354'></font>
+        <font color=#447700>!--- Best fit to mass-weighted fall speeds (V) from rain lookup tables <a name='1355'></font>
+        <font color=#447700>!      for mean diameters (Dr) between 0.10 and 0.20 mm:<a name='1356'></font>
+        <font color=#447700>!      V(Dr)=1.0867e4*Dr**.958, V in m/s and Dr in m<a name='1357'></font>
+        <font color=#447700>!      RR = PI*1000.*N0r0*1.0867e4*Dr**(4+.958) = 2.731e14*Dr**4.958,<a name='1358'></font>
+        <font color=#447700>!        RR in kg/(m**2*s)<a name='1359'></font>
+        <font color=#447700>!      Dr (m) = 1.225e-3*RR**.2017 -&gt; Dr (microns) = 1.225e3*RR**.2017<a name='1360'></font>
+        <font color=#447700>!<a name='1361'></font>
+                INDEXR=INT( 1.225E3*RR**.2017 + .5 )<a name='1362'>
+                INDEXR=MAX( MDR1, MIN(INDEXR, MDR2) )<a name='1363'>
+              ELSE IF (RR .LE. RR_DR3) THEN<a name='1364'>
+        <font color=#447700>!<a name='1365'></font>
+        <font color=#447700>!--- Best fit to mass-weighted fall speeds (V) from rain lookup tables <a name='1366'></font>
+        <font color=#447700>!      for mean diameters (Dr) between 0.20 and 0.32 mm:<a name='1367'></font>
+        <font color=#447700>!      V(Dr)=2831.*Dr**.80, V in m/s and Dr in m<a name='1368'></font>
+        <font color=#447700>!      RR = PI*1000.*N0r0*2831.*Dr**(4+.80) = 7.115e13*Dr**4.80, <a name='1369'></font>
+        <font color=#447700>!        RR in kg/(m**2*s)<a name='1370'></font>
+        <font color=#447700>!      Dr (m) = 1.3006e-3*RR**.2083 -&gt; Dr (microns) = 1.3006e3*RR**.2083<a name='1371'></font>
+        <font color=#447700>!<a name='1372'></font>
+                INDEXR=INT( 1.3006E3*RR**.2083 + .5 )<a name='1373'>
+                INDEXR=MAX( MDR2, MIN(INDEXR, MDR3) )<a name='1374'>
+              ELSE IF (RR .LE. RR_DRmax) THEN<a name='1375'>
+        <font color=#447700>!<a name='1376'></font>
+        <font color=#447700>!--- Best fit to mass-weighted fall speeds (V) from rain lookup tables <a name='1377'></font>
+        <font color=#447700>!      for mean diameters (Dr) between 0.32 and 0.45 mm:<a name='1378'></font>
+        <font color=#447700>!      V(Dr)=944.8*Dr**.6636, V in m/s and Dr in m<a name='1379'></font>
+        <font color=#447700>!      RR = PI*1000.*N0r0*944.8*Dr**(4+.6636) = 2.3745e13*Dr**4.6636,<a name='1380'></font>
+        <font color=#447700>!        RR in kg/(m**2*s)<a name='1381'></font>
+        <font color=#447700>!      Dr (m) = 1.355e-3*RR**.2144 -&gt; Dr (microns) = 1.355e3*RR**.2144<a name='1382'></font>
+        <font color=#447700>!<a name='1383'></font>
+                INDEXR=INT( 1.355E3*RR**.2144 + .5 )<a name='1384'>
+                INDEXR=MAX( MDR3, MIN(INDEXR, MDRmax) )<a name='1385'>
+              ELSE <a name='1386'>
+        <font color=#447700>!<a name='1387'></font>
+        <font color=#447700>!--- Assume fixed mean diameter of rain (0.45 mm) for high rain rates, <a name='1388'></font>
+        <font color=#447700>!      instead vary N0r with rain rate<a name='1389'></font>
+        <font color=#447700>!<a name='1390'></font>
+                INDEXR=MDRmax<a name='1391'>
+              ENDIF              <font color=#447700>! End IF (RR .LE. RR_DRmin) etc. <a name='1392'></font>
+              VRAIN1=GAMMAR*VRAIN(INDEXR)<a name='1393'>
+            ENDIF              <font color=#447700>! End IF (ARAIN .LE. 0.)<a name='1394'></font>
+            INDEXR1=INDEXR     <font color=#447700>! For debugging only<a name='1395'></font>
+            TOT_RAIN=THICK*QR+BLEND*ARAIN<a name='1396'>
+            QTRAIN=TOT_RAIN/(THICK+BLDTRH*VRAIN1)<a name='1397'>
+            PRLOSS=-TOT_RAIN/THICK<a name='1398'>
+            RQR=RHO*QTRAIN<a name='1399'>
+   <font color=#447700>!<a name='1400'></font>
+   <font color=#447700>!--- RQR - time-averaged rain content (kg/m**3)<a name='1401'></font>
+   <font color=#447700>!<a name='1402'></font>
+            IF (RQR .LE. RQR_DRmin) THEN<a name='1403'>
+              N0r=MAX(N0rmin, CN0r_DMRmin*RQR)<a name='1404'>
+              INDEXR=MDRmin<a name='1405'>
+            ELSE IF (RQR .GE. RQR_DRmax) THEN<a name='1406'>
+              N0r=CN0r_DMRmax*RQR<a name='1407'>
+              INDEXR=MDRmax<a name='1408'>
+            ELSE<a name='1409'>
+              N0r=N0r0<a name='1410'>
+              INDEXR=MAX( XMRmin, MIN(CN0r0*RQR**.25, XMRmax) )<a name='1411'>
+            ENDIF<a name='1412'>
+   <font color=#447700>!<a name='1413'></font>
+            IF (TC .LT. T_ICE) THEN<a name='1414'>
+              PIACR=-PRLOSS<a name='1415'>
+            ELSE<a name='1416'>
+              DWVr=WV-PCOND-QSW<a name='1417'>
+              DUM=QW+PCOND<a name='1418'>
+              IF (DWVr.LT.0. .AND. DUM.LE.CLIMIT) THEN<a name='1419'>
+      <font color=#447700>!<a name='1420'></font>
+      <font color=#447700>!--- Rain evaporation<a name='1421'></font>
+      <font color=#447700>!<a name='1422'></font>
+      <font color=#447700>!    * RFACTOR - [GAMMAR**.5]*[Schmidt**(1./3.)]*[(RHO/DYNVIS)**.5],<a name='1423'></font>
+      <font color=#447700>!        where Schmidt (Schmidt Number) =DYNVIS/(RHO*DIFFUS)<a name='1424'></font>
+      <font color=#447700>!<a name='1425'></font>
+      <font color=#447700>!    * Units: RFACTOR - s**.5/m ;  ABW - m**2/s ;  VENTR - m**-2 ;  <a name='1426'></font>
+      <font color=#447700>!             N0r - m**-4 ;  VENTR1 - m**2 ;  VENTR2 - m**3/s**.5 ;<a name='1427'></font>
+      <font color=#447700>!             CREVP - unitless<a name='1428'></font>
+      <font color=#447700>!<a name='1429'></font>
+                RFACTOR=GAMMAR**.5*(RHO/(DIFFUS*DIFFUS*DYNVIS))**C2<a name='1430'>
+                ABW=1./(RHO*XLV2/THERM_COND+1./DIFFUS)<a name='1431'>
+      <font color=#447700>!<a name='1432'></font>
+      <font color=#447700>!--- Note that VENTR1, VENTR2 lookup tables do not include the <a name='1433'></font>
+      <font color=#447700>!      1/Davg multiplier as in the ice tables<a name='1434'></font>
+      <font color=#447700>!<a name='1435'></font>
+                VENTR=N0r*(VENTR1(INDEXR)+RFACTOR*VENTR2(INDEXR))<a name='1436'>
+                CREVP=ABW*VENTR*DTPH<a name='1437'>
+                IF (CREVP .LT. Xratio) THEN<a name='1438'>
+                  DUM=DWVr*CREVP<a name='1439'>
+                ELSE<a name='1440'>
+                  DUM=DWVr*(1.-EXP(-CREVP*DENOMW))/DENOMW<a name='1441'>
+                ENDIF<a name='1442'>
+                PREVP=MAX(DUM, PRLOSS)<a name='1443'>
+              ELSE IF (QW .GT. CLIMIT) THEN<a name='1444'>
+                FWR=CRACW*GAMMAR*N0r*ACCRR(INDEXR)<a name='1445'>
+                PRACW=MIN(1.,FWR)*QW<a name='1446'>
+              ENDIF           <font color=#447700>! End IF (DWVr.LT.0. .AND. DUM.LE.CLIMIT)<a name='1447'></font>
+      <font color=#447700>!<a name='1448'></font>
+              IF (TC.LT.0. .AND. TCC.LT.0.) THEN<a name='1449'>
+         <font color=#447700>!<a name='1450'></font>
+         <font color=#447700>!--- Biggs (1953) heteorogeneous freezing (e.g., Lin et al., 1983)<a name='1451'></font>
+         <font color=#447700>!<a name='1452'></font>
+                PIACR=CBFR*N0r*RRHO*(EXP(ABFR*TC)-1.)*(FLOAT(INDEXR))**7<a name='1453'>
+                IF (QLICE .GT. CLIMIT) THEN<a name='1454'>
+            <font color=#447700>!<a name='1455'></font>
+            <font color=#447700>!--- Freezing of rain by collisions w/ large ice<a name='1456'></font>
+            <font color=#447700>!<a name='1457'></font>
+                  DUM=GAMMAR*VRAIN(INDEXR)<a name='1458'>
+                  DUM1=DUM-VSNOW<a name='1459'>
+            <font color=#447700>!<a name='1460'></font>
+            <font color=#447700>!--- DUM2 - Difference in spectral fall speeds of rain and<a name='1461'></font>
+            <font color=#447700>!      large ice, parameterized following eq. (48) on p. 112 of <a name='1462'></font>
+            <font color=#447700>!      Murakami (J. Meteor. Soc. Japan, 1990)<a name='1463'></font>
+            <font color=#447700>!<a name='1464'></font>
+                  DUM2=(DUM1*DUM1+.04*DUM*VSNOW)**.5<a name='1465'>
+                  DUM1=5.E-12*INDEXR*INDEXR+2.E-12*INDEXR*INDEXS        &amp;<a name='1466'>
+     &amp;                 +.5E-12*INDEXS*INDEXS<a name='1467'>
+                  FIR=MIN(1., CIACR*NLICE*DUM1*DUM2)<a name='1468'>
+            <font color=#447700>!<a name='1469'></font>
+            <font color=#447700>!--- Future?  Should COLLECTION BY SMALL ICE SHOULD BE INCLUDED???<a name='1470'></font>
+            <font color=#447700>!<a name='1471'></font>
+                  PIACR=MIN(PIACR+FIR*QTRAIN, QTRAIN)<a name='1472'>
+                ENDIF        <font color=#447700>! End IF (QLICE .GT. CLIMIT)<a name='1473'></font>
+                DUM=PREVP-PIACR<a name='1474'>
+                If (DUM .LT. PRLOSS) THEN<a name='1475'>
+                  DUM1=PRLOSS/DUM<a name='1476'>
+                  PREVP=DUM1*PREVP<a name='1477'>
+                  PIACR=DUM1*PIACR<a name='1478'>
+                ENDIF        <font color=#447700>! End If (DUM .LT. PRLOSS)<a name='1479'></font>
+              ENDIF          <font color=#447700>! End IF (TC.LT.0. .AND. TCC.LT.0.)<a name='1480'></font>
+            ENDIF            <font color=#447700>! End IF (TC .LT. T_ICE)<a name='1481'></font>
+          ENDIF              <font color=#447700>! End IF (RAIN_logical) <a name='1482'></font>
+<font color=#447700>!<a name='1483'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1484'></font>
+<font color=#447700>!---------------------- Main Budget Equations -------------------------<a name='1485'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1486'></font>
+<font color=#447700>!<a name='1487'></font>
+<font color=#447700>!<a name='1488'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1489'></font>
+<font color=#447700>!--- Update fields, determine characteristics for next lower layer ----<a name='1490'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1491'></font>
+<font color=#447700>!<a name='1492'></font>
+<font color=#447700>!--- Carefully limit sinks of cloud water<a name='1493'></font>
+<font color=#447700>!<a name='1494'></font>
+          DUM1=PIACW+PRAUT+PRACW-MIN(0.,PCOND)<a name='1495'>
+          IF (DUM1 .GT. QW) THEN<a name='1496'>
+            DUM=QW/DUM1<a name='1497'>
+            PIACW=DUM*PIACW<a name='1498'>
+            PIACWI=DUM*PIACWI<a name='1499'>
+            PRAUT=DUM*PRAUT<a name='1500'>
+            PRACW=DUM*PRACW<a name='1501'>
+            IF (PCOND .LT. 0.) PCOND=DUM*PCOND<a name='1502'>
+          ENDIF<a name='1503'>
+          PIACWR=PIACW-PIACWI          <font color=#447700>! TC &gt;= 0C<a name='1504'></font>
+<font color=#447700>!<a name='1505'></font>
+<font color=#447700>!--- QWnew - updated cloud water mixing ratio<a name='1506'></font>
+<font color=#447700>!<a name='1507'></font>
+          DELW=PCOND-PIACW-PRAUT-PRACW<a name='1508'>
+          QWnew=QW+DELW<a name='1509'>
+          IF (QWnew .LE. CLIMIT) QWnew=0.<a name='1510'>
+          IF (QW.GT.0. .AND. QWnew.NE.0.) THEN<a name='1511'>
+            DUM=QWnew/QW<a name='1512'>
+            IF (DUM .LT. TOLER) QWnew=0.<a name='1513'>
+          ENDIF<a name='1514'>
+<font color=#447700>!<a name='1515'></font>
+<font color=#447700>!--- Update temperature and water vapor mixing ratios<a name='1516'></font>
+<font color=#447700>!<a name='1517'></font>
+          DELT= XLV1*(PCOND+PIEVP+PICND+PREVP)                          &amp;<a name='1518'>
+     &amp;         +XLS1*PIDEP+XLF1*(PIACWI+PIACR-PIMLT)<a name='1519'>
+          Tnew=TK+DELT<a name='1520'>
+<font color=#447700>!<a name='1521'></font>
+          DELV=-PCOND-PIDEP-PIEVP-PICND-PREVP<a name='1522'>
+          WVnew=WV+DELV<a name='1523'>
+<font color=#447700>!<a name='1524'></font>
+<font color=#447700>!--- Update ice mixing ratios<a name='1525'></font>
+<font color=#447700>!<a name='1526'></font>
+<font color=#447700>!---<a name='1527'></font>
+<font color=#447700>!  * TOT_ICEnew - total mass (small &amp; large) ice after microphysics,<a name='1528'></font>
+<font color=#447700>!                 which is the sum of the total mass of large ice in the <a name='1529'></font>
+<font color=#447700>!                 current layer and the flux of ice out of the grid box below<a name='1530'></font>
+<font color=#447700>!  * RimeF      - Rime Factor, which is the mass ratio of total (unrimed &amp; <a name='1531'></font>
+<font color=#447700>!                 rimed) ice mass to the unrimed ice mass (&gt;=1)<a name='1532'></font>
+<font color=#447700>!  * QInew      - updated mixing ratio of total (large &amp; small) ice in layer<a name='1533'></font>
+<font color=#447700>!      -&gt; TOT_ICEnew=QInew*THICK+BLDTRH*QLICEnew*VSNOW<a name='1534'></font>
+<font color=#447700>!        -&gt; But QLICEnew=QInew*FLIMASS, so<a name='1535'></font>
+<font color=#447700>!      -&gt; TOT_ICEnew=QInew*(THICK+BLDTRH*FLIMASS*VSNOW)<a name='1536'></font>
+<font color=#447700>!  * ASNOWnew   - updated accumulation of snow at bottom of grid cell<a name='1537'></font>
+<font color=#447700>!---<a name='1538'></font>
+<font color=#447700>!<a name='1539'></font>
+          DELI=0.<a name='1540'>
+          RimeF=1.<a name='1541'>
+          IF (ICE_logical) THEN<a name='1542'>
+            DELI=PIDEP+PIEVP+PIACWI+PIACR-PIMLT<a name='1543'>
+            TOT_ICEnew=TOT_ICE+THICK*DELI<a name='1544'>
+            IF (TOT_ICE.GT.0. .AND. TOT_ICEnew.NE.0.) THEN<a name='1545'>
+              DUM=TOT_ICEnew/TOT_ICE<a name='1546'>
+              IF (DUM .LT. TOLER) TOT_ICEnew=0.<a name='1547'>
+            ENDIF<a name='1548'>
+            IF (TOT_ICEnew .LE. CLIMIT) THEN<a name='1549'>
+              TOT_ICEnew=0.<a name='1550'>
+              RimeF=1.<a name='1551'>
+              QInew=0.<a name='1552'>
+              ASNOWnew=0.<a name='1553'>
+            ELSE<a name='1554'>
+      <font color=#447700>!<a name='1555'></font>
+      <font color=#447700>!--- Update rime factor if appropriate<a name='1556'></font>
+      <font color=#447700>!<a name='1557'></font>
+              DUM=PIACWI+PIACR<a name='1558'>
+              IF (DUM.LE.CLIMIT .AND. PIDEP.LE.CLIMIT) THEN<a name='1559'>
+                RimeF=RimeF1<a name='1560'>
+              ELSE<a name='1561'>
+         <font color=#447700>!<a name='1562'></font>
+         <font color=#447700>!--- Rime Factor, RimeF = (Total ice mass)/(Total unrimed ice mass)<a name='1563'></font>
+         <font color=#447700>!      DUM1 - Total ice mass, rimed &amp; unrimed<a name='1564'></font>
+         <font color=#447700>!      DUM2 - Estimated mass of *unrimed* ice<a name='1565'></font>
+         <font color=#447700>!<a name='1566'></font>
+                DUM1=TOT_ICE+THICK*(PIDEP+DUM)<a name='1567'>
+                DUM2=TOT_ICE/RimeF1+THICK*PIDEP<a name='1568'>
+                IF (DUM2 .LE. 0.) THEN<a name='1569'>
+                  RimeF=RFmax<a name='1570'>
+                ELSE<a name='1571'>
+                  RimeF=MIN(RFmax, MAX(1., DUM1/DUM2) )<a name='1572'>
+                ENDIF<a name='1573'>
+              ENDIF       <font color=#447700>! End IF (DUM.LE.CLIMIT .AND. PIDEP.LE.CLIMIT)<a name='1574'></font>
+              QInew=TOT_ICEnew/(THICK+BLDTRH*FLIMASS*VSNOW)<a name='1575'>
+              IF (QInew .LE. CLIMIT) QInew=0.<a name='1576'>
+              IF (QI.GT.0. .AND. QInew.NE.0.) THEN<a name='1577'>
+                DUM=QInew/QI<a name='1578'>
+                IF (DUM .LT. TOLER) QInew=0.<a name='1579'>
+              ENDIF<a name='1580'>
+              ASNOWnew=BLDTRH*FLIMASS*VSNOW*QInew<a name='1581'>
+              IF (ASNOW.GT.0. .AND. ASNOWnew.NE.0.) THEN<a name='1582'>
+                DUM=ASNOWnew/ASNOW<a name='1583'>
+                IF (DUM .LT. TOLER) ASNOWnew=0.<a name='1584'>
+              ENDIF<a name='1585'>
+            ENDIF         <font color=#447700>! End IF (TOT_ICEnew .LE. CLIMIT)<a name='1586'></font>
+          ENDIF           <font color=#447700>! End IF (ICE_logical)<a name='1587'></font>
+<a name='1588'>
+<a name='1589'>
+<font color=#447700>!<a name='1590'></font>
+<font color=#447700>!--- Update rain mixing ratios<a name='1591'></font>
+<font color=#447700>!<a name='1592'></font>
+<font color=#447700>!---<a name='1593'></font>
+<font color=#447700>! * TOT_RAINnew - total mass of rain after microphysics<a name='1594'></font>
+<font color=#447700>!                 current layer and the input flux of ice from above<a name='1595'></font>
+<font color=#447700>! * VRAIN2      - time-averaged fall speed of rain in grid and below <a name='1596'></font>
+<font color=#447700>!                 (with air resistance correction)<a name='1597'></font>
+<font color=#447700>! * QRnew       - updated rain mixing ratio in layer<a name='1598'></font>
+<font color=#447700>!      -&gt; TOT_RAINnew=QRnew*(THICK+BLDTRH*VRAIN2)<a name='1599'></font>
+<font color=#447700>!  * ARAINnew  - updated accumulation of rain at bottom of grid cell<a name='1600'></font>
+<font color=#447700>!---<a name='1601'></font>
+<font color=#447700>!<a name='1602'></font>
+          DELR=PRAUT+PRACW+PIACWR-PIACR+PIMLT+PREVP+PICND<a name='1603'>
+          TOT_RAINnew=TOT_RAIN+THICK*DELR<a name='1604'>
+          IF (TOT_RAIN.GT.0. .AND. TOT_RAINnew.NE.0.) THEN<a name='1605'>
+            DUM=TOT_RAINnew/TOT_RAIN<a name='1606'>
+            IF (DUM .LT. TOLER) TOT_RAINnew=0.<a name='1607'>
+          ENDIF<a name='1608'>
+          IF (TOT_RAINnew .LE. CLIMIT) THEN<a name='1609'>
+            TOT_RAINnew=0.<a name='1610'>
+            VRAIN2=0.<a name='1611'>
+            QRnew=0.<a name='1612'>
+            ARAINnew=0.<a name='1613'>
+          ELSE<a name='1614'>
+   <font color=#447700>!<a name='1615'></font>
+   <font color=#447700>!--- 1st guess time-averaged rain rate at bottom of grid box<a name='1616'></font>
+   <font color=#447700>!<a name='1617'></font>
+            RR=TOT_RAINnew/(DTPH*GAMMAR)<a name='1618'>
+   <font color=#447700>!<a name='1619'></font>
+   <font color=#447700>!--- Use same algorithm as above for calculating mean drop diameter<a name='1620'></font>
+   <font color=#447700>!      (IDR, in microns), which is used to estimate the time-averaged<a name='1621'></font>
+   <font color=#447700>!      fall speed of rain drops at the bottom of the grid layer.  This<a name='1622'></font>
+   <font color=#447700>!      isn't perfect, but the alternative is solving a transcendental <a name='1623'></font>
+   <font color=#447700>!      equation that is numerically inefficient and nasty to program<a name='1624'></font>
+   <font color=#447700>!      (coded in earlier versions of GSMCOLUMN prior to 8-22-01).<a name='1625'></font>
+   <font color=#447700>!<a name='1626'></font>
+            IF (RR .LE. RR_DRmin) THEN<a name='1627'>
+              IDR=MDRmin<a name='1628'>
+            ELSE IF (RR .LE. RR_DR1) THEN<a name='1629'>
+              IDR=INT( 1.123E3*RR**.1947 + .5 )<a name='1630'>
+              IDR=MAX( MDRmin, MIN(IDR, MDR1) )<a name='1631'>
+            ELSE IF (RR .LE. RR_DR2) THEN<a name='1632'>
+              IDR=INT( 1.225E3*RR**.2017 + .5 )<a name='1633'>
+              IDR=MAX( MDR1, MIN(IDR, MDR2) )<a name='1634'>
+            ELSE IF (RR .LE. RR_DR3) THEN<a name='1635'>
+              IDR=INT( 1.3006E3*RR**.2083 + .5 )<a name='1636'>
+              IDR=MAX( MDR2, MIN(IDR, MDR3) )<a name='1637'>
+            ELSE IF (RR .LE. RR_DRmax) THEN<a name='1638'>
+              IDR=INT( 1.355E3*RR**.2144 + .5 )<a name='1639'>
+              IDR=MAX( MDR3, MIN(IDR, MDRmax) )<a name='1640'>
+            ELSE <a name='1641'>
+              IDR=MDRmax<a name='1642'>
+            ENDIF              <font color=#447700>! End IF (RR .LE. RR_DRmin)<a name='1643'></font>
+            VRAIN2=GAMMAR*VRAIN(IDR)<a name='1644'>
+            QRnew=TOT_RAINnew/(THICK+BLDTRH*VRAIN2)<a name='1645'>
+            IF (QRnew .LE. CLIMIT) QRnew=0.<a name='1646'>
+            IF (QR.GT.0. .AND. QRnew.NE.0.) THEN<a name='1647'>
+              DUM=QRnew/QR<a name='1648'>
+              IF (DUM .LT. TOLER) QRnew=0.<a name='1649'>
+            ENDIF<a name='1650'>
+            ARAINnew=BLDTRH*VRAIN2*QRnew<a name='1651'>
+            IF (ARAIN.GT.0. .AND. ARAINnew.NE.0.) THEN<a name='1652'>
+              DUM=ARAINnew/ARAIN<a name='1653'>
+              IF (DUM .LT. TOLER) ARAINnew=0.<a name='1654'>
+            ENDIF<a name='1655'>
+          ENDIF<a name='1656'>
+<font color=#447700>!<a name='1657'></font>
+          WCnew=QWnew+QRnew+QInew<a name='1658'>
+<font color=#447700>!<a name='1659'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1660'></font>
+<font color=#447700>!-------------- Begin debugging &amp; verification ------------------------<a name='1661'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1662'></font>
+<font color=#447700>!<a name='1663'></font>
+<font color=#447700>!--- QT, QTnew - total water (vapor &amp; condensate) before &amp; after microphysics, resp.<a name='1664'></font>
+<font color=#447700>!<a name='1665'></font>
+<a name='1666'>
+<a name='1667'>
+          QT=THICK*(WV+WC)+ARAIN+ASNOW<a name='1668'>
+          QTnew=THICK*(WVnew+WCnew)+ARAINnew+ASNOWnew<a name='1669'>
+          BUDGET=QT-QTnew<a name='1670'>
+<font color=#447700>!<a name='1671'></font>
+<font color=#447700>!--- Additional check on budget preservation, accounting for truncation effects<a name='1672'></font>
+<font color=#447700>!<a name='1673'></font>
+          DBG_logical=.FALSE.<a name='1674'>
+<font color=#447700>!          DUM=ABS(BUDGET)<a name='1675'></font>
+<font color=#447700>!          IF (DUM .GT. TOLER) THEN<a name='1676'></font>
+<font color=#447700>!            DUM=DUM/MIN(QT, QTnew)<a name='1677'></font>
+<font color=#447700>!            IF (DUM .GT. TOLER) DBG_logical=.TRUE.<a name='1678'></font>
+<font color=#447700>!          ENDIF<a name='1679'></font>
+<font color=#447700>!!<a name='1680'></font>
+<font color=#447700>!          DUM=(RHgrd+.001)*QSInew<a name='1681'></font>
+<font color=#447700>!          IF ( (QWnew.GT.CLIMIT .OR. QRnew.GT.CLIMIT .OR. WVnew.GT.DUM)<a name='1682'></font>
+<font color=#447700>!     &amp;        .AND. TC.LT.T_ICE )  DBG_logical=.TRUE.<a name='1683'></font>
+<font color=#447700>!<a name='1684'></font>
+<font color=#447700>!          IF (TC.GT.5. .AND. QInew.GT.CLIMIT) DBG_logical=.TRUE.<a name='1685'></font>
+<font color=#447700>!<a name='1686'></font>
+          IF ((WVnew.LT.CLIMIT .OR. DBG_logical) .AND. PRINT_diag) THEN<a name='1687'>
+   <font color=#447700>!<a name='1688'></font>
+            WRITE(6,"(/2(a,i4),2(a,i2))") '{} i=',I_index,' j=',J_index,&amp;<a name='1689'>
+     &amp;                                    ' L=',L,' LSFC=',LSFC<a name='1690'>
+   <font color=#447700>!<a name='1691'></font>
+            ESW=1000.*FPVS0(Tnew)<a name='1692'>
+            QSWnew=EPS*ESW/(PP-ESW)<a name='1693'>
+            IF (TC.LT.0. .OR. Tnew .LT. 0.) THEN<a name='1694'>
+              ESI=1000.*FPVS(Tnew)<a name='1695'>
+              QSInew=EPS*ESI/(PP-ESI)<a name='1696'>
+            ELSE<a name='1697'>
+              QSI=QSW<a name='1698'>
+              QSInew=QSWnew<a name='1699'>
+            ENDIF<a name='1700'>
+            WSnew=QSInew<a name='1701'>
+            WRITE(6,"(4(a12,g11.4,1x))")                                   &amp;<a name='1702'>
+     &amp; '{} TCold=',TC,'TCnew=',Tnew-T0C,'P=',.01*PP,'RHO=',RHO,            &amp;<a name='1703'>
+     &amp; '{} THICK=',THICK,'RHold=',WV/WS,'RHnew=',WVnew/WSnew,              &amp;<a name='1704'>
+     &amp;   'RHgrd=',RHgrd,                                                   &amp;<a name='1705'>
+     &amp; '{} RHWold=',WV/QSW,'RHWnew=',WVnew/QSWnew,'RHIold=',WV/QSI,        &amp;<a name='1706'>
+     &amp;   'RHInew=',WVnew/QSInew,                                           &amp;<a name='1707'>
+     &amp; '{} QSWold=',QSW,'QSWnew=',QSWnew,'QSIold=',QSI,'QSInew=',QSInew,   &amp;<a name='1708'>
+     &amp; '{} WSold=',WS,'WSnew=',WSnew,'WVold=',WV,'WVnew=',WVnew,           &amp;<a name='1709'>
+     &amp; '{} WCold=',WC,'WCnew=',WCnew,'QWold=',QW,'QWnew=',QWnew,           &amp;<a name='1710'>
+     &amp; '{} QIold=',QI,'QInew=',QInew,'QRold=',QR,'QRnew=',QRnew,           &amp;<a name='1711'>
+     &amp; '{} ARAINold=',ARAIN,'ARAINnew=',ARAINnew,'ASNOWold=',ASNOW,        &amp;<a name='1712'>
+     &amp;   'ASNOWnew=',ASNOWnew,                                             &amp;<a name='1713'>
+     &amp; '{} TOT_RAIN=',TOT_RAIN,'TOT_RAINnew=',TOT_RAINnew,                 &amp;<a name='1714'>
+     &amp;   'TOT_ICE=',TOT_ICE,'TOT_ICEnew=',TOT_ICEnew,                      &amp;<a name='1715'>
+     &amp; '{} BUDGET=',BUDGET,'QTold=',QT,'QTnew=',QTnew                       <a name='1716'>
+   <font color=#447700>!<a name='1717'></font>
+            WRITE(6,"(4(a12,g11.4,1x))")                                   &amp;<a name='1718'>
+     &amp; '{} DELT=',DELT,'DELV=',DELV,'DELW=',DELW,'DELI=',DELI,             &amp;<a name='1719'>
+     &amp; '{} DELR=',DELR,'PCOND=',PCOND,'PIDEP=',PIDEP,'PIEVP=',PIEVP,       &amp;<a name='1720'>
+     &amp; '{} PICND=',PICND,'PREVP=',PREVP,'PRAUT=',PRAUT,'PRACW=',PRACW,     &amp;<a name='1721'>
+     &amp; '{} PIACW=',PIACW,'PIACWI=',PIACWI,'PIACWR=',PIACWR,'PIMLT=',       &amp;<a name='1722'>
+     &amp;    PIMLT,                                                           &amp;<a name='1723'>
+     &amp; '{} PIACR=',PIACR                                                    <a name='1724'>
+   <font color=#447700>!<a name='1725'></font>
+            IF (ICE_logical) WRITE(6,"(4(a12,g11.4,1x))")                  &amp;<a name='1726'>
+     &amp; '{} RimeF1=',RimeF1,'GAMMAS=',GAMMAS,'VrimeF=',VrimeF,              &amp;<a name='1727'>
+     &amp;   'VSNOW=',VSNOW,                                                   &amp;<a name='1728'>
+     &amp; '{} INDEXS=',FLOAT(INDEXS),'FLARGE=',FLARGE,'FSMALL=',FSMALL,       &amp;<a name='1729'>
+     &amp;   'FLIMASS=',FLIMASS,                                               &amp;<a name='1730'>
+     &amp; '{} XSIMASS=',XSIMASS,'XLIMASS=',XLIMASS,'QLICE=',QLICE,            &amp;<a name='1731'>
+     &amp;   'QTICE=',QTICE,                                                   &amp;<a name='1732'>
+     &amp; '{} NLICE=',NLICE,'NSmICE=',NSmICE,'PILOSS=',PILOSS,                &amp;<a name='1733'>
+     &amp;   'EMAIRI=',EMAIRI,                                                 &amp;<a name='1734'>
+     &amp; '{} RimeF=',RimeF                                                    <a name='1735'>
+   <font color=#447700>!<a name='1736'></font>
+            IF (TOT_RAIN.GT.0. .OR. TOT_RAINnew.GT.0.)                     &amp;<a name='1737'>
+     &amp;        WRITE(6,"(4(a12,g11.4,1x))")                                 &amp;<a name='1738'>
+     &amp; '{} INDEXR1=',FLOAT(INDEXR1),'INDEXR=',FLOAT(INDEXR),               &amp;<a name='1739'>
+     &amp;   'GAMMAR=',GAMMAR,'N0r=',N0r,                                      &amp;<a name='1740'>
+     &amp; '{} VRAIN1=',VRAIN1,'VRAIN2=',VRAIN2,'QTRAIN=',QTRAIN,'RQR=',RQR,   &amp;<a name='1741'>
+     &amp; '{} PRLOSS=',PRLOSS,'VOLR1=',THICK+BLDTRH*VRAIN1,                   &amp;<a name='1742'>
+     &amp;   'VOLR2=',THICK+BLDTRH*VRAIN2<a name='1743'>
+   <font color=#447700>!<a name='1744'></font>
+            IF (PRAUT .GT. 0.) WRITE(6,"(a12,g11.4,1x)") '{} QW0=',QW0<a name='1745'>
+   <font color=#447700>!<a name='1746'></font>
+            IF (PRACW .GT. 0.) WRITE(6,"(a12,g11.4,1x)") '{} FWR=',FWR<a name='1747'>
+   <font color=#447700>!<a name='1748'></font>
+            IF (PIACR .GT. 0.) WRITE(6,"(a12,g11.4,1x)") '{} FIR=',FIR<a name='1749'>
+   <font color=#447700>!<a name='1750'></font>
+            DUM=PIMLT+PICND-PREVP-PIEVP<a name='1751'>
+            IF (DUM.GT.0. .or. DWVi.NE.0.)                                 &amp;<a name='1752'>
+     &amp;        WRITE(6,"(4(a12,g11.4,1x))")                                 &amp;<a name='1753'>
+     &amp; '{} TFACTOR=',TFACTOR,'DYNVIS=',DYNVIS,                             &amp;<a name='1754'>
+     &amp;   'THERM_CON=',THERM_COND,'DIFFUS=',DIFFUS<a name='1755'>
+   <font color=#447700>!<a name='1756'></font>
+            IF (PREVP .LT. 0.) WRITE(6,"(4(a12,g11.4,1x))")                &amp;<a name='1757'>
+     &amp; '{} RFACTOR=',RFACTOR,'ABW=',ABW,'VENTR=',VENTR,'CREVP=',CREVP,     &amp;<a name='1758'>
+     &amp; '{} DWVr=',DWVr,'DENOMW=',DENOMW<a name='1759'>
+   <font color=#447700>!<a name='1760'></font>
+            IF (PIDEP.NE.0. .AND. DWVi.NE.0.)                              &amp;<a name='1761'>
+     &amp;        WRITE(6,"(4(a12,g11.4,1x))")                                 &amp;<a name='1762'>
+     &amp; '{} DWVi=',DWVi,'DENOMI=',DENOMI,'PIDEP_max=',PIDEP_max,            &amp;<a name='1763'>
+     &amp;   'SFACTOR=',SFACTOR,                                               &amp;<a name='1764'>
+     &amp; '{} ABI=',ABI,'VENTIL=',VENTIL,'VENTIL1=',VENTI1(INDEXS),           &amp;<a name='1765'>
+     &amp;   'VENTIL2=',SFACTOR*VENTI2(INDEXS),                                &amp;<a name='1766'>
+     &amp; '{} VENTIS=',VENTIS,'DIDEP=',DIDEP<a name='1767'>
+   <font color=#447700>!<a name='1768'></font>
+            IF (PIDEP.GT.0. .AND. PCOND.NE.0.)                             &amp;<a name='1769'>
+     &amp;        WRITE(6,"(4(a12,g11.4,1x))")                                 &amp;<a name='1770'>
+     &amp; '{} DENOMW=',DENOMW,'DENOMWI=',DENOMWI,'DENOMF=',DENOMF,            &amp;<a name='1771'>
+     &amp;    'DUM2=',PCOND-PIACW<a name='1772'>
+   <font color=#447700>!<a name='1773'></font>
+            IF (FWS .GT. 0.) WRITE(6,"(4(a12,g11.4,1x))")                  &amp;<a name='1774'>
+     &amp; '{} FWS=',FWS                     <a name='1775'>
+   <font color=#447700>!<a name='1776'></font>
+            DUM=PIMLT+PICND-PIEVP<a name='1777'>
+            IF (DUM.GT. 0.) WRITE(6,"(4(a12,g11.4,1x))")                   &amp;<a name='1778'>
+     &amp; '{} SFACTOR=',SFACTOR,'VENTIL=',VENTIL,'VENTIL1=',VENTI1(INDEXS),   &amp;<a name='1779'>
+     &amp;   'VENTIL2=',SFACTOR*VENTI2(INDEXS),                                &amp;<a name='1780'>
+     &amp; '{} AIEVP=',AIEVP,'DIEVP=',DIEVP,'QSW0=',QSW0,'DWV0=',DWV0       <a name='1781'>
+   <font color=#447700>!<a name='1782'></font>
+          ENDIF<a name='1783'>
+<a name='1784'>
+<a name='1785'>
+<font color=#447700>!<a name='1786'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1787'></font>
+<font color=#447700>!--------------- Water budget statistics &amp; maximum values --------------<a name='1788'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1789'></font>
+<font color=#447700>!<a name='1790'></font>
+          IF (PRINT_diag) THEN<a name='1791'>
+            ITdx=MAX( ITLO, MIN( INT(Tnew-T0C), ITHI ) )<a name='1792'>
+            IF (QInew .GT. CLIMIT) NSTATS(ITdx,1)=NSTATS(ITdx,1)+1<a name='1793'>
+            IF (QInew.GT.CLIMIT .AND.  QRnew+QWnew.GT.CLIMIT)           &amp;<a name='1794'>
+     &amp;        NSTATS(ITdx,2)=NSTATS(ITdx,2)+1<a name='1795'>
+            IF (QWnew .GT. CLIMIT) NSTATS(ITdx,3)=NSTATS(ITdx,3)+1 <a name='1796'>
+            IF (QRnew .GT. CLIMIT) NSTATS(ITdx,4)=NSTATS(ITdx,4)+1<a name='1797'>
+  <font color=#447700>!<a name='1798'></font>
+            QMAX(ITdx,1)=MAX(QMAX(ITdx,1), QInew)<a name='1799'>
+            QMAX(ITdx,2)=MAX(QMAX(ITdx,2), QWnew)<a name='1800'>
+            QMAX(ITdx,3)=MAX(QMAX(ITdx,3), QRnew)<a name='1801'>
+            QMAX(ITdx,4)=MAX(QMAX(ITdx,4), ASNOWnew)<a name='1802'>
+            QMAX(ITdx,5)=MAX(QMAX(ITdx,5), ARAINnew)<a name='1803'>
+            QTOT(ITdx,1)=QTOT(ITdx,1)+QInew*THICK<a name='1804'>
+            QTOT(ITdx,2)=QTOT(ITdx,2)+QWnew*THICK<a name='1805'>
+            QTOT(ITdx,3)=QTOT(ITdx,3)+QRnew*THICK<a name='1806'>
+  <font color=#447700>!<a name='1807'></font>
+            QTOT(ITdx,4)=QTOT(ITdx,4)+PCOND*THICK<a name='1808'>
+            QTOT(ITdx,5)=QTOT(ITdx,5)+PICND*THICK<a name='1809'>
+            QTOT(ITdx,6)=QTOT(ITdx,6)+PIEVP*THICK<a name='1810'>
+            QTOT(ITdx,7)=QTOT(ITdx,7)+PIDEP*THICK<a name='1811'>
+            QTOT(ITdx,8)=QTOT(ITdx,8)+PREVP*THICK<a name='1812'>
+            QTOT(ITdx,9)=QTOT(ITdx,9)+PRAUT*THICK<a name='1813'>
+            QTOT(ITdx,10)=QTOT(ITdx,10)+PRACW*THICK<a name='1814'>
+            QTOT(ITdx,11)=QTOT(ITdx,11)+PIMLT*THICK<a name='1815'>
+            QTOT(ITdx,12)=QTOT(ITdx,12)+PIACW*THICK<a name='1816'>
+            QTOT(ITdx,13)=QTOT(ITdx,13)+PIACWI*THICK<a name='1817'>
+            QTOT(ITdx,14)=QTOT(ITdx,14)+PIACWR*THICK<a name='1818'>
+            QTOT(ITdx,15)=QTOT(ITdx,15)+PIACR*THICK<a name='1819'>
+  <font color=#447700>!<a name='1820'></font>
+            QTOT(ITdx,16)=QTOT(ITdx,16)+(WVnew-WV)*THICK<a name='1821'>
+            QTOT(ITdx,17)=QTOT(ITdx,17)+(QWnew-QW)*THICK<a name='1822'>
+            QTOT(ITdx,18)=QTOT(ITdx,18)+(QInew-QI)*THICK<a name='1823'>
+            QTOT(ITdx,19)=QTOT(ITdx,19)+(QRnew-QR)*THICK<a name='1824'>
+            QTOT(ITdx,20)=QTOT(ITdx,20)+(ARAINnew-ARAIN)<a name='1825'>
+            QTOT(ITdx,21)=QTOT(ITdx,21)+(ASNOWnew-ASNOW)<a name='1826'>
+            IF (QInew .GT. 0.)                                          &amp;<a name='1827'>
+     &amp;        QTOT(ITdx,22)=QTOT(ITdx,22)+QInew*THICK/RimeF<a name='1828'>
+  <font color=#447700>!<a name='1829'></font>
+          ENDIF<a name='1830'>
+<font color=#447700>!<a name='1831'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1832'></font>
+<font color=#447700>!------------------------- Update arrays ------------------------------<a name='1833'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='1834'></font>
+<font color=#447700>!<a name='1835'></font>
+<a name='1836'>
+<a name='1837'>
+          T_col(L)=Tnew                           <font color=#447700>! Updated temperature<a name='1838'></font>
+<font color=#447700>!<a name='1839'></font>
+          QV_col(L)=max(EPSQ, WVnew/(1.+WVnew))   <font color=#447700>! Updated specific humidity<a name='1840'></font>
+          WC_col(L)=max(EPSQ, WCnew)              <font color=#447700>! Updated total condensate mixing ratio<a name='1841'></font>
+          QI_col(L)=max(EPSQ, QInew)              <font color=#447700>! Updated ice mixing ratio<a name='1842'></font>
+          QR_col(L)=max(EPSQ, QRnew)              <font color=#447700>! Updated rain mixing ratio<a name='1843'></font>
+          QW_col(L)=max(EPSQ, QWnew)              <font color=#447700>! Updated cloud water mixing ratio<a name='1844'></font>
+          RimeF_col(L)=RimeF                      <font color=#447700>! Updated rime factor<a name='1845'></font>
+          ASNOW=ASNOWnew                          <font color=#447700>! Updated accumulated snow<a name='1846'></font>
+          ARAIN=ARAINnew                          <font color=#447700>! Updated accumulated rain<a name='1847'></font>
+<font color=#447700>!<a name='1848'></font>
+<font color=#447700>!#######################################################################<a name='1849'></font>
+<font color=#447700>!<a name='1850'></font>
+10      CONTINUE         <font color=#447700>! ##### End "L" loop through model levels #####<a name='1851'></font>
+<a name='1852'>
+<a name='1853'>
+<font color=#447700>!<a name='1854'></font>
+<font color=#447700>!#######################################################################<a name='1855'></font>
+<font color=#447700>!<a name='1856'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1857'></font>
+<font color=#447700>!--------------------------- Return to GSMDRIVE -----------------------<a name='1858'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1859'></font>
+<font color=#447700>!<a name='1860'></font>
+        CONTAINS<a name='1861'>
+<font color=#447700>!#######################################################################<a name='1862'></font>
+<font color=#447700>!--------- Produces accurate calculation of cloud condensation ---------<a name='1863'></font>
+<font color=#447700>!#######################################################################<a name='1864'></font>
+<font color=#447700>!<a name='1865'></font>
+<A NAME='CONDENSE'><A href='../../html_code/phys/module_mp_etanew.F.html#CONDENSE' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='1866'>
+      REAL <font color=#993300>FUNCTION </font><font color=#cc0000>CONDENSE</font> (PP, QW, RHgrd, TK, WV)<a name='1867'>
+<font color=#447700>!<a name='1868'></font>
+<font color=#447700>!---------------------------------------------------------------------------------<a name='1869'></font>
+<font color=#447700>!------   The Asai (1965) algorithm takes into consideration the release of ------<a name='1870'></font>
+<font color=#447700>!------   latent heat in increasing the temperature &amp; in increasing the     ------<a name='1871'></font>
+<font color=#447700>!------   saturation mixing ratio (following the Clausius-Clapeyron eqn.).  ------<a name='1872'></font>
+<font color=#447700>!---------------------------------------------------------------------------------<a name='1873'></font>
+<font color=#447700>!<a name='1874'></font>
+<font color=#447700>!FEB  use module_GPVS<a name='1875'></font>
+      IMPLICIT NONE<a name='1876'>
+<font color=#447700>!<a name='1877'></font>
+      INTEGER, PARAMETER :: HIGH_PRES=Selected_Real_Kind(15)<a name='1878'>
+      REAL (KIND=HIGH_PRES), PARAMETER :: CLIMIT=1.E-20,                &amp;<a name='1879'>
+     &amp; RHLIMIT=.001, RHLIMIT1=-RHLIMIT<a name='1880'>
+      REAL, PARAMETER :: CP=1004.6, RD=287.04, RV=461.5, EPS=RD/RV,     &amp;<a name='1881'>
+     &amp; RCP=1./CP, RCPRV=RCP/RV<a name='1882'>
+      REAL (KIND=HIGH_PRES) :: COND, SSAT, WCdum<a name='1883'>
+<font color=#447700>!<a name='1884'></font>
+      REAL,INTENT(IN) :: RHgrd,QW,PP,WV,TK<a name='1885'>
+      REAL WVdum,Tdum,XLV2,DWV,WS,ESW,XLV1,XLV<a name='1886'>
+integer nsteps<a name='1887'>
+<font color=#447700>!<a name='1888'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1889'></font>
+<font color=#447700>!<a name='1890'></font>
+<font color=#447700>!--- LV (T) is from Bolton (JAS, 1980)<a name='1891'></font>
+<font color=#447700>!<a name='1892'></font>
+      XLV=3.148E6-2370.*TK<a name='1893'>
+      XLV1=XLV*RCP<a name='1894'>
+      XLV2=XLV*XLV*RCPRV<a name='1895'>
+      Tdum=TK<a name='1896'>
+      WVdum=WV<a name='1897'>
+      WCdum=QW<a name='1898'>
+      ESW=1000.*FPVS0(Tdum)                     <font color=#447700>! Saturation vapor press w/r/t water<a name='1899'></font>
+      WS=RHgrd*EPS*ESW/(PP-ESW)                 <font color=#447700>! Saturation mixing ratio w/r/t water<a name='1900'></font>
+      DWV=WVdum-WS                              <font color=#447700>! Deficit grid-scale water vapor mixing ratio<a name='1901'></font>
+      SSAT=DWV/WS                               <font color=#447700>! Supersaturation ratio<a name='1902'></font>
+      CONDENSE=0.<a name='1903'>
+nsteps = 0<a name='1904'>
+      DO WHILE ((SSAT.LT.RHLIMIT1 .AND. WCdum.GT.CLIMIT)                &amp;<a name='1905'>
+     &amp;           .OR. SSAT.GT.RHLIMIT)<a name='1906'>
+        nsteps = nsteps + 1<a name='1907'>
+        COND=DWV/(1.+XLV2*WS/(Tdum*Tdum))       <font color=#447700>! Asai (1965, J. Japan)<a name='1908'></font>
+        COND=MAX(COND, -WCdum)                  <font color=#447700>! Limit cloud water evaporation<a name='1909'></font>
+        Tdum=Tdum+XLV1*COND                     <font color=#447700>! Updated temperature<a name='1910'></font>
+        WVdum=WVdum-COND                        <font color=#447700>! Updated water vapor mixing ratio<a name='1911'></font>
+        WCdum=WCdum+COND                        <font color=#447700>! Updated cloud water mixing ratio<a name='1912'></font>
+        CONDENSE=CONDENSE+COND                  <font color=#447700>! Total cloud water condensation<a name='1913'></font>
+        ESW=1000.*FPVS0(Tdum)                   <font color=#447700>! Updated saturation vapor press w/r/t water<a name='1914'></font>
+        WS=RHgrd*EPS*ESW/(PP-ESW)               <font color=#447700>! Updated saturation mixing ratio w/r/t water<a name='1915'></font>
+        DWV=WVdum-WS                            <font color=#447700>! Deficit grid-scale water vapor mixing ratio<a name='1916'></font>
+        SSAT=DWV/WS                             <font color=#447700>! Grid-scale supersaturation ratio<a name='1917'></font>
+      ENDDO<a name='1918'>
+<font color=#447700>!<a name='1919'></font>
+      END FUNCTION CONDENSE<a name='1920'>
+<font color=#447700>!<a name='1921'></font>
+<font color=#447700>!#######################################################################<a name='1922'></font>
+<font color=#447700>!---------------- Calculate ice deposition at T&lt;T_ICE ------------------<a name='1923'></font>
+<font color=#447700>!#######################################################################<a name='1924'></font>
+<font color=#447700>!<a name='1925'></font>
+<A NAME='DEPOSIT'><A href='../../html_code/phys/module_mp_etanew.F.html#DEPOSIT' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='1926'>
+      REAL <font color=#993300>FUNCTION </font><font color=#cc0000>DEPOSIT</font> (PP, RHgrd, Tdum, WVdum)<a name='1927'>
+<font color=#447700>!<a name='1928'></font>
+<font color=#447700>!--- Also uses the Asai (1965) algorithm, but uses a different target<a name='1929'></font>
+<font color=#447700>!      vapor pressure for the adjustment<a name='1930'></font>
+<font color=#447700>!<a name='1931'></font>
+<font color=#447700>!FEB  use module_GPVS<a name='1932'></font>
+      IMPLICIT NONE      <a name='1933'>
+<font color=#447700>!<a name='1934'></font>
+      INTEGER, PARAMETER :: HIGH_PRES=Selected_Real_Kind(15)<a name='1935'>
+      REAL (KIND=HIGH_PRES), PARAMETER :: RHLIMIT=.001,                 &amp;<a name='1936'>
+     &amp; RHLIMIT1=-RHLIMIT<a name='1937'>
+      REAL, PARAMETER :: CP=1004.6, RD=287.04, RV=461.5, XLS=2.834E6,   &amp;<a name='1938'>
+     &amp; EPS=RD/RV, RCP=1./CP, RCPRV=RCP/RV, XLS1=XLS*RCP,                &amp; <a name='1939'>
+     &amp; XLS2=XLS*XLS*RCPRV<a name='1940'>
+      REAL (KIND=HIGH_PRES) :: DEP, SSAT<a name='1941'>
+<font color=#447700>!    <a name='1942'></font>
+      real,INTENT(IN) ::  PP,RHgrd<a name='1943'>
+      real,INTENT(INOUT) ::  WVdum,Tdum<a name='1944'>
+      real ESI,WS,DWV<a name='1945'>
+<font color=#447700>!<a name='1946'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1947'></font>
+<font color=#447700>!<a name='1948'></font>
+      ESI=1000.*FPVS(Tdum)                      <font color=#447700>! Saturation vapor press w/r/t ice<a name='1949'></font>
+      WS=RHgrd*EPS*ESI/(PP-ESI)                 <font color=#447700>! Saturation mixing ratio<a name='1950'></font>
+      DWV=WVdum-WS                              <font color=#447700>! Deficit grid-scale water vapor mixing ratio<a name='1951'></font>
+      SSAT=DWV/WS                               <font color=#447700>! Supersaturation ratio<a name='1952'></font>
+      DEPOSIT=0.<a name='1953'>
+      DO WHILE (SSAT.GT.RHLIMIT .OR. SSAT.LT.RHLIMIT1)<a name='1954'>
+   <font color=#447700>!<a name='1955'></font>
+   <font color=#447700>!--- Note that XLVS2=LS*LV/(CP*RV)=LV*WS/(RV*T*T)*(LS/CP*DEP1), <a name='1956'></font>
+   <font color=#447700>!     where WS is the saturation mixing ratio following Clausius-<a name='1957'></font>
+   <font color=#447700>!     Clapeyron (see Asai,1965; Young,1993,p.405) <a name='1958'></font>
+   <font color=#447700>!<a name='1959'></font>
+        DEP=DWV/(1.+XLS2*WS/(Tdum*Tdum))        <font color=#447700>! Asai (1965, J. Japan)<a name='1960'></font>
+        Tdum=Tdum+XLS1*DEP                      <font color=#447700>! Updated temperature<a name='1961'></font>
+        WVdum=WVdum-DEP                         <font color=#447700>! Updated ice mixing ratio<a name='1962'></font>
+        DEPOSIT=DEPOSIT+DEP                     <font color=#447700>! Total ice deposition<a name='1963'></font>
+        ESI=1000.*FPVS(Tdum)                    <font color=#447700>! Updated saturation vapor press w/r/t ice<a name='1964'></font>
+        WS=RHgrd*EPS*ESI/(PP-ESI)               <font color=#447700>! Updated saturation mixing ratio w/r/t ice<a name='1965'></font>
+        DWV=WVdum-WS                            <font color=#447700>! Deficit grid-scale water vapor mixing ratio<a name='1966'></font>
+        SSAT=DWV/WS                             <font color=#447700>! Grid-scale supersaturation ratio<a name='1967'></font>
+      ENDDO<a name='1968'>
+<font color=#447700>!<a name='1969'></font>
+      END FUNCTION DEPOSIT<a name='1970'>
+<font color=#447700>!<a name='1971'></font>
+      END SUBROUTINE EGCP01COLUMN <a name='1972'>
+<a name='1973'>
+<font color=#447700>!#######################################################################<a name='1974'></font>
+<font color=#447700>!------- Initialize constants &amp; lookup tables for microphysics ---------<a name='1975'></font>
+<font color=#447700>!#######################################################################<a name='1976'></font>
+<font color=#447700>!<a name='1977'></font>
+<a name='1978'>
+<font color=#447700>! SH 0211/2002<a name='1979'></font>
+<a name='1980'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1981'></font>
+<A NAME='ETANEWINIT'><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1982'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>etanewinit</font> (GSMDT,DT,DELX,DELY,LOWLYR,restart,         &amp; <A href='../../call_to/ETANEWINIT.html' TARGET='index'>1</A>,<A href='../../call_from/ETANEWINIT.html' TARGET='index'>17</A><a name='1983'>
+     &amp;   F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY,                              &amp;<a name='1984'>
+     &amp;   ALLOWED_TO_READ,                                               &amp;<a name='1985'>
+     &amp;   IDS,IDE,JDS,JDE,KDS,KDE,                                       &amp;<a name='1986'>
+     &amp;   IMS,IME,JMS,JME,KMS,KME,                                       &amp;<a name='1987'>
+     &amp;   ITS,ITE,JTS,JTE,KTS,KTE                                       )<a name='1988'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='1989'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='1990'></font>
+<font color=#447700>!---  SUBPROGRAM DOCUMENTATION BLOCK<a name='1991'></font>
+<font color=#447700>!   PRGRMMR: Ferrier         ORG: W/NP22     DATE: February 2001<a name='1992'></font>
+<font color=#447700>!            Jin             ORG: W/NP22     DATE: January 2002 <a name='1993'></font>
+<font color=#447700>!        (Modification for WRF structure)<a name='1994'></font>
+<font color=#447700>!                                               <a name='1995'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='1996'></font>
+<font color=#447700>! ABSTRACT:<a name='1997'></font>
+<font color=#447700>!   * Reads various microphysical lookup tables used in COLUMN_MICRO<a name='1998'></font>
+<font color=#447700>!   * Lookup tables were created "offline" and are read in during execution<a name='1999'></font>
+<font color=#447700>!   * Creates lookup tables for saturation vapor pressure w/r/t water &amp; ice<a name='2000'></font>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='2001'></font>
+<font color=#447700>!     <a name='2002'></font>
+<font color=#447700>! USAGE: CALL etanewinit FROM SUBROUTINE GSMDRIVE AT MODEL START TIME<a name='2003'></font>
+<font color=#447700>!<a name='2004'></font>
+<font color=#447700>!   INPUT ARGUMENT LIST:<a name='2005'></font>
+<font color=#447700>!       DTPH - physics time step (s)<a name='2006'></font>
+<font color=#447700>!  <a name='2007'></font>
+<font color=#447700>!   OUTPUT ARGUMENT LIST: <a name='2008'></font>
+<font color=#447700>!     NONE<a name='2009'></font>
+<font color=#447700>!     <a name='2010'></font>
+<font color=#447700>!   OUTPUT FILES:<a name='2011'></font>
+<font color=#447700>!     NONE<a name='2012'></font>
+<font color=#447700>!     <a name='2013'></font>
+<font color=#447700>!   SUBROUTINES:<a name='2014'></font>
+<font color=#447700>!     MY_GROWTH_RATES - lookup table for growth of nucleated ice<a name='2015'></font>
+<font color=#447700>!     GPVS            - lookup tables for saturation vapor pressure (water, ice)<a name='2016'></font>
+<font color=#447700>!<a name='2017'></font>
+<font color=#447700>!   UNIQUE: NONE<a name='2018'></font>
+<font color=#447700>!  <a name='2019'></font>
+<font color=#447700>!   LIBRARY: NONE<a name='2020'></font>
+<font color=#447700>!  <a name='2021'></font>
+<font color=#447700>!   COMMON BLOCKS:<a name='2022'></font>
+<font color=#447700>!     CMICRO_CONS - constants used in GSMCOLUMN<a name='2023'></font>
+<font color=#447700>!     CMY600       - lookup table for growth of ice crystals in <a name='2024'></font>
+<font color=#447700>!                    water saturated conditions (Miller &amp; Young, 1979)<a name='2025'></font>
+<font color=#447700>!     IVENT_TABLES - lookup tables for ventilation effects of ice<a name='2026'></font>
+<font color=#447700>!     IACCR_TABLES - lookup tables for accretion rates of ice<a name='2027'></font>
+<font color=#447700>!     IMASS_TABLES - lookup tables for mass content of ice<a name='2028'></font>
+<font color=#447700>!     IRATE_TABLES - lookup tables for precipitation rates of ice<a name='2029'></font>
+<font color=#447700>!     IRIME_TABLES - lookup tables for increase in fall speed of rimed ice<a name='2030'></font>
+<font color=#447700>!     MAPOT        - Need lat/lon grid resolution<a name='2031'></font>
+<font color=#447700>!     RVENT_TABLES - lookup tables for ventilation effects of rain<a name='2032'></font>
+<font color=#447700>!     RACCR_TABLES - lookup tables for accretion rates of rain<a name='2033'></font>
+<font color=#447700>!     RMASS_TABLES - lookup tables for mass content of rain<a name='2034'></font>
+<font color=#447700>!     RVELR_TABLES - lookup tables for fall speeds of rain<a name='2035'></font>
+<font color=#447700>!     RRATE_TABLES - lookup tables for precipitation rates of rain<a name='2036'></font>
+<font color=#447700>!   <a name='2037'></font>
+<font color=#447700>! ATTRIBUTES:<a name='2038'></font>
+<font color=#447700>!   LANGUAGE: FORTRAN 90<a name='2039'></font>
+<font color=#447700>!   MACHINE : IBM SP<a name='2040'></font>
+<font color=#447700>!<a name='2041'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2042'></font>
+<font color=#447700>!<a name='2043'></font>
+<font color=#447700>!FEB  use module_GPVS<a name='2044'></font>
+<font color=#447700>!<a name='2045'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2046'></font>
+      IMPLICIT NONE<a name='2047'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2048'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='2049'></font>
+<font color=#447700>!-------------- Parameters &amp; arrays for lookup tables -------------------- <a name='2050'></font>
+<font color=#447700>!------------------------------------------------------------------------- <a name='2051'></font>
+<font color=#447700>!<a name='2052'></font>
+<font color=#447700>!--- Common block of constants used in column microphysics<a name='2053'></font>
+<font color=#447700>!<a name='2054'></font>
+<font color=#447700>!WRF<a name='2055'></font>
+<font color=#447700>!     real DLMD,DPHD<a name='2056'></font>
+<font color=#447700>!WRF<a name='2057'></font>
+<font color=#447700>!<a name='2058'></font>
+<font color=#447700>!<a name='2059'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2060'></font>
+<font color=#447700>!--- Parameters &amp; data statement for local calculations<a name='2061'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2062'></font>
+<font color=#447700>!<a name='2063'></font>
+      REAL, PARAMETER :: C1=1./3., DMR1=.1E-3, DMR2=.2E-3, DMR3=.32E-3, &amp;<a name='2064'>
+     &amp; N0r0=8.E6, N0s0=4.E6, RHOL=1000., RHOS=100., T0C=273.15,         &amp;<a name='2065'>
+     &amp; XMR1=1.e6*DMR1, XMR2=1.e6*DMR2, XMR3=1.e6*DMR3                   &amp;<a name='2066'>
+     &amp;,CLIMIT=1.E-12,T_ICE=-10., T_ICEK=T0C+T_ICE<a name='2067'>
+<font color=#447700>!<a name='2068'></font>
+      INTEGER, PARAMETER :: MDR1=XMR1, MDR2=XMR2, MDR3=XMR3<a name='2069'>
+<font color=#447700>!<a name='2070'></font>
+<font color=#447700>!     VARIABLES PASSED IN<a name='2071'></font>
+      integer,INTENT(IN) :: IDS,IDE,JDS,JDE,KDS,KDE                     &amp;<a name='2072'>
+     &amp;                     ,IMS,IME,JMS,JME,KMS,KME                     &amp; <a name='2073'>
+     &amp;                     ,ITS,ITE,JTS,JTE,KTS,KTE       <a name='2074'>
+<font color=#447700>!WRF<a name='2075'></font>
+       INTEGER, DIMENSION(ims:ime,jms:jme),INTENT(INOUT) :: LOWLYR<a name='2076'>
+<font color=#447700>!<a name='2077'></font>
+      real, INTENT(IN) ::  DELX,DELY<a name='2078'>
+      real,DIMENSION(ims:ime, kms:kme, jms:jme),INTENT(OUT) ::          &amp;<a name='2079'>
+     &amp;  F_ICE_PHY,F_RAIN_PHY,F_RIMEF_PHY<a name='2080'>
+      INTEGER, PARAMETER :: ITLO=-60, ITHI=40<a name='2081'>
+<font color=#447700>!     integer,DIMENSION(ITLO:ITHI,4),INTENT(INOUT) :: NSTATS<a name='2082'></font>
+<font color=#447700>!     real,DIMENSION(ITLO:ITHI,5),INTENT(INOUT) :: QMAX<a name='2083'></font>
+<font color=#447700>!     real,DIMENSION(ITLO:ITHI,22),INTENT(INOUT) :: QTOT<a name='2084'></font>
+<font color=#447700>!     real,INTENT(INOUT) :: PRECtot(2),PRECmax(2)<a name='2085'></font>
+      real,INTENT(IN) :: DT,GSMDT<a name='2086'>
+      LOGICAL,INTENT(IN) :: allowed_to_read,restart<a name='2087'>
+<font color=#447700>!<a name='2088'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2089'></font>
+<font color=#447700>!     LOCAL VARIABLES<a name='2090'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2091'></font>
+      REAL :: BBFR,DTPH,PI,XNCW,DX,Thour_print<a name='2092'>
+      INTEGER :: I,IM,J,L,K,JTF,KTF,ITF<a name='2093'>
+      INTEGER :: etampnew_unit1<a name='2094'>
+      LOGICAL :: AETA_01<a name='2095'>
+      LOGICAL, PARAMETER :: PRINT_diag=.FALSE.<a name='2096'>
+      LOGICAL :: opened<a name='2097'>
+      LOGICAL , EXTERNAL      :: wrf_dm_on_monitor<a name='2098'>
+      CHARACTER*80 errmess<a name='2099'>
+<font color=#447700>!<a name='2100'></font>
+<font color=#447700>!------------------------------------------------------------------------<a name='2101'></font>
+<font color=#447700>!--------- Constants passed through /CMICRO_CONS/ common block ----------<a name='2102'></font>
+<font color=#447700>!------------------------------------------------------------------------<a name='2103'></font>
+<font color=#447700>!<a name='2104'></font>
+<font color=#447700>!--- 9/1/01:  Assume the following functional dependence for 5 - 100 km resolution:<a name='2105'></font>
+<font color=#447700>!       RHgrd=0.90 for dx=100 km, 0.98 for dx=5 km, where<a name='2106'></font>
+<font color=#447700>!       RHgrd=0.90+0.08*[(100.-dX)/95.]**.5<a name='2107'></font>
+<font color=#447700>!<a name='2108'></font>
+      JTF=MIN0(JTE,JDE-1)<a name='2109'>
+      KTF=MIN0(KTE,KDE-1)<a name='2110'>
+      ITF=MIN0(ITE,IDE-1)<a name='2111'>
+<font color=#447700>!<a name='2112'></font>
+      DO J=JTS,JTF<a name='2113'>
+      DO I=ITS,ITF<a name='2114'>
+        LOWLYR(I,J)=1<a name='2115'>
+      ENDDO<a name='2116'>
+      ENDDO<a name='2117'>
+<font color=#447700>!    <a name='2118'></font>
+      IF(.NOT.RESTART)THEN<a name='2119'>
+        DO J = jts,jte<a name='2120'>
+        DO K = kts,kte<a name='2121'>
+        DO I= its,ite<a name='2122'>
+          F_ICE_PHY(i,k,j)=0.<a name='2123'>
+          F_RAIN_PHY(i,k,j)=0.<a name='2124'>
+          F_RIMEF_PHY(i,k,j)=1.<a name='2125'>
+        ENDDO<a name='2126'>
+        ENDDO<a name='2127'>
+        ENDDO<a name='2128'>
+      ENDIF<a name='2129'>
+<font color=#447700>!    <a name='2130'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2131'></font>
+      IF(ALLOWED_TO_READ)THEN<a name='2132'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2133'></font>
+<font color=#447700>!<a name='2134'></font>
+<font color=#447700>!       DX=111.*(DPHD**2+DLMD**2)**.5         ! Model resolution at equator (km)<a name='2135'></font>
+        DX=((DELX)**2+(DELY)**2)**.5/1000.    <font color=#447700>! Model resolution at equator (km)<a name='2136'></font>
+        DX=MIN(100., MAX(5., DX) )<a name='2137'>
+<font color=#447700>!       RHgrd=0.90+.08*((100.-DX)/95.)**.5<a name='2138'></font>
+        RHgrd=1.0<a name='2139'>
+<font color=#447700>!<a name='2140'></font>
+        DTPH=MAX(GSMDT*60.,DT)<a name='2141'>
+        DTPH=NINT(DTPH/DT)*DT<a name='2142'>
+<font color=#447700>!<a name='2143'></font>
+<font color=#447700>!--- Create lookup tables for saturation vapor pressure w/r/t water &amp; ice<a name='2144'></font>
+<font color=#447700>!<a name='2145'></font>
+        CALL <A href='../../html_code/phys/module_mp_etanew.F.html#GPVS'>GPVS</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="GPVS_2"><a name='2146'>
+<font color=#447700>!<a name='2147'></font>
+<font color=#447700>!--- Read in various lookup tables<a name='2148'></font>
+<font color=#447700>!<a name='2149'></font>
+        IF ( wrf_dm_on_monitor() ) THEN<a name='2150'>
+          DO i = 31,99<a name='2151'>
+            INQUIRE ( i , OPENED = opened )<a name='2152'>
+            IF ( .NOT. opened ) THEN<a name='2153'>
+              etampnew_unit1 = i<a name='2154'>
+              GOTO 2061<a name='2155'>
+            ENDIF<a name='2156'>
+          ENDDO<a name='2157'>
+          etampnew_unit1 = -1<a name='2158'>
+ 2061     CONTINUE<a name='2159'>
+        ENDIF<a name='2160'>
+<font color=#447700>!<a name='2161'></font>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_84"> ( etampnew_unit1 , IWORDSIZE )<a name='2162'>
+<font color=#447700>!<a name='2163'></font>
+        IF ( etampnew_unit1 &lt; 0 ) THEN<a name='2164'>
+          CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_149"> ( 'module_mp_etanew: etanewinit: Can not find unused fortran unit to read in lookup table.' )<a name='2165'>
+        ENDIF<a name='2166'>
+<font color=#447700>!<a name='2167'></font>
+        IF ( wrf_dm_on_monitor() ) THEN<a name='2168'>
+<font color=#447700>!!was     OPEN (UNIT=1,FILE="eta_micro_lookup.dat",FORM="UNFORMATTED")<a name='2169'></font>
+          OPEN(UNIT=etampnew_unit1,FILE="ETAMPNEW_DATA",                  &amp;<a name='2170'>
+     &amp;        FORM="UNFORMATTED",STATUS="OLD",ERR=9061)<a name='2171'>
+<font color=#447700>!<a name='2172'></font>
+          READ(etampnew_unit1) VENTR1<a name='2173'>
+          READ(etampnew_unit1) VENTR2<a name='2174'>
+          READ(etampnew_unit1) ACCRR<a name='2175'>
+          READ(etampnew_unit1) MASSR<a name='2176'>
+          READ(etampnew_unit1) VRAIN<a name='2177'>
+          READ(etampnew_unit1) RRATE<a name='2178'>
+          READ(etampnew_unit1) VENTI1<a name='2179'>
+          READ(etampnew_unit1) VENTI2<a name='2180'>
+          READ(etampnew_unit1) ACCRI<a name='2181'>
+          READ(etampnew_unit1) MASSI<a name='2182'>
+          READ(etampnew_unit1) VSNOWI<a name='2183'>
+          READ(etampnew_unit1) VEL_RF<a name='2184'>
+<font color=#447700>!        read(etampnew_unit1) my_growth    ! Applicable only for DTPH=180 s<a name='2185'></font>
+          CLOSE (etampnew_unit1)<a name='2186'>
+        ENDIF<a name='2187'>
+<font color=#447700>!<a name='2188'></font>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_85"> ( VENTR1 , size ( VENTR1 ) * RWORDSIZE )<a name='2189'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_86"> ( VENTR2 , size ( VENTR2 ) * RWORDSIZE )<a name='2190'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_87"> ( ACCRR , size ( ACCRR ) * RWORDSIZE )<a name='2191'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_88"> ( MASSR , size ( MASSR ) * RWORDSIZE )<a name='2192'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_89"> ( VRAIN , size ( VRAIN ) * RWORDSIZE )<a name='2193'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_90"> ( RRATE , size ( RRATE ) * RWORDSIZE )<a name='2194'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_91"> ( VENTI1 , size ( VENTI1 ) * RWORDSIZE )<a name='2195'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_92"> ( VENTI2 , size ( VENTI2 ) * RWORDSIZE )<a name='2196'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_93"> ( ACCRI , size ( ACCRI ) * RWORDSIZE )<a name='2197'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_94"> ( MASSI , size ( MASSI ) * RWORDSIZE )<a name='2198'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_95"> ( VSNOWI , size ( VSNOWI ) * RWORDSIZE )<a name='2199'>
+        CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_DM_BCAST_BYTES'>wrf_dm_bcast_bytes</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DM_BCAST_BYTES_96"> ( VEL_RF , size ( VEL_RF ) * RWORDSIZE )<a name='2200'>
+<font color=#447700>!<a name='2201'></font>
+<font color=#447700>!--- Calculates coefficients for growth rates of ice nucleated in water<a name='2202'></font>
+<font color=#447700>!    saturated conditions, scaled by physics time step (lookup table)<a name='2203'></font>
+<font color=#447700>!<a name='2204'></font>
+        CALL <A href='../../html_code/phys/module_mp_etanew.F.html#MY_GROWTH_RATES'>MY_GROWTH_RATES</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MY_GROWTH_RATES_1"> (DTPH)<a name='2205'>
+<font color=#447700>!       CALL MY_GROWTH_RATES (DTPH,MY_GROWTH)<a name='2206'></font>
+<font color=#447700>!<a name='2207'></font>
+        PI=ACOS(-1.)<a name='2208'>
+<font color=#447700>!<a name='2209'></font>
+<font color=#447700>!--- Constants associated with Biggs (1953) freezing of rain, as parameterized<a name='2210'></font>
+<font color=#447700>!    following Lin et al. (JCAM, 1983) &amp; Reisner et al. (1998, QJRMS).<a name='2211'></font>
+<font color=#447700>!<a name='2212'></font>
+        ABFR=-0.66<a name='2213'>
+        BBFR=100.<a name='2214'>
+<font color=#447700>!       CBFR=20.*PI*PI*BBFR*RHOL*1.E-42<a name='2215'></font>
+        CBFR=0.<a name='2216'>
+<font color=#447700>!<a name='2217'></font>
+<font color=#447700>!--- CIACW is used in calculating riming rates<a name='2218'></font>
+<font color=#447700>!      The assumed effective collection efficiency of cloud water rimed onto<a name='2219'></font>
+<font color=#447700>!      ice is =0.5 below:<a name='2220'></font>
+<font color=#447700>!<a name='2221'></font>
+        CIACW=DTPH*0.25*PI*0.5*(1.E5)**C1<a name='2222'>
+<font color=#447700>!<a name='2223'></font>
+<font color=#447700>!--- CIACR is used in calculating freezing of rain colliding with large ice<a name='2224'></font>
+<font color=#447700>!      The assumed collection efficiency is 1.0<a name='2225'></font>
+<font color=#447700>!<a name='2226'></font>
+        CIACR=PI*DTPH<a name='2227'>
+<font color=#447700>!<a name='2228'></font>
+<font color=#447700>!--- Based on rain lookup tables for mean diameters from 0.05 to 0.45 mm<a name='2229'></font>
+<font color=#447700>!    * Four different functional relationships of mean drop diameter as <a name='2230'></font>
+<font color=#447700>!      a function of rain rate (RR), derived based on simple fits to <a name='2231'></font>
+<font color=#447700>!      mass-weighted fall speeds of rain as functions of mean diameter<a name='2232'></font>
+<font color=#447700>!      from the lookup tables.  <a name='2233'></font>
+<font color=#447700>!<a name='2234'></font>
+        RR_DRmin=N0r0*RRATE(MDRmin)     <font color=#447700>! RR for mean drop diameter of .05 mm<a name='2235'></font>
+        RR_DR1=N0r0*RRATE(MDR1)         <font color=#447700>! RR for mean drop diameter of .10 mm<a name='2236'></font>
+        RR_DR2=N0r0*RRATE(MDR2)         <font color=#447700>! RR for mean drop diameter of .20 mm<a name='2237'></font>
+        RR_DR3=N0r0*RRATE(MDR3)         <font color=#447700>! RR for mean drop diameter of .32 mm<a name='2238'></font>
+        RR_DRmax=N0r0*RRATE(MDRmax)     <font color=#447700>! RR for mean drop diameter of .45 mm<a name='2239'></font>
+<font color=#447700>!<a name='2240'></font>
+        RQR_DRmin=N0r0*MASSR(MDRmin)    <font color=#447700>! Rain content for mean drop diameter of .05 mm<a name='2241'></font>
+        RQR_DR1=N0r0*MASSR(MDR1)        <font color=#447700>! Rain content for mean drop diameter of .10 mm<a name='2242'></font>
+        RQR_DR2=N0r0*MASSR(MDR2)        <font color=#447700>! Rain content for mean drop diameter of .20 mm<a name='2243'></font>
+        RQR_DR3=N0r0*MASSR(MDR3)        <font color=#447700>! Rain content for mean drop diameter of .32 mm<a name='2244'></font>
+        RQR_DRmax=N0r0*MASSR(MDRmax)    <font color=#447700>! Rain content for mean drop diameter of .45 mm<a name='2245'></font>
+        C_N0r0=PI*RHOL*N0r0<a name='2246'>
+        CN0r0=1.E6/C_N0r0**.25<a name='2247'>
+        CN0r_DMRmin=1./(PI*RHOL*DMRmin**4)<a name='2248'>
+        CN0r_DMRmax=1./(PI*RHOL*DMRmax**4)<a name='2249'>
+<font color=#447700>!<a name='2250'></font>
+<font color=#447700>!--- CRACW is used in calculating collection of cloud water by rain (an<a name='2251'></font>
+<font color=#447700>!      assumed collection efficiency of 1.0)<a name='2252'></font>
+<font color=#447700>!<a name='2253'></font>
+        CRACW=DTPH*0.25*PI*1.0<a name='2254'>
+<font color=#447700>!<a name='2255'></font>
+        ESW0=1000.*FPVS0(T0C)     <font color=#447700>! Saturation vapor pressure at 0C<a name='2256'></font>
+        RFmax=1.1**Nrime          <font color=#447700>! Maximum rime factor allowed<a name='2257'></font>
+<font color=#447700>!<a name='2258'></font>
+<font color=#447700>!------------------------------------------------------------------------<a name='2259'></font>
+<font color=#447700>!--------------- Constants passed through argument list -----------------<a name='2260'></font>
+<font color=#447700>!------------------------------------------------------------------------<a name='2261'></font>
+<font color=#447700>!<a name='2262'></font>
+<font color=#447700>!--- Important parameters for self collection (autoconversion) of <a name='2263'></font>
+<font color=#447700>!    cloud water to rain. <a name='2264'></font>
+<font color=#447700>!<a name='2265'></font>
+<font color=#447700>!--- CRAUT is proportional to the rate that cloud water is converted by<a name='2266'></font>
+<font color=#447700>!      self collection to rain (autoconversion rate)<a name='2267'></font>
+<font color=#447700>!<a name='2268'></font>
+        CRAUT=1.-EXP(-1.E-3*DTPH)<a name='2269'>
+<font color=#447700>!<a name='2270'></font>
+<font color=#447700>!--- QAUT0 is the threshold cloud content for autoconversion to rain <a name='2271'></font>
+<font color=#447700>!      needed for droplets to reach a diameter of 20 microns (following<a name='2272'></font>
+<font color=#447700>!      Manton and Cotton, 1977; Banta and Hanson, 1987, JCAM)<a name='2273'></font>
+<font color=#447700>!--- QAUT0=1.2567, 0.8378, or 0.4189 g/m**3 for droplet number concentrations<a name='2274'></font>
+<font color=#447700>!          of 300, 200, and 100 cm**-3, respectively<a name='2275'></font>
+<font color=#447700>!<a name='2276'></font>
+        XNCW=200.E6                 <font color=#447700>! 300 cm**-3 droplet concentration<a name='2277'></font>
+        QAUT0=PI*RHOL*XNCW*(20.E-6)**3/6.<a name='2278'>
+<font color=#447700>!<a name='2279'></font>
+<font color=#447700>!--- For calculating snow optical depths by considering bulk density of<a name='2280'></font>
+<font color=#447700>!      snow based on emails from Q. Fu (6/27-28/01), where optical <a name='2281'></font>
+<font color=#447700>!      depth (T) = 1.5*SWP/(Reff*DENS), SWP is snow water path, Reff <a name='2282'></font>
+<font color=#447700>!      is effective radius, and DENS is the bulk density of snow.<a name='2283'></font>
+<font color=#447700>!<a name='2284'></font>
+<font color=#447700>!    SWP (kg/m**2)=(1.E-3 kg/g)*SWPrad, SWPrad in g/m**2 used in radiation<a name='2285'></font>
+<font color=#447700>!    T = 1.5*1.E3*SWPrad/(Reff*DENS)<a name='2286'></font>
+<font color=#447700>!  <a name='2287'></font>
+<font color=#447700>!    See derivation for MASSI(INDEXS), note equal to RHO*QSNOW/NSNOW<a name='2288'></font>
+<font color=#447700>!<a name='2289'></font>
+<font color=#447700>!      SDENS=1.5e3/DENS, DENS=MASSI(INDEXS)/[PI*(1.E-6*INDEXS)**3]<a name='2290'></font>
+<font color=#447700>!<a name='2291'></font>
+        DO I=MDImin,MDImax<a name='2292'>
+          SDENS(I)=PI*1.5E-15*FLOAT(I*I*I)/MASSI(I)<a name='2293'>
+        ENDDO<a name='2294'>
+<font color=#447700>!<a name='2295'></font>
+        Thour_print=-DTPH/3600.<a name='2296'>
+<a name='2297'>
+<font color=#447700>! SH 0211/2002<a name='2298'></font>
+<font color=#447700>!       IF (PRINT_diag) THEN<a name='2299'></font>
+       <a name='2300'>
+      <font color=#447700>!-------- Total and maximum quantities<a name='2301'></font>
+      <font color=#447700>!<a name='2302'></font>
+<font color=#447700>!         NSTATS=0      ! Microphysical statistics dealing w/ grid-point counts<a name='2303'></font>
+<font color=#447700>!         QMAX=0.       ! Microphysical statistics dealing w/ hydrometeor mass<a name='2304'></font>
+<font color=#447700>!         QTOT=0.       ! Microphysical statistics dealing w/ hydrometeor mass<a name='2305'></font>
+<font color=#447700>!         PRECmax=0.    ! Maximum precip rates (rain, snow) at surface (mm/h)<a name='2306'></font>
+<font color=#447700>!         PRECtot=0.    ! Total precipitation (rain, snow) accumulation at surface<a name='2307'></font>
+<font color=#447700>!       ENDIF<a name='2308'></font>
+<a name='2309'>
+<font color=#447700>!wrf<a name='2310'></font>
+      ENDIF  <font color=#447700>! Allowed_to_read<a name='2311'></font>
+      RETURN<a name='2312'>
+<font color=#447700>!<a name='2313'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2314'></font>
+<font color=#447700>!<a name='2315'></font>
+9061 CONTINUE<a name='2316'>
+      WRITE( errmess , '(A,I4)' )                                        &amp;<a name='2317'>
+       'module_mp_etanew: error opening ETAMPNEW_DATA on unit '          &amp;<a name='2318'>
+     &amp;, etampnew_unit1<a name='2319'>
+      CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/phys/module_mp_etanew.F.html#ETANEWINIT' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_150">(errmess)<a name='2320'>
+<font color=#447700>!<a name='2321'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2322'></font>
+      END SUBROUTINE etanewinit<a name='2323'>
+<font color=#447700>!<a name='2324'></font>
+<A NAME='MY_GROWTH_RATES'><A href='../../html_code/phys/module_mp_etanew.F.html#MY_GROWTH_RATES' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2325'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>MY_GROWTH_RATES</font> (DTPH) <A href='../../call_to/MY_GROWTH_RATES.html' TARGET='index'>1</A><a name='2326'>
+<font color=#447700>!     SUBROUTINE MY_GROWTH_RATES (DTPH,MY_GROWTH)<a name='2327'></font>
+<font color=#447700>!<a name='2328'></font>
+<font color=#447700>!--- Below are tabulated values for the predicted mass of ice crystals<a name='2329'></font>
+<font color=#447700>!    after 600 s of growth in water saturated conditions, based on <a name='2330'></font>
+<font color=#447700>!    calculations from Miller and Young (JAS, 1979).  These values are<a name='2331'></font>
+<font color=#447700>!    crudely estimated from tabulated curves at 600 s from Fig. 6.9 of<a name='2332'></font>
+<font color=#447700>!    Young (1993).  Values at temperatures colder than -27C were <a name='2333'></font>
+<font color=#447700>!    assumed to be invariant with temperature.  <a name='2334'></font>
+<font color=#447700>!<a name='2335'></font>
+<font color=#447700>!--- Used to normalize Miller &amp; Young (1979) calculations of ice growth<a name='2336'></font>
+<font color=#447700>!    over large time steps using their tabulated values at 600 s.<a name='2337'></font>
+<font color=#447700>!    Assumes 3D growth with time**1.5 following eq. (6.3) in Young (1993).<a name='2338'></font>
+<font color=#447700>!<a name='2339'></font>
+      IMPLICIT NONE<a name='2340'>
+<font color=#447700>!<a name='2341'></font>
+      REAL,INTENT(IN) :: DTPH<a name='2342'>
+<font color=#447700>!<a name='2343'></font>
+      REAL  DT_ICE<a name='2344'>
+      REAL,DIMENSION(35) :: MY_600<a name='2345'>
+<font color=#447700>!WRF<a name='2346'></font>
+<font color=#447700>!<a name='2347'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2348'></font>
+      DATA MY_600 /                                                     &amp;<a name='2349'>
+     &amp; 5.5e-8, 1.4E-7, 2.8E-7, 6.E-7, 3.3E-6,                           &amp; <a name='2350'>
+     &amp; 2.E-6, 9.E-7, 8.8E-7, 8.2E-7, 9.4e-7,                            &amp; <a name='2351'>
+     &amp; 1.2E-6, 1.85E-6, 5.5E-6, 1.5E-5, 1.7E-5,                         &amp; <a name='2352'>
+     &amp; 1.5E-5, 1.E-5, 3.4E-6, 1.85E-6, 1.35E-6,                         &amp; <a name='2353'>
+     &amp; 1.05E-6, 1.E-6, 9.5E-7, 9.0E-7, 9.5E-7,                          &amp; <a name='2354'>
+     &amp; 9.5E-7, 9.E-7, 9.E-7, 9.E-7, 9.E-7,                              &amp; <a name='2355'>
+     &amp; 9.E-7, 9.E-7, 9.E-7, 9.E-7, 9.E-7 /        <font color=#447700>! -31 to -35 deg C<a name='2356'></font>
+<font color=#447700>!<a name='2357'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2358'></font>
+<font color=#447700>!<a name='2359'></font>
+      DT_ICE=(DTPH/600.)**1.5<a name='2360'>
+      MY_GROWTH=DT_ICE*MY_600<a name='2361'>
+<font color=#447700>!<a name='2362'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2363'></font>
+<font color=#447700>!<a name='2364'></font>
+      END SUBROUTINE MY_GROWTH_RATES<a name='2365'>
+<font color=#447700>!<a name='2366'></font>
+<A NAME='GPVS'><A href='../../html_code/phys/module_mp_etanew.F.html#GPVS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2367'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>GPVS</font> <A href='../../call_to/GPVS.html' TARGET='index'>2</A>,<A href='../../call_from/GPVS.html' TARGET='index'>3</A><a name='2368'>
+<font color=#447700>!     ******************************************************************<a name='2369'></font>
+<font color=#447700>!$$$  SUBPROGRAM DOCUMENTATION BLOCK<a name='2370'></font>
+<font color=#447700>!                .      .    .<a name='2371'></font>
+<font color=#447700>! SUBPROGRAM:    GPVS        COMPUTE SATURATION VAPOR PRESSURE TABLE<a name='2372'></font>
+<font color=#447700>!   AUTHOR: N PHILLIPS       W/NP2      DATE: 30 DEC 82<a name='2373'></font>
+<font color=#447700>!<a name='2374'></font>
+<font color=#447700>! ABSTRACT: COMPUTE SATURATION VAPOR PRESSURE TABLE AS A FUNCTION OF<a name='2375'></font>
+<font color=#447700>!   TEMPERATURE FOR THE TABLE LOOKUP FUNCTION FPVS.<a name='2376'></font>
+<font color=#447700>!   EXACT SATURATION VAPOR PRESSURES ARE CALCULATED IN SUBPROGRAM FPVSX.<a name='2377'></font>
+<font color=#447700>!   THE CURRENT IMPLEMENTATION COMPUTES A TABLE WITH A LENGTH<a name='2378'></font>
+<font color=#447700>!   OF 7501 FOR TEMPERATURES RANGING FROM 180.0 TO 330.0 KELVIN.<a name='2379'></font>
+<font color=#447700>!<a name='2380'></font>
+<font color=#447700>! PROGRAM HISTORY LOG:<a name='2381'></font>
+<font color=#447700>!   91-05-07  IREDELL<a name='2382'></font>
+<font color=#447700>!   94-12-30  IREDELL             EXPAND TABLE<a name='2383'></font>
+<font color=#447700>!   96-02-19  HONG                ICE EFFECT<a name='2384'></font>
+<font color=#447700>!   01-11-29  JIN                 MODIFIED FOR WRF<a name='2385'></font>
+<font color=#447700>!<a name='2386'></font>
+<font color=#447700>! USAGE:  CALL GPVS<a name='2387'></font>
+<font color=#447700>!<a name='2388'></font>
+<font color=#447700>! SUBPROGRAMS CALLED:<a name='2389'></font>
+<font color=#447700>!   (FPVSX)  - INLINABLE FUNCTION TO COMPUTE SATURATION VAPOR PRESSURE<a name='2390'></font>
+<font color=#447700>!<a name='2391'></font>
+<font color=#447700>! COMMON BLOCKS:<a name='2392'></font>
+<font color=#447700>!   COMPVS   - SCALING PARAMETERS AND TABLE FOR FUNCTION FPVS.<a name='2393'></font>
+<font color=#447700>!<a name='2394'></font>
+<font color=#447700>! ATTRIBUTES:<a name='2395'></font>
+<font color=#447700>!   LANGUAGE: FORTRAN 90<a name='2396'></font>
+<font color=#447700>!<a name='2397'></font>
+<font color=#447700>!$$$<a name='2398'></font>
+      IMPLICIT NONE<a name='2399'>
+      real :: X,XINC,T<a name='2400'>
+      integer :: JX<a name='2401'>
+<font color=#447700>!----------------------------------------------------------------------<a name='2402'></font>
+<font color=#447700>!     XMIN=180.0<a name='2403'></font>
+<font color=#447700>!     XMAX=330.0<a name='2404'></font>
+      XINC=(XMAX-XMIN)/(NX-1)<a name='2405'>
+      C1XPVS=1.-XMIN/XINC<a name='2406'>
+      C2XPVS=1./XINC<a name='2407'>
+      C1XPVS0=1.-XMIN/XINC<a name='2408'>
+      C2XPVS0=1./XINC<a name='2409'>
+<font color=#447700>!<a name='2410'></font>
+      DO JX=1,NX<a name='2411'>
+        X=XMIN+(JX-1)*XINC<a name='2412'>
+        T=X<a name='2413'>
+        TBPVS(JX)=<A href='../../html_code/phys/module_mp_etanew.F.html#FPVSX'>FPVSX</A><A href='../../html_code/phys/module_mp_etanew.F.html#GPVS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="FPVSX_2">(T)<a name='2414'>
+        TBPVS0(JX)=<A href='../../html_code/phys/module_mp_etanew.F.html#FPVSX0'>FPVSX0</A><A href='../../html_code/phys/module_mp_etanew.F.html#GPVS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="FPVSX0_1">(T)<a name='2415'>
+      ENDDO<a name='2416'>
+<font color=#447700>! <a name='2417'></font>
+      END SUBROUTINE GPVS<a name='2418'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2419'></font>
+<font color=#447700>!***********************************************************************<a name='2420'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2421'></font>
+<A NAME='FPVS'><A href='../../html_code/phys/module_mp_etanew.F.html#FPVS' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2422'>
+                     REAL   <font color=#993300>FUNCTION </font><font color=#cc0000>FPVS</font>(T) <A href='../../call_to/FPVS.html' TARGET='index'>17</A><a name='2423'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2424'></font>
+<font color=#447700>!$$$  SUBPROGRAM DOCUMENTATION BLOCK<a name='2425'></font>
+<font color=#447700>!                .      .    .<a name='2426'></font>
+<font color=#447700>! SUBPROGRAM:    FPVS        COMPUTE SATURATION VAPOR PRESSURE<a name='2427'></font>
+<font color=#447700>!   AUTHOR: N PHILLIPS            W/NP2      DATE: 30 DEC 82<a name='2428'></font>
+<font color=#447700>!<a name='2429'></font>
+<font color=#447700>! ABSTRACT: COMPUTE SATURATION VAPOR PRESSURE FROM THE TEMPERATURE.<a name='2430'></font>
+<font color=#447700>!   A LINEAR INTERPOLATION IS DONE BETWEEN VALUES IN A LOOKUP TABLE<a name='2431'></font>
+<font color=#447700>!   COMPUTED IN GPVS. SEE DOCUMENTATION FOR FPVSX FOR DETAILS.<a name='2432'></font>
+<font color=#447700>!   INPUT VALUES OUTSIDE TABLE RANGE ARE RESET TO TABLE EXTREMA.<a name='2433'></font>
+<font color=#447700>!   THE INTERPOLATION ACCURACY IS ALMOST 6 DECIMAL PLACES.<a name='2434'></font>
+<font color=#447700>!   ON THE CRAY, FPVS IS ABOUT 4 TIMES FASTER THAN EXACT CALCULATION.<a name='2435'></font>
+<font color=#447700>!   THIS FUNCTION SHOULD BE EXPANDED INLINE IN THE CALLING ROUTINE.<a name='2436'></font>
+<font color=#447700>!<a name='2437'></font>
+<font color=#447700>! PROGRAM HISTORY LOG:<a name='2438'></font>
+<font color=#447700>!   91-05-07  IREDELL             MADE INTO INLINABLE FUNCTION<a name='2439'></font>
+<font color=#447700>!   94-12-30  IREDELL             EXPAND TABLE<a name='2440'></font>
+<font color=#447700>!   96-02-19  HONG                ICE EFFECT<a name='2441'></font>
+<font color=#447700>!   01-11-29  JIN                 MODIFIED FOR WRF<a name='2442'></font>
+<font color=#447700>!<a name='2443'></font>
+<font color=#447700>! USAGE:   PVS=FPVS(T)<a name='2444'></font>
+<font color=#447700>!<a name='2445'></font>
+<font color=#447700>!   INPUT ARGUMENT LIST:<a name='2446'></font>
+<font color=#447700>!     T        - REAL TEMPERATURE IN KELVIN<a name='2447'></font>
+<font color=#447700>!<a name='2448'></font>
+<font color=#447700>!   OUTPUT ARGUMENT LIST:<a name='2449'></font>
+<font color=#447700>!     FPVS     - REAL SATURATION VAPOR PRESSURE IN KILOPASCALS (CB)<a name='2450'></font>
+<font color=#447700>!<a name='2451'></font>
+<font color=#447700>! ATTRIBUTES:<a name='2452'></font>
+<font color=#447700>!   LANGUAGE: FORTRAN 90<a name='2453'></font>
+<font color=#447700>!$$$<a name='2454'></font>
+      IMPLICIT NONE<a name='2455'>
+      real,INTENT(IN) :: T<a name='2456'>
+      real XJ<a name='2457'>
+      integer :: JX<a name='2458'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2459'></font>
+      XJ=MIN(MAX(C1XPVS+C2XPVS*T,1.),FLOAT(NX))<a name='2460'>
+      JX=MIN(XJ,NX-1.)<a name='2461'>
+      FPVS=TBPVS(JX)+(XJ-JX)*(TBPVS(JX+1)-TBPVS(JX))<a name='2462'>
+<font color=#447700>!<a name='2463'></font>
+      END FUNCTION FPVS<a name='2464'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2465'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2466'></font>
+<A NAME='FPVS0'><A href='../../html_code/phys/module_mp_etanew.F.html#FPVS0' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2467'>
+                     REAL <font color=#993300>FUNCTION </font><font color=#cc0000>FPVS0</font>(T)<a name='2468'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2469'></font>
+      IMPLICIT NONE<a name='2470'>
+      real,INTENT(IN) :: T<a name='2471'>
+      real :: XJ1<a name='2472'>
+      integer :: JX1<a name='2473'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2474'></font>
+      XJ1=MIN(MAX(C1XPVS0+C2XPVS0*T,1.),FLOAT(NX))<a name='2475'>
+      JX1=MIN(XJ1,NX-1.)<a name='2476'>
+      FPVS0=TBPVS0(JX1)+(XJ1-JX1)*(TBPVS0(JX1+1)-TBPVS0(JX1))<a name='2477'>
+<font color=#447700>!<a name='2478'></font>
+      END FUNCTION FPVS0<a name='2479'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2480'></font>
+<font color=#447700>!***********************************************************************<a name='2481'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2482'></font>
+<A NAME='FPVSX'><A href='../../html_code/phys/module_mp_etanew.F.html#FPVSX' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2483'>
+                    REAL <font color=#993300>FUNCTION </font><font color=#cc0000>FPVSX</font>(T) <A href='../../call_to/FPVSX.html' TARGET='index'>2</A><a name='2484'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2485'></font>
+<font color=#447700>!$$$  SUBPROGRAM DOCUMENTATION BLOCK<a name='2486'></font>
+<font color=#447700>!                .      .    .<a name='2487'></font>
+<font color=#447700>! SUBPROGRAM:    FPVSX       COMPUTE SATURATION VAPOR PRESSURE<a name='2488'></font>
+<font color=#447700>!   AUTHOR: N PHILLIPS            W/NP2      DATE: 30 DEC 82<a name='2489'></font>
+<font color=#447700>!<a name='2490'></font>
+<font color=#447700>! ABSTRACT: EXACTLY COMPUTE SATURATION VAPOR PRESSURE FROM TEMPERATURE.<a name='2491'></font>
+<font color=#447700>!   THE WATER MODEL ASSUMES A PERFECT GAS, CONSTANT SPECIFIC HEATS<a name='2492'></font>
+<font color=#447700>!   FOR GAS AND LIQUID, AND NEGLECTS THE VOLUME OF THE LIQUID.<a name='2493'></font>
+<font color=#447700>!   THE MODEL DOES ACCOUNT FOR THE VARIATION OF THE LATENT HEAT<a name='2494'></font>
+<font color=#447700>!   OF CONDENSATION WITH TEMPERATURE.  THE ICE OPTION IS NOT INCLUDED.<a name='2495'></font>
+<font color=#447700>!   THE CLAUSIUS-CLAPEYRON EQUATION IS INTEGRATED FROM THE TRIPLE POINT<a name='2496'></font>
+<font color=#447700>!   TO GET THE FORMULA<a name='2497'></font>
+<font color=#447700>!       PVS=PSATK*(TR**XA)*EXP(XB*(1.-TR))<a name='2498'></font>
+<font color=#447700>!   WHERE TR IS TTP/T AND OTHER VALUES ARE PHYSICAL CONSTANTS<a name='2499'></font>
+<font color=#447700>!   THIS FUNCTION SHOULD BE EXPANDED INLINE IN THE CALLING ROUTINE.<a name='2500'></font>
+<font color=#447700>!<a name='2501'></font>
+<font color=#447700>! PROGRAM HISTORY LOG:<a name='2502'></font>
+<font color=#447700>!   91-05-07  IREDELL             MADE INTO INLINABLE FUNCTION<a name='2503'></font>
+<font color=#447700>!   94-12-30  IREDELL             EXACT COMPUTATION<a name='2504'></font>
+<font color=#447700>!   96-02-19  HONG                ICE EFFECT <a name='2505'></font>
+<font color=#447700>!   01-11-29  JIN                 MODIFIED FOR WRF<a name='2506'></font>
+<font color=#447700>!<a name='2507'></font>
+<font color=#447700>! USAGE:   PVS=FPVSX(T)<a name='2508'></font>
+<font color=#447700>! REFERENCE:   EMANUEL(1994),116-117<a name='2509'></font>
+<font color=#447700>!<a name='2510'></font>
+<font color=#447700>!   INPUT ARGUMENT LIST:<a name='2511'></font>
+<font color=#447700>!     T        - REAL TEMPERATURE IN KELVIN<a name='2512'></font>
+<font color=#447700>!<a name='2513'></font>
+<font color=#447700>!   OUTPUT ARGUMENT LIST:<a name='2514'></font>
+<font color=#447700>!     FPVSX    - REAL SATURATION VAPOR PRESSURE IN KILOPASCALS (CB)<a name='2515'></font>
+<font color=#447700>!<a name='2516'></font>
+<font color=#447700>! ATTRIBUTES:<a name='2517'></font>
+<font color=#447700>!   LANGUAGE: FORTRAN 90<a name='2518'></font>
+<font color=#447700>!$$$<a name='2519'></font>
+      IMPLICIT NONE<a name='2520'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2521'></font>
+       real, parameter :: CP=1.0046E+3,RD=287.04,RV=4.6150E+2                     &amp;<a name='2522'>
+      ,         TTP=2.7316E+2,HVAP=2.5000E+6,PSAT=6.1078E+2                       &amp;<a name='2523'>
+      ,         CLIQ=4.1855E+3,CVAP= 1.8460E+3                                    &amp;<a name='2524'>
+      ,         CICE=2.1060E+3,HSUB=2.8340E+6<a name='2525'>
+<font color=#447700>!<a name='2526'></font>
+      real, parameter :: PSATK=PSAT*1.E-3<a name='2527'>
+      real, parameter :: DLDT=CVAP-CLIQ,XA=-DLDT/RV,XB=XA+HVAP/(RV*TTP)<a name='2528'>
+      real, parameter :: DLDTI=CVAP-CICE                                          &amp;<a name='2529'>
+      ,                  XAI=-DLDTI/RV,XBI=XAI+HSUB/(RV*TTP)<a name='2530'>
+      real T,TR<a name='2531'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2532'></font>
+      TR=TTP/T<a name='2533'>
+<font color=#447700>!<a name='2534'></font>
+      IF(T.GE.TTP)THEN<a name='2535'>
+        FPVSX=PSATK*(TR**XA)*EXP(XB*(1.-TR))<a name='2536'>
+      ELSE<a name='2537'>
+        FPVSX=PSATK*(TR**XAI)*EXP(XBI*(1.-TR))<a name='2538'>
+      ENDIF<a name='2539'>
+<font color=#447700>! <a name='2540'></font>
+      END FUNCTION FPVSX<a name='2541'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2542'></font>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2543'></font>
+<A NAME='FPVSX0'><A href='../../html_code/phys/module_mp_etanew.F.html#FPVSX0' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='2544'>
+                 REAL   <font color=#993300>FUNCTION </font><font color=#cc0000>FPVSX0</font>(T) <A href='../../call_to/FPVSX0.html' TARGET='index'>1</A><a name='2545'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2546'></font>
+      IMPLICIT NONE<a name='2547'>
+      real,parameter :: CP=1.0046E+3,RD=287.04,RV=4.6150E+2                      &amp;<a name='2548'>
+      ,         TTP=2.7316E+2,HVAP=2.5000E+6,PSAT=6.1078E+2                      &amp;<a name='2549'>
+      ,         CLIQ=4.1855E+3,CVAP=1.8460E+3                                    &amp;<a name='2550'>
+      ,         CICE=2.1060E+3,HSUB=2.8340E+6<a name='2551'>
+      real,PARAMETER :: PSATK=PSAT*1.E-3<a name='2552'>
+      real,PARAMETER :: DLDT=CVAP-CLIQ,XA=-DLDT/RV,XB=XA+HVAP/(RV*TTP)<a name='2553'>
+      real,PARAMETER :: DLDTI=CVAP-CICE                                          &amp;<a name='2554'>
+      ,                 XAI=-DLDT/RV,XBI=XA+HSUB/(RV*TTP)<a name='2555'>
+      real :: T,TR<a name='2556'>
+<font color=#447700>!-----------------------------------------------------------------------<a name='2557'></font>
+      TR=TTP/T<a name='2558'>
+      FPVSX0=PSATK*(TR**XA)*EXP(XB*(1.-TR))<a name='2559'>
+<font color=#447700>!<a name='2560'></font>
+      END FUNCTION FPVSX0<a name='2561'>
+<font color=#447700>!<a name='2562'></font>
+      END MODULE module_mp_etanew<a name='2563'>
+</pre></body></html>

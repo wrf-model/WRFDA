@@ -1,0 +1,227 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="scripts/menu_array_tutorial_base.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="menu.html"><img src="images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="images/goldrule.jpg"><img src="tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+      <p class="headingtext" id="Font20">Main Menu</p>
+      <blockquote>
+        <p class="style5"><span style="color:red;"><em><strong>Please Note!</strong></em><br>
+          This tutorial is still under construction! You will likely find dead links, missing text and images, and probably an ugly color scheme. It's coming along, we promise! But we always appreciate your suggestions; you can send them via the "WRFDA Tutorial webmaster" link at the bottom of this page.</span></p>
+        <p class="style5" id="Font16">Introduction</p>
+        <ul>
+          <li class="bodybullet"><a href="index.html">Welcome</a></li>
+          <li class="bodybullet"><a href="Introduction/index.html">Introduction to WRFDA</a></li>
+          <ul>
+            <li class="bodybullet"><a href="Introduction/index.html#software">Software Requirements</a></li>
+            <li class="bodybullet"><a href="Introduction/index.html#documentation">Documentation</a></li>
+          </ul> 
+          <li class="bodybullet"><a href="Introduction/start.html">Choose your own adventure!</a></li>
+          <ul>
+            <li class="bodybullet"><a href="3dvar/index.html">Basic 3DVAR</a></li>
+            <li class="bodybullet">Advanced 3DVAR (<em>Coming soon!</em>)<!--<a href="Advanced_3dvar/index.html">Advanced 3DVAR</a>--></li>
+            <li class="bodybullet">Hybrid  (<em>Under construction</em>)<!--<a href="Hybrid/index.html">Hybrid</a>--></li>
+            <li class="bodybullet">4DVAR  (<em>Under construction</em>)<!--<a href="4dvar/index.html">4DVAR</a>--></li>
+            <li class="bodybullet">FSO  (<em>Under construction</em>)<!--<a href="FSO/index.html">FSO</a>--></li>
+          </ul>
+        </ul>
+        <p class="style5" id="Font16">3DVAR</p>
+        <ul>
+          <li class="bodybullet"><a href="3dvar/index.html">Introduction</a></li>
+          <ul>
+            <li class="bodybullet"><a href="3dvar/configure.html">Configuration</a></li>
+            <li class="bodybullet"><a href="3dvar/compile.html">Compilation</a></li>
+          </ul>
+          <li class="bodybullet"><a href="3dvar/testcase.html">Test Case</a></li>
+        </ul>
+        <p class="style5" id="Font16">Help!</p>
+        <ul>
+          <li class="bodybullet"><a href="Help/index.html">Main Help Page</a></li>
+          <ul>
+            <li class="bodybullet"><a href="Help/netcdf.html">NetCDF</a></li>
+            <li class="bodybullet"><a href="Help/shells.html">Shells</a></li>
+          </ul>
+        </ul>
+        <p class="style5" id="Font16">Advanced 3DVAR</p>
+         <p class="bodytext"><span class="style7">Coming soon!</p>
+<!--        <ul>
+          <li class="bodybullet"><a href="Advanced_3dvar/index.html">Introduction</a></li>
+          <ul>
+            <li class="bodybullet"><a href="Advanced_3dvar/configure.html">Configuration</a></li>
+            <li class="bodybullet"><a href="Advanced_3dvar/compile.html">Compilation</a></li>
+          </ul>
+        </ul>-->
+        <p class="style5" id="Font16">Hybrid Ensemble 3DVAR</p>
+         <p class="bodytext"><span class="style7">Under construction</p>
+<!--        <ul>
+          <li class="bodybullet"><a href="Hybrid/index.html">Introduction</a></li>
+          <ul>
+            <li class="bodybullet"><a href="Compile/hybrid_configure.html">Configuration</a></li>
+            <li class="bodybullet"><a href="Compile/hybrid_compile.html">Compilation</a></li>
+          </ul>
+        </ul>-->
+        <p class="style5" id="Font16">4DVAR</p>
+         <p class="bodytext"><span class="style7">Under construction</p>
+<!--        <ul>
+          <li class="bodybullet"><a href="4dvar/index.html">Introduction</a></li>
+          <ul>
+            <li class="bodybullet"><a href="4dvar/configure.html">Configuration</a></li>
+            <li class="bodybullet"><a href="4dvar/compile.html">Compilation</a></li>
+          </ul>
+        </ul>-->
+        <p class="style5" id="Font16">Forecast Sensitivity to Observations (FSO)</p>
+         <p class="bodytext"><span class="style7">Under construction</p>
+<!--        <ul>
+          <li class="bodybullet"><a href="FSO/index.html">Introduction</a></li>
+          <ul>
+            <li class="bodybullet"><a href="FSO/configure.html">Configuration</a></li>
+            <li class="bodybullet"><a href="FSO/compile.html">Compilation</a></li>
+          </ul>
+        </ul>-->
+      </blockquote>      
+      <p class="bodytext">For questions regarding WRFDA, please submit emails to <strong><em>wrfhelp@ucar.edu</em></strong><br>
+      <br>
+      <strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> or wrfhelp@ucar.edu so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

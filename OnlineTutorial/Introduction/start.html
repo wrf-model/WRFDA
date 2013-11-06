@@ -1,0 +1,216 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+
+      <p class="headingtext" id="Font18">Getting started</p>
+      <p class="bodytext">Preparation for installing WRFDA depends on how you plan on using it. There are several different ways that WRFDA could be set up. We recommend that you try the "Basic 3DVAR" case if this is your first experience with WRFDA.</p>
+      <blockquote><hr></blockquote>
+      <p class="bodytext"><strong id="Font14">Basic 3DVAR</strong></p>
+      <blockquote>
+        <p class="bodytext">This is the easiest WRFDA method, but it is by no means <em>easy</em> for a beginner. Through this tutorial, however, we hope to at least make it relatively painless.</p>
+      </blockquote>
+      <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> Compiling WRFDA for 3DVAR (basic)</span>&nbsp;&nbsp;&nbsp;<a href="../3dvar/index.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote>
+      <p class="bodytext"><strong id="Font14">Advanced 3DVAR</strong></p>
+      <blockquote>
+        <p class="bodytext">This branch of the tutorial will go over more advanced options, such as compiling for parallel execution, reading observations in PREPBUFR format, assimilating radiance observations, and running in cycling mode.</p>
+      </blockquote>                                                                                                        <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7">Compiling 3DVAR with advanced options</span>&nbsp;&nbsp;&nbsp;<a href="../Advanced_3dvar/index.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote>
+      <p class="bodytext"><strong id="Font14">Hybrid Variational/Ensemble Data Assimilation</strong></p>
+      <blockquote>
+        <p class="bodytext">This branch of the tutorial will introduce WRFDA's Hybrid Variational/Ensemble system.</p>
+      </blockquote>
+      <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> <!--Compiling WRFDA for Hybrid</span>&nbsp;&nbsp;&nbsp;<a href="../Compile/hybrid.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a>--> Coming soon!</span></div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote>
+      <p class="bodytext"><strong id="Font14">4DVAR</strong></p>
+      <blockquote>
+        <p class="bodytext">This branch of the tutorial will go over more advanced options, such as reading in bufr files, assimilating radiance observations, and running in cycling mode.</p>
+      </blockquote>
+      <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> <!--Compiling WRFDA for 4DVAR</span>&nbsp;&nbsp;&nbsp;<a href="../Compile/4dvar.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a>--> Coming soon!</span></div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote>
+      <p class="bodytext"><strong id="Font14">FSO</strong></p>
+      <blockquote>
+        <p class="bodytext">This final branch of the tutorial will describe the Forecast Sensitivity to Observations (FSO) utility.</p>
+      </blockquote>
+      <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> <!--Compiling WRFDA for FSO</span>&nbsp;&nbsp;&nbsp;<a href="../Compile/fso.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a>--> Coming soon!</span></div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote>
+      <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><a href="../Help/index.html"><img src="../images/help.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;<a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+
+      </table>
+
+      <br>
+      <br><blockquote><hr></blockquote><br>
+      <p class="bodytext"><strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> so that we can address the problem. We appreciate your feedback!
+
+      </p>
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

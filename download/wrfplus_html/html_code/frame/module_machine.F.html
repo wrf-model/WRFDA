@@ -1,0 +1,190 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:DRIVER_LAYER:DECOMPOSITION<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_MACHINE'><A href='../../html_code/frame/module_machine.F.html#MODULE_MACHINE' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_machine</font> <A href='../../call_to/MODULE_MACHINE.html' TARGET='index'>24</A><a name='6'>
+<a name='7'>
+   USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_machine.F.html#module_machine.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_22"><a name='8'>
+<a name='9'>
+   <font color=#447700>!  Machine characteristics and utilities here.<a name='10'></font>
+<a name='11'>
+   <font color=#447700>! Tile strategy defined constants<a name='12'></font>
+   INTEGER, PARAMETER :: TILE_X = 1, TILE_Y = 2, TILE_XY = 3<a name='13'>
+<a name='14'>
+   TYPE machine_type<a name='15'>
+      INTEGER                       :: tile_strategy<a name='16'>
+   END TYPE machine_type<a name='17'>
+<a name='18'>
+   TYPE (machine_type) machine_info<a name='19'>
+<a name='20'>
+   CONTAINS<a name='21'>
+<a name='22'>
+<A NAME='RLOCPROC'><A href='../../html_code/frame/module_machine.F.html#RLOCPROC' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='23'>
+   RECURSIVE <font color=#993300>SUBROUTINE </font><font color=#cc0000>rlocproc</font>(p,maxi,nproc,ml,mr,ret) <A href='../../call_to/RLOCPROC.html' TARGET='index'>2</A>,<A href='../../call_from/RLOCPROC.html' TARGET='index'>1</A><a name='24'>
+   IMPLICIT NONE<a name='25'>
+   INTEGER, INTENT(IN)  :: p, maxi, nproc, ml, mr<a name='26'>
+   INTEGER, INTENT(OUT) :: ret<a name='27'>
+   INTEGER              :: width, rem, ret2, bl, br, mid, adjust, &amp;<a name='28'>
+                           p_r, maxi_r, nproc_r, zero<a name='29'>
+   adjust = 0<a name='30'>
+   rem = mod( maxi, nproc )<a name='31'>
+   width = maxi / nproc<a name='32'>
+   mid = maxi / 2<a name='33'>
+   IF ( rem&gt;0 .AND. (((mod(rem,2).EQ.0).OR.(rem.GT.2)).OR.(p.LE.mid))) THEN<a name='34'>
+     width = width + 1<a name='35'>
+   END IF<a name='36'>
+   IF ( p.LE.mid .AND. mod(rem,2).NE.0 ) THEN<a name='37'>
+     adjust = adjust + 1<a name='38'>
+   END IF<a name='39'>
+   bl = max(width,ml) ;<a name='40'>
+   br = max(width,mr) ;<a name='41'>
+   IF      (p&lt;bl) THEN<a name='42'>
+     ret = 0<a name='43'>
+   ELSE IF (p&gt;maxi-br-1) THEN<a name='44'>
+     ret = nproc-1<a name='45'>
+   ELSE<a name='46'>
+     p_r = p - bl<a name='47'>
+     maxi_r = maxi-bl-br+adjust<a name='48'>
+     nproc_r = max(nproc-2,1)<a name='49'>
+     zero = 0<a name='50'>
+     CALL <A href='../../html_code/frame/module_machine.F.html#RLOCPROC'>rlocproc</A><A href='../../html_code/frame/module_machine.F.html#RLOCPROC' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RLOCPROC_1">( p_r, maxi_r, nproc_r, zero, zero, ret2 )  <font color=#447700>! Recursive<a name='51'></font>
+     ret = ret2 + 1<a name='52'>
+   END IF<a name='53'>
+   RETURN<a name='54'>
+   END SUBROUTINE rlocproc<a name='55'>
+<a name='56'>
+<A NAME='LOCPROC'><A href='../../html_code/frame/module_machine.F.html#LOCPROC' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='57'>
+   INTEGER <font color=#993300>FUNCTION </font><font color=#cc0000>locproc</font>( i, m, numpart ) <A href='../../call_to/LOCPROC.html' TARGET='index'>2</A>,<A href='../../call_from/LOCPROC.html' TARGET='index'>1</A><a name='58'>
+   implicit none<a name='59'>
+   integer, intent(in) :: i, m, numpart <a name='60'>
+   integer             :: retval, ii, im, inumpart, zero<a name='61'>
+   ii = i<a name='62'>
+   im = m<a name='63'>
+   inumpart = numpart<a name='64'>
+   zero = 0<a name='65'>
+   CALL <A href='../../html_code/frame/module_machine.F.html#RLOCPROC'>rlocproc</A><A href='../../html_code/frame/module_machine.F.html#LOCPROC' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="RLOCPROC_2">( ii, im, inumpart, zero, zero, retval )<a name='66'>
+   locproc = retval<a name='67'>
+   RETURN<a name='68'>
+   END FUNCTION locproc<a name='69'>
+<a name='70'>
+<A NAME='PATCHMAP'><A href='../../html_code/frame/module_machine.F.html#PATCHMAP' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='71'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>patchmap</font>( res, y, x, py, px ),<A href='../../call_from/PATCHMAP.html' TARGET='index'>2</A><a name='72'>
+   implicit none<a name='73'>
+   INTEGER, INTENT(IN)                    :: y, x, py, px<a name='74'>
+   INTEGER, DIMENSION(x,y), INTENT(OUT)   :: res<a name='75'>
+   INTEGER                                :: i, j, p_min, p_maj<a name='76'>
+   DO j = 0,y-1<a name='77'>
+     p_maj = <A href='../../html_code/frame/module_machine.F.html#LOCPROC'>locproc</A><A href='../../html_code/frame/module_machine.F.html#PATCHMAP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LOCPROC_1">( j, y, py )<a name='78'>
+     DO i = 0,x-1<a name='79'>
+       p_min = <A href='../../html_code/frame/module_machine.F.html#LOCPROC'>locproc</A><A href='../../html_code/frame/module_machine.F.html#PATCHMAP' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LOCPROC_2">( i, x, px )<a name='80'>
+       res(i+1,j+1) = p_min + px*p_maj<a name='81'>
+     END DO<a name='82'>
+   END DO<a name='83'>
+   RETURN<a name='84'>
+   END SUBROUTINE patchmap<a name='85'>
+<a name='86'>
+<A NAME='REGION_BOUNDS'><A href='../../html_code/frame/module_machine.F.html#REGION_BOUNDS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='87'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>region_bounds</font>( region_start, region_end, &amp; <A href='../../call_to/REGION_BOUNDS.html' TARGET='index'>2</A><a name='88'>
+                             num_p, p,                 &amp;<a name='89'>
+                             patch_start, patch_end )<a name='90'>
+   <font color=#447700>! 1-D decomposition routine: Given starting and ending indices of a<a name='91'></font>
+   <font color=#447700>! vector, the number of patches dividing the vector, and the number of<a name='92'></font>
+   <font color=#447700>! the patch, give the start and ending indices of the patch within the<a name='93'></font>
+   <font color=#447700>! vector.  This will work with tiles too.  Implementation note.  This is<a name='94'></font>
+   <font color=#447700>! implemented somewhat inefficiently, now, with a loop, so we can use the<a name='95'></font>
+   <font color=#447700>! locproc function above, which returns processor number for a given<a name='96'></font>
+   <font color=#447700>! index, whereas what we want is index for a given processor number.<a name='97'></font>
+   <font color=#447700>! With a little thought and a lot of debugging, we can come up with a<a name='98'></font>
+   <font color=#447700>! direct expression for what we want.  For time being, we loop...<a name='99'></font>
+   <font color=#447700>! Remember that processor numbering starts with zero.<a name='100'></font>
+                      <a name='101'>
+   IMPLICIT NONE<a name='102'>
+   INTEGER, INTENT(IN)                    :: region_start, region_end, num_p, p<a name='103'>
+   INTEGER, INTENT(OUT)                   :: patch_start, patch_end<a name='104'>
+   INTEGER                                :: offset, i<a name='105'>
+   patch_end = -999999999<a name='106'>
+   patch_start = 999999999<a name='107'>
+   offset = region_start<a name='108'>
+   do i = 0, region_end - offset<a name='109'>
+     if ( locproc( i, region_end-region_start+1, num_p ) == p ) then<a name='110'>
+       patch_end = max(patch_end,i)<a name='111'>
+       patch_start = min(patch_start,i)<a name='112'>
+     endif<a name='113'>
+   enddo<a name='114'>
+   patch_start = patch_start + offset<a name='115'>
+   patch_end   = patch_end   + offset<a name='116'>
+   RETURN<a name='117'>
+   END SUBROUTINE region_bounds<a name='118'>
+<a name='119'>
+<A NAME='LEAST_ASPECT'><A href='../../html_code/frame/module_machine.F.html#LEAST_ASPECT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='120'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>least_aspect</font>( nparts, minparts_y, minparts_x, nparts_y, nparts_x ) <A href='../../call_to/LEAST_ASPECT.html' TARGET='index'>1</A><a name='121'>
+   IMPLICIT NONE<a name='122'>
+   <font color=#447700>!  Input data.<a name='123'></font>
+   INTEGER, INTENT(IN)           :: nparts,                &amp;<a name='124'>
+                                    minparts_y, minparts_x<a name='125'>
+   <font color=#447700>! Output data. <a name='126'></font>
+   INTEGER, INTENT(OUT)          :: nparts_y, nparts_x<a name='127'>
+   <font color=#447700>! Local data.<a name='128'></font>
+   INTEGER                       :: x, y, mini<a name='129'>
+   mini = 2*nparts<a name='130'>
+   nparts_y = 1<a name='131'>
+   nparts_x = nparts<a name='132'>
+   DO y = 1, nparts<a name='133'>
+      IF ( mod( nparts, y ) .eq. 0 ) THEN<a name='134'>
+         x = nparts / y<a name='135'>
+         IF (       abs( y-x ) .LT. mini       &amp;<a name='136'>
+              .AND. y .GE. minparts_y                &amp;<a name='137'>
+              .AND. x .GE. minparts_x    ) THEN<a name='138'>
+            mini = abs( y-x )<a name='139'>
+            nparts_y = y<a name='140'>
+            nparts_x = x<a name='141'>
+         END IF<a name='142'>
+      END IF<a name='143'>
+   END DO<a name='144'>
+   END SUBROUTINE least_aspect<a name='145'>
+<a name='146'>
+<A NAME='INIT_MODULE_MACHINE'><A href='../../html_code/frame/module_machine.F.html#INIT_MODULE_MACHINE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='147'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_machine</font> <A href='../../call_to/INIT_MODULE_MACHINE.html' TARGET='index'>2</A><a name='148'>
+      machine_info%tile_strategy = TILE_Y<a name='149'>
+   END SUBROUTINE init_module_machine<a name='150'>
+<a name='151'>
+END MODULE module_machine<a name='152'>
+<a name='153'>
+<A NAME='WRF_SIZEOF_INTEGER'><A href='../../html_code/frame/module_machine.F.html#WRF_SIZEOF_INTEGER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='154'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>wrf_sizeof_integer</font>( retval )<a name='155'>
+  IMPLICIT NONE<a name='156'>
+  INTEGER retval<a name='157'>
+<font color=#447700>! IWORDSIZE is defined by CPP<a name='158'></font>
+  retval = IWORDSIZE<a name='159'>
+  RETURN<a name='160'>
+END SUBROUTINE wrf_sizeof_integer<a name='161'>
+<a name='162'>
+<A NAME='WRF_SIZEOF_REAL'><A href='../../html_code/frame/module_machine.F.html#WRF_SIZEOF_REAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='163'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>wrf_sizeof_real</font>( retval )<a name='164'>
+  IMPLICIT NONE<a name='165'>
+  INTEGER retval<a name='166'>
+<font color=#447700>! RWORDSIZE is defined by CPP<a name='167'></font>
+  retval = RWORDSIZE<a name='168'>
+  RETURN<a name='169'>
+END SUBROUTINE wrf_sizeof_real<a name='170'>
+<a name='171'>
+<A NAME='WRF_SIZEOF_DOUBLEPRECISION'><A href='../../html_code/frame/module_machine.F.html#WRF_SIZEOF_DOUBLEPRECISION' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='172'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>wrf_sizeof_doubleprecision</font>( retval )<a name='173'>
+  IMPLICIT NONE<a name='174'>
+  INTEGER retval<a name='175'>
+<font color=#447700>! DWORDSIZE is defined by CPP<a name='176'></font>
+  retval = DWORDSIZE<a name='177'>
+  RETURN<a name='178'>
+END SUBROUTINE wrf_sizeof_doubleprecision<a name='179'>
+<a name='180'>
+<A NAME='WRF_SIZEOF_LOGICAL'><A href='../../html_code/frame/module_machine.F.html#WRF_SIZEOF_LOGICAL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='181'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>wrf_sizeof_logical</font>( retval )<a name='182'>
+  IMPLICIT NONE<a name='183'>
+  INTEGER retval<a name='184'>
+<font color=#447700>! LWORDSIZE is defined by CPP<a name='185'></font>
+  retval = LWORDSIZE<a name='186'>
+  RETURN<a name='187'>
+END SUBROUTINE wrf_sizeof_logical<a name='188'>
+<a name='189'>
+</pre></body></html>

@@ -1,0 +1,895 @@
+<HTML> <BODY BGCOLOR=#eeeeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='NUPDOWN'><A href='../../html_code/main/nupdown.F.html#NUPDOWN' TARGET='top_target'><IMG SRC="../../gif/bar_yellow.gif" border=0></A><a name='2'>
+      <font color=#993300>program </font><font color=#cc0000>nupdown</font>,<A href='../../call_from/NUPDOWN.html' TARGET='index'>4</A><a name='3'>
+<font color=#447700>!  Program to read/write wrf output. <a name='4'></font>
+<font color=#447700>!  OPTION -thin  : It will nestup data to the ratio given<a name='5'></font>
+<font color=#447700>!  OPTION -down  : It will nestdown data to the ratio given<a name='6'></font>
+<font color=#447700>!   Cindy Bruyere - March 2006<a name='7'></font>
+<font color=#447700>!   Some code borrowed from Jim Bresch<a name='8'></font>
+<font color=#447700>!   Modyfied for multi-incremental wrf4dvar by Xin Zhang - Sept. 2006<a name='9'></font>
+<font color=#447700>!=================================Run Program================================<a name='10'></font>
+<font color=#447700>!  To thin your input file down (by picking up corresponding points)<a name='11'></font>
+<font color=#447700>!     nupdown wrfout_file -thin/down 3 [-debug]<a name='12'></font>
+<font color=#447700>!<a name='13'></font>
+<font color=#447700>!  To see more options<a name='14'></font>
+<font color=#447700>!     nupdown -help         <a name='15'></font>
+<font color=#447700>!<a name='16'></font>
+<font color=#447700>!  The output will be written to a file with original file name + -thin/down<a name='17'></font>
+<font color=#447700>!<a name='18'></font>
+<font color=#447700>!=================================Make Executable============================<a name='19'></font>
+<font color=#447700>!  Make executable:<a name='20'></font>
+<font color=#447700>!    DEC Alpha<a name='21'></font>
+<font color=#447700>!      f90 nupdown.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='22'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -free  -o nupdown<a name='23'></font>
+<font color=#447700>!<a name='24'></font>
+<font color=#447700>!   linux flags<a name='25'></font>
+<font color=#447700>!      pgf90 nupdown.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='26'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -Mfree  -o nupdown<a name='27'></font>
+<font color=#447700>!<a name='28'></font>
+<font color=#447700>!   Sun flags<a name='29'></font>
+<font color=#447700>!      f90 nupdown.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='30'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -free  -o nupdown<a name='31'></font>
+<font color=#447700>!<a name='32'></font>
+<font color=#447700>!   SGI flags<a name='33'></font>
+<font color=#447700>!      f90 nupdown.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='34'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -freeform  -o nupdown<a name='35'></font>
+<font color=#447700>!<a name='36'></font>
+<font color=#447700>!   IBM flags (NCAR bluesky - 32bit)<a name='37'></font>
+<font color=#447700>!      xlf nupdown.f -L/usr/local/lib32/r4i4 -lnetcdf -lm  \<a name='38'></font>
+<font color=#447700>!      -I/usr/local/include  -qfree=f90  -o nupdown<a name='39'></font>
+<font color=#447700>!<a name='40'></font>
+<font color=#447700>!   IBM flags (NCAR bluesky - 64bit)<a name='41'></font>
+<font color=#447700>!      xlf nupdown.f -L/usr/local/lib64/r4i4 -lnetcdf -lm  \<a name='42'></font>
+<font color=#447700>!      -I/usr/local/include  -qfree=f90  -o nupdown<a name='43'></font>
+<font color=#447700>!<a name='44'></font>
+<font color=#447700>!   IBM flags (NCAR bluevista)   <a name='45'></font>
+<font color=#447700>!      xlf nupdown.f -L/usr/local/netcdf/lib -lnetcdf -lm  \<a name='46'></font>
+<font color=#447700>!      -I/usr/local/netcdf/include  -qfree=f90  -o nupdown<a name='47'></font>
+<font color=#447700>!<a name='48'></font>
+<font color=#447700>!   Mac flags (with xlf compiler)<a name='49'></font>
+<font color=#447700>!      xlf -O3 nupdown.f -L/usr/local/netcdf-3.5.1-xlf/lib -lnetcdf -lm  \<a name='50'></font>
+<font color=#447700>!      -I/usr/local/netcdf-3.5.1-xlf/include  -qfree=f90  -o nupdown<a name='51'></font>
+<font color=#447700>!<a name='52'></font>
+<font color=#447700>!============================================================================<a name='53'></font>
+<a name='54'>
+      INCLUDE 'netcdf.inc'<a name='55'>
+      parameter (jdim=6)<a name='56'>
+      integer ncid, status<a name='57'>
+      integer ishape(jdim)<a name='58'>
+      integer ishape2(jdim)<a name='59'>
+      character cval*100<a name='60'>
+      character name*31<a name='61'>
+      character (len=31),allocatable, dimension(:)      :: dname<a name='62'>
+      integer,           allocatable, dimension(:)       :: dval, dval2<a name='63'>
+      real,              allocatable, dimension(:,:,:,:) :: data, data2<a name='64'>
+      double precision,  allocatable, dimension(:,:,:,:) :: ddata, ddata2<a name='65'>
+      integer,           allocatable, dimension(:,:,:,:) :: idata, idata2<a name='66'>
+      character,         allocatable, dimension(:,:,:,:) :: text<a name='67'>
+      character omit(10)*80<a name='68'>
+      integer             :: dims_in(4), dims_out(4), box_start(3), box_end(3)<a name='69'>
+      real                :: new_cen<a name='70'>
+      character (len=80)  :: input_file, output_file<a name='71'>
+      character (len=10)  :: option<a name='72'>
+      logical             :: debug=.FALSE.<a name='73'>
+      logical             :: x_ave=.FALSE.<a name='74'>
+      logical             :: y_ave=.FALSE.<a name='75'>
+      real                :: okm<a name='76'>
+      double precision    :: dbval<a name='77'>
+      integer             :: i, j, ii, jj<a name='78'>
+<a name='79'>
+      call <A href='../../html_code/main/nupdown.F.html#READ_ARGS'>read_args</A><A href='../../html_code/main/nupdown.F.html#NUPDOWN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="READ_ARGS_2">(input_file,option,ratio,box_start,box_end,debug)<a name='80'>
+      output_file  = trim(input_file)//option<a name='81'>
+<a name='82'>
+      write(6,*) <a name='83'>
+      write(6,*) "#########################################"<a name='84'>
+      write(6,*) " Running NUPDOWN with option ",option<a name='85'>
+      write(6,*) <a name='86'>
+      IF ( .not. debug ) write(6,*) "   Ouput will be written to ",output_file<a name='87'>
+<a name='88'>
+      IF (debug) THEN<a name='89'>
+        write(6,*) "INPUT FILE:         ",input_file<a name='90'>
+        write(6,*) "OUTPUT FILE:        ",output_file<a name='91'>
+        write(6,*) "OPTION:             ",option    <a name='92'>
+        if ( option(1:5) == '-thin' .or. option(1:5) == '-down' ) then           <font color=#447700>! used for -thin or -down<a name='93'></font>
+          write(6,*) "RATIO:             ",int(ratio)    <a name='94'>
+        endif<a name='95'>
+      ENDIF<a name='96'>
+<a name='97'>
+<a name='98'>
+<font color=#447700>! OPEN INPUT AND OUTPUT FILE<a name='99'></font>
+<font color=#447700>! output_file is input_file_new<a name='100'></font>
+      status = nf_open(input_file, 0, ncid)<a name='101'>
+      if (status .ne. nf_noerr) call <A href='../../html_code/main/nupdown.F.html#HANDLE_ERR'>handle_err</A><A href='../../html_code/main/nupdown.F.html#NUPDOWN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HANDLE_ERR_4">(status)<a name='102'>
+      status = nf_create(output_file, 0, mcid)<a name='103'>
+      if (status .ne. nf_noerr) call <A href='../../html_code/main/nupdown.F.html#HANDLE_ERR'>handle_err</A><A href='../../html_code/main/nupdown.F.html#NUPDOWN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HANDLE_ERR_5">(status)<a name='104'>
+<a name='105'>
+<font color=#447700>! GET BASIC INFORMTION ABOUT THE FILE<a name='106'></font>
+<font color=#447700>! most important <a name='107'></font>
+<font color=#447700>!   ndims:  number of dimensions<a name='108'></font>
+<font color=#447700>!   nvars:  number of variables<a name='109'></font>
+<font color=#447700>!   ngatts: number of global attributes<a name='110'></font>
+      status = nf_inq(ncid, ndims, nvars, ngatts, nunlimdimid)<a name='111'>
+      if (status .ne. nf_noerr) call <A href='../../html_code/main/nupdown.F.html#HANDLE_ERR'>handle_err</A><A href='../../html_code/main/nupdown.F.html#NUPDOWN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HANDLE_ERR_6">(status)<a name='112'>
+      IF (debug) THEN<a name='113'>
+        write(6,*) 'ndims = ',ndims,' nvars = ',nvars,' ngatts = ',ngatts, &amp;<a name='114'>
+                   ' nunlimdimid =',nunlimdimid<a name='115'>
+      ENDIF<a name='116'>
+<a name='117'>
+<font color=#447700>! ALLOCATE SOME VARIABLES<a name='118'></font>
+      allocate (dval(ndims))<a name='119'>
+      allocate(dval2(ndims))<a name='120'>
+      allocate(dname(ndims))<a name='121'>
+<a name='122'>
+<font color=#447700>! GET SOME BASIC DIMS FROM INPUT_FILE<a name='123'></font>
+      dx = -99.<a name='124'>
+      status = nf_get_att_real (ncid, nf_global, 'DX', dx)<a name='125'>
+      status = nf_get_att_int (ncid, nf_global, 'WEST-EAST_GRID_DIMENSION', iweg)<a name='126'>
+      status = nf_get_att_int (ncid, nf_global, 'SOUTH-NORTH_GRID_DIMENSION', isng)<a name='127'>
+      status = nf_get_att_int (ncid, nf_global, 'BOTTOM-TOP_GRID_DIMENSION', ibtg)<a name='128'>
+      IF (debug) THEN<a name='129'>
+        write(6,*) "BASICS from input file:"<a name='130'>
+        write(6,*) "       DX= ", dx<a name='131'>
+        write(6,*) "       DT= ", dt<a name='132'>
+        write(6,*) "        X= ", iweg<a name='133'>
+        write(6,*) "        Y= ", isng<a name='134'>
+        write(6,*) "        Z= ", ibtg<a name='135'>
+      ENDIF<a name='136'>
+      if (dx .lt. 0.) stop 'dx is bad'<a name='137'>
+<a name='138'>
+<font color=#447700>! CALCULATE DIMS FOR OUTPUT FILE<a name='139'></font>
+      IF ( option(1:5) == '-thin' ) THEN           <font color=#447700>! used for -thin<a name='140'></font>
+        okm = dx*ratio<a name='141'>
+        jweg = int((iweg-1)/ratio) + 1<a name='142'>
+        jsng = int((isng-1)/ratio) + 1<a name='143'>
+        jbtg = ibtg<a name='144'>
+      ELSEIF ( option(1:5) == '-down' ) THEN           <font color=#447700>! used for -down<a name='145'></font>
+        okm = dx/ratio<a name='146'>
+        jweg = int((iweg-1)*ratio) + 1<a name='147'>
+        jsng = int((isng-1)*ratio) + 1<a name='148'>
+        jbtg = ibtg<a name='149'>
+      ENDIF<a name='150'>
+      IF (debug) THEN<a name='151'>
+        write(6,*) "BASICS for output file:"<a name='152'>
+        write(6,*) "       DX= ", okm<a name='153'>
+        write(6,*) "       DT= ", dt<a name='154'>
+        write(6,*) "        X= ", jweg<a name='155'>
+        write(6,*) "        Y= ", jsng<a name='156'>
+        write(6,*) "        Z= ", jbtg<a name='157'>
+      ENDIF<a name='158'>
+      <font color=#447700>!! We also need to fix the CEN_LAT and CEN_LON later, so get<a name='159'></font>
+      <font color=#447700>!! the middle of the new domain<a name='160'></font>
+      ix = int((jweg-1)/2.)<a name='161'>
+      iy = int((jsng-1)/2.)<a name='162'>
+      if ( ix .eq. int(jweg/2.) ) x_ave = .TRUE.<a name='163'>
+      if ( iy .eq. int(jsng/2.) ) y_ave = .TRUE.<a name='164'>
+      ix = int(jweg/2.)<a name='165'>
+      iy = int(jsng/2.)<a name='166'>
+<a name='167'>
+<font color=#447700>! READ ALL DIMS FROM INPUT FILE AND CREATE DIMS FOR OUTPUT FILE<a name='168'></font>
+      IF (debug) THEN<a name='169'>
+        write(6,*) <a name='170'>
+        write(6,*) "FILE dimensions:"<a name='171'>
+      ENDIF<a name='172'>
+      do i = 1, ndims<a name='173'>
+        status = nf_inq_dim(ncid, i, dname(i), dval(i))<a name='174'>
+	dval2(i) = dval(i)<a name='175'>
+<font color=#447700>!       CAUTION -- this stuff is hard-wired<a name='176'></font>
+	if (dname(i) .eq. 'west_east_stag') then<a name='177'>
+	  dval2(i) = jweg<a name='178'>
+	else if (dname(i) .eq. 'west_east') then<a name='179'>
+	  dval2(i) = jweg-1<a name='180'>
+	else if (dname(i) .eq. 'south_north_stag') then<a name='181'>
+	  dval2(i) = jsng<a name='182'>
+	else if (dname(i) .eq. 'south_north') then<a name='183'>
+	  dval2(i) = jsng-1<a name='184'>
+	else if (dname(i) .eq. 'bottom_top_stag') then<a name='185'>
+	  dval2(i) = jbtg<a name='186'>
+	else if (dname(i) .eq. 'bottom_top') then<a name='187'>
+	  dval2(i) = jbtg-1<a name='188'>
+        endif<a name='189'>
+        status = nf_def_dim(mcid, dname(i), dval2(i), i)<a name='190'>
+        IF (debug) THEN<a name='191'>
+	  write(6,'(" i = ",i2," : ",A," in = ",i4," (out = ",i4,")")') &amp;<a name='192'>
+                i,dname(i),dval(i),dval2(i)<a name='193'>
+        ENDIF<a name='194'>
+      enddo<a name='195'>
+<a name='196'>
+<font color=#447700>! DEALING WITH THE GLOBAL ATTRIBUTES<a name='197'></font>
+      IF (debug) THEN<a name='198'>
+        write(6,*) <a name='199'>
+        write(6,*) "FILE attributes:"<a name='200'>
+      ENDIF<a name='201'>
+      do i = 1, ngatts<a name='202'>
+        status = nf_inq_attname(ncid, nf_global, i, name)<a name='203'>
+        status = nf_inq_atttype(ncid, nf_global, name, itype)<a name='204'>
+        status = nf_inq_attlen(ncid, nf_global, name, ilen)<a name='205'>
+<a name='206'>
+	if ( itype .eq. 2 ) then        <font color=#447700>! characters<a name='207'></font>
+	  status = nf_get_att_text (ncid, nf_global, name, cval)<a name='208'>
+          IF (debug) THEN<a name='209'>
+            write(6,*) i,name,ilen,cval(1:ilen)<a name='210'>
+	    write(6,'(" i = ",i2," : ",A," in = ",A," (out = ",$)') &amp;<a name='211'>
+                  i,name,cval(1:ilen)<a name='212'>
+          ENDIF<a name='213'>
+	  if(name(1:5) .eq. 'TITLE') then<a name='214'>
+             cval = cval(1:ilen)//" : nupdown"//option<a name='215'>
+             ilen = len_trim(cval)<a name='216'>
+          endif<a name='217'>
+          IF (debug) write(6,'(A,")")') cval(1:ilen)<a name='218'>
+	  status = nf_put_att_text(mcid, nf_global, name, ilen,&amp;<a name='219'>
+                    cval(1:ilen))<a name='220'>
+<a name='221'>
+	elseif ( itype .eq. 4 ) then     <font color=#447700>! integers<a name='222'></font>
+	  status = nf_get_att_int (ncid, nf_global, name, ival)<a name='223'>
+          IF (debug) THEN<a name='224'>
+	    write(6,'(" i = ",i2," : ",A," in = ",i7," (out = ",$)') &amp;<a name='225'>
+                  i,name,ival        <a name='226'>
+          ENDIF<a name='227'>
+	  if(name .eq. 'WEST-EAST_GRID_DIMENSION') ival = jweg<a name='228'>
+	  if(name .eq. 'SOUTH-NORTH_GRID_DIMENSION') ival = jsng<a name='229'>
+	  if(name .eq. 'BOTTOM-TOP_GRID_DIMENSION') ival = jbtg<a name='230'>
+	  if(name .eq. 'WEST-EAST_PATCH_END_UNSTAG') ival = jweg-1<a name='231'>
+	  if(name .eq. 'WEST-EAST_PATCH_END_STAG') ival = jweg<a name='232'>
+	  if(name .eq. 'SOUTH-NORTH_PATCH_END_UNSTAG') ival = jsng-1<a name='233'>
+	  if(name .eq. 'SOUTH-NORTH_PATCH_END_STAG') ival = jsng<a name='234'>
+          iF (debug) write(6,'(i7,")")') ival<a name='235'>
+          status = nf_put_att_int(mcid, nf_global, name, itype,&amp;<a name='236'>
+                    ilen, ival)<a name='237'>
+<a name='238'>
+	elseif ( itype .eq. 5 ) then    <font color=#447700>! real<a name='239'></font>
+	  status = nf_get_att_real (ncid, nf_global, name, rval)<a name='240'>
+          IF (debug) THEN<a name='241'>
+	    write(6,'(" i = ",i2," : ",A," in = ",G18.10E2," (out = ",$)') &amp;<a name='242'>
+                  i,name,rval        <a name='243'>
+          ENDIF<a name='244'>
+          if(name(1:2) .eq. 'DX' .or. name(1:2) .eq. 'DY') rval = okm<a name='245'>
+          IF (debug) write(6,'(G18.10E2,")")') rval<a name='246'>
+	  status = nf_put_att_real(mcid, nf_global, name, itype,&amp;<a name='247'>
+                    ilen, rval)<a name='248'>
+	elseif ( itype .eq. 6 ) then    <font color=#447700>! double<a name='249'></font>
+	  status = nf_get_att_double (ncid, nf_global, name, dbval)<a name='250'>
+          IF (debug) THEN<a name='251'>
+	    write(6,'(" i = ",i2," : ",A," in = ",G18.10E2," (out = ",$)') &amp;<a name='252'>
+                  i,name,dbval        <a name='253'>
+          ENDIF<a name='254'>
+          if(name(1:2) .eq. 'DX' .or. name(1:2) .eq. 'DY') dbval = okm<a name='255'>
+          IF (debug) write(6,'(G18.10E2,")")') dbval<a name='256'>
+	  status = nf_put_att_double(mcid, nf_global, name, itype,&amp;<a name='257'>
+                    ilen, dbval)<a name='258'>
+	endif<a name='259'>
+      enddo<a name='260'>
+<a name='261'>
+<a name='262'>
+      IF (debug) THEN<a name='263'>
+        write(6,*) <a name='264'>
+        write(6,*) <a name='265'>
+        write(6,*) "FILE variables:"<a name='266'>
+      ENDIF<a name='267'>
+      do i = 1, nvars<a name='268'>
+        status = nf_inq_var(ncid, i, cval, itype, idm, ishape, natt)<a name='269'>
+	if (idm .gt. jdim) stop<a name='270'>
+	status = nf_def_var(mcid, cval, itype, idm, ishape, j)<a name='271'>
+	do na = 1, natt<a name='272'>
+          status = nf_inq_attname(ncid, i, na, name)<a name='273'>
+          status = nf_copy_att(ncid, i, name, mcid, i)<a name='274'>
+	enddo<a name='275'>
+      enddo<a name='276'>
+      status = nf_enddef(mcid)<a name='277'>
+<a name='278'>
+<font color=#447700>! ########## LOOP THROUGH THE DATA <a name='279'></font>
+      do i = 1, nvars<a name='280'>
+        status = nf_inq_var(ncid, i, cval, itype, idm, ishape, natt)<a name='281'>
+        IF (debug) THEN<a name='282'>
+          write(6,*) <a name='283'>
+	  write(6,*) 'VARIABLE: ',trim(cval), '    itype: ',itype<a name='284'>
+        ENDIF<a name='285'>
+<a name='286'>
+<font color=#447700>! GET THE DIMS FOR INPUT AND OUTPUT FROM THE SHAPE<a name='287'></font>
+        dims_in  = 1<a name='288'>
+        dims_out = 1<a name='289'>
+        do ii = 1,idm<a name='290'>
+          dims_in(ii)  = dval(ishape(ii))<a name='291'>
+          dims_out(ii) = dval2(ishape(ii))<a name='292'>
+        enddo<a name='293'>
+        IF (debug) THEN<a name='294'>
+          write(6,*) '   DIMS  IN: ',dims_in<a name='295'>
+          write(6,*) '   DIMS OUT: ',dims_out<a name='296'>
+        ENDIF<a name='297'>
+<a name='298'>
+<a name='299'>
+<font color=#447700>! ALLOCATE THE INPUT AND OUTPUT ARRAYS<a name='300'></font>
+<font color=#447700>! READ THE DATA FROM INPUT FILE<a name='301'></font>
+<font color=#447700>! THIN THE GRID IF NEEDED, OR GET THE CORRECT BOX<a name='302'></font>
+<a name='303'>
+	IF     (itype .eq. 2) THEN          <font color=#447700>! character<a name='304'></font>
+          allocate (text(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='305'>
+                         dims_in(4)))<a name='306'>
+	  status = nf_get_var_text(ncid, i, text)<a name='307'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',text(:,1,1,1)<a name='308'>
+	  status = nf_put_var_text (mcid, i, text)<a name='309'>
+          deallocate (text)<a name='310'>
+<a name='311'>
+	ELSEIF (itype .eq. 4) THEN          <font color=#447700>! integer<a name='312'></font>
+          allocate (idata(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='313'>
+                          dims_in(4)))<a name='314'>
+          allocate(idata2(dims_out(1),dims_out(2),dims_out(3),&amp;<a name='315'>
+                          dims_out(4)))<a name='316'>
+	  status = nf_get_var_int(ncid, i, idata)<a name='317'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',idata(1,1,1,1)<a name='318'>
+          IF ( option == '-thin' ) THEN   <a name='319'>
+            if (idm .ge. 3) then<a name='320'>
+              IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio)<a name='321'>
+              idata2 = idata(2:dims_in(1):3,2:dims_in(2):3,:,:)<a name='322'>
+	    else<a name='323'>
+	      idata2 = idata<a name='324'>
+	    endif<a name='325'>
+          ELSEIF ( option == '-down' ) THEN   <a name='326'>
+            if (idm .ge. 3) then<a name='327'>
+              IF (debug) write(6,*) '   Grid is nestdowned with a ratio of ',int(ratio)<a name='328'>
+                   idata2(2:dims_out(1):3,2:dims_out(2):3,:,:) = idata<a name='329'>
+                   do jj = 3 , dims_out(2)-1 , 3<a name='330'>
+                      idata2(2:dims_out(1):3,jj,:,:) = ( idata2(2:dims_out(1):3,jj-1,:,:) &amp;<a name='331'>
+                              * 2.0 + idata2(2:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='332'>
+                   enddo<a name='333'>
+                   do jj = 4 , dims_out(2) , 3<a name='334'>
+                      idata2(2:dims_out(1):3,jj,:,:) = ( idata2(2:dims_out(1):3,jj+1,:,:) &amp;<a name='335'>
+                              * 2.0 + idata2(2:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='336'>
+                   enddo<a name='337'>
+                   do ii = 3 , dims_out(1)-1 , 3<a name='338'>
+                      idata2(ii,2:dims_out(2):3,:,:) = ( idata2(ii-1,2:dims_out(2):3,:,:) &amp;<a name='339'>
+                              * 2.0 + idata2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='340'>
+                   enddo<a name='341'>
+                   do ii = 4 , dims_out(1) , 3<a name='342'>
+                      idata2(ii,2:dims_out(2):3,:,:) = ( idata2(ii+1,2:dims_out(2):3,:,:) &amp;<a name='343'>
+                              * 2.0 + idata2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='344'>
+                   enddo<a name='345'>
+                   idata2(1,2:dims_out(2):3,:,:) = ( 2.0*idata2(2,2:dims_out(2):3,:,:)  &amp;<a name='346'>
+                              - idata2(3,2:dims_out(2):3,:,:)  )<a name='347'>
+                   idata2(dims_out(1),2:dims_out(2):3,:,:) = ( 2.0*idata2(dims_out(1)-1,2:dims_out(2):3,:,:)  &amp;<a name='348'>
+                              - idata2(dims_out(1)-2,2:dims_out(2):3,:,:)  )<a name='349'>
+                   idata2(2:dims_out(1):3,1,:,:) = ( 2.0*idata2(2:dims_out(1):3,2,:,:)  &amp;<a name='350'>
+                              - idata2(2:dims_out(1):3,3,:,:)  )<a name='351'>
+                   idata2(2:dims_out(1):3,dims_out(2),:,:) = ( 2.0*idata2(2:dims_out(1):3,dims_out(2)-1,:,:)  &amp;<a name='352'>
+                              - idata2(2:dims_out(1):3,dims_out(2)-2,:,:)  )<a name='353'>
+                   idata2(1:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='354'>
+                               ( idata2(1:dims_out(1):3,2:dims_out(2):3,:,:) * 2.0 &amp;<a name='355'>
+                               + idata2(1:dims_out(1):3,5:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='356'>
+                   idata2(1:dims_out(1):3,4:dims_out(2):3,:,:) = &amp;<a name='357'>
+                               ( idata2(1:dims_out(1):3,5:dims_out(2):3,:,:) * 2.0 &amp;<a name='358'>
+                               + idata2(1:dims_out(1):3,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='359'>
+                   idata2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='360'>
+                               ( idata2(3:dims_out(1):3,2:dims_out(2):3,:,:) * 2.0 &amp;<a name='361'>
+                               + idata2(3:dims_out(1):3,5:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='362'>
+                   idata2(3:dims_out(1):3,4:dims_out(2):3,:,:) = &amp;<a name='363'>
+                               ( idata2(3:dims_out(1):3,5:dims_out(2):3,:,:) * 2.0 &amp;<a name='364'>
+                               + idata2(3:dims_out(1):3,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='365'>
+                   idata2(3:dims_out(1):3,1,:,:) = &amp;<a name='366'>
+                               ( idata2(2:dims_out(1):3,1,:,:) * 2.0 &amp;<a name='367'>
+                               + idata2(5:dims_out(1):3,1,:,:) * 1.0 ) / 3.0<a name='368'>
+                   idata2(4:dims_out(1):3,1,:,:) = &amp;<a name='369'>
+                               ( idata2(5:dims_out(1):3,1,:,:) * 2.0 &amp;<a name='370'>
+                               + idata2(2:dims_out(1):3,1,:,:) * 1.0 ) / 3.0<a name='371'>
+                   idata2(3:dims_out(1):3,dims_out(2),:,:) = &amp;<a name='372'>
+                               ( idata2(2:dims_out(1):3,dims_out(2),:,:) * 2.0 &amp;<a name='373'>
+                               + idata2(5:dims_out(1):3,dims_out(2),:,:) * 1.0 ) / 3.0<a name='374'>
+                   idata2(4:dims_out(1):3,dims_out(2),:,:) = &amp;<a name='375'>
+                               ( idata2(5:dims_out(1):3,dims_out(2),:,:) * 2.0 &amp;<a name='376'>
+                               + idata2(2:dims_out(1):3,dims_out(2),:,:) * 1.0 ) / 3.0<a name='377'>
+                   idata2(1,1,:,:) = ( 2.0*idata2(2,1,:,:) - idata2(3,1,:,:)  )<a name='378'>
+                   idata2(dims_out(1),1,:,:) = ( 2.0*idata2(dims_out(1)-1,1,:,:) - idata2(dims_out(1)-2,1,:,:)  )<a name='379'>
+                   idata2(1,dims_out(2),:,:) = ( 2.0*idata2(1,dims_out(2)-1,:,:) - idata2(1,dims_out(2)-2,:,:)  )<a name='380'>
+                   idata2(dims_out(1),dims_out(2),:,:) = ( 2.0*idata2(dims_out(1)-1,dims_out(2),:,:) - idata2(dims_out(1)-2,dims_out(2),:,:)  )<a name='381'>
+                   if ( trim(cval) .eq. 'IVGTYP'  ) then <a name='382'>
+                        where ( idata2 .lt. 1 )  idata2 = 1<a name='383'>
+                        where ( idata2 .gt. 19 ) idata2 = 19<a name='384'>
+                   endif<a name='385'>
+                   if ( trim(cval) .eq. 'ISLTYP'  ) then <a name='386'>
+                        where ( idata2 .lt. 3 )  idata2 = 3<a name='387'>
+                        where ( idata2 .gt. 14 ) idata2 = 14<a name='388'>
+                   endif<a name='389'>
+	    else<a name='390'>
+	      idata2 = idata<a name='391'>
+	    endif<a name='392'>
+          ENDIF<a name='393'>
+	  status = nf_put_var_int (mcid, i, idata2)<a name='394'>
+          deallocate (idata)<a name='395'>
+          deallocate (idata2)<a name='396'>
+<a name='397'>
+	ELSEIF (itype .eq. 5) THEN          <font color=#447700>! real<a name='398'></font>
+          allocate (data(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='399'>
+                         dims_in(4)))<a name='400'>
+          allocate(data2(dims_out(1),dims_out(2),dims_out(3), &amp;<a name='401'>
+                         dims_out(4)))<a name='402'>
+	  status = nf_get_var_real(ncid, i, data)<a name='403'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',data(1,1,1,1)<a name='404'>
+          IF ( option == '-thin' ) THEN    <a name='405'>
+            if (idm .ge. 3) then<a name='406'>
+              IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio)<a name='407'>
+              if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or. trim(cval) == 'MAPFAC_UX' .or.  &amp;<a name='408'>
+                   trim(cval) == 'MAPFAC_UY' .or. trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then<a name='409'>
+                   IF (debug) write(6,*) '   Attention'<a name='410'>
+                   data2 = data(1:dims_in(1):3,2:dims_in(2):3,:,:)<a name='411'>
+              elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or. trim(cval) == 'MAPFAC_VX' .or. &amp;<a name='412'>
+                   trim(cval) == 'MAPFAC_VY' .or. trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' .or. &amp;<a name='413'>
+                   trim(cval) == 'MF_VX_INV' ) then<a name='414'>
+                   IF (debug) write(6,*) '   Attention'<a name='415'>
+                   data2 = data(2:dims_in(1):3,1:dims_in(2):3,:,:)<a name='416'>
+              else<a name='417'>
+                   data2 = data(2:dims_in(1):3,2:dims_in(2):3,:,:)<a name='418'>
+              endif<a name='419'>
+	    else<a name='420'>
+	      data2 = data<a name='421'>
+	    endif<a name='422'>
+          ELSEIF ( option == '-down' ) THEN    <a name='423'>
+            if (idm .ge. 3) then<a name='424'>
+              IF (debug) write(6,*) '   Grid is nestdowned with a ratio of ',int(ratio)<a name='425'>
+              if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &amp;<a name='426'>
+                   trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then<a name='427'>
+                   data2(1:dims_out(1):3,2:dims_out(2):3,:,:) = data<a name='428'>
+                   do ii = 2 , dims_out(1)-1 , 3<a name='429'>
+                      data2(ii,2:dims_out(2):3,:,:) = ( data2(ii-1,2:dims_out(2):3,:,:) &amp;<a name='430'>
+                              * 2.0 + data2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='431'>
+                   enddo<a name='432'>
+                   do ii = 3 , dims_out(1) , 3<a name='433'>
+                      data2(ii,2:dims_out(2):3,:,:) = ( data2(ii+1,2:dims_out(2):3,:,:) &amp;<a name='434'>
+                              * 2.0 + data2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='435'>
+                   enddo<a name='436'>
+                   do jj = 3 , dims_out(2)-1 , 3<a name='437'>
+                      data2(1:dims_out(1):3,jj,:,:) = ( data2(1:dims_out(1):3,jj-1,:,:) &amp;<a name='438'>
+                              * 2.0 + data2(1:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='439'>
+                   enddo<a name='440'>
+                   do jj = 4 , dims_out(2) , 3<a name='441'>
+                      data2(1:dims_out(1):3,jj,:,:) = ( data2(1:dims_out(1):3,jj+1,:,:) &amp;<a name='442'>
+                              * 2.0 + data2(1:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='443'>
+                   enddo<a name='444'>
+                   data2(1:dims_out(1):3,1,:,:) = ( 2.0*data2(1:dims_out(1):3,2,:,:)  &amp;<a name='445'>
+                              - data2(1:dims_out(1):3,3,:,:)  )<a name='446'>
+                   data2(1:dims_out(1):3,dims_out(2),:,:) = ( 2.0*data2(1:dims_out(1):3,dims_out(2)-1,:,:) &amp;<a name='447'>
+                              - data2(1:dims_out(1):3,dims_out(2)-2,:,:)  )<a name='448'>
+                   data2(2:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='449'>
+                               ( data2(1:dims_out(1):3,3:dims_out(2):3,:,:) * 2.0 &amp;<a name='450'>
+                               + data2(4:dims_out(1):3,3:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='451'>
+                   data2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='452'>
+                               ( data2(4:dims_out(1):3,3:dims_out(2):3,:,:) * 2.0 &amp;<a name='453'>
+                               + data2(1:dims_out(1):3,3:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='454'>
+                   data2(2:dims_out(1):3,1:dims_out(2):3,:,:) = &amp;<a name='455'>
+                               ( data2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='456'>
+                               + data2(4:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='457'>
+                   data2(3:dims_out(1):3,1:dims_out(2):3,:,:) = &amp;<a name='458'>
+                               ( data2(4:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='459'>
+                               + data2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='460'>
+              elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or.  &amp;<a name='461'>
+                   trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then<a name='462'>
+                   data2(2:dims_out(1):3,1:dims_out(2):3,:,:) = data<a name='463'>
+                   do jj = 2 , dims_out(2) , 3<a name='464'>
+                      data2(2:dims_out(1):3,jj,:,:) = ( data2(2:dims_out(1):3,jj-1,:,:) &amp;<a name='465'>
+                              * 2.0 + data2(2:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='466'>
+                   enddo<a name='467'>
+                   do jj = 3 , dims_out(2) , 3<a name='468'>
+                      data2(2:dims_out(1):3,jj,:,:) = ( data2(2:dims_out(1):3,jj+1,:,:) &amp;<a name='469'>
+                              * 2.0 + data2(2:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='470'>
+                   enddo<a name='471'>
+                   do ii = 3 , dims_out(1) , 3<a name='472'>
+                      data2(ii,1:dims_out(2):3,:,:) = ( data2(ii-1,1:dims_out(2):3,:,:) &amp;<a name='473'>
+                              * 2.0 + data2(ii+2,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='474'>
+                   enddo<a name='475'>
+                   do ii = 4 , dims_out(1) , 3<a name='476'>
+                      data2(ii,1:dims_out(2):3,:,:) = ( data2(ii+1,1:dims_out(2):3,:,:) &amp;<a name='477'>
+                              * 2.0 + data2(ii-2,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='478'>
+                   enddo<a name='479'>
+                   data2(1,1:dims_out(2):3,:,:) = ( 2.0*data2(2,1:dims_out(2):3,:,:) &amp; <a name='480'>
+                              - data2(3,1:dims_out(2):3,:,:)  )<a name='481'>
+                   data2(dims_out(1),1:dims_out(2):3,:,:) = ( 2.0*data2(dims_out(1)-1,1:dims_out(2):3,:,:)  &amp;<a name='482'>
+                              - data2(dims_out(1)-2,1:dims_out(2):3,:,:)  )<a name='483'>
+                   data2(3:dims_out(1):3,2:dims_out(2):3,:,:) = &amp;<a name='484'>
+                               ( data2(3:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='485'>
+                               + data2(3:dims_out(1):3,4:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='486'>
+                   data2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='487'>
+                               ( data2(3:dims_out(1):3,4:dims_out(2):3,:,:) * 2.0 &amp;<a name='488'>
+                               + data2(3:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='489'>
+                   data2(1:dims_out(1):3,2:dims_out(2):3,:,:) = &amp;<a name='490'>
+                               ( data2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='491'>
+                               + data2(1:dims_out(1):3,4:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='492'>
+                   data2(1:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='493'>
+                               ( data2(1:dims_out(1):3,4:dims_out(2):3,:,:) * 2.0 &amp;<a name='494'>
+                               + data2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='495'>
+              else<a name='496'>
+                   data2(2:dims_out(1):3,2:dims_out(2):3,:,:) = data<a name='497'>
+                   do jj = 3 , dims_out(2) , 3<a name='498'>
+                      data2(2:dims_out(1):3,jj,:,:) = ( data2(2:dims_out(1):3,jj-1,:,:) &amp;<a name='499'>
+                              * 2.0 + data2(2:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='500'>
+                   enddo<a name='501'>
+                   do jj = 4 , dims_out(2) , 3<a name='502'>
+                      data2(2:dims_out(1):3,jj,:,:) = ( data2(2:dims_out(1):3,jj+1,:,:) &amp;<a name='503'>
+                              * 2.0 + data2(2:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='504'>
+                   enddo<a name='505'>
+                   do ii = 3 , dims_out(1) , 3<a name='506'>
+                      data2(ii,2:dims_out(2):3,:,:) = ( data2(ii-1,2:dims_out(2):3,:,:) &amp;<a name='507'>
+                              * 2.0 + data2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='508'>
+                   enddo<a name='509'>
+                   do ii = 4 , dims_out(1) , 3<a name='510'>
+                      data2(ii,2:dims_out(2):3,:,:) = ( data2(ii+1,2:dims_out(2):3,:,:) &amp;<a name='511'>
+                              * 2.0 + data2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='512'>
+                   enddo<a name='513'>
+                   data2(1,2:dims_out(2):3,:,:) = ( 2.0*data2(2,2:dims_out(2):3,:,:)  &amp;<a name='514'>
+                              - data2(3,2:dims_out(2):3,:,:)  )<a name='515'>
+                   data2(dims_out(1),2:dims_out(2):3,:,:) = ( 2.0*data2(dims_out(1)-1,2:dims_out(2):3,:,:)  &amp;<a name='516'>
+                              - data2(dims_out(1)-2,2:dims_out(2):3,:,:)  )<a name='517'>
+                   data2(2:dims_out(1):3,1,:,:) = ( 2.0*data2(2:dims_out(1):3,2,:,:)  &amp;<a name='518'>
+                              - data2(2:dims_out(1):3,3,:,:)  )<a name='519'>
+                   data2(2:dims_out(1):3,dims_out(2),:,:) = ( 2.0*data2(2:dims_out(1):3,dims_out(2)-1,:,:)  &amp;<a name='520'>
+                              - data2(2:dims_out(1):3,dims_out(2)-2,:,:)  )<a name='521'>
+                   data2(1:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='522'>
+                               ( data2(1:dims_out(1):3,2:dims_out(2):3,:,:) * 2.0 &amp;<a name='523'>
+                               + data2(1:dims_out(1):3,5:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='524'>
+                   data2(1:dims_out(1):3,4:dims_out(2):3,:,:) = &amp;<a name='525'>
+                               ( data2(1:dims_out(1):3,5:dims_out(2):3,:,:) * 2.0 &amp;<a name='526'>
+                               + data2(1:dims_out(1):3,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='527'>
+                   data2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='528'>
+                               ( data2(3:dims_out(1):3,2:dims_out(2):3,:,:) * 2.0 &amp;<a name='529'>
+                               + data2(3:dims_out(1):3,5:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='530'>
+                   data2(3:dims_out(1):3,4:dims_out(2):3,:,:) = &amp;<a name='531'>
+                               ( data2(3:dims_out(1):3,5:dims_out(2):3,:,:) * 2.0 &amp;<a name='532'>
+                               + data2(3:dims_out(1):3,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='533'>
+                   data2(3:dims_out(1):3,1,:,:) = &amp;<a name='534'>
+                               ( data2(2:dims_out(1):3,1,:,:) * 2.0 &amp;<a name='535'>
+                               + data2(5:dims_out(1):3,1,:,:) * 1.0 ) / 3.0<a name='536'>
+                   data2(4:dims_out(1):3,1,:,:) = &amp;<a name='537'>
+                               ( data2(5:dims_out(1):3,1,:,:) * 2.0 &amp;<a name='538'>
+                               + data2(2:dims_out(1):3,1,:,:) * 1.0 ) / 3.0<a name='539'>
+                   data2(3:dims_out(1):3,dims_out(2),:,:) = &amp;<a name='540'>
+                               ( data2(2:dims_out(1):3,dims_out(2),:,:) * 2.0 &amp;<a name='541'>
+                               + data2(5:dims_out(1):3,dims_out(2),:,:) * 1.0 ) / 3.0<a name='542'>
+                   data2(4:dims_out(1):3,dims_out(2),:,:) = &amp;<a name='543'>
+                               ( data2(5:dims_out(1):3,dims_out(2),:,:) * 2.0 &amp;<a name='544'>
+                               + data2(2:dims_out(1):3,dims_out(2),:,:) * 1.0 ) / 3.0<a name='545'>
+                   data2(1,1,:,:) = ( 2.0*data2(2,1,:,:) - data2(3,1,:,:)  )<a name='546'>
+                   data2(dims_out(1),1,:,:) = ( 2.0*data2(dims_out(1)-1,1,:,:) - data2(dims_out(1)-2,1,:,:)  )<a name='547'>
+                   data2(1,dims_out(2),:,:) = ( 2.0*data2(1,dims_out(2)-1,:,:) - data2(1,dims_out(2)-2,:,:)  )<a name='548'>
+                   data2(dims_out(1),dims_out(2),:,:) = ( 2.0*data2(dims_out(1)-1,dims_out(2),:,:) - data2(dims_out(1)-2,dims_out(2),:,:)  )<a name='549'>
+                   if ( trim(cval) .eq. 'PHB' .or. trim(cval) .eq. 'SNOALB') where ( data2 .lt. 0.0 ) data2 = 0.0<a name='550'>
+                   if ( trim(cval) .eq. 'SMOIS' .or. trim(cval) .eq. 'SH2O') then <a name='551'>
+                        where ( data2 .lt. 0.0 ) data2 = 0.0<a name='552'>
+                        where ( data2 .gt. 1.0 ) data2 = 1.0<a name='553'>
+                   endif<a name='554'>
+                   if ( trim(cval) .eq. 'SHDMAX' .or. trim(cval) .eq. 'VEGFRA' ) then <a name='555'>
+                        where ( data2 .lt. 0.0 ) data2 = 0.0<a name='556'>
+                        where ( data2 .gt. 100.0 ) data2 = 1.0<a name='557'>
+                   endif<a name='558'>
+                   if ( trim(cval) .eq. 'LANDMASK'  ) then <a name='559'>
+                        data2 = INT (data2+0.5)<a name='560'>
+                        where ( data2 .lt. 0.0 ) data2 = 0.0<a name='561'>
+                        where ( data2 .gt. 1.0 ) data2 = 1.0<a name='562'>
+                   endif<a name='563'>
+                   if ( trim(cval) .eq. 'XLAND'  ) then <a name='564'>
+                        data2 = INT (data2+0.5)<a name='565'>
+                        where ( data2 .lt. 1.0 ) data2 = 1.0<a name='566'>
+                        where ( data2 .gt. 2.0 ) data2 = 2.0<a name='567'>
+                   endif<a name='568'>
+                   if ( trim(cval) .eq. 'LU_INDEX'  ) then <a name='569'>
+                        data2 = INT (data2+0.5)<a name='570'>
+                        where ( data2 .lt. 1.0 ) data2 = 1.0<a name='571'>
+                        where ( data2 .gt. 19.0 ) data2 = 19.0<a name='572'>
+                   endif<a name='573'>
+              endif<a name='574'>
+	    else<a name='575'>
+	      data2 = data<a name='576'>
+	    endif<a name='577'>
+          ENDIF<a name='578'>
+	  status = nf_put_var_real (mcid, i, data2)<a name='579'>
+          IF ( cval == 'XLAT' .or. cval == 'XLONG' ) THEN<a name='580'>
+<font color=#447700>!            We need fix the box's center long and lat<a name='581'></font>
+             new_cen = data2(ix,iy,1,1)<a name='582'>
+             if ( x_ave .and. y_ave ) then<a name='583'>
+               new_cen = (data2(ix,  iy,1,1)+data2(ix  ,iy+1,1,1)+  &amp;<a name='584'>
+                          data2(ix+1,iy,1,1)+data2(ix+1,iy+1,1,1))/4.<a name='585'>
+             elseif ( x_ave .and. .not. y_ave ) then<a name='586'>
+               new_cen = (data2(ix,  iy,1,1)+data2(ix+1,iy  ,1,1))/2.<a name='587'>
+             elseif ( .not. x_ave .and. y_ave ) then<a name='588'>
+               new_cen = (data2(ix,  iy,1,1)+data2(ix  ,iy+1,1,1))/2.<a name='589'>
+             endif<a name='590'>
+          ENDIF<a name='591'>
+          IF ( cval == 'XLAT' ) THEN<a name='592'>
+             IF (debug) write(6,*) '   Fix global attribute CEN_LAT: now = ', new_cen<a name='593'>
+             status = nf_inq_atttype(ncid, nf_global, 'CEN_LAT', itype)<a name='594'>
+             status = nf_inq_attlen(ncid, nf_global, 'CEN_LAT', ilen)<a name='595'>
+<font color=#447700>! 	     status = nf_put_att_real(mcid, nf_global, 'CEN_LAT', itype,&amp;<a name='596'></font>
+<font color=#447700>!                      ilen, new_cen)<a name='597'></font>
+          ELSEIF ( cval == 'XLONG' ) THEN<a name='598'>
+             IF (debug) write(6,*) '   Fix global attribute CEN_LON: now = ', new_cen<a name='599'>
+             status = nf_inq_atttype(ncid, nf_global, 'CEN_LON', itype)<a name='600'>
+             status = nf_inq_attlen(ncid, nf_global, 'CEN_LON', ilen)<a name='601'>
+<font color=#447700>!	     status = nf_put_att_real(mcid, nf_global, 'CEN_LON', itype,&amp;<a name='602'></font>
+<font color=#447700>!                      ilen, new_cen)<a name='603'></font>
+          ENDIF<a name='604'>
+          deallocate (data)<a name='605'>
+          deallocate (data2)<a name='606'>
+<a name='607'>
+	ELSEIF (itype .eq. 6) THEN          <font color=#447700>! double<a name='608'></font>
+          allocate (ddata(dims_in(1), dims_in(2), dims_in(3), &amp;<a name='609'>
+                          dims_in(4)))<a name='610'>
+          allocate(ddata2(dims_out(1),dims_out(2),dims_out(3),&amp;<a name='611'>
+                          dims_out(4)))<a name='612'>
+	  status = nf_get_var_double(ncid, i, ddata)<a name='613'>
+          IF (debug) write(6,*) '   SAMPLE VALUE = ',ddata(1,1,1,1)<a name='614'>
+          IF ( option == '-thin' ) THEN <a name='615'>
+            if (idm .ge. 3) then<a name='616'>
+              IF (debug) write(6,*) '   Grid is thinned with a ratio of ',int(ratio)<a name='617'>
+              if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &amp;<a name='618'>
+                   trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then<a name='619'>
+                   IF (debug) write(6,*) '   Attention'<a name='620'>
+                   ddata2 = ddata(1:dims_in(1):3,2:dims_in(2):3,:,:)<a name='621'>
+              elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or.  &amp;<a name='622'>
+                   trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then<a name='623'>
+                   IF (debug) write(6,*) '   Attention'<a name='624'>
+                   ddata2 = ddata(2:dims_in(1):3,1:dims_in(2):3,:,:)<a name='625'>
+              else<a name='626'>
+                   ddata2 = ddata(2:dims_in(1):3,2:dims_in(2):3,:,:)<a name='627'>
+              endif<a name='628'>
+	    else<a name='629'>
+	      ddata2 = ddata<a name='630'>
+	    endif<a name='631'>
+          ELSEIF ( option == '-down' ) THEN <a name='632'>
+            if (idm .ge. 3) then<a name='633'>
+              IF (debug) write(6,*) '   Grid is nestdowned with a ratio of ',int(ratio)<a name='634'>
+              if ( trim(cval) == 'U' .or. trim(cval) == 'MAPFAC_U' .or.  &amp;<a name='635'>
+                   trim(cval) == 'XLAT_U' .or. trim(cval) == 'XLONG_U' ) then<a name='636'>
+                   ddata2(1:dims_out(1):3,2:dims_out(2):3,:,:) = ddata<a name='637'>
+                   do ii = 2 , dims_out(1)-1 , 3<a name='638'>
+                      ddata2(ii,2:dims_out(2):3,:,:) = ( ddata2(ii-1,2:dims_out(2):3,:,:) &amp;<a name='639'>
+                              * 2.0 + ddata2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='640'>
+                   enddo<a name='641'>
+                   do ii = 3 , dims_out(1) , 3<a name='642'>
+                      ddata2(ii,2:dims_out(2):3,:,:) = ( ddata2(ii+1,2:dims_out(2):3,:,:) &amp;<a name='643'>
+                              * 2.0 + ddata2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='644'>
+                   enddo<a name='645'>
+                   do jj = 3 , dims_out(2)-1 , 3<a name='646'>
+                      ddata2(1:dims_out(1):3,jj,:,:) = ( ddata2(1:dims_out(1):3,jj-1,:,:) &amp;<a name='647'>
+                              * 2.0 + ddata2(1:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='648'>
+                   enddo<a name='649'>
+                   do jj = 4 , dims_out(2) , 3<a name='650'>
+                      ddata2(1:dims_out(1):3,jj,:,:) = ( ddata2(1:dims_out(1):3,jj+1,:,:) &amp;<a name='651'>
+                              * 2.0 + ddata2(1:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='652'>
+                   enddo<a name='653'>
+                   ddata2(1:dims_out(1):3,1,:,:) = ( 2.0*ddata2(1:dims_out(1):3,2,:,:)  &amp;<a name='654'>
+                              - ddata2(1:dims_out(1):3,3,:,:)  )<a name='655'>
+                   ddata2(1:dims_out(1):3,dims_out(2),:,:) = ( 2.0*ddata2(1:dims_out(1):3,dims_out(2)-1,:,:) &amp;<a name='656'>
+                              - ddata2(1:dims_out(1):3,dims_out(2)-2,:,:)  )<a name='657'>
+                   ddata2(2:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='658'>
+                               ( ddata2(1:dims_out(1):3,3:dims_out(2):3,:,:) * 2.0 &amp;<a name='659'>
+                               + ddata2(4:dims_out(1):3,3:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='660'>
+                   ddata2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='661'>
+                               ( ddata2(4:dims_out(1):3,3:dims_out(2):3,:,:) * 2.0 &amp;<a name='662'>
+                               + ddata2(1:dims_out(1):3,3:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='663'>
+                   ddata2(2:dims_out(1):3,1:dims_out(2):3,:,:) = &amp;<a name='664'>
+                               ( ddata2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='665'>
+                               + ddata2(4:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='666'>
+                   ddata2(3:dims_out(1):3,1:dims_out(2):3,:,:) = &amp;<a name='667'>
+                               ( ddata2(4:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='668'>
+                               + ddata2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='669'>
+              elseif ( trim(cval) == 'V' .or. trim(cval) == 'MAPFAC_V' .or.  &amp;<a name='670'>
+                   trim(cval) == 'XLAT_V' .or. trim(cval) == 'XLONG_V' ) then<a name='671'>
+                   ddata2(2:dims_out(1):3,1:dims_out(2):3,:,:) = data<a name='672'>
+                   do jj = 2 , dims_out(2) , 3<a name='673'>
+                      ddata2(2:dims_out(1):3,jj,:,:) = ( ddata2(2:dims_out(1):3,jj-1,:,:) &amp;<a name='674'>
+                              * 2.0 + ddata2(2:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='675'>
+                   enddo<a name='676'>
+                   do jj = 3 , dims_out(2) , 3<a name='677'>
+                      ddata2(2:dims_out(1):3,jj,:,:) = ( ddata2(2:dims_out(1):3,jj+1,:,:) &amp;<a name='678'>
+                              * 2.0 + ddata2(2:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='679'>
+                   enddo<a name='680'>
+                   do ii = 3 , dims_out(1) , 3<a name='681'>
+                      ddata2(ii,1:dims_out(2):3,:,:) = ( ddata2(ii-1,1:dims_out(2):3,:,:) &amp;<a name='682'>
+                              * 2.0 + ddata2(ii+2,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='683'>
+                   enddo<a name='684'>
+                   do ii = 4 , dims_out(1) , 3<a name='685'>
+                      ddata2(ii,1:dims_out(2):3,:,:) = ( ddata2(ii+1,1:dims_out(2):3,:,:) &amp;<a name='686'>
+                              * 2.0 + ddata2(ii-2,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='687'>
+                   enddo<a name='688'>
+                   ddata2(1,1:dims_out(2):3,:,:) = ( 2.0*ddata2(2,1:dims_out(2):3,:,:) &amp; <a name='689'>
+                              - ddata2(3,1:dims_out(2):3,:,:)  )<a name='690'>
+                   ddata2(dims_out(1),1:dims_out(2):3,:,:) = ( 2.0*ddata2(dims_out(1)-1,1:dims_out(2):3,:,:)  &amp;<a name='691'>
+                              - ddata2(dims_out(1)-2,1:dims_out(2):3,:,:)  )<a name='692'>
+                   ddata2(3:dims_out(1):3,2:dims_out(2):3,:,:) = &amp;<a name='693'>
+                               ( ddata2(3:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='694'>
+                               + ddata2(3:dims_out(1):3,4:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='695'>
+                   ddata2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='696'>
+                               ( ddata2(3:dims_out(1):3,4:dims_out(2):3,:,:) * 2.0 &amp;<a name='697'>
+                               + ddata2(3:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='698'>
+                   ddata2(1:dims_out(1):3,2:dims_out(2):3,:,:) = &amp;<a name='699'>
+                               ( ddata2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 2.0 &amp;<a name='700'>
+                               + ddata2(1:dims_out(1):3,4:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='701'>
+                   ddata2(1:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='702'>
+                               ( ddata2(1:dims_out(1):3,4:dims_out(2):3,:,:) * 2.0 &amp;<a name='703'>
+                               + ddata2(1:dims_out(1):3,1:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='704'>
+              else<a name='705'>
+                   ddata2(2:dims_out(1):3,2:dims_out(2):3,:,:) = data<a name='706'>
+                   do jj = 3 , dims_out(2) , 3<a name='707'>
+                      ddata2(2:dims_out(1):3,jj,:,:) = ( ddata2(2:dims_out(1):3,jj-1,:,:) &amp;<a name='708'>
+                              * 2.0 + ddata2(2:dims_out(1):3,jj+2,:,:) * 1.0 ) / 3.0<a name='709'>
+                   enddo<a name='710'>
+                   do jj = 4 , dims_out(2) , 3<a name='711'>
+                      ddata2(2:dims_out(1):3,jj,:,:) = ( ddata2(2:dims_out(1):3,jj+1,:,:) &amp;<a name='712'>
+                              * 2.0 + ddata2(2:dims_out(1):3,jj-2,:,:) * 1.0 ) / 3.0<a name='713'>
+                   enddo<a name='714'>
+                   do ii = 3 , dims_out(1) , 3<a name='715'>
+                      ddata2(ii,2:dims_out(2):3,:,:) = ( ddata2(ii-1,2:dims_out(2):3,:,:) &amp;<a name='716'>
+                              * 2.0 + ddata2(ii+2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='717'>
+                   enddo<a name='718'>
+                   do ii = 4 , dims_out(1) , 3<a name='719'>
+                      ddata2(ii,2:dims_out(2):3,:,:) = ( ddata2(ii+1,2:dims_out(2):3,:,:) &amp;<a name='720'>
+                              * 2.0 + ddata2(ii-2,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='721'>
+                   enddo<a name='722'>
+                   ddata2(1,2:dims_out(2):3,:,:) = ( 2.0*ddata2(2,2:dims_out(2):3,:,:)  &amp;<a name='723'>
+                              - ddata2(3,2:dims_out(2):3,:,:)  )<a name='724'>
+                   ddata2(dims_out(1),2:dims_out(2):3,:,:) = ( 2.0*ddata2(dims_out(1)-1,2:dims_out(2):3,:,:)  &amp;<a name='725'>
+                              - ddata2(dims_out(1)-2,2:dims_out(2):3,:,:)  )<a name='726'>
+                   ddata2(2:dims_out(1):3,1,:,:) = ( 2.0*ddata2(2:dims_out(1):3,2,:,:)  &amp;<a name='727'>
+                              - ddata2(2:dims_out(1):3,3,:,:)  )<a name='728'>
+                   ddata2(2:dims_out(1):3,dims_out(2),:,:) = ( 2.0*ddata2(2:dims_out(1):3,dims_out(2)-1,:,:)  &amp;<a name='729'>
+                              - ddata2(2:dims_out(1):3,dims_out(2)-2,:,:)  )<a name='730'>
+                   ddata2(1:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='731'>
+                               ( ddata2(1:dims_out(1):3,2:dims_out(2):3,:,:) * 2.0 &amp;<a name='732'>
+                               + ddata2(1:dims_out(1):3,5:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='733'>
+                   ddata2(1:dims_out(1):3,4:dims_out(2):3,:,:) = &amp;<a name='734'>
+                               ( ddata2(1:dims_out(1):3,5:dims_out(2):3,:,:) * 2.0 &amp;<a name='735'>
+                               + ddata2(1:dims_out(1):3,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='736'>
+                   ddata2(3:dims_out(1):3,3:dims_out(2):3,:,:) = &amp;<a name='737'>
+                               ( ddata2(3:dims_out(1):3,2:dims_out(2):3,:,:) * 2.0 &amp;<a name='738'>
+                               + ddata2(3:dims_out(1):3,5:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='739'>
+                   ddata2(3:dims_out(1):3,4:dims_out(2):3,:,:) = &amp;<a name='740'>
+                               ( ddata2(3:dims_out(1):3,5:dims_out(2):3,:,:) * 2.0 &amp;<a name='741'>
+                               + ddata2(3:dims_out(1):3,2:dims_out(2):3,:,:) * 1.0 ) / 3.0<a name='742'>
+                   ddata2(3:dims_out(1):3,1,:,:) = &amp;<a name='743'>
+                               ( ddata2(2:dims_out(1):3,1,:,:) * 2.0 &amp;<a name='744'>
+                               + ddata2(5:dims_out(1):3,1,:,:) * 1.0 ) / 3.0<a name='745'>
+                   ddata2(4:dims_out(1):3,1,:,:) = &amp;<a name='746'>
+                               ( ddata2(5:dims_out(1):3,1,:,:) * 2.0 &amp;<a name='747'>
+                               + ddata2(2:dims_out(1):3,1,:,:) * 1.0 ) / 3.0<a name='748'>
+                   ddata2(3:dims_out(1):3,dims_out(2),:,:) = &amp;<a name='749'>
+                               ( ddata2(2:dims_out(1):3,dims_out(2),:,:) * 2.0 &amp;<a name='750'>
+                               + ddata2(5:dims_out(1):3,dims_out(2),:,:) * 1.0 ) / 3.0<a name='751'>
+                   ddata2(4:dims_out(1):3,dims_out(2),:,:) = &amp;<a name='752'>
+                               ( ddata2(5:dims_out(1):3,dims_out(2),:,:) * 2.0 &amp;<a name='753'>
+                               + ddata2(2:dims_out(1):3,dims_out(2),:,:) * 1.0 ) / 3.0<a name='754'>
+                   ddata2(1,1,:,:) = ( 2.0*ddata2(2,1,:,:) - ddata2(3,1,:,:)  )<a name='755'>
+                   ddata2(dims_out(1),1,:,:) = ( 2.0*ddata2(dims_out(1)-1,1,:,:) - ddata2(dims_out(1)-2,1,:,:)  )<a name='756'>
+                   ddata2(1,dims_out(2),:,:) = ( 2.0*ddata2(1,dims_out(2)-1,:,:) - ddata2(1,dims_out(2)-2,:,:)  )<a name='757'>
+                   ddata2(dims_out(1),dims_out(2),:,:) = ( 2.0*ddata2(dims_out(1)-1,dims_out(2),:,:) - ddata2(dims_out(1)-2,dims_out(2),:,:)  )<a name='758'>
+              endif<a name='759'>
+	    else<a name='760'>
+	      ddata2 = ddata<a name='761'>
+	    endif<a name='762'>
+          ENDIF<a name='763'>
+	  status = nf_put_var_double (mcid, i, ddata2)<a name='764'>
+          deallocate (ddata)<a name='765'>
+          deallocate (ddata2)<a name='766'>
+        ELSE<a name='767'>
+	    stop 'trouble - do not know the variable type'<a name='768'>
+        ENDIF<a name='769'>
+<a name='770'>
+      ENDDO     <font color=#447700>! END OF VARIABLE LOOP<a name='771'></font>
+      status = nf_close(mcid)<a name='772'>
+<a name='773'>
+      write(6,*) <a name='774'>
+      write(6,*) " Success - we are out of here"      <a name='775'>
+      write(6,*) "#########################################"<a name='776'>
+<a name='777'>
+      end program nupdown<a name='778'>
+<font color=#447700>!---------------------------------------------------------------------<a name='779'></font>
+<A NAME='HANDLE_ERR'><A href='../../html_code/main/nupdown.F.html#HANDLE_ERR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='780'>
+      <font color=#993300>subroutine </font><font color=#cc0000>handle_err</font>(status) <A href='../../call_to/HANDLE_ERR.html' TARGET='index'>6</A><a name='781'>
+      integer status<a name='782'>
+      write(6,*) 'Error number ',status<a name='783'>
+      stop<a name='784'>
+      end subroutine<a name='785'>
+<font color=#447700>!---------------------------------------------------------------------<a name='786'></font>
+<a name='787'>
+<A NAME='READ_ARGS'><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='788'>
+  <font color=#993300>subroutine </font><font color=#cc0000>read_args</font>(input_file,option,ratio,box_start,box_end,debug) <A href='../../call_to/READ_ARGS.html' TARGET='index'>2</A>,<A href='../../call_from/READ_ARGS.html' TARGET='index'>10</A><a name='789'>
+<a name='790'>
+  implicit none<a name='791'>
+  character (len=80)    :: input_file<a name='792'>
+  character (len=10)    :: option<a name='793'>
+<a name='794'>
+  integer               :: iratio<a name='795'>
+  real                  :: ratio<a name='796'>
+  integer               :: box_start(3), box_end(3)<a name='797'>
+  logical               :: debug<a name='798'>
+<a name='799'>
+  integer               :: numarg, i, idummy, idummy1, idummy2<a name='800'>
+  real                  :: rdummy<a name='801'>
+  integer, external     :: iargc<a name='802'>
+  character (len=80)    :: dummy, dir<a name='803'>
+<a name='804'>
+<font color=#447700>! set up some defaults first<a name='805'></font>
+  input_file = " "<a name='806'>
+  option = " "<a name='807'>
+  ratio = 0.0<a name='808'>
+  idummy1 = 0<a name='809'>
+  idummy2 = 0<a name='810'>
+  box_start = 0<a name='811'>
+  box_end   = 0<a name='812'>
+  numarg = iargc()<a name='813'>
+  i = 1<a name='814'>
+<a name='815'>
+  if (numarg .lt. 1) call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_6"><a name='816'>
+<a name='817'>
+  do while (i &lt;= numarg)<a name='818'>
+    call getarg(i,dummy)<a name='819'>
+<a name='820'>
+    if (dummy(1:1) == "-") then    <font color=#447700>! We have an option, else it is the filename<a name='821'></font>
+<a name='822'>
+      SELECTCASE (trim(dummy))<a name='823'>
+          CASE ("-help")<a name='824'>
+               call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_7"><a name='825'>
+          CASE ("-h")<a name='826'>
+               call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_8"><a name='827'>
+          CASE ("-debug")<a name='828'>
+               debug = .TRUE.     <a name='829'>
+          CASE ("-down")<a name='830'>
+               option = dummy<a name='831'>
+               i = i+1<a name='832'>
+               call getarg(i,dummy)<a name='833'>
+               read(dummy,'(i3)')idummy<a name='834'>
+               iratio = idummy<a name='835'>
+               if ( iratio .lt. 2 ) STOP ' Must supply a ratio of 2 or more ' <a name='836'>
+               ratio = real(iratio)<a name='837'>
+          CASE ("-thin")<a name='838'>
+               option = dummy<a name='839'>
+               i = i+1<a name='840'>
+               call getarg(i,dummy)<a name='841'>
+               read(dummy,'(i3)')idummy<a name='842'>
+               iratio = idummy<a name='843'>
+               if ( iratio .lt. 2 ) STOP ' Must supply a ratio of 2 or more ' <a name='844'>
+               ratio = real(iratio)<a name='845'>
+          CASE DEFAULT<a name='846'>
+               call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_9"><a name='847'>
+      END SELECT<a name='848'>
+    else<a name='849'>
+      input_file = dummy<a name='850'>
+    endif<a name='851'>
+<a name='852'>
+      i = i+1<a name='853'>
+<a name='854'>
+  enddo<a name='855'>
+<a name='856'>
+  if (input_file == " ") call <A href='../../html_code/main/nupdown.F.html#HELP_INFO'>help_info</A><A href='../../html_code/main/nupdown.F.html#READ_ARGS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="HELP_INFO_10"><a name='857'>
+<a name='858'>
+<a name='859'>
+  end subroutine read_args<a name='860'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='861'></font>
+<a name='862'>
+<A NAME='HELP_INFO'><A href='../../html_code/main/nupdown.F.html#HELP_INFO' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='863'>
+  <font color=#993300>subroutine </font><font color=#cc0000>help_info</font> <A href='../../call_to/HELP_INFO.html' TARGET='index'>10</A><a name='864'>
+<a name='865'>
+  print*," "<a name='866'>
+  print*," nupdown   wrf_data_file_name  [-options] "<a name='867'>
+  print*," "<a name='868'>
+  print*," Current options available are:"<a name='869'>
+  print*," -help     : Print this information"                           <a name='870'>
+  print*," -h        : Print this information"                           <a name='871'>
+  print*," "<a name='872'>
+  print*," -down x  : Nestdown the input grid, with a ration of x"  <a name='873'>
+  print*,"             Example:"<a name='874'>
+  print*,"                -down 3 " <a name='875'>
+  print*,"             Will nestdown the grid with a ratio of 3, i.e.,   "<a name='876'>
+  print*,"             a 36km grid will be downscaled to a 12km grid" <a name='877'>
+  print*," "<a name='878'>
+  print*," -thin x   : Thin the input grid, with a ration of x"  <a name='879'>
+  print*,"             Example:"<a name='880'>
+  print*,"                -thin 3 " <a name='881'>
+  print*,"             Will thin the grid with a ratio of 3, i.e.,   "<a name='882'>
+  print*,"             a 12km grid will be upscaled to a 36km grid" <a name='883'>
+  print*,"             The new grid point will be the feedback value from the input domain"<a name='884'>
+  print*," "<a name='885'>
+  print*," -debug    : Print information about dimensions/attributes and variables"<a name='886'>
+  print*," "<a name='887'>
+<a name='888'>
+  STOP<a name='889'>
+<a name='890'>
+  end subroutine help_info<a name='891'>
+<a name='892'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='893'></font>
+<a name='894'>
+</pre></body></html>

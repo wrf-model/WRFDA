@@ -1,0 +1,221 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+"Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
+);
+</script>
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Courier, Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+
+      <p class="headingtext" id="Font14">3DVAR: Compilation</p>
+
+      <p class="bodytext"><strong id="Font14">Step 5: Compile WRFDA</strong> </p>
+      <p class="bodytext">If everything has worked up to this point, then congratulations, you're ready to compile! All the relevant settings and environment variables should have been worked out at this point, so to compile you simply need to enter the following:</p>
+      <p class="code">>./compile all_wrfvar >& compile_3dvar_serial.out </p>
+      <p class="bodytext">The text "<span class="style6" id="Font12">./compile all_wrfvar</span>" is the actual command to compile wrfda. The remaining text (<span class="style6" id="Font12">>& compile_3dvar_serial.out</span>) is simply to write all the compilation output (including any possible error messages) to a log file named "compile_3dvar_serial.out". You can name this file anything you want, but it is a good idea to be descriptive!</p>
+      <p class="bodytext">Compilation typically takes from 15&ndash;30 minutes, depending on your system's operating system, processor speed, memory, compiler, and other factors. In some rare cases compilation can take up to an hour, but if the process still hasn't completed after an hour, something has likely gone wrong. See the <a href="../Help/compilation.html">Compilation Help Page</a> for assistance.</p>
+
+
+      <p class="bodytext"><strong id="Font14">Step 6: Examine the compiled system</strong> </p>
+      <p class="bodytext">Once the compile script has finished, we need to make sure there were no errors in the compilation process. The easiest way to do this is to count the number of executables which were built. Successful compilation will produce 43 executables: 42 in the <span class="style6" id="Font12">var/build</span> directory and linked in the <span class="style6" id="Font12">var/da</span> directory, with the 43rd, <span class="style6" id="Font12">obsproc.exe</span>, in the <span class="style6" id="Font12">var/obsproc/src</span> directory. If something went wrong with the compilation, one or more executable files will be missing. You can list these executables by issuing the command:</p>
+      <p class="code">> ls -l var/build/*exe var/obsproc/src/obsproc.exe</p>
+      <p class="bodytext">This command should list out the following 44 executable files:</p>
+      <p class="code">-rwxrwxr-x 1 user &nbsp; &nbsp;26564 Jun 25 15:02 var/build/da_advance_time.exe</br>
+-rwxrwxr-x 1 user &nbsp; 110401 Jun 25 15:04 var/build/da_bias_airmass.exe</br>
+-rwxrwxr-x 1 user &nbsp; &nbsp;85327 Jun 25 15:02 var/build/da_bias_scan.exe</br>
+-rwxrwxr-x 1 user &nbsp; &nbsp;43744 Jun 25 15:02 var/build/da_bias_sele.exe</br>
+-rwxrwxr-x 1 user &nbsp; &nbsp;52424 Jun 25 15:02 var/build/da_bias_verif.exe</br>
+-rwxrwxr-x 1 user &nbsp; 101741 Jun 25 15:03 var/build/da_rad_diags.exe</br>
+-rwxrwxr-x 1 user &nbsp; 122382 Jun 25 15:02 var/build/da_tune_obs_desroziers.exe</br>
+-rwxrwxr-x 1 user &nbsp; 254887 Jun 25 15:04 var/build/da_tune_obs_hollingsworth1.exe</br>
+-rwxrwxr-x 1 user &nbsp; 156835 Jun 25 15:04 var/build/da_tune_obs_hollingsworth2.exe</br>
+-rwxrwxr-x 1 user &nbsp; 148082 Jun 25 15:04 var/build/da_update_bc_ad.exe</br>
+-rwxrwxr-x 1 user &nbsp; 156176 Jun 25 15:04 var/build/da_update_bc.exe</br>
+-rwxrwxr-x 1 user &nbsp; 242613 Jun 25 15:04 var/build/da_verif_grid.exe</br>
+-rwxrwxr-x 1 user &nbsp; &nbsp;91326 Jun 25 15:04 var/build/da_verif_obs.exe</br>
+-rwxrwxr-x 1 user 11199062 Jun 25 15:10 var/build/da_wrfvar.exe</br>
+-rwxrwxr-x 1 user &nbsp; 729473 Jun 25 15:04 var/build/gen_be_addmean.exe</br>
+-rwxrwxr-x 1 user &nbsp; 729421 Jun 25 15:04 var/build/gen_be_cov2d3d_contrib.exe</br>
+-rwxrwxr-x 1 user &nbsp; 720981 Jun 25 15:04 var/build/gen_be_cov2d.exe</br>
+-rwxrwxr-x 1 user &nbsp; 733518 Jun 25 15:04 var/build/gen_be_cov3d2d_contrib.exe</br>
+-rwxrwxr-x 1 user &nbsp; 729427 Jun 25 15:04 var/build/gen_be_cov3d3d_bin3d_contrib.exe</br>
+-rwxrwxr-x 1 user &nbsp; 733518 Jun 25 15:04 var/build/gen_be_cov3d3d_contrib.exe</br>
+-rwxrwxr-x 1 user &nbsp; 716885 Jun 25 15:04 var/build/gen_be_cov3d.exe</br>
+-rwxrwxr-x 1 user &nbsp; 708693 Jun 25 15:04 var/build/gen_be_diags.exe</br>
+-rwxrwxr-x 1 user &nbsp; 733435 Jun 25 15:04 var/build/gen_be_diags_read.exe</br>
+-rwxrwxr-x 1 user &nbsp; 725252 Jun 25 15:04 var/build/gen_be_ensmean.exe</br>
+-rwxrwxr-x 1 user &nbsp; 745710 Jun 25 15:04 var/build/gen_be_ensrf.exe</br>
+-rwxrwxr-x 1 user &nbsp; 802900 Jun 25 15:04 var/build/gen_be_ep1.exe</br>
+-rwxrwxr-x 1 user &nbsp; 815300 Jun 25 15:04 var/build/gen_be_ep2.exe</br>
+-rwxrwxr-x 1 user &nbsp; 774641 Jun 25 15:04 var/build/gen_be_etkf.exe</br>
+-rwxrwxr-x 1 user &nbsp; 725076 Jun 25 15:04 var/build/gen_be_hist.exe</br>
+-rwxrwxr-x 1 user &nbsp; 832310 Jun 25 15:04 var/build/gen_be_stage0_gsi.exe</br>
+-rwxrwxr-x 1 user &nbsp; 819754 Jun 25 15:04 var/build/gen_be_stage0_wrf.exe</br>
+-rwxrwxr-x 1 user &nbsp; 782429 Jun 25 15:04 var/build/gen_be_stage1_1dvar.exe</br>
+-rwxrwxr-x 1 user &nbsp; 749655 Jun 25 15:04 var/build/gen_be_stage1.exe</br>
+-rwxrwxr-x 1 user &nbsp; 762159 Jun 25 15:04 var/build/gen_be_stage1_gsi.exe</br>
+-rwxrwxr-x 1 user &nbsp; 770199 Jun 25 15:04 var/build/gen_be_stage2_1dvar.exe</br>
+-rwxrwxr-x 1 user &nbsp; 725080 Jun 25 15:04 var/build/gen_be_stage2a.exe</br>
+-rwxrwxr-x 1 user &nbsp; 741463 Jun 25 15:04 var/build/gen_be_stage2.exe</br>
+-rwxrwxr-x 1 user &nbsp; 232935 Jun 25 15:02 var/build/gen_be_stage2_gsi.exe</br>
+-rwxrwxr-x 1 user &nbsp; 741463 Jun 25 15:04 var/build/gen_be_stage3.exe</br>
+-rwxrwxr-x 1 user &nbsp; 716893 Jun 25 15:04 var/build/gen_be_stage4_global.exe</br>
+-rwxrwxr-x 1 user &nbsp; 754007 Jun 25 15:04 var/build/gen_be_stage4_regional.exe</br>
+-rwxrwxr-x 1 user &nbsp; 716990 Jun 25 15:04 var/build/gen_be_vertloc.exe</br>
+-rwxrwxr-x 1 user &nbsp; 868618 Jun 25 15:04 var/build/gen_mbe_stage2.exe</br>
+
+      <p class="bodytext">If all the executables are there, then you're ready to move on to the next step! If not, see the <a href="../Help/compilation.html">Compilation Help Page</a> to try to determine what went wrong.</p>
+
+
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><span class="bodytext"><span class="style7"> NEXT: Preparing a test case </span>&nbsp;&nbsp;&nbsp;<a href="../3dvar/testcase.html"><img src="../images/forward.svg" width="30" height="30" border="0" align="absmiddle"></a></span></div></td>
+        </tr>
+        <tr>
+          <td><div align="right"><a href="../Help/index.html"><img src="../images/help.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;<a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+      </table>
+
+      <br><blockquote><hr></blockquote><br>
+      <p class="bodytext"><strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> or wrfhelp@ucar.edu so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

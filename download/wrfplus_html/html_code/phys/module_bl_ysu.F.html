@@ -1,0 +1,1165 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!wrf:model_layer:physics<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<font color=#447700>!<a name='4'></font>
+<font color=#447700>!<a name='5'></font>
+<A NAME='MODULE_BL_YSU'><A href='../../html_code/phys/module_bl_ysu.F.html#MODULE_BL_YSU' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='6'>
+<font color=#993300>module </font><font color=#cc0000>module_bl_ysu</font> <A href='../../call_to/MODULE_BL_YSU.html' TARGET='index'>2</A><a name='7'>
+contains<a name='8'>
+<font color=#447700>!<a name='9'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='10'></font>
+<font color=#447700>!<a name='11'></font>
+<A NAME='YSU'><A href='../../html_code/phys/module_bl_ysu.F.html#YSU' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='12'>
+   <font color=#993300>subroutine </font><font color=#cc0000>ysu</font>(u3d,v3d,th3d,t3d,qv3d,qc3d,qi3d,p3d,pi3d,        &amp; <A href='../../call_to/YSU.html' TARGET='index'>1</A>,<A href='../../call_from/YSU.html' TARGET='index'>1</A><a name='13'>
+                  rublten,rvblten,rthblten,                        &amp;<a name='14'>
+                  rqvblten,rqcblten,rqiblten,          		   &amp;<a name='15'>
+                  cp,g,rovcp,rd,rovg,                              &amp;<a name='16'>
+                  dz8w,z,xlv,rv,psfc,                              &amp;<a name='17'>
+                  znt,ust,zol,hol,hpbl,regime,psim,psih,           &amp;<a name='18'>
+                  xland,hfx,qfx,tsk,gz1oz0,wspd,br,                &amp;<a name='19'>
+                  dt,dtmin,kpbl2d,                                 &amp;<a name='20'>
+                  svp1,svp2,svp3,svpt0,ep1,ep2,karman,eomeg,stbolt,&amp;<a name='21'>
+                  ids,ide, jds,jde, kds,kde,                       &amp;<a name='22'>
+                  ims,ime, jms,jme, kms,kme,                       &amp;<a name='23'>
+                  its,ite, jts,jte, kts,kte                        )<a name='24'>
+<font color=#447700>!-------------------------------------------------------------------<a name='25'></font>
+      implicit none<a name='26'>
+<font color=#447700>!-------------------------------------------------------------------<a name='27'></font>
+<font color=#447700>!-- u3d         3d u-velocity interpolated to theta points (m/s)<a name='28'></font>
+<font color=#447700>!-- v3d         3d v-velocity interpolated to theta points (m/s)<a name='29'></font>
+<font color=#447700>!-- th3d	3d potential temperature (k)<a name='30'></font>
+<font color=#447700>!-- t3d         temperature (k)<a name='31'></font>
+<font color=#447700>!-- qv3d        3d water vapor mixing ratio (kg/kg)<a name='32'></font>
+<font color=#447700>!-- qc3d        3d cloud mixing ratio (kg/kg)<a name='33'></font>
+<font color=#447700>!-- qi3d        3d ice mixing ratio (kg/kg)   <a name='34'></font>
+<font color=#447700>!               (note: if P_QI&lt;PARAM_FIRST_SCALAR this should be zero filled)<a name='35'></font>
+<font color=#447700>!-- p3d         3d pressure (pa)<a name='36'></font>
+<font color=#447700>!-- pi3d	3d exner function (dimensionless)<a name='37'></font>
+<font color=#447700>!-- rr3d	3d dry air density (kg/m^3)<a name='38'></font>
+<font color=#447700>!-- rublten     u tendency due to<a name='39'></font>
+<font color=#447700>!               pbl parameterization (m/s/s)<a name='40'></font>
+<font color=#447700>!-- rvblten     v tendency due to<a name='41'></font>
+<font color=#447700>!               pbl parameterization (m/s/s)<a name='42'></font>
+<font color=#447700>!-- rthblten    theta tendency due to<a name='43'></font>
+<font color=#447700>!               pbl parameterization (K/s)<a name='44'></font>
+<font color=#447700>!-- rqvblten    qv tendency due to<a name='45'></font>
+<font color=#447700>!               pbl parameterization (kg/kg/s)<a name='46'></font>
+<font color=#447700>!-- rqcblten    qc tendency due to<a name='47'></font>
+<font color=#447700>!               pbl parameterization (kg/kg/s)<a name='48'></font>
+<font color=#447700>!-- rqiblten    qi tendency due to<a name='49'></font>
+<font color=#447700>!               pbl parameterization (kg/kg/s)<a name='50'></font>
+<font color=#447700>!-- cp          heat capacity at constant pressure for dry air (j/kg/k)<a name='51'></font>
+<font color=#447700>!-- g           acceleration due to gravity (m/s^2)<a name='52'></font>
+<font color=#447700>!-- rovcp       r/cp<a name='53'></font>
+<font color=#447700>!-- rd          gas constant for dry air (j/kg/k)<a name='54'></font>
+<font color=#447700>!-- rovg 	r/g<a name='55'></font>
+<font color=#447700>!-- dz8w	dz between full levels (m)<a name='56'></font>
+<font color=#447700>!-- z		height above sea level (m)<a name='57'></font>
+<font color=#447700>!-- xlv         latent heat of vaporization (j/kg)<a name='58'></font>
+<font color=#447700>!-- rv 		gas constant for water vapor (j/kg/k)<a name='59'></font>
+<font color=#447700>!-- psfc        pressure at the surface (pa)<a name='60'></font>
+<font color=#447700>!-- znt		roughness length (m)<a name='61'></font>
+<font color=#447700>!-- ust		u* in similarity theory (m/s)<a name='62'></font>
+<font color=#447700>!-- zol		z/l height over monin-obukhov length<a name='63'></font>
+<font color=#447700>!-- hol		pbl height over monin-obukhov length<a name='64'></font>
+<font color=#447700>!-- hpbl	pbl height (m)<a name='65'></font>
+<font color=#447700>!-- regime	flag indicating pbl regime (stable, unstable, etc.)<a name='66'></font>
+<font color=#447700>!-- psim        similarity stability function for momentum<a name='67'></font>
+<font color=#447700>!-- psih        similarity stability function for heat<a name='68'></font>
+<font color=#447700>!-- xland	land mask (1 for land, 2 for water)<a name='69'></font>
+<font color=#447700>!-- hfx		upward heat flux at the surface (w/m^2)<a name='70'></font>
+<font color=#447700>!-- qfx		upward moisture flux at the surface (kg/m^2/s)<a name='71'></font>
+<font color=#447700>!-- tsk		surface temperature (k)<a name='72'></font>
+<font color=#447700>!-- gz1oz0      log(z/z0) where z0 is roughness length<a name='73'></font>
+<font color=#447700>!-- wspd        wind speed at lowest model level (m/s)<a name='74'></font>
+<font color=#447700>!-- br          bulk richardson number in surface layer<a name='75'></font>
+<font color=#447700>!-- dt		time step (s)<a name='76'></font>
+<font color=#447700>!-- dtmin	time step (minute)<a name='77'></font>
+<font color=#447700>!-- rvovrd      r_v divided by r_d (dimensionless)<a name='78'></font>
+<font color=#447700>!-- svp1        constant for saturation vapor pressure (kpa)<a name='79'></font>
+<font color=#447700>!-- svp2        constant for saturation vapor pressure (dimensionless)<a name='80'></font>
+<font color=#447700>!-- svp3        constant for saturation vapor pressure (k)<a name='81'></font>
+<font color=#447700>!-- svpt0       constant for saturation vapor pressure (k)<a name='82'></font>
+<font color=#447700>!-- ep1         constant for virtual temperature (r_v/r_d - 1) (dimensionless)<a name='83'></font>
+<font color=#447700>!-- ep2         constant for specific humidity calculation<a name='84'></font>
+<font color=#447700>!-- karman      von karman constant<a name='85'></font>
+<font color=#447700>!-- eomeg       angular velocity of earths rotation (rad/s)<a name='86'></font>
+<font color=#447700>!-- stbolt      stefan-boltzmann constant (w/m^2/k^4)<a name='87'></font>
+<font color=#447700>!-- ids         start index for i in domain<a name='88'></font>
+<font color=#447700>!-- ide         end index for i in domain<a name='89'></font>
+<font color=#447700>!-- jds         start index for j in domain<a name='90'></font>
+<font color=#447700>!-- jde         end index for j in domain<a name='91'></font>
+<font color=#447700>!-- kds         start index for k in domain<a name='92'></font>
+<font color=#447700>!-- kde         end index for k in domain<a name='93'></font>
+<font color=#447700>!-- ims         start index for i in memory<a name='94'></font>
+<font color=#447700>!-- ime         end index for i in memory<a name='95'></font>
+<font color=#447700>!-- jms         start index for j in memory<a name='96'></font>
+<font color=#447700>!-- jme         end index for j in memory<a name='97'></font>
+<font color=#447700>!-- kms         start index for k in memory<a name='98'></font>
+<font color=#447700>!-- kme         end index for k in memory<a name='99'></font>
+<font color=#447700>!-- its         start index for i in tile<a name='100'></font>
+<font color=#447700>!-- ite         end index for i in tile<a name='101'></font>
+<font color=#447700>!-- jts         start index for j in tile<a name='102'></font>
+<font color=#447700>!-- jte         end index for j in tile<a name='103'></font>
+<font color=#447700>!-- kts         start index for k in tile<a name='104'></font>
+<font color=#447700>!-- kte         end index for k in tile<a name='105'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='106'></font>
+<font color=#447700>!<a name='107'></font>
+      integer,  intent(in   )   ::      ids,ide, jds,jde, kds,kde, &amp;<a name='108'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='109'>
+                                        its,ite, jts,jte, kts,kte<a name='110'>
+<font color=#447700>!<a name='111'></font>
+      real,     intent(in   )   ::      dt,dtmin,cp,g,rovcp,       &amp;<a name='112'>
+				        rovg,rd,xlv,rv<a name='113'>
+<font color=#447700>!<a name='114'></font>
+      real,     intent(in )     ::     svp1,svp2,svp3,svpt0<a name='115'>
+      real,     intent(in )     ::     ep1,ep2,karman,eomeg,stbolt<a name='116'>
+<font color=#447700>!<a name='117'></font>
+      real,     dimension( ims:ime, kms:kme, jms:jme )           , &amp;<a name='118'>
+                intent(in   )   ::                           qv3d, &amp;<a name='119'>
+							     qc3d, &amp;<a name='120'>
+ 		 				             qi3d, &amp;<a name='121'>
+							      p3d, &amp;<a name='122'>
+							     pi3d, &amp;<a name='123'>
+							     th3d, &amp;<a name='124'>
+							      t3d, &amp;<a name='125'>
+							     dz8w, &amp;<a name='126'>
+							        z<a name='127'>
+<font color=#447700>!<a name='128'></font>
+      real,     dimension( ims:ime, kms:kme, jms:jme )           , &amp;<a name='129'>
+                intent(inout)   ::                        rublten, &amp;<a name='130'>
+							  rvblten, &amp;<a name='131'>
+							 rthblten, &amp;<a name='132'>
+							 rqvblten, &amp;<a name='133'>
+							 rqcblten, &amp;<a name='134'>
+							 rqiblten<a name='135'>
+<font color=#447700>!<a name='136'></font>
+      real,     dimension( ims:ime, jms:jme )                    , &amp;<a name='137'>
+                intent(in   )   ::                          xland, &amp;<a name='138'>
+           			                              hfx, &amp;<a name='139'>
+           					              qfx, &amp;<a name='140'>
+     					                     psim, &amp;<a name='141'>
+           					             psih, &amp;<a name='142'>
+							   gz1oz0, &amp;<a name='143'>
+							       br, &amp;<a name='144'>
+                                                             psfc, &amp;<a name='145'>
+                                                              tsk<a name='146'>
+<font color=#447700>!<a name='147'></font>
+      real,     dimension( ims:ime, jms:jme )                    , &amp;<a name='148'>
+                intent(inout)   ::                            hol, &amp;<a name='149'>
+							      ust, &amp;<a name='150'>
+							     hpbl, &amp;<a name='151'>
+                                                              znt, &amp;<a name='152'>
+						           regime, &amp;<a name='153'>
+						             wspd, &amp;<a name='154'>
+                                                              zol<a name='155'>
+<font color=#447700>!<a name='156'></font>
+     real,     dimension( ims:ime, kms:kme, jms:jme )            , &amp;<a name='157'>
+                intent(in   )   ::                            u3d, &amp;<a name='158'>
+                                                              v3d<a name='159'>
+<font color=#447700>!<a name='160'></font>
+     integer,  dimension( ims:ime, jms:jme )                     , &amp;<a name='161'>
+                intent(out  )   ::                         kpbl2d<a name='162'>
+<font color=#447700>!<a name='163'></font>
+   integer ::  i,j,k<a name='164'>
+<font color=#447700>!<a name='165'></font>
+   do j = jts,jte<a name='166'>
+      call <A href='../../html_code/phys/module_bl_ysu.F.html#YSU2D'>ysu2d</A><A href='../../html_code/phys/module_bl_ysu.F.html#YSU' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="YSU2D_1">(j,u3d(ims,kms,j),v3d(ims,kms,j),t3d(ims,kms,j),    &amp;<a name='167'>
+               qv3d(ims,kms,j),qc3d(ims,kms,j),qi3d(ims,kms,j),     &amp;<a name='168'>
+               p3d(ims,kms,j),rublten(ims,kms,j),rvblten(ims,kms,j),&amp;<a name='169'>
+               rthblten(ims,kms,j),rqvblten(ims,kms,j),             &amp;<a name='170'>
+               rqcblten(ims,kms,j),rqiblten(ims,kms,j),             &amp;<a name='171'>
+               cp,g,rovcp,rd,rovg,                                  &amp;<a name='172'>
+               dz8w(ims,kms,j),z(ims,kms,j),xlv,rv,                 &amp;<a name='173'>
+               psfc(ims,j),znt(ims,j),ust(ims,j),zol(ims,j),        &amp;<a name='174'>
+               hol(ims,j),hpbl(ims,j),regime(ims,j),psim(ims,j),    &amp;<a name='175'>
+               psih(ims,j),xland(ims,j),hfx(ims,j),qfx(ims,j),      &amp;<a name='176'>
+               tsk(ims,j),gz1oz0(ims,j),wspd(ims,j),br(ims,j),      &amp;<a name='177'>
+               dt,dtmin,kpbl2d(ims,j),                              &amp;<a name='178'>
+               svp1,svp2,svp3,svpt0,ep1,ep2,karman,eomeg,stbolt,    &amp;<a name='179'>
+               ids,ide, jds,jde, kds,kde,                           &amp;<a name='180'>
+               ims,ime, jms,jme, kms,kme,                           &amp;<a name='181'>
+               its,ite, jts,jte, kts,kte                            )<a name='182'>
+      do k = kts,kte<a name='183'>
+      do i = its,ite<a name='184'>
+         rthblten(i,k,j) = rthblten(i,k,j)/pi3d(i,k,j)<a name='185'>
+      enddo<a name='186'>
+      enddo<a name='187'>
+    enddo<a name='188'>
+<font color=#447700>!<a name='189'></font>
+   end subroutine ysu<a name='190'>
+<font color=#447700>!<a name='191'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='192'></font>
+<font color=#447700>!<a name='193'></font>
+<A NAME='YSU2D'><A href='../../html_code/phys/module_bl_ysu.F.html#YSU2D' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='194'>
+   <font color=#993300>subroutine </font><font color=#cc0000>ysu2d</font>(j,ux,vx,tx,qx,qcx,qix,p2d,                     &amp; <A href='../../call_to/YSU2D.html' TARGET='index'>1</A>,<A href='../../call_from/YSU2D.html' TARGET='index'>2</A><a name='195'>
+                  utnp,vtnp,ttnp,                                  &amp;<a name='196'>
+                  qtnp,qctnp,qitnp,             		   &amp;<a name='197'>
+                  cp,g,rovcp,rd,rovg,                              &amp;<a name='198'>
+                  dz8w2d,z2d,xlv,rv,psfcpa,                        &amp;<a name='199'>
+                  znt,ust,zol,hol,hpbl,regime,psim,psih,           &amp;<a name='200'>
+                  xland,hfx,qfx,tsk,gz1oz0,wspd,br,                &amp;<a name='201'>
+                  dt,dtmin,kpbl1d,                                 &amp;<a name='202'>
+                  svp1,svp2,svp3,svpt0,ep1,ep2,karman,eomeg,stbolt,&amp;<a name='203'>
+                  ids,ide, jds,jde, kds,kde,                       &amp;<a name='204'>
+                  ims,ime, jms,jme, kms,kme,                       &amp;<a name='205'>
+                  its,ite, jts,jte, kts,kte                        )<a name='206'>
+<font color=#447700>!-------------------------------------------------------------------<a name='207'></font>
+      implicit none<a name='208'>
+<font color=#447700>!-------------------------------------------------------------------<a name='209'></font>
+<font color=#447700>!<a name='210'></font>
+<font color=#447700>!     this code is a revised vertical diffusion package ("ysupbl")<a name='211'></font>
+<font color=#447700>!     with a nonlocal turbulent mixing in the pbl after "mrfpbl".<a name='212'></font>
+<font color=#447700>!     the ysupbl is based on the study of noh et al(2003) and<a name='213'></font>
+<font color=#447700>!     accumulated realism of the behavior of the troen and mahrt<a name='214'></font>
+<font color=#447700>!     (1986) concept implemented by hong and pan(1996). the major<a name='215'></font>
+<font color=#447700>!     ingredient of the ysupbl is the inclusion of an explicit<a name='216'></font>
+<font color=#447700>!     treatment of the entrainment processes at the entrainment layer.<a name='217'></font>
+<font color=#447700>!     this routine uses an implicit approach for vertical flux<a name='218'></font>
+<font color=#447700>!     divergence and does not require "miter" timesteps.<a name='219'></font>
+<font color=#447700>!     it includes vertical diffusion in the stable atmosphere<a name='220'></font>
+<font color=#447700>!     and moist vertical diffusion in clouds.<a name='221'></font>
+<font color=#447700>!     surface fluxes calculated as in hirpbl.<a name='222'></font>
+<font color=#447700>!     5-layer soil model option required in slab due to long timestep<a name='223'></font>
+<font color=#447700>!<a name='224'></font>
+<font color=#447700>!     mrfpbl:<a name='225'></font>
+<font color=#447700>!     coded by song-you hong (ncep), implemented by jimy dudhia (ncar)<a name='226'></font>
+<font color=#447700>!     fall 1996<a name='227'></font>
+<font color=#447700>!<a name='228'></font>
+<font color=#447700>!     ysupbl:<a name='229'></font>
+<font color=#447700>!     coded by song-you hong (yonsei university) and implemented by<a name='230'></font>
+<font color=#447700>!         song-you hong (yonsei university) and jimy dudhia (ncar)<a name='231'></font>
+<font color=#447700>!     summer 2002<a name='232'></font>
+<font color=#447700>!<a name='233'></font>
+<font color=#447700>!     references:<a name='234'></font>
+<font color=#447700>!<a name='235'></font>
+<font color=#447700>!        hong and pan (1996), mon. wea. rev.<a name='236'></font>
+<font color=#447700>!        hong, noh, and dudhia (2004), mon. wea. rev, to be submitted<a name='237'></font>
+<font color=#447700>!        dudhia and hong (2004), mon. wea. rev, to be submitted<a name='238'></font>
+<font color=#447700>!        noh, chun, hong, and raasch (2003), boundary layer met.<a name='239'></font>
+<font color=#447700>!        troen and mahrt (1986), boundary layer met.<a name='240'></font>
+<font color=#447700>!<a name='241'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='242'></font>
+<font color=#447700>!<a name='243'></font>
+      real      rlam,prmin,prmax,xkzmin,xkzmax,rimin,brcr,         &amp;<a name='244'>
+                bfac,pfac,sfcfrac,ckz,zfmin,aphi5,aphi16,gamcrt,   &amp;<a name='245'>
+                gamcrq,xka<a name='246'>
+<font color=#447700>!<a name='247'></font>
+      parameter (xkzmin = 0.01,xkzmax = 1000.,rimin = -100.)<a name='248'>
+      integer ncloud<a name='249'>
+      parameter (ncloud = 3)<a name='250'>
+      real afac, phifac, qmin<a name='251'>
+      real d1,d2,d3<a name='252'>
+      real h1,h2<a name='253'>
+      parameter (rlam = 150.,prmin = 0.25,prmax = 4.)<a name='254'>
+      parameter (brcr = 0.0,bfac = 6.8,pfac = 2.0,sfcfrac = 0.1)<a name='255'>
+      parameter (afac = 6.8,phifac = 8.,qmin=1.e-2)<a name='256'>
+      parameter (d1 = 0.02, d2 = 0.05, d3 = 0.001)<a name='257'>
+      parameter (h1 = 0.33333335, h2 = 0.6666667)<a name='258'>
+      parameter (ckz = 0.001,zfmin = 1.e-8,aphi5 = 5.,aphi16 = 16.)<a name='259'>
+      parameter (gamcrt = 3.,gamcrq = 2.e-3)<a name='260'>
+      parameter (xka = 2.4e-5)<a name='261'>
+<font color=#447700>!<a name='262'></font>
+      integer,  intent(in   )   ::      ids,ide, jds,jde, kds,kde, &amp;<a name='263'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='264'>
+                                        its,ite, jts,jte, kts,kte, j<a name='265'>
+<font color=#447700>!<a name='266'></font>
+      real,     intent(in   )   ::      dt,dtmin,cp,g,rovcp,       &amp;<a name='267'>
+				        rovg,rd,xlv,rv<a name='268'>
+<font color=#447700>!<a name='269'></font>
+      real,     intent(in )     ::     svp1,svp2,svp3,svpt0<a name='270'>
+      real,     intent(in )     ::     ep1,ep2,karman,eomeg,stbolt<a name='271'>
+<font color=#447700>!<a name='272'></font>
+      real,     dimension( ims:ime, kms:kme ),                     &amp;<a name='273'>
+                intent(in)      ::                         dz8w2d, &amp;<a name='274'>
+                                                              z2d<a name='275'>
+<font color=#447700>!<a name='276'></font>
+      real,     dimension( ims:ime, kms:kme )                    , &amp;<a name='277'>
+                intent(in   )   ::                             tx, &amp;<a name='278'>
+                                                               qx, &amp;<a name='279'>
+						  	      qcx, &amp;<a name='280'>
+ 		 				              qix, &amp;<a name='281'>
+							      p2d<a name='282'>
+<font color=#447700>!<a name='283'></font>
+      real,     dimension( ims:ime, kms:kme )                    , &amp;<a name='284'>
+                intent(inout)   ::                           utnp, &amp;<a name='285'>
+							     vtnp, &amp;<a name='286'>
+							     ttnp, &amp;<a name='287'>
+							     qtnp, &amp;<a name='288'>
+							    qctnp, &amp;<a name='289'>
+							    qitnp<a name='290'>
+<font color=#447700>!<a name='291'></font>
+      real,     dimension( ims:ime )                             , &amp;<a name='292'>
+                intent(inout)   ::                            hol, &amp;<a name='293'>
+							      ust, &amp;<a name='294'>
+							     hpbl, &amp;<a name='295'>
+                                                              znt, &amp;<a name='296'>
+						           regime<a name='297'>
+      real,     dimension( ims:ime )                             , &amp;<a name='298'>
+                intent(in   )   ::                          xland, &amp;<a name='299'>
+           			                              hfx, &amp;<a name='300'>
+           					              qfx<a name='301'>
+<font color=#447700>!<a name='302'></font>
+      real,     dimension( ims:ime ), intent(inout)   ::     wspd<a name='303'>
+      real,     dimension( ims:ime ), intent(in  )    ::       br<a name='304'>
+<font color=#447700>!<a name='305'></font>
+<a name='306'>
+      real,     dimension( ims:ime ), intent(in   )   ::     psim, &amp;<a name='307'>
+           					             psih<a name='308'>
+      real,     dimension( ims:ime ), intent(in   )   ::   gz1oz0<a name='309'>
+<a name='310'>
+<font color=#447700>!<a name='311'></font>
+      real,     dimension( ims:ime ), intent(in   )   ::   psfcpa<a name='312'>
+      real,     dimension( ims:ime ), intent(in   )   ::      tsk<a name='313'>
+      real,     dimension( ims:ime ), intent(inout)   ::      zol<a name='314'>
+      integer,  dimension( ims:ime ), intent(out  )   ::   kpbl1d<a name='315'>
+<font color=#447700>!<a name='316'></font>
+      real,     dimension( ims:ime, kms:kme )                    , &amp;<a name='317'>
+                intent(in   )   ::                             ux, &amp;<a name='318'>
+                                                               vx<a name='319'>
+<font color=#447700>!<a name='320'></font>
+<font color=#447700>! local vars<a name='321'></font>
+<font color=#447700>!<a name='322'></font>
+      real,     dimension( its:ite, kts:kte+1 ) ::             zq<a name='323'>
+<font color=#447700>!<a name='324'></font>
+      real,     dimension( its:ite, kts:kte )   ::     		   &amp;<a name='325'>
+                  				         thx,thvx, &amp;<a name='326'>
+                  				          dzq,dza, &amp;<a name='327'>
+						               za, &amp;<a name='328'>
+						          uxs,vxs, &amp;<a name='329'>
+							 thxs,qxs, &amp;<a name='330'>
+                   				        qcxs,qixs<a name='331'>
+<font color=#447700>!<a name='332'></font>
+      real,    dimension( its:ite )             ::     qixsv,rhox, &amp;<a name='333'>
+       				                           govrth, &amp;<a name='334'>
+   						            thxsv, &amp;<a name='335'>
+							uxsv,vxsv, &amp;<a name='336'>
+                  			               qxsv,qcxsv, &amp;<a name='337'>
+                  			             qgh,tgdsa,ps<a name='338'>
+<font color=#447700>!<a name='339'></font>
+      real,    dimension( its:ite )             ::                 &amp;<a name='340'>
+                                                      zl1,thermal, &amp;<a name='341'>
+						     wscale,hgamt, &amp;<a name='342'>
+                                                       hgamq,brdn, &amp;<a name='343'>
+                 				        brup,phim, &amp;<a name='344'>
+						         phih,cpm, &amp;<a name='345'>
+					              dusfc,dvsfc, &amp;<a name='346'>
+						      dtsfc,dqsfc, &amp;<a name='347'>
+                                                       thgb,prpbl, &amp;<a name='348'>
+                                                            wspd1<a name='349'>
+<font color=#447700>!<a name='350'></font>
+      real,    dimension( its:ite, kts:kte )    ::      xkzm,xkzh, &amp;<a name='351'>
+							    f1,f2, &amp;<a name='352'>
+                                                            ad,au, &amp;<a name='353'>
+                                                               al, &amp;<a name='354'>
+                                                             zfac, &amp;<a name='355'>
+                                                             scr4<a name='356'>
+      real,    dimension( its:ite, kts:kte, ncloud)  ::        f3<a name='357'>
+<font color=#447700>!<a name='358'></font>
+      logical, dimension( its:ite )             ::         pblflg, &amp;<a name='359'>
+					                   sfcflg, &amp;<a name='360'>
+							   stable<a name='361'>
+<font color=#447700>!<a name='362'></font>
+      integer ::  n,i,k,l,nzol,imvdif,ic<a name='363'>
+      integer ::  klpbl<a name='364'>
+<font color=#447700>!<a name='365'></font>
+      integer, dimension( its:ite )             ::           kpbl<a name='366'>
+<font color=#447700>!<a name='367'></font>
+      real    ::  zoln,x,y,thcon,tvcon,e1,dtstep<a name='368'>
+      real    ::  zl,tskv,dthvdz,dthvm,vconv,rzol<a name='369'>
+      real    ::  dtthx,psix,dtg,psiq,ustm<a name='370'>
+      real    ::  dt2,rdt,spdk2,fm,fh,hol1,gamfac,vpert,prnum<a name='371'>
+      real    ::  xkzo,ss,ri,qmean,tmean,alph,chi,zk,rl2,dk,sri<a name='372'>
+      real    ::  brint,dtodsd,rdz,dsdzt,dsdzq,dsdz2,ttend,qtend<a name='373'>
+      real    ::  utend,vtend,qctend,qitend,tgc,dtodsu,govrthv<a name='374'>
+<font color=#447700>!<a name='375'></font>
+      real, dimension( its:ite, kts:kte )     ::         wscalek, &amp;<a name='376'>
+                                                     xkzml,xkzhl, &amp;<a name='377'>
+                                                  zfacent,entfac<a name='378'>
+      real, dimension( its:ite )              ::            ust3, &amp;<a name='379'>
+                                                    wstar3,wstar, &amp;<a name='380'>
+                                                     hgamu,hgamv, &amp;<a name='381'>
+                                                         wm2, &amp;<a name='382'>
+                                                          bfxpbl, &amp;<a name='383'>
+                                                   hfxpbl,qfxpbl, &amp;<a name='384'>
+                                                   ufxpbl,vfxpbl, &amp;<a name='385'>
+                                                     delta,dthvx<a name='386'>
+      real    ::  prnumfac,bfx0,hfx0,qfx0,delb,dux,dvx,           &amp;<a name='387'>
+                  dsdzu,dsdzv,wm3,dthx,dqx<a name='388'>
+<font color=#447700>!<a name='389'></font>
+<font color=#447700>!----------------------------------------------------------------------<a name='390'></font>
+<font color=#447700>!<a name='391'></font>
+      klpbl = kte<a name='392'>
+<font color=#447700>!<a name='393'></font>
+<font color=#447700>!-- imvdif      imvdif = 1 for moist adiabat vertical diffusion<a name='394'></font>
+<a name='395'>
+      imvdif = 1<a name='396'>
+<font color=#447700>!<a name='397'></font>
+<font color=#447700>!----convert ground temperature to potential temperature:<a name='398'></font>
+<font color=#447700>!<a name='399'></font>
+      do i = its,ite<a name='400'>
+        tgdsa(i) = tsk(i)<a name='401'>
+        ps(i) = psfcpa(i)/1000.          <font color=#447700>! ps psfc cmb<a name='402'></font>
+        thgb(i) = tsk(i)*(100./ps(i))**rovcp<a name='403'>
+      enddo<a name='404'>
+<font color=#447700>!<a name='405'></font>
+<font color=#447700>!     scr4(i,k) store virtual temperature.<a name='406'></font>
+<font color=#447700>!<a name='407'></font>
+      do k = kts,kte<a name='408'>
+        do i = its,ite<a name='409'>
+          thcon = (100000./p2d(i,k))**rovcp<a name='410'>
+          thx(i,k) = tx(i,k)*thcon<a name='411'>
+          scr4(i,k) = tx(i,k)<a name='412'>
+          thvx(i,k) = thx(i,k)<a name='413'>
+        enddo<a name='414'>
+      enddo<a name='415'>
+<font color=#447700>!<a name='416'></font>
+      do i = its,ite<a name='417'>
+        qgh(i) = 0.<a name='418'>
+        cpm(i) = cp<a name='419'>
+      enddo<a name='420'>
+<font color=#447700>!<a name='421'></font>
+      do k = kts,kte<a name='422'>
+        do i = its,ite<a name='423'>
+          tvcon = (1.+ep1*qx(i,k))<a name='424'>
+          thvx(i,k) = thx(i,k)*tvcon<a name='425'>
+          scr4(i,k) = tx(i,k)*tvcon<a name='426'>
+        enddo<a name='427'>
+      enddo<a name='428'>
+<font color=#447700>!<a name='429'></font>
+      do i = its,ite<a name='430'>
+        e1 = svp1*exp(svp2*(tgdsa(i)-svpt0)/(tgdsa(i)-svp3))<a name='431'>
+        qgh(i) = ep2*e1/(ps(i)-e1)<a name='432'>
+        cpm(i) = cp*(1.+0.8*qx(i,1))<a name='433'>
+      enddo<a name='434'>
+<font color=#447700>!<a name='435'></font>
+<font color=#447700>!-----compute the height of full- and half-sigma levels above ground<a name='436'></font>
+<font color=#447700>!     level, and the layer thicknesses.<a name='437'></font>
+<font color=#447700>!<a name='438'></font>
+      do i = its,ite<a name='439'>
+        zq(i,1) = 0.<a name='440'>
+        rhox(i) = ps(i)*1000./(rd*scr4(i,1))<a name='441'>
+      enddo<a name='442'>
+<font color=#447700>!<a name='443'></font>
+      do k = kts,kte<a name='444'>
+        do i = its,ite<a name='445'>
+          zq(i,k+1) = dz8w2d(i,k)+zq(i,k)<a name='446'>
+        enddo<a name='447'>
+      enddo<a name='448'>
+<font color=#447700>!<a name='449'></font>
+      do k = kts,kte<a name='450'>
+        do i = its,ite<a name='451'>
+          za(i,k) = 0.5*(zq(i,k)+zq(i,k+1))<a name='452'>
+          dzq(i,k) = zq(i,k+1)-zq(i,k)<a name='453'>
+        enddo<a name='454'>
+      enddo<a name='455'>
+<font color=#447700>!<a name='456'></font>
+      do i = its,ite<a name='457'>
+        dza(i,1) = za(i,1)<a name='458'>
+      enddo<a name='459'>
+<font color=#447700>!<a name='460'></font>
+      do k = kts+1,kte<a name='461'>
+        do i = its,ite<a name='462'>
+          dza(i,k) = za(i,k)-za(i,k-1)<a name='463'>
+        enddo<a name='464'>
+      enddo<a name='465'>
+<font color=#447700>!<a name='466'></font>
+      do i = its,ite<a name='467'>
+        govrth(i) = g/thx(i,1)<a name='468'>
+      enddo<a name='469'>
+<font color=#447700>!<a name='470'></font>
+<font color=#447700>!-----initialize vertical tendencies and<a name='471'></font>
+<font color=#447700>!<a name='472'></font>
+      do i = its,ite<a name='473'>
+        do k = kts,kte<a name='474'>
+          utnp(i,k) = 0.<a name='475'>
+          vtnp(i,k) = 0.<a name='476'>
+          ttnp(i,k) = 0.<a name='477'>
+        enddo<a name='478'>
+      enddo<a name='479'>
+<font color=#447700>!<a name='480'></font>
+      do k = kts,kte<a name='481'>
+        do i = its,ite<a name='482'>
+          qtnp(i,k) = 0.<a name='483'>
+        enddo<a name='484'>
+      enddo<a name='485'>
+<font color=#447700>!<a name='486'></font>
+      do k = kts,kte<a name='487'>
+        do i = its,ite<a name='488'>
+          qctnp(i,k) = 0.<a name='489'>
+          qitnp(i,k) = 0.<a name='490'>
+        enddo<a name='491'>
+      enddo<a name='492'>
+<font color=#447700>!<a name='493'></font>
+<font color=#447700>!-----compute the frictional velocity:<a name='494'></font>
+<font color=#447700>!     za(1982) eqs(2.60),(2.61).<a name='495'></font>
+      do i = its,ite<a name='496'>
+        dtg = thx(i,1)-thgb(i)<a name='497'>
+        psix = gz1oz0(i)-psim(i)<a name='498'>
+        if((xland(i)-1.5).ge.0)then<a name='499'>
+          zl = znt(i)<a name='500'>
+        else<a name='501'>
+          zl = 0.01<a name='502'>
+        endif<a name='503'>
+        psiq = alog(karman*ust(i)*za(i,1)/xka+za(i,1)/zl)-psih(i)<a name='504'>
+        ust(i) = karman*wspd(i)/psix<a name='505'>
+        ustm = amax1(ust(i),0.1)<a name='506'>
+        if((xland(i)-1.5).ge.0)then<a name='507'>
+          ust(i) = ust(i)<a name='508'>
+        else<a name='509'>
+          ust(i) = ustm<a name='510'>
+        endif<a name='511'>
+      enddo<a name='512'>
+<font color=#447700>!<a name='513'></font>
+      do i = its,ite<a name='514'>
+        wspd1(i) = sqrt(ux(i,1)*ux(i,1)+vx(i,1)*vx(i,1))+1.e-9<a name='515'>
+      enddo<a name='516'>
+<font color=#447700>!<a name='517'></font>
+<font color=#447700>!---- compute vertical diffusion<a name='518'></font>
+<font color=#447700>!<a name='519'></font>
+<font color=#447700>! - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -<a name='520'></font>
+<font color=#447700>!     compute preliminary variables<a name='521'></font>
+<font color=#447700>!<a name='522'></font>
+      dtstep = dt<a name='523'>
+      dt2 = 2.*dtstep<a name='524'>
+      rdt = 1./dt2<a name='525'>
+<font color=#447700>!<a name='526'></font>
+      do i = its,ite<a name='527'>
+        bfxpbl(i) = 0.0<a name='528'>
+        hfxpbl(i) = 0.0<a name='529'>
+        qfxpbl(i) = 0.0<a name='530'>
+        ufxpbl(i) = 0.0<a name='531'>
+        vfxpbl(i) = 0.0<a name='532'>
+        hgamu(i)  = 0.0<a name='533'>
+        hgamv(i)  = 0.0<a name='534'>
+        delta(i)  = 0.0<a name='535'>
+      enddo<a name='536'>
+<font color=#447700>!<a name='537'></font>
+      do k = kts,klpbl<a name='538'>
+        do i = its,ite<a name='539'>
+          wscalek(i,k) = 0.0<a name='540'>
+        enddo<a name='541'>
+      enddo<a name='542'>
+<font color=#447700>!<a name='543'></font>
+      do k = kts,klpbl<a name='544'>
+        do i = its,ite<a name='545'>
+          zfac(i,k) = 0.0<a name='546'>
+        enddo<a name='547'>
+      enddo<a name='548'>
+<font color=#447700>!<a name='549'></font>
+      do i = its,ite<a name='550'>
+        hgamt(i)  = 0.<a name='551'>
+        hgamq(i)  = 0.<a name='552'>
+        wscale(i) = 0.<a name='553'>
+        kpbl(i)   = 1<a name='554'>
+        hpbl(i)   = zq(i,1)<a name='555'>
+        zl1(i)    = za(i,1)<a name='556'>
+        thermal(i)= thvx(i,1)<a name='557'>
+        pblflg(i) = .true.<a name='558'>
+        sfcflg(i) = .true.<a name='559'>
+        if(br(i).gt.0.0) sfcflg(i) = .false.<a name='560'>
+      enddo<a name='561'>
+<font color=#447700>!<a name='562'></font>
+<font color=#447700>!     compute the first guess of pbl height<a name='563'></font>
+<font color=#447700>!<a name='564'></font>
+      do i = its,ite<a name='565'>
+        stable(i) = .false.<a name='566'>
+        brup(i) = br(i)<a name='567'>
+      enddo<a name='568'>
+<font color=#447700>!<a name='569'></font>
+      do k = 2,klpbl<a name='570'>
+        do i = its,ite<a name='571'>
+          if(.not.stable(i))then<a name='572'>
+            brdn(i) = brup(i)<a name='573'>
+            spdk2   = max(ux(i,k)**2+vx(i,k)**2,1.)<a name='574'>
+            brup(i) = (thvx(i,k)-thermal(i))*(g*za(i,k)/thvx(i,1))/spdk2<a name='575'>
+            kpbl(i) = k<a name='576'>
+            stable(i) = brup(i).gt.brcr<a name='577'>
+          endif<a name='578'>
+        enddo<a name='579'>
+      enddo<a name='580'>
+<font color=#447700>!<a name='581'></font>
+      do i = its,ite<a name='582'>
+        k = kpbl(i)<a name='583'>
+        if(brdn(i).ge.brcr)then<a name='584'>
+          brint = 0.<a name='585'>
+        elseif(brup(i).le.brcr)then<a name='586'>
+          brint = 1.<a name='587'>
+        else<a name='588'>
+          brint = (brcr-brdn(i))/(brup(i)-brdn(i))<a name='589'>
+        endif<a name='590'>
+        hpbl(i) = za(i,k-1)+brint*(za(i,k)-za(i,k-1))<a name='591'>
+        if(hpbl(i).lt.zq(i,2)) kpbl(i) = 1<a name='592'>
+        if(kpbl(i).le.1) pblflg(i) = .false.<a name='593'>
+      enddo<a name='594'>
+<font color=#447700>!<a name='595'></font>
+      do i = its,ite<a name='596'>
+        fm = gz1oz0(i)-psim(i)<a name='597'>
+        fh = gz1oz0(i)-psih(i)<a name='598'>
+        hol(i) = max(br(i)*fm*fm/fh,rimin)<a name='599'>
+        if(sfcflg(i))then<a name='600'>
+          hol(i) = min(hol(i),-zfmin)<a name='601'>
+        else<a name='602'>
+          hol(i) = max(hol(i),zfmin)<a name='603'>
+        endif<a name='604'>
+<font color=#447700>!<a name='605'></font>
+        hol1 = hol(i)*hpbl(i)/zl1(i)*sfcfrac<a name='606'>
+        hol(i) = -hol(i)*hpbl(i)/zl1(i)<a name='607'>
+        if(sfcflg(i))then<a name='608'>
+          phim(i) = (1.-aphi16*hol1)**(-1./4.)<a name='609'>
+          phih(i) = (1.-aphi16*hol1)**(-1./2.)<a name='610'>
+          bfx0 = max(hfx(i)/rhox(i)/cpm(i)             &amp;<a name='611'>
+                   +ep1*thx(i,1)*qfx(i)/rhox(i),0.)<a name='612'>
+          hfx0 = max(hfx(i)/rhox(i)/cpm(i),0.)<a name='613'>
+          qfx0 = max(ep1*thx(i,1)*qfx(i)/rhox(i),0.)<a name='614'>
+          wstar3(i) = (govrth(i)*bfx0*hpbl(i))<a name='615'>
+          wstar(i) = (wstar3(i))**h1<a name='616'>
+        else<a name='617'>
+          phim(i) = (1.+aphi5*hol1)<a name='618'>
+          phih(i) = phim(i)<a name='619'>
+          wstar(i)  = 0.<a name='620'>
+          wstar3(i) = 0.<a name='621'>
+        endif<a name='622'>
+        ust3(i)   = ust(i)**3.<a name='623'>
+        wscale(i) = (ust3(i)+phifac*karman*wstar3(i)*0.5)**h1<a name='624'>
+        wscale(i) = min(wscale(i),ust(i)*aphi16)<a name='625'>
+        wscale(i) = max(wscale(i),ust(i)/aphi5)<a name='626'>
+      enddo<a name='627'>
+<font color=#447700>!<a name='628'></font>
+<font color=#447700>!     compute the surface variables for pbl height estimation<a name='629'></font>
+<font color=#447700>!     under unstable conditions<a name='630'></font>
+<font color=#447700>!<a name='631'></font>
+      do i = its,ite<a name='632'>
+        if(sfcflg(i))then<a name='633'>
+          gamfac   = bfac/rhox(i)/wscale(i)<a name='634'>
+          hgamt(i) = min(gamfac*hfx(i)/cpm(i),gamcrt)<a name='635'>
+          hgamq(i) = min(gamfac*qfx(i),gamcrq)<a name='636'>
+          vpert = (hgamt(i)+ep1*thx(i,1)*hgamq(i))/bfac*afac<a name='637'>
+          thermal(i) = thermal(i)+max(vpert,0.)<a name='638'>
+          hgamt(i) = max(hgamt(i),0.0)<a name='639'>
+          hgamq(i) = 0.0<a name='640'>
+          brint    = -15.9*ust(i)*ust(i)/wspd(i)*wstar3(i) &amp;<a name='641'>
+                     /(wscale(i)**4.)<a name='642'>
+          hgamu(i) = brint*ux(i,1)<a name='643'>
+          hgamv(i) = brint*vx(i,1)<a name='644'>
+        else<a name='645'>
+          pblflg(i) = .false.<a name='646'>
+        endif<a name='647'>
+      enddo<a name='648'>
+<font color=#447700>!<a name='649'></font>
+<font color=#447700>!     enhance the pbl height by considering the thermal<a name='650'></font>
+<font color=#447700>!<a name='651'></font>
+      do i = its,ite<a name='652'>
+        if(pblflg(i))then<a name='653'>
+          kpbl(i) = 1<a name='654'>
+          hpbl(i) = zq(i,1)<a name='655'>
+        endif<a name='656'>
+      enddo<a name='657'>
+<font color=#447700>!<a name='658'></font>
+      do i = its,ite<a name='659'>
+        if(pblflg(i))then<a name='660'>
+          stable(i) = .false.<a name='661'>
+          brup(i) = br(i)<a name='662'>
+        endif<a name='663'>
+      enddo<a name='664'>
+<font color=#447700>!<a name='665'></font>
+      do k = 2,klpbl<a name='666'>
+        do i = its,ite<a name='667'>
+          if(.not.stable(i).and.pblflg(i))then<a name='668'>
+            brdn(i) = brup(i)<a name='669'>
+            spdk2 = max((ux(i,k)**2+vx(i,k)**2),1.)<a name='670'>
+            brup(i) = (thvx(i,k)-thermal(i))*(g*za(i,k)/thvx(i,1))/spdk2<a name='671'>
+            kpbl(i) = k<a name='672'>
+            stable(i) = brup(i).gt.brcr<a name='673'>
+          endif<a name='674'>
+        enddo<a name='675'>
+      enddo<a name='676'>
+<font color=#447700>!<a name='677'></font>
+      do i = its,ite<a name='678'>
+        if(pblflg(i))then<a name='679'>
+          k = kpbl(i)<a name='680'>
+          if(brdn(i).ge.brcr)then<a name='681'>
+            brint = 0.<a name='682'>
+          elseif(brup(i).le.brcr)then<a name='683'>
+            brint = 1.<a name='684'>
+          else<a name='685'>
+            brint = (brcr-brdn(i))/(brup(i)-brdn(i))<a name='686'>
+          endif<a name='687'>
+          hpbl(i) = za(i,k-1)+brint*(za(i,k)-za(i,k-1))<a name='688'>
+          if(hpbl(i).lt.zq(i,2)) kpbl(i) = 1<a name='689'>
+          if(kpbl(i).le.1) pblflg(i) = .false.<a name='690'>
+        endif<a name='691'>
+      enddo<a name='692'>
+<font color=#447700>!<a name='693'></font>
+<font color=#447700>!     estimate the entrainment parameters<a name='694'></font>
+<font color=#447700>!<a name='695'></font>
+      do i = its,ite<a name='696'>
+        if(pblflg(i)) then<a name='697'>
+          k = kpbl(i) - 1<a name='698'>
+          ss = ((ux(i,k+1)-ux(i,k))*(ux(i,k+1)-ux(i,k))+(vx(i,k+1)- &amp;<a name='699'>
+             vx(i,k))*(vx(i,k+1)-vx(i,k)))/(dza(i,k+1)*dza(i,k+1))+ &amp;<a name='700'>
+             1.e-9<a name='701'>
+          ri = govrth(i)*(thvx(i,k+1)-thvx(i,k))/(ss*dza(i,k+1))<a name='702'>
+          if(imvdif.eq.1)then<a name='703'>
+            if((qcx(i,k)+qix(i,k)).gt.0.01e-3.and.(qcx(i,k+1)+      &amp;<a name='704'>
+              qix(i,k+1)).gt.0.01e-3)then<a name='705'>
+<font color=#447700>!      in cloud<a name='706'></font>
+              qmean = 0.5*(qx(i,k)+qx(i,k+1))<a name='707'>
+              tmean = 0.5*(tx(i,k)+tx(i,k+1))<a name='708'>
+              alph  = xlv*qmean/rd/tmean<a name='709'>
+              chi   = xlv*xlv*qmean/cp/rv/tmean/tmean<a name='710'>
+              ri    = (1.+alph)*(ri-g*g/ss/tmean/cp*((chi-alph)/(1.+chi)))<a name='711'>
+            endif<a name='712'>
+          endif<a name='713'>
+          prpbl(i) = 1.0<a name='714'>
+          wm3       = wstar3(i) + 5. * ust3(i)<a name='715'>
+          wm2(i)    = wm3**h2<a name='716'>
+          bfxpbl(i) = -0.15*thvx(i,1)/g*wm3/hpbl(i)<a name='717'>
+          dthvx(i)  = max(thvx(i,k+1)-thvx(i,k),qmin)<a name='718'>
+          dthx  = max(thx(i,k+1)-thx(i,k),qmin)<a name='719'>
+          dqx   = min(qx(i,k+1)-qx(i,k),0.0)<a name='720'>
+          hfxpbl(i) = bfxpbl(i)*dthx/dthvx(i)<a name='721'>
+          qfxpbl(i) = bfxpbl(i)*dqx/dthvx(i)<a name='722'>
+<font color=#447700>!<a name='723'></font>
+          dux = ux(i,k+1)-ux(i,k)<a name='724'>
+          dvx = vx(i,k+1)-vx(i,k)<a name='725'>
+          if(dux.gt.qmin) then<a name='726'>
+            ufxpbl(i) = max(prpbl(i)*bfxpbl(i)*dux/dthvx(i),-ust(i)*ust(i))<a name='727'>
+          elseif(dux.lt.-qmin) then<a name='728'>
+            ufxpbl(i) = min(prpbl(i)*bfxpbl(i)*dux/dthvx(i),ust(i)*ust(i))<a name='729'>
+          else<a name='730'>
+            ufxpbl(i) = 0.0<a name='731'>
+          endif<a name='732'>
+          if(dvx.gt.qmin) then<a name='733'>
+            vfxpbl(i) = max(prpbl(i)*bfxpbl(i)*dvx/dthvx(i),-ust(i)*ust(i))<a name='734'>
+          elseif(dvx.lt.-qmin) then<a name='735'>
+            vfxpbl(i) = min(prpbl(i)*bfxpbl(i)*dvx/dthvx(i),ust(i)*ust(i))<a name='736'>
+          else<a name='737'>
+            vfxpbl(i) = 0.0<a name='738'>
+          endif<a name='739'>
+          delb  = govrth(i)*d3*hpbl(i)<a name='740'>
+          delta(i) = min(d1*hpbl(i) + d2*wm2(i)/delb,100.)<a name='741'>
+        endif<a name='742'>
+      enddo<a name='743'>
+<font color=#447700>!<a name='744'></font>
+      do k = kts,klpbl<a name='745'>
+        do i = its,ite<a name='746'>
+          if(pblflg(i).and.k.ge.kpbl(i))then<a name='747'>
+            entfac(i,k) = ((zq(i,k)-hpbl(i))/delta(i))**2.<a name='748'>
+          else<a name='749'>
+            entfac(i,k) = 1.e30<a name='750'>
+          endif<a name='751'>
+        enddo<a name='752'>
+      enddo<a name='753'>
+<font color=#447700>!<a name='754'></font>
+<font color=#447700>!     compute diffusion coefficients below pbl<a name='755'></font>
+<font color=#447700>!<a name='756'></font>
+      do k = kts,klpbl<a name='757'>
+        do i = its,ite<a name='758'>
+          if(k.lt.kpbl(i)) then<a name='759'>
+            zfac(i,k) = min(max((1.-(zq(i,k+1)-zl1(i)) &amp;<a name='760'>
+                        /(hpbl(i)-zl1(i))),zfmin),1.)<a name='761'>
+            xkzo = ckz*dza(i,k+1)<a name='762'>
+            zfacent(i,k) = (1.-zfac(i,k))**3.<a name='763'>
+            prnumfac = -3.*(max(zq(i,k+1)-sfcfrac*hpbl(i),0.))**2. &amp;<a name='764'>
+                       /hpbl(i)**2.<a name='765'>
+            prnum = (phih(i)/phim(i)+bfac*karman*sfcfrac)<a name='766'>
+            prnum =  1. + (prnum-1.)*exp(prnumfac)<a name='767'>
+            prnum = min(prnum,prmax)<a name='768'>
+            prnum = max(prnum,prmin)<a name='769'>
+            wscalek(i,k) = (ust3(i)+phifac*karman*wstar3(i) &amp;<a name='770'>
+                          *(1.-zfac(i,k)))**h1<a name='771'>
+            xkzm(i,k) = xkzo+wscalek(i,k)*karman*zq(i,k+1) &amp;<a name='772'>
+                        *zfac(i,k)**pfac<a name='773'>
+            xkzh(i,k) = xkzm(i,k)/prnum<a name='774'>
+            xkzm(i,k) = min(xkzm(i,k),xkzmax)<a name='775'>
+            xkzm(i,k) = max(xkzm(i,k),xkzmin)<a name='776'>
+            xkzh(i,k) = min(xkzh(i,k),xkzmax)<a name='777'>
+            xkzh(i,k) = max(xkzh(i,k),xkzmin)<a name='778'>
+          endif<a name='779'>
+        enddo<a name='780'>
+      enddo<a name='781'>
+<font color=#447700>!<a name='782'></font>
+<font color=#447700>!     compute diffusion coefficients over pbl (free atmosphere)<a name='783'></font>
+<font color=#447700>!<a name='784'></font>
+      do k = kts,kte-1<a name='785'>
+        do i = its,ite<a name='786'>
+          xkzo = ckz*dza(i,k+1)<a name='787'>
+          if(k.ge.kpbl(i)) then<a name='788'>
+            ss = ((ux(i,k+1)-ux(i,k))*(ux(i,k+1)-ux(i,k))+(vx(i,k+1)- &amp;<a name='789'>
+               vx(i,k))*(vx(i,k+1)-vx(i,k)))/(dza(i,k+1)*dza(i,k+1))+ &amp;<a name='790'>
+               1.e-9<a name='791'>
+            govrthv = g/(0.5*(thvx(i,k+1)+thvx(i,k)))<a name='792'>
+            ri = govrthv*(thvx(i,k+1)-thvx(i,k))/(ss*dza(i,k+1))<a name='793'>
+            if(imvdif.eq.1)then<a name='794'>
+              if((qcx(i,k)+qix(i,k)).gt.0.01e-3.and.(qcx(i,k+1)+      &amp;<a name='795'>
+                qix(i,k+1)).gt.0.01e-3)then<a name='796'>
+<font color=#447700>!      in cloud<a name='797'></font>
+                qmean = 0.5*(qx(i,k)+qx(i,k+1))<a name='798'>
+                tmean = 0.5*(tx(i,k)+tx(i,k+1))<a name='799'>
+                alph  = xlv*qmean/rd/tmean<a name='800'>
+                chi   = xlv*xlv*qmean/cp/rv/tmean/tmean<a name='801'>
+                ri    = (1.+alph)*(ri-g*g/ss/tmean/cp*((chi-alph)/(1.+chi)))<a name='802'>
+              endif<a name='803'>
+            endif<a name='804'>
+            zk = karman*zq(i,k+1)<a name='805'>
+            rl2 = (zk*rlam/(rlam+zk))**2<a name='806'>
+            dk = rl2*sqrt(ss)<a name='807'>
+            if(ri.lt.0.)then<a name='808'>
+<font color=#447700>! unstable regime<a name='809'></font>
+              sri = sqrt(-ri)<a name='810'>
+              xkzm(i,k) = xkzo+dk*(1+8.*(-ri)/(1+1.746*sri))<a name='811'>
+              xkzh(i,k) = xkzo+dk*(1+8.*(-ri)/(1+1.286*sri))<a name='812'>
+            else<a name='813'>
+<font color=#447700>! stable regime<a name='814'></font>
+              xkzh(i,k) = xkzo+dk/(1+5.*ri)**2<a name='815'>
+              prnum = 1.0+2.1*ri<a name='816'>
+              prnum = min(prnum,prmax)<a name='817'>
+              xkzm(i,k) = (xkzh(i,k)-xkzo)*prnum+xkzo<a name='818'>
+            endif<a name='819'>
+<font color=#447700>!<a name='820'></font>
+            xkzm(i,k) = min(xkzm(i,k),xkzmax)<a name='821'>
+            xkzm(i,k) = max(xkzm(i,k),xkzmin)<a name='822'>
+            xkzh(i,k) = min(xkzh(i,k),xkzmax)<a name='823'>
+            xkzh(i,k) = max(xkzh(i,k),xkzmin)<a name='824'>
+            xkzml(i,k) = xkzm(i,k)<a name='825'>
+            xkzhl(i,k) = xkzh(i,k)<a name='826'>
+          endif<a name='827'>
+        enddo<a name='828'>
+      enddo<a name='829'>
+<font color=#447700>!<a name='830'></font>
+<font color=#447700>!     compute tridiagonal matrix elements for heat and moisture, and clouds<a name='831'></font>
+<font color=#447700>!<a name='832'></font>
+      do i = its,ite<a name='833'>
+        do k = kts,kte<a name='834'>
+          au(i,k) = 0.<a name='835'>
+          al(i,k) = 0.<a name='836'>
+          ad(i,k) = 0.<a name='837'>
+          f1(i,k) = 0.<a name='838'>
+        enddo<a name='839'>
+      enddo<a name='840'>
+<font color=#447700>!<a name='841'></font>
+      do ic = 1,ncloud<a name='842'>
+        do i = its,ite<a name='843'>
+          do k = kts,kte<a name='844'>
+            f3(i,k,ic) = 0.<a name='845'>
+          enddo<a name='846'>
+        enddo<a name='847'>
+      enddo<a name='848'>
+<font color=#447700>!<a name='849'></font>
+      do i = its,ite<a name='850'>
+        ad(i,1) = 1.<a name='851'>
+        f1(i,1) = thx(i,1)+hfx(i)/(rhox(i)*cpm(i))/zq(i,2)*dt2<a name='852'>
+        f3(i,1,1) = qx(i,1)+qfx(i)/(rhox(i))/zq(i,2)*dt2<a name='853'>
+      enddo<a name='854'>
+<font color=#447700>!<a name='855'></font>
+      if(ncloud.ge.2) then<a name='856'>
+        do ic = 2,ncloud<a name='857'>
+          do i = its,ite<a name='858'>
+            if(ic.eq.2) then<a name='859'>
+              f3(i,1,ic) = qcx(i,1)<a name='860'>
+            elseif(ic.eq.3) then<a name='861'>
+              f3(i,1,ic) = qix(i,1)<a name='862'>
+            endif<a name='863'>
+          enddo<a name='864'>
+        enddo<a name='865'>
+      endif<a name='866'>
+<font color=#447700>!<a name='867'></font>
+      do k = kts,kte-1<a name='868'>
+        do i = its,ite<a name='869'>
+          dtodsd = dt2/dz8w2d(i,k)<a name='870'>
+          dtodsu = dt2/dz8w2d(i,k+1)<a name='871'>
+          rdz = 1./dza(i,k+1)<a name='872'>
+          if(pblflg(i).and.k.lt.kpbl(i)) then<a name='873'>
+            dsdzt = xkzh(i,k)*(-hgamt(i)/hpbl(i) &amp;<a name='874'>
+                   -hfxpbl(i)*zfacent(i,k)/xkzh(i,k))<a name='875'>
+            dsdzq = xkzh(i,k)*(-hgamq(i)/hpbl(i) &amp;<a name='876'>
+                   -qfxpbl(i)*zfacent(i,k)/xkzh(i,k))<a name='877'>
+            f1(i,k)   = f1(i,k)+dtodsd*dsdzt<a name='878'>
+            f1(i,k+1) = thx(i,k+1)-dtodsu*dsdzt<a name='879'>
+            f3(i,k,1) = f3(i,k,1)+dtodsd*dsdzq<a name='880'>
+            f3(i,k+1,1) = qx(i,k+1)-dtodsu*dsdzq<a name='881'>
+          elseif(pblflg(i).and.k.ge.kpbl(i).and.entfac(i,k).lt.4.6) then<a name='882'>
+            xkzh(i,k) = -bfxpbl(i)*dza(i,kpbl(i)+1)*exp(-entfac(i,k))/dthvx(i)<a name='883'>
+            xkzh(i,k) = sqrt(xkzh(i,k)*xkzhl(i,k))<a name='884'>
+            xkzh(i,k) = min(xkzh(i,k),xkzmax)<a name='885'>
+            xkzh(i,k) = max(xkzh(i,k),xkzmin)<a name='886'>
+            f1(i,k+1) = thx(i,k+1)<a name='887'>
+            f3(i,k+1,1) = qx(i,k+1)<a name='888'>
+          else<a name='889'>
+            f1(i,k+1) = thx(i,k+1)<a name='890'>
+            f3(i,k+1,1) = qx(i,k+1)<a name='891'>
+          endif<a name='892'>
+          dsdz2 = xkzh(i,k)*rdz<a name='893'>
+          au(i,k)   = -dtodsd*dsdz2<a name='894'>
+          al(i,k)   = -dtodsu*dsdz2<a name='895'>
+          ad(i,k)   = ad(i,k)-au(i,k)<a name='896'>
+          ad(i,k+1) = 1.-al(i,k)<a name='897'>
+        enddo<a name='898'>
+      enddo<a name='899'>
+<font color=#447700>!<a name='900'></font>
+      if(ncloud.ge.2) then<a name='901'>
+        do ic = 2,ncloud<a name='902'>
+          do k = kts,kte-1<a name='903'>
+            do i = its,ite<a name='904'>
+              if(ic.eq.2) then<a name='905'>
+                f3(i,k+1,ic) = qcx(i,k+1)<a name='906'>
+              elseif(ic.eq.3) then<a name='907'>
+                f3(i,k+1,ic) = qix(i,k+1)<a name='908'>
+              endif<a name='909'>
+            enddo<a name='910'>
+          enddo<a name='911'>
+        enddo<a name='912'>
+      endif<a name='913'>
+<font color=#447700>!<a name='914'></font>
+<font color=#447700>!     solve tridiagonal problem for heat and moisture, and clouds<a name='915'></font>
+<font color=#447700>!<a name='916'></font>
+      call <A href='../../html_code/phys/module_bl_ysu.F.html#TRIDIN'>tridin</A><A href='../../html_code/phys/module_bl_ysu.F.html#YSU2D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRIDIN_2">(al,ad,au,f1,f3,au,f1,f3,                 &amp;<a name='917'>
+		  its,ite,kts,kte,ncloud                   )<a name='918'>
+<font color=#447700>!<a name='919'></font>
+<font color=#447700>!     recover tendencies of heat and moisture<a name='920'></font>
+<font color=#447700>!<a name='921'></font>
+      do k = kte,kts,-1<a name='922'>
+        do i = its,ite<a name='923'>
+          ttend = (f1(i,k)-thx(i,k))*rdt*(tx(i,k)/thx(i,k))<a name='924'>
+          qtend = (f3(i,k,1)-qx(i,k))*rdt<a name='925'>
+          ttnp(i,k) = ttnp(i,k)+ttend<a name='926'>
+          qtnp(i,k) = qtnp(i,k)+qtend<a name='927'>
+        enddo<a name='928'>
+      enddo<a name='929'>
+<font color=#447700>!<a name='930'></font>
+      if(ncloud.ge.2) then<a name='931'>
+        do ic = 2,ncloud<a name='932'>
+          do k = kte,kts,-1<a name='933'>
+            do i = its,ite<a name='934'>
+              if(ic.eq.2) then<a name='935'>
+                qctend = (f3(i,k,ic)-qcx(i,k))*rdt<a name='936'>
+                qctnp(i,k) = qctnp(i,k)+qctend<a name='937'>
+              elseif(ic.eq.3) then<a name='938'>
+                qitend = (f3(i,k,ic)-qix(i,k))*rdt<a name='939'>
+                qitnp(i,k) = qitnp(i,k)+qitend<a name='940'>
+              endif<a name='941'>
+            enddo<a name='942'>
+          enddo<a name='943'>
+        enddo<a name='944'>
+      endif<a name='945'>
+<font color=#447700>!<a name='946'></font>
+<font color=#447700>!     compute tridiagonal matrix elements for momentum<a name='947'></font>
+<font color=#447700>!<a name='948'></font>
+      do i = its,ite<a name='949'>
+      do k = kts,kte<a name='950'>
+         au(i,k) = 0.<a name='951'>
+         al(i,k) = 0.<a name='952'>
+         ad(i,k) = 0.<a name='953'>
+         f1(i,k) = 0.<a name='954'>
+         f2(i,k) = 0.<a name='955'>
+      enddo<a name='956'>
+      enddo<a name='957'>
+<font color=#447700>!<a name='958'></font>
+      do i = its,ite<a name='959'>
+        ad(i,1) = 1.<a name='960'>
+        f1(i,1) = ux(i,1)-ux(i,1)/wspd1(i)*ust(i)*ust(i)/zq(i,2)*dt2 &amp;<a name='961'>
+                          *(wspd1(i)/wspd(i))**2<a name='962'>
+        f2(i,1) = vx(i,1)-vx(i,1)/wspd1(i)*ust(i)*ust(i)/zq(i,2)*dt2 &amp;<a name='963'>
+                          *(wspd1(i)/wspd(i))**2<a name='964'>
+      enddo<a name='965'>
+<font color=#447700>!<a name='966'></font>
+      do k = kts,kte-1<a name='967'>
+        do i = its,ite<a name='968'>
+          dtodsd = dt2/dz8w2d(i,k)<a name='969'>
+          dtodsu = dt2/dz8w2d(i,k+1)<a name='970'>
+          rdz = 1./dza(i,k+1)<a name='971'>
+        if(pblflg(i).and.k.lt.kpbl(i))then<a name='972'>
+          dsdzu=xkzm(i,k)*(-hgamu(i)/hpbl(i) &amp;<a name='973'>
+                 -ufxpbl(i)*zfacent(i,k)/xkzm(i,k))<a name='974'>
+          dsdzv=xkzm(i,k)*(-hgamv(i)/hpbl(i) &amp;<a name='975'>
+                 -vfxpbl(i)*zfacent(i,k)/xkzm(i,k))<a name='976'>
+          f1(i,k)   = f1(i,k)+dtodsd*dsdzu<a name='977'>
+          f1(i,k+1) = ux(i,k+1)-dtodsu*dsdzu<a name='978'>
+          f2(i,k)   = f2(i,k)+dtodsd*dsdzv<a name='979'>
+          f2(i,k+1) = vx(i,k+1)-dtodsu*dsdzv<a name='980'>
+        elseif(pblflg(i).and.k.ge.kpbl(i).and.entfac(i,k).lt.4.6) then<a name='981'>
+          xkzm(i,k) = prpbl(i)*xkzh(i,k)<a name='982'>
+          xkzm(i,k) = sqrt(xkzm(i,k)*xkzml(i,k))<a name='983'>
+          xkzm(i,k)=min(xkzm(i,k),xkzmax)<a name='984'>
+          xkzm(i,k)=max(xkzm(i,k),xkzmin)<a name='985'>
+          f1(i,k+1)=ux(i,k+1)<a name='986'>
+          f2(i,k+1)=vx(i,k+1)<a name='987'>
+        else<a name='988'>
+          f1(i,k+1) = ux(i,k+1)<a name='989'>
+          f2(i,k+1) = vx(i,k+1)<a name='990'>
+        endif<a name='991'>
+          dsdz2 = xkzm(i,k)*rdz<a name='992'>
+          au(i,k)   = -dtodsd*dsdz2<a name='993'>
+          al(i,k)   = -dtodsu*dsdz2<a name='994'>
+          ad(i,k)   = ad(i,k)-au(i,k)<a name='995'>
+          ad(i,k+1) = 1.-al(i,k)<a name='996'>
+        enddo<a name='997'>
+      enddo<a name='998'>
+<font color=#447700>!<a name='999'></font>
+<font color=#447700>!     solve tridiagonal problem for momentum<a name='1000'></font>
+<font color=#447700>!<a name='1001'></font>
+      call <A href='../../html_code/phys/module_bl_ysu.F.html#TRIDIN'>tridin</A><A href='../../html_code/phys/module_bl_ysu.F.html#YSU2D' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="TRIDIN_3">(al,ad,au,f1,f2,au,f1,f2,                 &amp;<a name='1002'>
+		  its,ite,kts,kte,1                         )<a name='1003'>
+<font color=#447700>!<a name='1004'></font>
+<font color=#447700>!     recover tendencies of momentum<a name='1005'></font>
+<font color=#447700>!<a name='1006'></font>
+      do k = kte,kts,-1<a name='1007'>
+        do i = its,ite<a name='1008'>
+          utend = (f1(i,k)-ux(i,k))*rdt<a name='1009'>
+          vtend = (f2(i,k)-vx(i,k))*rdt<a name='1010'>
+          utnp(i,k) = utnp(i,k)+utend<a name='1011'>
+          vtnp(i,k) = vtnp(i,k)+vtend<a name='1012'>
+        enddo<a name='1013'>
+      enddo<a name='1014'>
+<font color=#447700>!<a name='1015'></font>
+<font color=#447700>!---- end of vertical diffusion<a name='1016'></font>
+<font color=#447700>!<a name='1017'></font>
+      do i = its,ite<a name='1018'>
+        kpbl1d(i) = kpbl(i)<a name='1019'>
+      enddo<a name='1020'>
+<font color=#447700>!<a name='1021'></font>
+   end subroutine ysu2d<a name='1022'>
+<font color=#447700>!<a name='1023'></font>
+<A NAME='TRIDIN'><A href='../../html_code/phys/module_bl_ysu.F.html#TRIDIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1024'>
+   <font color=#993300>subroutine </font><font color=#cc0000>tridin</font>(cl,cm,cu,r1,r2,au,f1,f2,                   &amp; <A href='../../call_to/TRIDIN.html' TARGET='index'>3</A>,<A href='../../call_from/TRIDIN.html' TARGET='index'>1</A><a name='1025'>
+                     its,ite,kts,kte,nt			        )<a name='1026'>
+<font color=#447700>!----------------------------------------------------------------<a name='1027'></font>
+   implicit none<a name='1028'>
+<font color=#447700>!----------------------------------------------------------------<a name='1029'></font>
+<font color=#447700>!<a name='1030'></font>
+   integer, intent(in )      ::     its,ite, kts,kte, nt<a name='1031'>
+<font color=#447700>!<a name='1032'></font>
+   real, dimension( its:ite, kts+1:kte+1 )                    , &amp;<a name='1033'>
+         intent(in   )  ::                                  cl<a name='1034'>
+<font color=#447700>!<a name='1035'></font>
+   real, dimension( its:ite, kts:kte )                        , &amp;<a name='1036'>
+         intent(in   )  ::                                  cm, &amp;<a name='1037'>
+							    r1<a name='1038'>
+   real, dimension( its:ite, kts:kte,nt )                     , &amp;<a name='1039'>
+         intent(in   )  ::                                  r2<a name='1040'>
+<font color=#447700>!<a name='1041'></font>
+   real, dimension( its:ite, kts:kte )                        , &amp;<a name='1042'>
+         intent(inout)  ::                                  au, &amp;<a name='1043'>
+							    cu, &amp;<a name='1044'>
+							    f1<a name='1045'>
+   real, dimension( its:ite, kts:kte,nt )                     , &amp;<a name='1046'>
+         intent(inout)  ::                                  f2<a name='1047'>
+<font color=#447700>!<a name='1048'></font>
+   real    :: fk<a name='1049'>
+   integer :: i,k,l,n,it<a name='1050'>
+<font color=#447700>!<a name='1051'></font>
+<font color=#447700>!----------------------------------------------------------------<a name='1052'></font>
+<font color=#447700>!<a name='1053'></font>
+   l = ite<a name='1054'>
+   n = kte<a name='1055'>
+<font color=#447700>!<a name='1056'></font>
+   do i = its,l<a name='1057'>
+     fk = 1./cm(i,1)<a name='1058'>
+     au(i,1) = fk*cu(i,1)<a name='1059'>
+     f1(i,1) = fk*r1(i,1)<a name='1060'>
+   enddo<a name='1061'>
+   do it = 1,nt<a name='1062'>
+     do i = its,l<a name='1063'>
+       fk = 1./cm(i,1)<a name='1064'>
+       f2(i,1,it) = fk*r2(i,1,it)<a name='1065'>
+     enddo<a name='1066'>
+   enddo<a name='1067'>
+   do k = kts+1,n-1<a name='1068'>
+     do i = its,l<a name='1069'>
+       fk = 1./(cm(i,k)-cl(i,k)*au(i,k-1))<a name='1070'>
+       au(i,k) = fk*cu(i,k)<a name='1071'>
+       f1(i,k) = fk*(r1(i,k)-cl(i,k)*f1(i,k-1))<a name='1072'>
+     enddo<a name='1073'>
+   enddo<a name='1074'>
+   do it = 1,nt<a name='1075'>
+   do k = kts+1,n-1<a name='1076'>
+     do i = its,l<a name='1077'>
+       fk = 1./(cm(i,k)-cl(i,k)*au(i,k-1))<a name='1078'>
+       f2(i,k,it) = fk*(r2(i,k,it)-cl(i,k)*f2(i,k-1,it))<a name='1079'>
+     enddo<a name='1080'>
+   enddo<a name='1081'>
+   enddo<a name='1082'>
+   do i = its,l<a name='1083'>
+     fk = 1./(cm(i,n)-cl(i,n)*au(i,n-1))<a name='1084'>
+     f1(i,n) = fk*(r1(i,n)-cl(i,n)*f1(i,n-1))<a name='1085'>
+   enddo<a name='1086'>
+   do it = 1,nt<a name='1087'>
+   do i = its,l<a name='1088'>
+     fk = 1./(cm(i,n)-cl(i,n)*au(i,n-1))<a name='1089'>
+     f2(i,n,it) = fk*(r2(i,n,it)-cl(i,n)*f2(i,n-1,it))<a name='1090'>
+   enddo<a name='1091'>
+   enddo<a name='1092'>
+   do k = n-1,kts,-1<a name='1093'>
+     do i = its,l<a name='1094'>
+       f1(i,k) = f1(i,k)-au(i,k)*f1(i,k+1)<a name='1095'>
+     enddo<a name='1096'>
+   enddo<a name='1097'>
+   do it = 1,nt<a name='1098'>
+   do k = n-1,kts,-1<a name='1099'>
+     do i = its,l<a name='1100'>
+       f2(i,k,it) = f2(i,k,it)-au(i,k)*f2(i,k+1,it)<a name='1101'>
+     enddo<a name='1102'>
+   enddo<a name='1103'>
+   enddo<a name='1104'>
+<font color=#447700>!<a name='1105'></font>
+   end subroutine tridin<a name='1106'>
+<font color=#447700>!<a name='1107'></font>
+<A NAME='YSUINIT'><A href='../../html_code/phys/module_bl_ysu.F.html#YSUINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1108'>
+   <font color=#993300>subroutine </font><font color=#cc0000>ysuinit</font>(rublten,rvblten,rthblten,rqvblten,           &amp; <A href='../../call_to/YSUINIT.html' TARGET='index'>1</A><a name='1109'>
+                      rqcblten,rqiblten,p_qi,p_first_scalar,       &amp;<a name='1110'>
+                      restart, allowed_to_read,                    &amp;<a name='1111'>
+                      ids, ide, jds, jde, kds, kde,                &amp;<a name='1112'>
+                      ims, ime, jms, jme, kms, kme,                &amp;<a name='1113'>
+                      its, ite, jts, jte, kts, kte                 )<a name='1114'>
+<font color=#447700>!-------------------------------------------------------------------<a name='1115'></font>
+   implicit none<a name='1116'>
+<font color=#447700>!-------------------------------------------------------------------<a name='1117'></font>
+<font color=#447700>!<a name='1118'></font>
+   logical , intent(in)          :: restart, allowed_to_read<a name='1119'>
+   integer , intent(in)          ::  ids, ide, jds, jde, kds, kde, &amp;<a name='1120'>
+                                     ims, ime, jms, jme, kms, kme, &amp;<a name='1121'>
+                                     its, ite, jts, jte, kts, kte<a name='1122'>
+   integer , intent(in)          ::  p_qi,p_first_scalar<a name='1123'>
+   real , dimension( ims:ime , kms:kme , jms:jme ), intent(out) :: &amp;<a name='1124'>
+                                                          rublten, &amp;<a name='1125'>
+                                                          rvblten, &amp;<a name='1126'>
+                                                         rthblten, &amp;<a name='1127'>
+                                                         rqvblten, &amp;<a name='1128'>
+                                                         rqcblten, &amp;<a name='1129'>
+                                                         rqiblten<a name='1130'>
+   integer :: i, j, k, itf, jtf, ktf<a name='1131'>
+<font color=#447700>!<a name='1132'></font>
+   jtf = min0(jte,jde-1)<a name='1133'>
+   ktf = min0(kte,kde-1)<a name='1134'>
+   itf = min0(ite,ide-1)<a name='1135'>
+<font color=#447700>!<a name='1136'></font>
+   if(.not.restart)then<a name='1137'>
+     do j = jts,jtf<a name='1138'>
+     do k = kts,ktf<a name='1139'>
+     do i = its,itf<a name='1140'>
+        rublten(i,k,j) = 0.<a name='1141'>
+        rvblten(i,k,j) = 0.<a name='1142'>
+        rthblten(i,k,j) = 0.<a name='1143'>
+        rqvblten(i,k,j) = 0.<a name='1144'>
+        rqcblten(i,k,j) = 0.<a name='1145'>
+     enddo<a name='1146'>
+     enddo<a name='1147'>
+     enddo<a name='1148'>
+   endif<a name='1149'>
+<font color=#447700>!<a name='1150'></font>
+   if (p_qi .ge. p_first_scalar .and. .not.restart) then<a name='1151'>
+      do j = jts,jtf<a name='1152'>
+      do k = kts,ktf<a name='1153'>
+      do i = its,itf<a name='1154'>
+         rqiblten(i,k,j) = 0.<a name='1155'>
+      enddo<a name='1156'>
+      enddo<a name='1157'>
+      enddo<a name='1158'>
+   endif<a name='1159'>
+<font color=#447700>!<a name='1160'></font>
+   end subroutine ysuinit<a name='1161'>
+<font color=#447700>!-------------------------------------------------------------------<a name='1162'></font>
+end module module_bl_ysu<a name='1163'>
+<a name='1164'>
+</pre></body></html>

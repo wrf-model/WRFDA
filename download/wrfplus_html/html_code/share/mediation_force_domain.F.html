@@ -1,0 +1,197 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!<a name='2'></font>
+<font color=#447700>!WRF:MEDIATION_LAYER:NESTING<a name='3'></font>
+<font color=#447700>!<a name='4'></font>
+<A NAME='MED_FORCE_DOMAIN'><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='5'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>med_force_domain</font> ( parent_grid , nested_grid ) <A href='../../call_to/MED_FORCE_DOMAIN.html' TARGET='index'>1</A>,<A href='../../call_from/MED_FORCE_DOMAIN.html' TARGET='index'>20</A><a name='6'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_106"><a name='7'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_130"><a name='8'>
+   IMPLICIT NONE<a name='9'>
+   TYPE(domain), POINTER :: parent_grid , nested_grid<a name='10'>
+   TYPE(domain), POINTER :: grid<a name='11'>
+   INTEGER nlev, msize<a name='12'>
+   TYPE (grid_config_rec_type)            :: config_flags<a name='13'>
+<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='14'></font>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33<a name='15'>
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x<a name='16'>
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y<a name='17'>
+<a name='18'>
+<font color=#447700>! ----------------------------------------------------------<a name='19'></font>
+#if (DA_CORE <font color=#447700>!= 1)<a name='20'></font>
+<font color=#447700>! ------------------------------------------------------<a name='21'></font>
+<font color=#447700>! Interface blocks<a name='22'></font>
+<font color=#447700>! ------------------------------------------------------<a name='23'></font>
+   INTERFACE<a name='24'>
+<font color=#447700>! ------------------------------------------------------<a name='25'></font>
+<font color=#447700>!    Interface definitions for EM CORE<a name='26'></font>
+<font color=#447700>! ------------------------------------------------------<a name='27'></font>
+#if (EM_CORE == 1)<a name='28'>
+<font color=#447700>! ------------------------------------------------------<a name='29'></font>
+<font color=#447700>!    These routines are supplied by module_dm.F from the<a name='30'></font>
+<font color=#447700>!    external communication package (e.g. external/RSL)<a name='31'></font>
+<font color=#447700>! ------------------------------------------------------<a name='32'></font>
+      SUBROUTINE interp_domain_em_part1 ( grid, intermediate_grid, config_flags ,  &amp;<a name='33'>
+<font color=#447700>!<a name='34'></font>
+#        include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_1"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='35'>
+<font color=#447700>!<a name='36'></font>
+                 )<a name='37'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_107"><a name='38'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_131"><a name='39'>
+         TYPE(domain), POINTER :: grid          <font color=#447700>! name of the grid being dereferenced (must be "grid")<a name='40'></font>
+         TYPE(domain), POINTER :: intermediate_grid<a name='41'>
+         TYPE (grid_config_rec_type)            :: config_flags<a name='42'>
+#        include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_2"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='43'>
+      END SUBROUTINE interp_domain_em_part1<a name='44'>
+<a name='45'>
+      SUBROUTINE force_domain_em_part2 ( grid, nested_grid, config_flags ,  &amp;<a name='46'>
+<font color=#447700>!<a name='47'></font>
+#        include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_3"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='48'>
+<font color=#447700>!<a name='49'></font>
+                 )<a name='50'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_108"><a name='51'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_132"><a name='52'>
+         TYPE(domain), POINTER :: grid          <font color=#447700>! name of the grid being dereferenced (must be "grid")<a name='53'></font>
+         TYPE(domain), POINTER :: nested_grid<a name='54'>
+         TYPE (grid_config_rec_type)            :: config_flags<a name='55'>
+#        include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_4"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='56'>
+      END SUBROUTINE force_domain_em_part2<a name='57'>
+<a name='58'>
+<font color=#447700>! ----------------------------------------------------------<a name='59'></font>
+<font color=#447700>!    This routine is supplied by dyn_em/couple_or_uncouple_em.F<a name='60'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='61'></font>
+      SUBROUTINE couple_or_uncouple_em ( grid, config_flags , couple,  &amp;<a name='62'>
+<font color=#447700>!<a name='63'></font>
+#        include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_5"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='64'>
+<font color=#447700>!<a name='65'></font>
+                 )<a name='66'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_109"><a name='67'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_133"><a name='68'>
+         TYPE(domain), INTENT(INOUT)            :: grid<a name='69'>
+         TYPE (grid_config_rec_type)            :: config_flags<a name='70'>
+         LOGICAL, INTENT(   IN) :: couple<a name='71'>
+#        include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_6"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='72'>
+      END SUBROUTINE couple_or_uncouple_em<a name='73'>
+#endif<a name='74'>
+<font color=#447700>! ----------------------------------------------------------<a name='75'></font>
+<font color=#447700>!    Interface definitions for NMM (placeholder)<a name='76'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='77'></font>
+#if (NMM_CORE == 1)<a name='78'>
+#endif<a name='79'>
+<font color=#447700>! ----------------------------------------------------------<a name='80'></font>
+<font color=#447700>!    Interface definitions for COAMPS (placeholder)<a name='81'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='82'></font>
+#if (COAMPS_CORE == 1)<a name='83'>
+#endif<a name='84'>
+   END INTERFACE<a name='85'>
+<font color=#447700>! ----------------------------------------------------------<a name='86'></font>
+<font color=#447700>! End of Interface blocks<a name='87'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='88'></font>
+<a name='89'>
+<font color=#447700>! ----------------------------------------------------------<a name='90'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='91'></font>
+<font color=#447700>! Executable code<a name='92'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='93'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='94'></font>
+<font color=#447700>!    Forcing calls for EM CORE.<a name='95'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='96'></font>
+#if (EM_CORE == 1 &amp;&amp; defined( DM_PARALLEL ))<a name='97'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_31"> ( nested_grid%id , model_config_rec , config_flags )<a name='98'>
+   IF ( config_flags%dyn_opt == DYN_EM ) THEN<a name='99'>
+     <font color=#447700>! couple parent domain<a name='100'></font>
+     grid =&gt; parent_grid<a name='101'>
+     <font color=#447700>! swich config_flags to point to parent rconfig info<a name='102'></font>
+     CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_32"> ( grid%id , model_config_rec , config_flags )<a name='103'>
+#    include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>" ( grid%id , model_config_rec , config_flags )<A NAME="deref_kludge.h_7"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='104'>
+     CALL <A href='../../html_code/dyn_em/couple_or_uncouple_em.F.html#COUPLE_OR_UNCOUPLE_EM'>couple_or_uncouple_em</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COUPLE_OR_UNCOUPLE_EM_1"> ( grid , config_flags ,  .true., &amp;<a name='105'>
+<font color=#447700>!<a name='106'></font>
+#      include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_8"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='107'>
+<font color=#447700>!<a name='108'></font>
+                                )<a name='109'>
+     <font color=#447700>! on restart do not force the nest the first time since it has already been forced<a name='110'></font>
+     <font color=#447700>! prior to the writing of the restart file<a name='111'></font>
+     IF ( .NOT. ( config_flags%restart .AND. nested_grid%first_force ) ) THEN<a name='112'>
+        <font color=#447700>! couple nested domain<a name='113'></font>
+        grid =&gt; nested_grid<a name='114'>
+        CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_33"> ( grid%id , model_config_rec , config_flags )<a name='115'>
+#       include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>" ( grid%id , model_config_rec , config_flags )<A NAME="deref_kludge.h_9"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='116'>
+        CALL <A href='../../html_code/dyn_em/couple_or_uncouple_em.F.html#COUPLE_OR_UNCOUPLE_EM'>couple_or_uncouple_em</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COUPLE_OR_UNCOUPLE_EM_2"> ( nested_grid , config_flags ,  .true., &amp;<a name='117'>
+<font color=#447700>!<a name='118'></font>
+#         include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_10"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='119'>
+<font color=#447700>!<a name='120'></font>
+                                   )<a name='121'>
+        <font color=#447700>! perform first part: transfer data from parent to intermediate domain<a name='122'></font>
+        <font color=#447700>! at the same resolution but on the same decomposition as the nest<a name='123'></font>
+        <font color=#447700>! note that this will involve communication on multiple DM procs<a name='124'></font>
+        grid =&gt; parent_grid<a name='125'>
+        CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_34"> ( grid%id , model_config_rec , config_flags )<a name='126'>
+#       include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>" ( grid%id , model_config_rec , config_flags )<A NAME="deref_kludge.h_11"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='127'>
+        CALL <A href='../../html_code/dyn_em/interp_domain_em.F.html#INTERP_DOMAIN_EM_PART1'>interp_domain_em_part1</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTERP_DOMAIN_EM_PART1_1"> ( grid , nested_grid%intermediate_grid, config_flags ,  &amp;<a name='128'>
+<font color=#447700>!<a name='129'></font>
+#         include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_12"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='130'>
+<font color=#447700>!<a name='131'></font>
+                                    )<a name='132'>
+     ENDIF <font color=#447700>! not restart and first force<a name='133'></font>
+     grid =&gt; nested_grid%intermediate_grid<a name='134'>
+     IF ( .NOT. ( config_flags%restart .AND. nested_grid%first_force ) ) THEN<a name='135'>
+        <font color=#447700>! perform 2nd part: run interpolation on the intermediate domain<a name='136'></font>
+        <font color=#447700>! and compute the values for the nest boundaries<a name='137'></font>
+        <font color=#447700>! note that this is all local (no communication)<a name='138'></font>
+        CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_35"> ( nested_grid%id , model_config_rec , config_flags )<a name='139'>
+#       include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>" ( nested_grid%id , model_config_rec , config_flags )<A NAME="deref_kludge.h_13"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='140'>
+        CALL force_domain_em_part2 ( grid, nested_grid, config_flags ,  &amp;<a name='141'>
+<font color=#447700>!<a name='142'></font>
+#         include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_14"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='143'>
+<font color=#447700>!<a name='144'></font>
+                                   )<a name='145'>
+        <font color=#447700>! uncouple the nest<a name='146'></font>
+        grid =&gt; nested_grid<a name='147'>
+        CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_36"> ( grid%id , model_config_rec , config_flags )<a name='148'>
+#       include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>" ( grid%id , model_config_rec , config_flags )<A NAME="deref_kludge.h_15"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='149'>
+        CALL <A href='../../html_code/dyn_em/couple_or_uncouple_em.F.html#COUPLE_OR_UNCOUPLE_EM'>couple_or_uncouple_em</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COUPLE_OR_UNCOUPLE_EM_3"> ( nested_grid , config_flags ,  .false. , &amp;<a name='150'>
+<font color=#447700>!<a name='151'></font>
+#         include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_16"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='152'>
+<font color=#447700>!<a name='153'></font>
+                                   )<a name='154'>
+     ENDIF <font color=#447700>! not restart and first_force<a name='155'></font>
+     <font color=#447700>! uncouple the parent<a name='156'></font>
+     grid =&gt; parent_grid<a name='157'>
+     CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_37"> ( grid%id , model_config_rec , config_flags )<a name='158'>
+#    include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>" ( grid%id , model_config_rec , config_flags )<A NAME="deref_kludge.h_17"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='159'>
+     CALL <A href='../../html_code/dyn_em/couple_or_uncouple_em.F.html#COUPLE_OR_UNCOUPLE_EM'>couple_or_uncouple_em</A><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="COUPLE_OR_UNCOUPLE_EM_4"> ( grid , config_flags ,  .false. , &amp;<a name='160'>
+<font color=#447700>!<a name='161'></font>
+#      include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_18"><A href='../../html_code/share/mediation_force_domain.F.html#MED_FORCE_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='162'>
+<font color=#447700>!<a name='163'></font>
+                                )<a name='164'>
+     IF ( nested_grid%first_force ) THEN<a name='165'>
+        nested_grid%first_force = .FALSE.<a name='166'>
+     ENDIF<a name='167'>
+     nested_grid%dtbc = 0.<a name='168'>
+   ENDIF<a name='169'>
+#endif<a name='170'>
+<font color=#447700>! ------------------------------------------------------<a name='171'></font>
+<font color=#447700>!    End of Forcing calls for EM CORE.<a name='172'></font>
+<font color=#447700>! ------------------------------------------------------<a name='173'></font>
+<font color=#447700>! ------------------------------------------------------<a name='174'></font>
+<font color=#447700>! ------------------------------------------------------<a name='175'></font>
+<font color=#447700>!    Forcing calls for NMM. (Placeholder)<a name='176'></font>
+<font color=#447700>! ------------------------------------------------------<a name='177'></font>
+# if (NMM_CORE == 1)<a name='178'>
+# endif<a name='179'>
+<font color=#447700>! ------------------------------------------------------<a name='180'></font>
+<font color=#447700>!    End of Forcing calls for NMM.<a name='181'></font>
+<font color=#447700>! ------------------------------------------------------<a name='182'></font>
+<font color=#447700>! ------------------------------------------------------<a name='183'></font>
+<font color=#447700>! ------------------------------------------------------<a name='184'></font>
+<font color=#447700>!    Forcing calls for COAMPS. (Placeholder)<a name='185'></font>
+<font color=#447700>! ------------------------------------------------------<a name='186'></font>
+# if (COAMPS_CORE == 1)<a name='187'>
+# endif<a name='188'>
+<font color=#447700>! ------------------------------------------------------<a name='189'></font>
+<font color=#447700>!    End of Forcing calls for COAMPS.<a name='190'></font>
+<font color=#447700>! ------------------------------------------------------<a name='191'></font>
+#endif<a name='192'>
+   RETURN<a name='193'>
+END SUBROUTINE med_force_domain<a name='194'>
+<a name='195'>
+<a name='196'>
+</pre></body></html>

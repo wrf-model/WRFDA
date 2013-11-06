@@ -1,0 +1,2965 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<a name='2'>
+<a name='3'>
+<a name='4'>
+<a name='5'>
+<a name='6'>
+<a name='7'>
+<a name='8'>
+<a name='9'>
+<a name='10'>
+<a name='11'>
+<a name='12'>
+<a name='13'>
+<a name='14'>
+<a name='15'>
+<A NAME='MODULE_RA_GSFCSW'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#MODULE_RA_GSFCSW' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='16'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_ra_gsfcsw</font> <A href='../../call_to/MODULE_RA_GSFCSW.html' TARGET='index'>2</A><a name='17'>
+<a name='18'>
+   REAL,    PARAMETER, PRIVATE ::   thresh=1.e-9<a name='19'>
+   REAL,    SAVE               ::   center_lat<a name='20'>
+<a name='21'>
+<font color=#447700>!  Assign co2 and trace gases amount (units are parts/part by volumn)<a name='22'></font>
+<a name='23'>
+   REAL,    PARAMETER, PRIVATE ::   co2   = 300.e-6<a name='24'>
+<a name='25'>
+CONTAINS<a name='26'>
+<a name='27'>
+<font color=#447700>!------------------------------------------------------------------<a name='28'></font>
+<A NAME='GSFCSWRAD'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#GSFCSWRAD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='29'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>GSFCSWRAD</font>(RTHRATEN,GSW,XLAT,XLONG,                  &amp; <A href='../../call_to/GSFCSWRAD.html' TARGET='index'>1</A>,<A href='../../call_from/GSFCSWRAD.html' TARGET='index'>2</A><a name='30'>
+                    ALB,T3D,QV3D,QC3D,QR3D,                       &amp;<a name='31'>
+                    QI3D,QS3D,QG3D,P3D,P8W3D,pi3D,CLDFRA3D,       &amp;<a name='32'>
+                    GMT,CP,G,JULDAY,XTIME,DECLIN,SOLCON,          &amp;<a name='33'>
+                    P_QV,P_QC,P_QR,P_QI,P_QS,P_QG,                &amp;<a name='34'>
+                    PARAM_FIRST_SCALAR,                           &amp;<a name='35'>
+                    RADFRQ,DEGRAD,taucldi,taucldc,warm_rain,      &amp;<a name='36'>
+                    ids,ide, jds,jde, kds,kde,                    &amp; <a name='37'>
+                    ims,ime, jms,jme, kms,kme,                    &amp;<a name='38'>
+                    its,ite, jts,jte, kts,kte                     ) <a name='39'>
+<font color=#447700>!------------------------------------------------------------------<a name='40'></font>
+   IMPLICIT NONE<a name='41'>
+<font color=#447700>!------------------------------------------------------------------<a name='42'></font>
+   INTEGER,    PARAMETER     ::        np    = 75<a name='43'>
+<a name='44'>
+   INTEGER,    INTENT(IN   ) ::        ids,ide, jds,jde, kds,kde, &amp;<a name='45'>
+                                       ims,ime, jms,jme, kms,kme, &amp;<a name='46'>
+                                       its,ite, jts,jte, kts,kte, &amp;<a name='47'>
+                                       P_QV,P_QC,P_QR,P_QI,P_QS,P_QG<a name='48'>
+   INTEGER,    INTENT(IN   ) ::        PARAM_FIRST_SCALAR<a name='49'>
+   LOGICAL,    INTENT(IN   ) ::        warm_rain<a name='50'>
+<a name='51'>
+   INTEGER,    INTENT(IN  )  ::                           JULDAY  <a name='52'>
+<a name='53'>
+<a name='54'>
+   REAL, INTENT(IN    )      ::        RADFRQ,DEGRAD,             &amp;<a name='55'>
+                                       XTIME,DECLIN,SOLCON<a name='56'>
+<font color=#447700>!<a name='57'></font>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &amp;<a name='58'>
+         INTENT(IN    ) ::                                   P3D, &amp;<a name='59'>
+                                                           P8W3D, &amp;<a name='60'>
+                                                            pi3D, &amp;<a name='61'>
+                                                             T3D, &amp;<a name='62'>
+                                                            QV3D, &amp;<a name='63'>
+                                                            QC3D, &amp;<a name='64'>
+                                                            QR3D, &amp;<a name='65'>
+                                                            QI3D, &amp;<a name='66'>
+                                                            QS3D, &amp;<a name='67'>
+                                                            QG3D, &amp;<a name='68'>
+                                                        CLDFRA3D<a name='69'>
+<a name='70'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &amp;<a name='71'>
+         INTENT(INOUT)  ::                              RTHRATEN<a name='72'>
+   REAL, DIMENSION( ims:ime, kms:kme, jms:jme ),                  &amp;<a name='73'>
+         INTENT(INOUT)  ::                               taucldi, &amp;<a name='74'>
+                                                         taucldc<a name='75'>
+<font color=#447700>!<a name='76'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ),                           &amp;<a name='77'>
+         INTENT(IN   )  ::                                  XLAT, &amp;<a name='78'>
+                                                           XLONG, &amp;<a name='79'>
+                                                             ALB<a name='80'>
+<font color=#447700>!<a name='81'></font>
+   REAL, DIMENSION( ims:ime, jms:jme ),                           &amp;<a name='82'>
+         INTENT(INOUT)  ::                                   GSW<a name='83'>
+<font color=#447700>!<a name='84'></font>
+   REAL, INTENT(IN   )  ::                              GMT,CP,G<a name='85'>
+<font color=#447700>!<a name='86'></font>
+ <a name='87'>
+<font color=#447700>! LOCAL VARS<a name='88'></font>
+ <a name='89'>
+   REAL, DIMENSION( its:ite ) ::                                  &amp;<a name='90'>
+                                                              ts, &amp;<a name='91'>
+                                                            cosz, &amp;<a name='92'>
+                                                          rsuvbm, &amp;<a name='93'>
+                                                          rsuvdf, &amp;<a name='94'>
+                                                          rsirbm, &amp;<a name='95'>
+                                                          rsirdf, &amp;<a name='96'>
+                                                            p400, &amp;<a name='97'>
+                                                            p700<a name='98'>
+<a name='99'>
+   INTEGER, DIMENSION( its:ite ) ::                               &amp;<a name='100'>
+                                                             ict, &amp;<a name='101'>
+                                                             icb   <a name='102'>
+<a name='103'>
+   REAL, DIMENSION( its:ite, kts-1:kte, 2 ) ::            taucld<a name='104'>
+<a name='105'>
+   REAL, DIMENSION( its:ite, kts-1:kte+1 )  ::               flx, &amp;<a name='106'>
+                                                            flxd<a name='107'>
+<font color=#447700>!<a name='108'></font>
+   REAL, DIMENSION( its:ite, kts-1:kte ) ::                     O3<a name='109'>
+<font color=#447700>!<a name='110'></font>
+   REAL, DIMENSION( its:ite, kts-1:kte, 11 ) ::                   &amp;<a name='111'>
+                                                           taual, &amp;<a name='112'>
+                                                           ssaal, &amp;<a name='113'>
+                                                           asyal<a name='114'>
+<a name='115'>
+   REAL, DIMENSION( its:ite, kts-1:kte, 2 ) ::                    &amp;<a name='116'>
+                                                            reff, &amp;    <a name='117'>
+                                                             cwc    <a name='118'>
+   REAL, DIMENSION( its: ite, kts-1:kte+1 ) ::                    &amp;<a name='119'>
+                                                           P8W2D<a name='120'>
+   REAL, DIMENSION( its: ite, kts-1:kte ) ::                      &amp;<a name='121'>
+                                                          TTEN2D, &amp;<a name='122'>
+                                                            SH2D, &amp;<a name='123'>
+                                                             P2D, &amp;<a name='124'>
+                                                             T2D, &amp;<a name='125'>
+                                                          fcld2D<a name='126'>
+<a name='127'>
+   REAL, DIMENSION( np, 5 ) ::                              pres, &amp;<a name='128'>
+                                                           ozone<a name='129'>
+   REAL, DIMENSION( np )    ::                                 p<a name='130'>
+<a name='131'>
+   LOGICAL :: cldwater,overcast<a name='132'>
+<font color=#447700>!<a name='133'></font>
+   INTEGER :: i,j,K,NK,ib,kk,mix,mkx<a name='134'>
+<a name='135'>
+<font color=#447700>!  iprof = 1  :  mid-latitude summer profile<a name='136'></font>
+<font color=#447700>!        = 2  :  mid-latitude winter profile<a name='137'></font>
+<font color=#447700>!        = 3  :  sub-arctic   summer profile<a name='138'></font>
+<font color=#447700>!        = 4  :  sub-arctic   winter profile<a name='139'></font>
+<font color=#447700>!        = 5  :  tropical profile<a name='140'></font>
+<font color=#447700>!<a name='141'></font>
+<a name='142'>
+   INTEGER  ::                                             iprof, &amp;<a name='143'>
+                                                       is_summer, &amp;<a name='144'>
+                                                       ie_summer, &amp;<a name='145'>
+                                                          lattmp<a name='146'>
+<a name='147'>
+<a name='148'>
+<font color=#447700>!<a name='149'></font>
+   REAL    :: XLAT0,XLONG0<a name='150'>
+   REAL    :: fac,latrmp<a name='151'>
+   REAL    :: xt24,tloctm,hrang,xxlat<a name='152'>
+<font color=#447700>!<a name='153'></font>
+<font color=#447700>!--------------------------------------------------------------------------------<a name='154'></font>
+<font color=#447700>!   data set 1<a name='155'></font>
+<font color=#447700>!     mid-latitude summer (75 levels) :  p(mb)  o3(g/g)<a name='156'></font>
+<font color=#447700>!     surface temp = 294.0<a name='157'></font>
+<font color=#447700>!<a name='158'></font>
+      data (pres(i,1),i=1,np)/ &amp;<a name='159'>
+          0.0006244,   0.0008759,   0.0012286,   0.0017234,   0.0024174, &amp;<a name='160'>
+          0.0033909,   0.0047565,   0.0066720,   0.0093589,   0.0131278, &amp;<a name='161'>
+          0.0184145,   0.0258302,   0.0362323,   0.0508234,   0.0712906, &amp;<a name='162'>
+          0.1000000,   0.1402710,   0.1967600,   0.2759970,   0.3871430, &amp;<a name='163'>
+          0.5430,    0.7617,    1.0685,    1.4988,    2.1024,    2.9490, &amp;<a name='164'>
+          4.1366,    5.8025,    8.1392,   11.4170,   16.0147,   22.4640, &amp;<a name='165'>
+         31.5105,   44.2001,   62.0000,   85.7750,  109.5500,  133.3250, &amp;<a name='166'>
+        157.1000,  180.8750,  204.6500,  228.4250,  252.2000,  275.9750, &amp;<a name='167'>
+        299.7500,  323.5250,  347.3000,  371.0750,  394.8500,  418.6250, &amp;<a name='168'>
+        442.4000,  466.1750,  489.9500,  513.7250,  537.5000,  561.2750, &amp;<a name='169'>
+        585.0500,  608.8250,  632.6000,  656.3750,  680.1500,  703.9250, &amp;<a name='170'>
+        727.7000,  751.4750,  775.2500,  799.0250,  822.8000,  846.5750, &amp;<a name='171'>
+        870.3500,  894.1250,  917.9000,  941.6750,  965.4500,  989.2250, &amp;<a name='172'>
+       1013.0000/<a name='173'>
+<font color=#447700>!<a name='174'></font>
+      data (ozone(i,1),i=1,np)/ &amp;<a name='175'>
+        0.1793E-06,  0.2228E-06,  0.2665E-06,  0.3104E-06,  0.3545E-06, &amp;<a name='176'>
+        0.3989E-06,  0.4435E-06,  0.4883E-06,  0.5333E-06,  0.5786E-06, &amp;<a name='177'>
+        0.6241E-06,  0.6698E-06,  0.7157E-06,  0.7622E-06,  0.8557E-06, &amp;<a name='178'>
+        0.1150E-05,  0.1462E-05,  0.1793E-05,  0.2143E-05,  0.2512E-05, &amp;<a name='179'>
+        0.2902E-05,  0.3313E-05,  0.4016E-05,  0.5193E-05,  0.6698E-05, &amp;<a name='180'>
+        0.8483E-05,  0.9378E-05,  0.9792E-05,  0.1002E-04,  0.1014E-04, &amp;<a name='181'>
+        0.9312E-05,  0.7834E-05,  0.6448E-05,  0.5159E-05,  0.3390E-05, &amp;<a name='182'>
+        0.1937E-05,  0.1205E-05,  0.8778E-06,  0.6935E-06,  0.5112E-06, &amp;<a name='183'>
+        0.3877E-06,  0.3262E-06,  0.2770E-06,  0.2266E-06,  0.2020E-06, &amp;<a name='184'>
+        0.1845E-06,  0.1679E-06,  0.1519E-06,  0.1415E-06,  0.1317E-06, &amp;<a name='185'>
+        0.1225E-06,  0.1137E-06,  0.1055E-06,  0.1001E-06,  0.9487E-07, &amp;<a name='186'>
+        0.9016E-07,  0.8641E-07,  0.8276E-07,  0.7930E-07,  0.7635E-07, &amp;<a name='187'>
+        0.7347E-07,  0.7065E-07,  0.6821E-07,  0.6593E-07,  0.6368E-07, &amp;<a name='188'>
+        0.6148E-07,  0.5998E-07,  0.5859E-07,  0.5720E-07,  0.5582E-07, &amp;<a name='189'>
+        0.5457E-07,  0.5339E-07,  0.5224E-07,  0.5110E-07,  0.4999E-07/<a name='190'>
+<a name='191'>
+<font color=#447700>!--------------------------------------------------------------------------------<a name='192'></font>
+<font color=#447700>!   data set 2<a name='193'></font>
+<font color=#447700>!   mid-latitude winter (75 levels) :  p(mb)  o3(g/g)<a name='194'></font>
+<font color=#447700>!   surface temp = 272.2<a name='195'></font>
+<font color=#447700>!<a name='196'></font>
+      data (pres(i,2),i=1,np)/ &amp;<a name='197'>
+          0.0006244,   0.0008759,   0.0012286,   0.0017234,   0.0024174, &amp;<a name='198'>
+          0.0033909,   0.0047565,   0.0066720,   0.0093589,   0.0131278, &amp;<a name='199'>
+          0.0184145,   0.0258302,   0.0362323,   0.0508234,   0.0712906, &amp;<a name='200'>
+          0.1000000,   0.1402710,   0.1967600,   0.2759970,   0.3871430, &amp;<a name='201'>
+          0.5430,    0.7617,    1.0685,    1.4988,    2.1024,    2.9490, &amp;<a name='202'>
+          4.1366,    5.8025,    8.1392,   11.4170,   16.0147,   22.4640, &amp;<a name='203'>
+         31.5105,   44.2001,   62.0000,   85.9000,  109.8000,  133.7000, &amp;<a name='204'>
+        157.6000,  181.5000,  205.4000,  229.3000,  253.2000,  277.1000, &amp;<a name='205'>
+        301.0000,  324.9000,  348.8000,  372.7000,  396.6000,  420.5000, &amp;<a name='206'>
+        444.4000,  468.3000,  492.2000,  516.1000,  540.0000,  563.9000, &amp;<a name='207'>
+        587.8000,  611.7000,  635.6000,  659.5000,  683.4000,  707.3000, &amp;<a name='208'>
+        731.2000,  755.1000,  779.0000,  802.9000,  826.8000,  850.7000, &amp;<a name='209'>
+        874.6000,  898.5000,  922.4000,  946.3000,  970.2000,  994.1000, &amp;<a name='210'>
+       1018.0000/<a name='211'>
+<font color=#447700>!<a name='212'></font>
+      data (ozone(i,2),i=1,np)/ &amp;<a name='213'>
+        0.2353E-06,  0.3054E-06,  0.3771E-06,  0.4498E-06,  0.5236E-06, &amp;<a name='214'>
+        0.5984E-06,  0.6742E-06,  0.7511E-06,  0.8290E-06,  0.9080E-06, &amp;<a name='215'>
+        0.9881E-06,  0.1069E-05,  0.1152E-05,  0.1319E-05,  0.1725E-05, &amp;<a name='216'>
+        0.2145E-05,  0.2581E-05,  0.3031E-05,  0.3497E-05,  0.3980E-05, &amp;<a name='217'>
+        0.4478E-05,  0.5300E-05,  0.6725E-05,  0.8415E-05,  0.1035E-04, &amp;<a name='218'>
+        0.1141E-04,  0.1155E-04,  0.1143E-04,  0.1093E-04,  0.1060E-04, &amp;<a name='219'>
+        0.9720E-05,  0.8849E-05,  0.7424E-05,  0.6023E-05,  0.4310E-05, &amp;<a name='220'>
+        0.2820E-05,  0.1990E-05,  0.1518E-05,  0.1206E-05,  0.9370E-06, &amp;<a name='221'>
+        0.7177E-06,  0.5450E-06,  0.4131E-06,  0.3277E-06,  0.2563E-06, &amp;<a name='222'>
+        0.2120E-06,  0.1711E-06,  0.1524E-06,  0.1344E-06,  0.1199E-06, &amp;<a name='223'>
+        0.1066E-06,  0.9516E-07,  0.8858E-07,  0.8219E-07,  0.7598E-07, &amp;<a name='224'>
+        0.6992E-07,  0.6403E-07,  0.5887E-07,  0.5712E-07,  0.5540E-07, &amp;<a name='225'>
+        0.5370E-07,  0.5214E-07,  0.5069E-07,  0.4926E-07,  0.4785E-07, &amp;<a name='226'>
+        0.4713E-07,  0.4694E-07,  0.4676E-07,  0.4658E-07,  0.4641E-07, &amp;<a name='227'>
+        0.4634E-07,  0.4627E-07,  0.4619E-07,  0.4612E-07,  0.4605E-07/<a name='228'>
+<a name='229'>
+<a name='230'>
+<font color=#447700>!--------------------------------------------------------------------------------<a name='231'></font>
+<font color=#447700>!   data set 3<a name='232'></font>
+<font color=#447700>!   sub-arctic summer (75 levels) :  p(mb)  o3(g/g)<a name='233'></font>
+<font color=#447700>!   surface temp = 287.0<a name='234'></font>
+<font color=#447700>!<a name='235'></font>
+      data (pres(i,3),i=1,np)/ &amp;<a name='236'>
+          0.0006244,   0.0008759,   0.0012286,   0.0017234,   0.0024174, &amp;<a name='237'>
+          0.0033909,   0.0047565,   0.0066720,   0.0093589,   0.0131278, &amp;<a name='238'>
+          0.0184145,   0.0258302,   0.0362323,   0.0508234,   0.0712906, &amp;<a name='239'>
+          0.1000000,   0.1402710,   0.1967600,   0.2759970,   0.3871430, &amp;<a name='240'>
+          0.5430,    0.7617,    1.0685,    1.4988,    2.1024,    2.9490, &amp;<a name='241'>
+          4.1366,    5.8025,    8.1392,   11.4170,   16.0147,   22.4640, &amp;<a name='242'>
+         31.5105,   44.2001,   62.0000,   85.7000,  109.4000,  133.1000, &amp;<a name='243'>
+        156.8000,  180.5000,  204.2000,  227.9000,  251.6000,  275.3000, &amp;<a name='244'>
+        299.0000,  322.7000,  346.4000,  370.1000,  393.8000,  417.5000, &amp;<a name='245'>
+        441.2000,  464.9000,  488.6000,  512.3000,  536.0000,  559.7000, &amp;<a name='246'>
+        583.4000,  607.1000,  630.8000,  654.5000,  678.2000,  701.9000, &amp;<a name='247'>
+        725.6000,  749.3000,  773.0000,  796.7000,  820.4000,  844.1000, &amp;<a name='248'>
+        867.8000,  891.5000,  915.2000,  938.9000,  962.6000,  986.3000, &amp;<a name='249'>
+       1010.0000/<a name='250'>
+<font color=#447700>!<a name='251'></font>
+      data (ozone(i,3),i=1,np)/ &amp;<a name='252'>
+        0.1728E-06,  0.2131E-06,  0.2537E-06,  0.2944E-06,  0.3353E-06, &amp;<a name='253'>
+        0.3764E-06,  0.4176E-06,  0.4590E-06,  0.5006E-06,  0.5423E-06, &amp;<a name='254'>
+        0.5842E-06,  0.6263E-06,  0.6685E-06,  0.7112E-06,  0.7631E-06, &amp;<a name='255'>
+        0.1040E-05,  0.1340E-05,  0.1660E-05,  0.2001E-05,  0.2362E-05, &amp;<a name='256'>
+        0.2746E-05,  0.3153E-05,  0.3762E-05,  0.4988E-05,  0.6518E-05, &amp;<a name='257'>
+        0.8352E-05,  0.9328E-05,  0.9731E-05,  0.8985E-05,  0.7632E-05, &amp;<a name='258'>
+        0.6814E-05,  0.6384E-05,  0.5718E-05,  0.4728E-05,  0.4136E-05, &amp;<a name='259'>
+        0.3033E-05,  0.2000E-05,  0.1486E-05,  0.1121E-05,  0.8680E-06, &amp;<a name='260'>
+        0.6474E-06,  0.5164E-06,  0.3921E-06,  0.2996E-06,  0.2562E-06, &amp;<a name='261'>
+        0.2139E-06,  0.1723E-06,  0.1460E-06,  0.1360E-06,  0.1267E-06, &amp;<a name='262'>
+        0.1189E-06,  0.1114E-06,  0.1040E-06,  0.9678E-07,  0.8969E-07, &amp;<a name='263'>
+        0.8468E-07,  0.8025E-07,  0.7590E-07,  0.7250E-07,  0.6969E-07, &amp;<a name='264'>
+        0.6694E-07,  0.6429E-07,  0.6208E-07,  0.5991E-07,  0.5778E-07, &amp;<a name='265'>
+        0.5575E-07,  0.5403E-07,  0.5233E-07,  0.5067E-07,  0.4904E-07, &amp;<a name='266'>
+        0.4721E-07,  0.4535E-07,  0.4353E-07,  0.4173E-07,  0.3997E-07/<a name='267'>
+<a name='268'>
+<a name='269'>
+<font color=#447700>!--------------------------------------------------------------------------------<a name='270'></font>
+<font color=#447700>!   data set 3<a name='271'></font>
+<font color=#447700>!   sub-arctic winter (75 levels) :   p(mb)  o3(g/g)<a name='272'></font>
+<font color=#447700>!   surface temp = 257.1<a name='273'></font>
+<font color=#447700>!<a name='274'></font>
+      data (pres(i,4),i=1,np)/ &amp;<a name='275'>
+          0.0006244,   0.0008759,   0.0012286,   0.0017234,   0.0024174, &amp;<a name='276'>
+          0.0033909,   0.0047565,   0.0066720,   0.0093589,   0.0131278, &amp;<a name='277'>
+          0.0184145,   0.0258302,   0.0362323,   0.0508234,   0.0712906, &amp;<a name='278'>
+          0.1000000,   0.1402710,   0.1967600,   0.2759970,   0.3871430, &amp;<a name='279'>
+          0.5430,    0.7617,    1.0685,    1.4988,    2.1024,    2.9490, &amp;<a name='280'>
+          4.1366,    5.8025,    8.1392,   11.4170,   16.0147,   22.4640, &amp;<a name='281'>
+         31.5105,   44.2001,   62.0000,   85.7750,  109.5500,  133.3250, &amp;<a name='282'>
+        157.1000,  180.8750,  204.6500,  228.4250,  252.2000,  275.9750, &amp;<a name='283'>
+        299.7500,  323.5250,  347.3000,  371.0750,  394.8500,  418.6250, &amp;<a name='284'>
+        442.4000,  466.1750,  489.9500,  513.7250,  537.5000,  561.2750, &amp;<a name='285'>
+        585.0500,  608.8250,  632.6000,  656.3750,  680.1500,  703.9250, &amp;<a name='286'>
+        727.7000,  751.4750,  775.2500,  799.0250,  822.8000,  846.5750, &amp;<a name='287'>
+        870.3500,  894.1250,  917.9000,  941.6750,  965.4500,  989.2250, &amp;<a name='288'>
+       1013.0000/<a name='289'>
+<font color=#447700>!<a name='290'></font>
+      data (ozone(i,4),i=1,np)/ &amp;<a name='291'>
+        0.2683E-06,  0.3562E-06,  0.4464E-06,  0.5387E-06,  0.6333E-06, &amp;<a name='292'>
+        0.7301E-06,  0.8291E-06,  0.9306E-06,  0.1034E-05,  0.1140E-05, &amp;<a name='293'>
+        0.1249E-05,  0.1360E-05,  0.1474E-05,  0.1855E-05,  0.2357E-05, &amp;<a name='294'>
+        0.2866E-05,  0.3383E-05,  0.3906E-05,  0.4437E-05,  0.4975E-05, &amp;<a name='295'>
+        0.5513E-05,  0.6815E-05,  0.8157E-05,  0.1008E-04,  0.1200E-04, &amp;<a name='296'>
+        0.1242E-04,  0.1250E-04,  0.1157E-04,  0.1010E-04,  0.9063E-05, &amp;<a name='297'>
+        0.8836E-05,  0.8632E-05,  0.8391E-05,  0.7224E-05,  0.6054E-05, &amp;<a name='298'>
+        0.4503E-05,  0.3204E-05,  0.2278E-05,  0.1833E-05,  0.1433E-05, &amp;<a name='299'>
+        0.9996E-06,  0.7440E-06,  0.5471E-06,  0.3944E-06,  0.2852E-06, &amp;<a name='300'>
+        0.1977E-06,  0.1559E-06,  0.1333E-06,  0.1126E-06,  0.9441E-07, &amp;<a name='301'>
+        0.7678E-07,  0.7054E-07,  0.6684E-07,  0.6323E-07,  0.6028E-07, &amp;<a name='302'>
+        0.5746E-07,  0.5468E-07,  0.5227E-07,  0.5006E-07,  0.4789E-07, &amp;<a name='303'>
+        0.4576E-07,  0.4402E-07,  0.4230E-07,  0.4062E-07,  0.3897E-07, &amp;<a name='304'>
+        0.3793E-07,  0.3697E-07,  0.3602E-07,  0.3506E-07,  0.3413E-07, &amp;<a name='305'>
+        0.3326E-07,  0.3239E-07,  0.3153E-07,  0.3069E-07,  0.2987E-07/ <a name='306'>
+<a name='307'>
+<font color=#447700>!--------------------------------------------------------------------------------<a name='308'></font>
+<font color=#447700>!   data set 4<a name='309'></font>
+<font color=#447700>!   tropical (75 levels) :   p(mb)  o3(g/g)<a name='310'></font>
+<font color=#447700>!   surface temp = 300.0<a name='311'></font>
+<font color=#447700>!<a name='312'></font>
+      data (pres(i,5),i=1,np)/ &amp;<a name='313'>
+          0.0006244,   0.0008759,   0.0012286,   0.0017234,   0.0024174, &amp;<a name='314'>
+          0.0033909,   0.0047565,   0.0066720,   0.0093589,   0.0131278, &amp;<a name='315'>
+          0.0184145,   0.0258302,   0.0362323,   0.0508234,   0.0712906, &amp;<a name='316'>
+          0.1000000,   0.1402710,   0.1967600,   0.2759970,   0.3871430, &amp;<a name='317'>
+          0.5430,    0.7617,    1.0685,    1.4988,    2.1024,    2.9490, &amp;<a name='318'>
+          4.1366,    5.8025,    8.1392,   11.4170,   16.0147,   22.4640, &amp;<a name='319'>
+         31.5105,   44.2001,   62.0000,   85.7750,  109.5500,  133.3250, &amp;<a name='320'>
+        157.1000,  180.8750,  204.6500,  228.4250,  252.2000,  275.9750, &amp;<a name='321'>
+        299.7500,  323.5250,  347.3000,  371.0750,  394.8500,  418.6250, &amp;<a name='322'>
+        442.4000,  466.1750,  489.9500,  513.7250,  537.5000,  561.2750, &amp;<a name='323'>
+        585.0500,  608.8250,  632.6000,  656.3750,  680.1500,  703.9250, &amp;<a name='324'>
+        727.7000,  751.4750,  775.2500,  799.0250,  822.8000,  846.5750, &amp;<a name='325'>
+        870.3500,  894.1250,  917.9000,  941.6750,  965.4500,  989.2250, &amp;<a name='326'>
+       1013.0000/<a name='327'>
+<font color=#447700>!<a name='328'></font>
+      data (ozone(i,5),i=1,np)/ &amp;<a name='329'>
+        0.1993E-06,  0.2521E-06,  0.3051E-06,  0.3585E-06,  0.4121E-06, &amp;<a name='330'>
+        0.4661E-06,  0.5203E-06,  0.5748E-06,  0.6296E-06,  0.6847E-06, &amp;<a name='331'>
+        0.7402E-06,  0.7959E-06,  0.8519E-06,  0.9096E-06,  0.1125E-05, &amp;<a name='332'>
+        0.1450E-05,  0.1794E-05,  0.2156E-05,  0.2538E-05,  0.2939E-05, &amp;<a name='333'>
+        0.3362E-05,  0.3785E-05,  0.4753E-05,  0.6005E-05,  0.7804E-05, &amp;<a name='334'>
+        0.9635E-05,  0.1023E-04,  0.1067E-04,  0.1177E-04,  0.1290E-04, &amp;<a name='335'>
+        0.1134E-04,  0.9223E-05,  0.6667E-05,  0.3644E-05,  0.1545E-05, &amp;<a name='336'>
+        0.5355E-06,  0.2523E-06,  0.2062E-06,  0.1734E-06,  0.1548E-06, &amp;<a name='337'>
+        0.1360E-06,  0.1204E-06,  0.1074E-06,  0.9707E-07,  0.8960E-07, &amp;<a name='338'>
+        0.8419E-07,  0.7962E-07,  0.7542E-07,  0.7290E-07,  0.7109E-07, &amp;<a name='339'>
+        0.6940E-07,  0.6786E-07,  0.6635E-07,  0.6500E-07,  0.6370E-07, &amp;<a name='340'>
+        0.6244E-07,  0.6132E-07,  0.6022E-07,  0.5914E-07,  0.5884E-07, &amp;<a name='341'>
+        0.5855E-07,  0.5823E-07,  0.5772E-07,  0.5703E-07,  0.5635E-07, &amp;<a name='342'>
+        0.5570E-07,  0.5492E-07,  0.5412E-07,  0.5335E-07,  0.5260E-07, &amp;<a name='343'>
+        0.5167E-07,  0.5063E-07,  0.4961E-07,  0.4860E-07,  0.4761E-07/<a name='344'>
+<a name='345'>
+<font color=#447700>!--------------------------------------------------------------------------------<a name='346'></font>
+   cldwater = .true.<a name='347'>
+   overcast = .false.<a name='348'>
+<a name='349'>
+   mix=ite-its+1 <a name='350'>
+   mkx=kte-kts+1 <a name='351'>
+<a name='352'>
+   is_summer=80<a name='353'>
+   ie_summer=265<a name='354'>
+<a name='355'>
+<font color=#447700>! testing, need to change iprof, which is function of lat and julian day<a name='356'></font>
+<font color=#447700>!  iprof = 1  :  mid-latitude summer profile<a name='357'></font>
+<font color=#447700>!        = 2  :  mid-latitude winter profile<a name='358'></font>
+<font color=#447700>!        = 3  :  sub-arctic   summer profile<a name='359'></font>
+<font color=#447700>!        = 4  :  sub-arctic   winter profile<a name='360'></font>
+<font color=#447700>!        = 5  :  tropical profile<a name='361'></font>
+<a name='362'>
+   IF (center_lat .le. 30. ) THEN <font color=#447700>! tropic<a name='363'></font>
+      iprof = 5<a name='364'>
+   ELSE<a name='365'>
+      IF (center_lat .gt.  0.) THEN<a name='366'>
+         IF (center_lat .gt. 60. ) THEN <font color=#447700>!  arctic<a name='367'></font>
+            IF (JULDAY .gt. is_summer .and. JULDAY .lt. ie_summer ) THEN<a name='368'>
+               <font color=#447700>! arctic summer<a name='369'></font>
+               iprof = 3<a name='370'>
+            ELSE<a name='371'>
+               <font color=#447700>! arctic winter<a name='372'></font>
+               iprof = 4<a name='373'>
+            ENDIF<a name='374'>
+         ELSE        <font color=#447700>! midlatitude<a name='375'></font>
+            IF (JULDAY .gt. is_summer .and. JULDAY .lt. ie_summer ) THEN<a name='376'>
+               <font color=#447700>! north midlatitude summer<a name='377'></font>
+               iprof = 1<a name='378'>
+            ELSE<a name='379'>
+               <font color=#447700>! north midlatitude winter<a name='380'></font>
+               iprof = 2<a name='381'>
+            ENDIF<a name='382'>
+         ENDIF<a name='383'>
+<a name='384'>
+      ELSE<a name='385'>
+         IF (center_lat .lt. -60. ) THEN <font color=#447700>!  antarctic<a name='386'></font>
+            IF (JULDAY .lt. is_summer .or. JULDAY .gt. ie_summer ) THEN<a name='387'>
+               <font color=#447700>! antarctic summer<a name='388'></font>
+               iprof = 3<a name='389'>
+            ELSE<a name='390'>
+               <font color=#447700>! antarctic winter<a name='391'></font>
+               iprof = 4<a name='392'>
+            ENDIF<a name='393'>
+         ELSE        <font color=#447700>! midlatitude<a name='394'></font>
+            IF (JULDAY .lt. is_summer .or. JULDAY .gt. ie_summer ) THEN<a name='395'>
+               <font color=#447700>! south midlatitude summer<a name='396'></font>
+               iprof = 1<a name='397'>
+            ELSE<a name='398'>
+               <font color=#447700>! south midlatitude winter<a name='399'></font>
+               iprof = 2<a name='400'>
+            ENDIF<a name='401'>
+         ENDIF<a name='402'>
+<a name='403'>
+      ENDIF<a name='404'>
+   ENDIF<a name='405'>
+<a name='406'>
+<a name='407'>
+   j_loop: DO J=jts,jte<a name='408'>
+<a name='409'>
+      DO K=kts,kte          <a name='410'>
+      DO I=its,ite          <a name='411'>
+         cwc(i,k,1) = 0.<a name='412'>
+         cwc(i,k,2) = 0.<a name='413'>
+      ENDDO<a name='414'>
+      ENDDO<a name='415'>
+<a name='416'>
+      DO K=1,np<a name='417'>
+         p(k)=pres(k,iprof)<a name='418'>
+      ENDDO<a name='419'>
+<a name='420'>
+<font color=#447700>! reverse vars <a name='421'></font>
+<font color=#447700>!<a name='422'></font>
+      DO K=kts,kte+1<a name='423'>
+      DO I=its,ite<a name='424'>
+         NK=kme-K+kms<a name='425'>
+         P8W2D(I,K)=P8W3D(I,NK,J)*0.01   <font color=#447700>! P8w2D is in mb<a name='426'></font>
+      ENDDO<a name='427'>
+      ENDDO<a name='428'>
+<a name='429'>
+      DO I=its,ite<a name='430'>
+         P8W2D(I,0)=.0<a name='431'>
+      ENDDO<a name='432'>
+<font color=#447700>!<a name='433'></font>
+      DO K=kts,kte<a name='434'>
+      DO I=its,ite<a name='435'>
+         NK=kme-1-K+kms<a name='436'>
+         TTEN2D(I,K)=0.<a name='437'>
+         T2D(I,K)=T3D(I,NK,J)<a name='438'>
+<a name='439'>
+<font color=#447700>! SH2D specific humidity<a name='440'></font>
+         SH2D(I,K)=QV3D(I,NK,J)/(1.+QV3D(I,NK,J))<a name='441'>
+         SH2D(I,K)=max(0.,SH2D(I,K))<a name='442'>
+         cwc(I,K,2)=QC3D(I,NK,J)<a name='443'>
+         cwc(I,K,2)=max(0.,cwc(I,K,2))<a name='444'>
+<a name='445'>
+         P2D(I,K)=P3D(I,NK,J)*0.01      <font color=#447700>! P2D is in mb<a name='446'></font>
+         fcld2D(I,K)=CLDFRA3D(I,NK,J)<a name='447'>
+      ENDDO<a name='448'>
+      ENDDO<a name='449'>
+<a name='450'>
+      IF (P_QI .lt. PARAM_FIRST_SCALAR .and. .not. warm_rain) THEN<a name='451'>
+      DO K=kts,kte<a name='452'>
+      DO I=its,ite<a name='453'>
+         IF (T2D(I,K) .lt. 273.15) THEN<a name='454'>
+            cwc(I,K,1)=cwc(I,K,2)<a name='455'>
+            cwc(I,K,2)=0.<a name='456'>
+         ENDIF<a name='457'>
+      ENDDO<a name='458'>
+      ENDDO<a name='459'>
+      ENDIF<a name='460'>
+<a name='461'>
+      DO I=its,ite<a name='462'>
+         TTEN2D(I,0)=0.<a name='463'>
+         T2D(I,0)=T2D(I,1)<a name='464'>
+<font color=#447700>! SH2D specific humidity<a name='465'></font>
+         SH2D(I,0)=0.5*SH2D(i,1)<a name='466'>
+         cwc(I,0,2)=0.<a name='467'>
+         cwc(I,0,1)=0.<a name='468'>
+         P2D(I,0)=0.5*(P8W2D(I,0)+P8W2D(I,1))<a name='469'>
+         fcld2D(I,0)=0.<a name='470'>
+      ENDDO<a name='471'>
+<font color=#447700>!<a name='472'></font>
+      IF (P_QI .ge. PARAM_FIRST_SCALAR) THEN<a name='473'>
+         DO K=kts,kte          <a name='474'>
+         DO I=its,ite          <a name='475'>
+            NK=kme-1-K+kms<a name='476'>
+            cwc(I,K,1)=QI3D(I,NK,J)<a name='477'>
+            cwc(I,K,1)=max(0.,cwc(I,K,1))<a name='478'>
+         ENDDO<a name='479'>
+         ENDDO<a name='480'>
+      ENDIF<a name='481'>
+<font color=#447700>!<a name='482'></font>
+<font color=#447700>! ... Vertical profiles for ozone<a name='483'></font>
+<font color=#447700>!<a name='484'></font>
+      call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#O3PROF'>o3prof</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#GSFCSWRAD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="O3PROF_1"> (np, p, ozone(1,iprof), its, ite, kts-1, kte, P2D, O3)<a name='485'>
+<a name='486'>
+<font color=#447700>! ... Vertical profiles for effective particle size<a name='487'></font>
+<font color=#447700>!<a name='488'></font>
+      do k = kts-1, kte<a name='489'>
+      do i = its, ite<a name='490'>
+         reff(i,k,2) = 10.<a name='491'>
+         reff(i,k,1) = 80.<a name='492'>
+      end do<a name='493'>
+      end do<a name='494'>
+<font color=#447700>!<a name='495'></font>
+<font color=#447700>! ... Level indices separating high, middle and low clouds<a name='496'></font>
+<font color=#447700>!<a name='497'></font>
+      do i = its, ite<a name='498'>
+         p400(i) = 1.e5<a name='499'>
+         p700(i) = 1.e5<a name='500'>
+      enddo<a name='501'>
+<a name='502'>
+      do k = kts-1,kte+1<a name='503'>
+         do i = its, ite<a name='504'>
+            if (abs(P8W2D(i,k) - 400.) .lt. p400(i)) then<a name='505'>
+               p400(i) = abs(P8W2D(i,k) - 400.)<a name='506'>
+               ict(i) = k<a name='507'>
+            endif<a name='508'>
+            if (abs(P8W2D(i,k) - 700.) .lt. p700(i)) then<a name='509'>
+               p700(i) = abs(P8W2D(i,k) - 700.)<a name='510'>
+               icb(i) = k<a name='511'>
+            endif<a name='512'>
+        end do<a name='513'>
+      end do<a name='514'>
+<font color=#447700>!<a name='515'></font>
+<font color=#447700>! ... Ignore aerosol effects<a name='516'></font>
+<font color=#447700>!<a name='517'></font>
+      do ib = 1, 11<a name='518'>
+      do k = kts-1,kte<a name='519'>
+      do i = its,ite<a name='520'>
+         taual(i,k,ib) = 0.<a name='521'>
+         ssaal(i,k,ib) = 0.<a name='522'>
+         asyal(i,k,ib) = 0.<a name='523'>
+      end do<a name='524'>
+      end do<a name='525'>
+      end do<a name='526'>
+<font color=#447700>!<a name='527'></font>
+<font color=#447700>! ... Initialize output arrays<a name='528'></font>
+<font color=#447700>!<a name='529'></font>
+      do ib = 1, 2<a name='530'>
+      do k = kts-1, kte<a name='531'>
+      do i = its, ite<a name='532'>
+         taucld(i,k,ib) = 0.<a name='533'>
+      end do<a name='534'>
+      end do<a name='535'>
+      end do<a name='536'>
+<font color=#447700>!<a name='537'></font>
+      do k = kts-1,kte+1<a name='538'>
+      do i = its,ite<a name='539'>
+         flx(i,k)   = 0.<a name='540'>
+         flxd(i,k)  = 0.<a name='541'>
+      end do<a name='542'>
+      end do<a name='543'>
+<font color=#447700>!<a name='544'></font>
+<font color=#447700>! ... Solar zenith angle<a name='545'></font>
+<font color=#447700>!<a name='546'></font>
+      do i = its,ite<a name='547'>
+        xt24 = dmod(dble(xtime + radfrq * 0.5), dble(1440.))<a name='548'>
+        tloctm = GMT + xt24 / 60. + XLONG(i,j) / 15.<a name='549'>
+        hrang = 15. * (tloctm - 12.) * degrad<a name='550'>
+        xxlat = XLAT(i,j) * degrad<a name='551'>
+        cosz(i) = sin(xxlat) * sin(declin) + &amp;<a name='552'>
+                  cos(xxlat) * cos(declin) * cos(hrang)<a name='553'>
+        rsuvbm(i) = ALB(i,j)<a name='554'>
+        rsuvdf(i) = ALB(i,j)<a name='555'>
+        rsirbm(i) = ALB(i,j)<a name='556'>
+        rsirdf(i) = ALB(i,j)<a name='557'>
+      end do<a name='558'>
+                                  <a name='559'>
+      call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SORAD'>sorad</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#GSFCSWRAD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SORAD_1"> (mix,1,1,mkx+1,p8w2D,t2D,sh2D,o3,                 &amp;<a name='560'>
+                  overcast,cldwater,cwc,taucld,reff,fcld2D,ict,icb,&amp;<a name='561'>
+                  taual,ssaal,asyal,                               &amp;<a name='562'>
+                  cosz,rsuvbm,rsuvdf,rsirbm,rsirdf,                &amp;<a name='563'>
+                  flx,flxd)<a name='564'>
+<font color=#447700>!<a name='565'></font>
+<font color=#447700>! ... Convert the units of flx and flc from fraction to w/m^2<a name='566'></font>
+<font color=#447700>!<a name='567'></font>
+      do k = kts, kte<a name='568'>
+      do i = its, ite<a name='569'>
+         taucldc(i,k,j)=taucld(i,k,2)<a name='570'>
+         taucldi(i,k,j)=taucld(i,k,1)<a name='571'>
+      enddo<a name='572'>
+      enddo<a name='573'>
+ <a name='574'>
+      do k = kts, kte+1<a name='575'>
+        do i = its, ite<a name='576'>
+          if (cosz(i) .lt. thresh) then<a name='577'>
+            flx(i,k) = 0.<a name='578'>
+          else<a name='579'>
+            flx(i,k) = flx(i,k) * SOLCON * cosz(i)<a name='580'>
+          endif<a name='581'>
+        end do<a name='582'>
+      end do<a name='583'>
+<font color=#447700>!<a name='584'></font>
+<font color=#447700>! ... Calculate heating rate (deg/sec)<a name='585'></font>
+<font color=#447700>!<a name='586'></font>
+      fac = .01 * g / Cp<a name='587'>
+      do k = kts, kte<a name='588'>
+      do i = its, ite<a name='589'>
+         if (cosz(i) .gt. thresh) then<a name='590'>
+             TTEN2D(i,k) = - fac * (flx(i,k) - flx(i,k+1))/ &amp;<a name='591'>
+                           (p8w2d(i,k)-p8w2d(i,k+1))<a name='592'>
+         endif<a name='593'>
+      end do<a name='594'>
+      end do<a name='595'>
+<a name='596'>
+<font color=#447700>!<a name='597'></font>
+<font color=#447700>! ... Absorbed part in surface energy budget<a name='598'></font>
+<font color=#447700>!<a name='599'></font>
+      do i = its, ite<a name='600'>
+        if (cosz(i) .le. thresh) then<a name='601'>
+          GSW(i,j) = 0.<a name='602'>
+        else<a name='603'>
+          GSW(i,j) = (1. - rsuvbm(i)) * flxd(i,kte+1) * SOLCON * cosz(i)<a name='604'>
+        endif<a name='605'>
+      end do<a name='606'>
+<a name='607'>
+      DO K=kts,kte          <a name='608'>
+         NK=kme-1-K+kms<a name='609'>
+         DO I=its,ite          <a name='610'>
+            RTHRATEN(I,K,J)=RTHRATEN(I,K,J)+TTEN2D(I,NK)/pi3D(I,K,J)<a name='611'>
+         ENDDO<a name='612'>
+      ENDDO<a name='613'>
+<font color=#447700>!<a name='614'></font>
+   ENDDO j_loop                                          <a name='615'>
+<a name='616'>
+   END SUBROUTINE GSFCSWRAD<a name='617'>
+<a name='618'>
+<font color=#447700>!*********************   Version Solar-6 (May 8, 1997)  *****************<a name='619'></font>
+<a name='620'>
+<A NAME='SORAD'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SORAD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='621'>
+      <font color=#993300>subroutine </font><font color=#cc0000>sorad</font> (m,n,ndim,np,pl,ta,wa,oa,                        &amp; <A href='../../call_to/SORAD.html' TARGET='index'>1</A>,<A href='../../call_from/SORAD.html' TARGET='index'>3</A><a name='622'>
+                        overcast,cldwater,cwc,taucld,reff,fcld,ict,icb, &amp;<a name='623'>
+                        taual,ssaal,asyal,                              &amp;<a name='624'>
+                        cosz,rsuvbm,rsuvdf,rsirbm,rsirdf,               &amp;<a name='625'>
+                        flx,flxd)<a name='626'>
+<a name='627'>
+<font color=#447700>!************************************************************************<a name='628'></font>
+<font color=#447700>!<a name='629'></font>
+<font color=#447700>!                        Version Solar-6 (May 8, 1997)<a name='630'></font>
+<font color=#447700>!<a name='631'></font>
+<font color=#447700>!  New feature of this version is:<a name='632'></font>
+<font color=#447700>!   (1) An option is added for scaling the cloud optical thickness. If<a name='633'></font>
+<font color=#447700>!       the fractional cloud cover, fcld, in an atmospheric model is alway <a name='634'></font>
+<font color=#447700>!       either 1 or 0 (i.e. partly cloudy sky is not allowed), it does<a name='635'></font>
+<font color=#447700>!       not require the scaling of cloud optical thickness, and the<a name='636'></font>
+<font color=#447700>!       option "overcast" can be set to .true.  Computation is faster<a name='637'></font>
+<font color=#447700>!       with this option than with overcast=.false.<a name='638'></font>
+<font color=#447700>!<a name='639'></font>
+<font color=#447700>!**********************************************************************<a name='640'></font>
+<font color=#447700>!<a name='641'></font>
+<font color=#447700>!                        Version Solar-5 (April 1997)<a name='642'></font>
+<font color=#447700>!<a name='643'></font>
+<font color=#447700>!  New features of this version are:<a name='644'></font>
+<font color=#447700>!   (1) Cloud optical properties can be computed from cloud water/ice<a name='645'></font>
+<font color=#447700>!       amount and the effective particle size.<a name='646'></font>
+<font color=#447700>!   (2) Aerosol optical properties are functions of height and band.<a name='647'></font>
+<font color=#447700>!   (3) A maximum-random cloud overlapping approximation is applied.<a name='648'></font>
+<font color=#447700>!<a name='649'></font>
+<font color=#447700>!*********************************************************************<a name='650'></font>
+<font color=#447700>!  <a name='651'></font>
+<font color=#447700>! This routine computes solar fluxes due to the absoption by water<a name='652'></font>
+<font color=#447700>!  vapor, ozone, co2, o2, clouds, and aerosols and due to the<a name='653'></font>
+<font color=#447700>!  scattering by clouds, aerosols, and gases.<a name='654'></font>
+<font color=#447700>!<a name='655'></font>
+<font color=#447700>! The solar spectrum is divided into one UV+visible band and three IR<a name='656'></font>
+<font color=#447700>!  bands separated by the wavelength 0.7 micron.  The UV+visible band<a name='657'></font>
+<font color=#447700>!  is further divided into eight sub-bands.<a name='658'></font>
+<font color=#447700>!<a name='659'></font>
+<font color=#447700>! This is a vectorized code. It computes fluxes simultaneously for<a name='660'></font>
+<font color=#447700>!  (m x n) soundings, which is a subset of (m x ndim) soundings.<a name='661'></font>
+<font color=#447700>!  In a global climate model, m and ndim correspond to the numbers of<a name='662'></font>
+<font color=#447700>!  grid boxes in the zonal and meridional directions, respectively.<a name='663'></font>
+<font color=#447700>!<a name='664'></font>
+<font color=#447700>! Ice and liquid cloud particles are allowed to co-exist in a layer. <a name='665'></font>
+<font color=#447700>!<a name='666'></font>
+<font color=#447700>! There is an option of providing either cloud ice/water mixing ratio <a name='667'></font>
+<font color=#447700>!  (cwc) or thickness (taucld).  If the former is provided, set<a name='668'></font>
+<font color=#447700>!  cldwater=.true., and taucld will be computed from cwc and reff as a<a name='669'></font>
+<font color=#447700>!  function of spectra band. Otherwise, set cldwater=.false., and<a name='670'></font>
+<font color=#447700>!  specify taucld, independent of spectral band.<a name='671'></font>
+<font color=#447700>!<a name='672'></font>
+<font color=#447700>! If no information is available for reff, a default value of<a name='673'></font>
+<font color=#447700>!  10 micron for liquid water and 75 micron for ice can be used.<a name='674'></font>
+<font color=#447700>!  For a clear layer, reff can be set to any values except zero.<a name='675'></font>
+<font color=#447700>!<a name='676'></font>
+<font color=#447700>! The maximum-random assumption is applied for treating cloud<a name='677'></font>
+<font color=#447700>!  overlapping.<a name='678'></font>
+<a name='679'>
+<font color=#447700>! Clouds are grouped into high, middle, and low clouds separated by<a name='680'></font>
+<font color=#447700>!  the level indices ict and icb.  For detail, see subroutine cldscale.<a name='681'></font>
+<font color=#447700>!<a name='682'></font>
+<font color=#447700>! In a high spatial-resolution atmospheric model, fractional cloud cover<a name='683'></font>
+<font color=#447700>!  might be computed to be either 0 or 1.  In such a case, scaling of the<a name='684'></font>
+<font color=#447700>!  cloud optical thickness is not necessary, and the computation can be<a name='685'></font>
+<font color=#447700>!  made faster by setting overcast=.true.  The option overcast=.false.<a name='686'></font>
+<font color=#447700>!  can be applied to any values of the fractional cloud cover, but the<a name='687'></font>
+<font color=#447700>!  computation is slower.<a name='688'></font>
+<font color=#447700>!<a name='689'></font>
+<font color=#447700>! Aerosol optical thickness, single-scattering albaedo, and asymmtry<a name='690'></font>
+<font color=#447700>!  factor can be specified as functions of height and spectral band.<a name='691'></font>
+<font color=#447700>!<a name='692'></font>
+<font color=#447700>!----- Input parameters:                           <a name='693'></font>
+<font color=#447700>!                                                   units      size<a name='694'></font>
+<font color=#447700>!  number of soundings in zonal direction (m)       n/d        1<a name='695'></font>
+<font color=#447700>!  number of soundings in meridional direction (n)  n/d        1<a name='696'></font>
+<font color=#447700>!  maximum number of soundings in                   n/d        1<a name='697'></font>
+<font color=#447700>!         meridional direction (ndim&gt;=n)<a name='698'></font>
+<font color=#447700>!  number of atmospheric layers (np)                n/d        1<a name='699'></font>
+<font color=#447700>!  level pressure (pl)                              mb     m*ndim*(np+1)<a name='700'></font>
+<font color=#447700>!  layer temperature (ta)                           k        m*ndim*np<a name='701'></font>
+<font color=#447700>!  layer specific humidity (wa)                     gm/gm    m*ndim*np<a name='702'></font>
+<font color=#447700>!  layer ozone concentration (oa)                   gm/gm    m*ndim*np<a name='703'></font>
+<font color=#447700>!  co2 mixing ratio by volumn (co2)                 pppv       1<a name='704'></font>
+<font color=#447700>!  option for scaling cloud optical thickness       n/d        1<a name='705'></font>
+<font color=#447700>!        overcast="true" if scaling is NOT required<a name='706'></font>
+<font color=#447700>!        overcast="fasle" if scaling is required<a name='707'></font>
+<font color=#447700>!  option for cloud optical thickness               n/d        1<a name='708'></font>
+<font color=#447700>!        cldwater="true" if cwc is provided<a name='709'></font>
+<font color=#447700>!        cldwater="false" if taucld is provided<a name='710'></font>
+<font color=#447700>!  cloud water mixing ratio (cwc)                  gm/gm     m*ndim*np*2<a name='711'></font>
+<font color=#447700>!        index 1 for ice particles<a name='712'></font>
+<font color=#447700>!        index 2 for liquid drops<a name='713'></font>
+<font color=#447700>!  cloud optical thickness (taucld)                 n/d      m*ndim*np*2<a name='714'></font>
+<font color=#447700>!        index 1 for ice particles<a name='715'></font>
+<font color=#447700>!        index 2 for liquid drops<a name='716'></font>
+<font color=#447700>!  effective cloud-particle size (reff)          micrometer m*ndim*np*2<a name='717'></font>
+<font color=#447700>!        index 1 for ice particles<a name='718'></font>
+<font color=#447700>!        index 2 for liquid drops<a name='719'></font>
+<font color=#447700>!  cloud amount (fcld)                            fraction   m*ndim*np<a name='720'></font>
+<font color=#447700>!  level index separating high and middle           n/d        1<a name='721'></font>
+<font color=#447700>!        clouds (ict)<a name='722'></font>
+<font color=#447700>!  level index separating middle and low            n/d        1<a name='723'></font>
+<font color=#447700>!          clouds (icb)<a name='724'></font>
+<font color=#447700>!  aerosol optical thickness (taual)                n/d    m*ndim*np*11<a name='725'></font>
+<font color=#447700>!  aerosol single-scattering albedo (ssaal)         n/d    m*ndim*np*11<a name='726'></font>
+<font color=#447700>!  aerosol asymmetry factor (asyal)                 n/d    m*ndim*np*11<a name='727'></font>
+<font color=#447700>!        in the uv region :<a name='728'></font>
+<font color=#447700>!           index  1 for the 0.175-0.225 micron band<a name='729'></font>
+<font color=#447700>!           index  2 for the 0.225-0.245; 0.260-0.280 micron band<a name='730'></font>
+<font color=#447700>!           index  3 for the 0.245-0.260 micron band<a name='731'></font>
+<font color=#447700>!           index  4 for the 0.280-0.295 micron band<a name='732'></font>
+<font color=#447700>!           index  5 for the 0.295-0.310 micron band<a name='733'></font>
+<font color=#447700>!           index  6 for the 0.310-0.320 micron band<a name='734'></font>
+<font color=#447700>!           index  7 for the 0.325-0.400 micron band<a name='735'></font>
+<font color=#447700>!        in the par region :<a name='736'></font>
+<font color=#447700>!           index  8 for the 0.400-0.700 micron band<a name='737'></font>
+<font color=#447700>!        in the infrared region :<a name='738'></font>
+<font color=#447700>!           index  9 for the 0.700-1.220 micron band<a name='739'></font>
+<font color=#447700>!           index 10 for the 1.220-2.270 micron band<a name='740'></font>
+<font color=#447700>!           index 11 for the 2.270-10.00 micron band<a name='741'></font>
+<font color=#447700>!   cosine of solar zenith angle (cosz)              n/d      m*ndim<a name='742'></font>
+<font color=#447700>!   uv+visible sfc albedo for beam radiation<a name='743'></font>
+<font color=#447700>!        for wavelengths&lt;0.7 micron (rsuvbm)    fraction   m*ndim<a name='744'></font>
+<font color=#447700>!   uv+visible sfc albedo for diffuse radiation<a name='745'></font>
+<font color=#447700>!        for wavelengths&lt;0.7 micron (rsuvdf)    fraction   m*ndim<a name='746'></font>
+<font color=#447700>!   ir sfc albedo for beam radiation<a name='747'></font>
+<font color=#447700>!        for wavelengths&gt;0.7 micron  (rsirbm)   fraction   m*ndim<a name='748'></font>
+<font color=#447700>!   ir sfc albedo for diffuse radiation (rsirdf)   fraction   m*ndim<a name='749'></font>
+<font color=#447700>!<a name='750'></font>
+<font color=#447700>!----- Output parameters<a name='751'></font>
+<font color=#447700>!<a name='752'></font>
+<font color=#447700>!   all-sky flux (downward minus upward) (flx)    fraction m*ndim*(np+1)<a name='753'></font>
+<font color=#447700>!   clear-sky flux (downward minus upward) (flc)  fraction m*ndim*(np+1)<a name='754'></font>
+<font color=#447700>!   all-sky direct downward uv (0.175-0.4 micron)<a name='755'></font>
+<font color=#447700>!                flux at the surface (fdiruv)      fraction   m*ndim<a name='756'></font>
+<font color=#447700>!   all-sky diffuse downward uv flux at<a name='757'></font>
+<font color=#447700>!                the surface (fdifuv)              fraction   m*ndim<a name='758'></font>
+<font color=#447700>!   all-sky direct downward par (0.4-0.7 micron)<a name='759'></font>
+<font color=#447700>!                flux at the surface (fdirpar)     fraction   m*ndim<a name='760'></font>
+<font color=#447700>!   all-sky diffuse downward par flux at<a name='761'></font>
+<font color=#447700>!                the surface (fdifpar)             fraction   m*ndim<a name='762'></font>
+<font color=#447700>!   all-sky direct downward ir (0.7-10 micron)<a name='763'></font>
+<font color=#447700>!                flux at the surface (fdirir)      fraction   m*ndim<a name='764'></font>
+<font color=#447700>!   all-sky diffuse downward ir flux at<a name='765'></font>
+<font color=#447700>!                the surface (fdifir)              fraction   m*ndim<a name='766'></font>
+<font color=#447700>!<a name='767'></font>
+<font color=#447700>!----- Notes:<a name='768'></font>
+<font color=#447700>!<a name='769'></font>
+<font color=#447700>!    (1) The unit of "flux" is fraction of the incoming solar radiation<a name='770'></font>
+<font color=#447700>!        at the top of the atmosphere.  Therefore, fluxes should<a name='771'></font>
+<font color=#447700>!        be equal to "flux" multiplied by the extra-terrestrial solar<a name='772'></font>
+<font color=#447700>!        flux and the cosine of solar zenith angle.<a name='773'></font>
+<font color=#447700>!    (2) pl(i,j,1) is the pressure at the top of the model, and<a name='774'></font>
+<font color=#447700>!        pl(i,j,np+1) is the surface pressure.<a name='775'></font>
+<font color=#447700>!    (3) the pressure levels ict and icb correspond approximately<a name='776'></font>
+<font color=#447700>!        to 400 and 700 mb.<a name='777'></font>
+<font color=#447700>!    (4) if overcast=true, the clear-sky flux, flc, is not computed.<a name='778'></font>
+<font color=#447700>!        <a name='779'></font>
+<font color=#447700>!**************************************************************************<a name='780'></font>
+      implicit none<a name='781'>
+<font color=#447700>!**************************************************************************<a name='782'></font>
+<a name='783'>
+<font color=#447700>!-----input parameters<a name='784'></font>
+<a name='785'>
+      integer m,n,ndim,np<a name='786'>
+      integer ict(m,ndim),icb(m,ndim)<a name='787'>
+      real pl(m,ndim,np+1),ta(m,ndim,np),wa(m,ndim,np),oa(m,ndim,np)<a name='788'>
+      real cwc(m,ndim,np,2),taucld(m,ndim,np,2),reff(m,ndim,np,2), &amp;<a name='789'>
+             fcld(m,ndim,np)<a name='790'>
+      real taual(m,ndim,np,11),ssaal(m,ndim,np,11),asyal(m,ndim,np,11)<a name='791'>
+      real cosz(m,ndim),rsuvbm(m,ndim),rsuvdf(m,ndim), &amp;<a name='792'>
+             rsirbm(m,ndim),rsirdf(m,ndim)           <a name='793'>
+      logical overcast,cldwater<a name='794'>
+<a name='795'>
+<font color=#447700>!-----output parameters<a name='796'></font>
+<a name='797'>
+      real flx(m,ndim,np+1),flc(m,ndim,np+1)<a name='798'>
+      real flxu(m,ndim,np+1),flxd(m,ndim,np+1)<a name='799'>
+      real fdiruv (m,ndim),fdifuv (m,ndim)<a name='800'>
+      real fdirpar(m,ndim),fdifpar(m,ndim)<a name='801'>
+      real fdirir (m,ndim),fdifir (m,ndim)<a name='802'>
+<a name='803'>
+<font color=#447700>!-----temporary array<a name='804'></font>
+ <a name='805'>
+      integer i,j,k<a name='806'>
+      real cwp(m,n,np,2)<a name='807'>
+      real dp(m,n,np),wh(m,n,np),oh(m,n,np),scal(m,n,np)<a name='808'>
+      real swh(m,n,np+1),so2(m,n,np+1),df(m,n,np+1)<a name='809'>
+      real sdf(m,n),sclr(m,n),csm(m,n),x<a name='810'>
+ <a name='811'>
+      do j= 1, n <a name='812'>
+       do i= 1, m <a name='813'>
+          if (pl(i,j,1) .eq. 0.0) then<a name='814'>
+              pl(i,j,1)=1.0e-4<a name='815'>
+          endif<a name='816'>
+       enddo<a name='817'>
+      enddo<a name='818'>
+<a name='819'>
+      do j= 1, n <a name='820'>
+       do i= 1, m <a name='821'>
+<a name='822'>
+         swh(i,j,1)=0. <a name='823'>
+         so2(i,j,1)=0. <a name='824'>
+<a name='825'>
+<font color=#447700>!-----csm is the effective secant of the solar zenith angle<a name='826'></font>
+<font color=#447700>!     see equation (12) of Lacis and Hansen (1974, JAS)    <a name='827'></font>
+ <a name='828'>
+         csm(i,j)=35./sqrt(1224.*cosz(i,j)*cosz(i,j)+1.)<a name='829'>
+<a name='830'>
+       enddo <a name='831'>
+      enddo<a name='832'>
+<a name='833'>
+      do k= 1, np<a name='834'>
+       do j= 1, n<a name='835'>
+         do i= 1, m<a name='836'>
+<a name='837'>
+<font color=#447700>!-----compute layer thickness and pressure-scaling function. <a name='838'></font>
+<font color=#447700>!     indices for the surface level and surface layer<a name='839'></font>
+<font color=#447700>!     are np+1 and np, respectively.<a name='840'></font>
+ <a name='841'>
+          dp(i,j,k)=pl(i,j,k+1)-pl(i,j,k)<a name='842'>
+          scal(i,j,k)=dp(i,j,k)*(.5*(pl(i,j,k)+pl(i,j,k+1))/300.)**.8<a name='843'>
+ <a name='844'>
+<font color=#447700>!-----compute scaled water vapor amount, unit is g/cm**2<a name='845'></font>
+<font color=#447700>!     note: the sign prior to the constant 0.00135 was incorrectly <a name='846'></font>
+<font color=#447700>!           set to negative in the previous version<a name='847'></font>
+<a name='848'>
+          wh(i,j,k)=1.02*wa(i,j,k)*scal(i,j,k)* &amp;<a name='849'>
+                    (1.+0.00135*(ta(i,j,k)-240.)) +1.e-11<a name='850'>
+          swh(i,j,k+1)=swh(i,j,k)+wh(i,j,k)<a name='851'>
+<a name='852'>
+<font color=#447700>!-----compute ozone amount, unit is (cm-atm)stp<a name='853'></font>
+<font color=#447700>!     the number 466.7 is a conversion factor from g/cm**2 to (cm-atm)stp<a name='854'></font>
+ <a name='855'>
+          oh(i,j,k)=1.02*oa(i,j,k)*dp(i,j,k)*466.7 +1.e-11<a name='856'>
+<a name='857'>
+<font color=#447700>!-----compute layer cloud water amount (gm/m**2)<a name='858'></font>
+<font color=#447700>!     the index is 1 for ice crystals and 2 for liquid drops<a name='859'></font>
+<a name='860'>
+          cwp(i,j,k,1)=1.02*10000.*cwc(i,j,k,1)*dp(i,j,k)<a name='861'>
+          cwp(i,j,k,2)=1.02*10000.*cwc(i,j,k,2)*dp(i,j,k)<a name='862'>
+<a name='863'>
+        enddo<a name='864'>
+       enddo<a name='865'>
+      enddo<a name='866'>
+<a name='867'>
+<font color=#447700>!-----initialize fluxes for all-sky (flx), clear-sky (flc), and<a name='868'></font>
+<font color=#447700>!     flux reduction (df)<a name='869'></font>
+<a name='870'>
+      do k=1, np+1<a name='871'>
+       do j=1, n<a name='872'>
+        do i=1, m<a name='873'>
+          flx(i,j,k)=0.<a name='874'>
+          flc(i,j,k)=0.<a name='875'>
+          flxu(i,j,k)=0.<a name='876'>
+          flxd(i,j,k)=0.<a name='877'>
+          df(i,j,k)=0.<a name='878'>
+        enddo<a name='879'>
+       enddo<a name='880'>
+      enddo<a name='881'>
+<a name='882'>
+<font color=#447700>!-----compute solar uv and par fluxes<a name='883'></font>
+<a name='884'>
+      call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV'>soluv</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SORAD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLUV_1"> (m,n,ndim,np,oh,dp,overcast,cldwater,  &amp;<a name='885'>
+                  cwp,taucld,reff,ict,icb,fcld,cosz,    &amp;<a name='886'>
+                  taual,ssaal,asyal,csm,rsuvbm,rsuvdf,  &amp;<a name='887'>
+                  flx,flc,flxu,flxd,fdiruv,fdifuv,fdirpar,fdifpar)<a name='888'>
+<a name='889'>
+<font color=#447700>!-----compute and update solar ir fluxes<a name='890'></font>
+<a name='891'>
+      call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR'>solir</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SORAD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLIR_1"> (m,n,ndim,np,wh,overcast,cldwater,     &amp;<a name='892'>
+                  cwp,taucld,reff,ict,icb,fcld,cosz,    &amp;<a name='893'>
+                  taual,ssaal,asyal,csm,rsirbm,rsirdf,  &amp;<a name='894'>
+                  flx,flc,flxu,flxd,fdirir,fdifir)<a name='895'>
+<a name='896'>
+<font color=#447700>!-----compute scaled o2 amount, unit is (cm-atm)stp.<a name='897'></font>
+<a name='898'>
+      do k= 1, np<a name='899'>
+       do j= 1, n<a name='900'>
+        do i= 1, m<a name='901'>
+          so2(i,j,k+1)=so2(i,j,k)+165.22*scal(i,j,k)<a name='902'>
+        enddo<a name='903'>
+       enddo<a name='904'>
+      enddo<a name='905'>
+<a name='906'>
+<font color=#447700>!-----compute flux reduction due to oxygen following<a name='907'></font>
+<font color=#447700>!      chou (J. climate, 1990). The fraction 0.0287 is the<a name='908'></font>
+<font color=#447700>!      extraterrestrial solar flux in the o2 bands.<a name='909'></font>
+<a name='910'>
+       do k= 2, np+1<a name='911'>
+        do j= 1, n<a name='912'>
+         do i= 1, m<a name='913'>
+           x=so2(i,j,k)*csm(i,j)<a name='914'>
+           df(i,j,k)=df(i,j,k)+0.0287*(1.-exp(-0.00027*sqrt(x)))<a name='915'>
+         enddo<a name='916'>
+        enddo<a name='917'>
+       enddo          <a name='918'>
+<a name='919'>
+<font color=#447700>!-----compute scaled co2 amounts. unit is (cm-atm)stp.<a name='920'></font>
+<a name='921'>
+      do k= 1, np<a name='922'>
+       do j= 1, n<a name='923'>
+        do i= 1, m<a name='924'>
+         so2(i,j,k+1)=so2(i,j,k)+co2*789.*scal(i,j,k)+1.e-11<a name='925'>
+        enddo<a name='926'>
+       enddo<a name='927'>
+      enddo<a name='928'>
+<a name='929'>
+<font color=#447700>!-----compute and update flux reduction due to co2 following<a name='930'></font>
+<font color=#447700>!     chou (J. Climate, 1990)<a name='931'></font>
+<a name='932'>
+      call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#FLXCO2'>flxco2</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SORAD' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="FLXCO2_1">(m,n,np,so2,swh,csm,df)<a name='933'>
+<a name='934'>
+<font color=#447700>!-----adjust for the effect of o2 cnd co2 on clear-sky fluxes.<a name='935'></font>
+<a name='936'>
+      do k= 2, np+1<a name='937'>
+       do j= 1, n<a name='938'>
+        do i= 1, m<a name='939'>
+          flc(i,j,k)=flc(i,j,k)-df(i,j,k)<a name='940'>
+        enddo<a name='941'>
+       enddo<a name='942'>
+      enddo<a name='943'>
+<a name='944'>
+<font color=#447700>!-----adjust for the all-sky fluxes due to o2 and co2.  It is<a name='945'></font>
+<font color=#447700>!     assumed that o2 and co2 have no effects on solar radiation<a name='946'></font>
+<font color=#447700>!     below clouds.<a name='947'></font>
+<a name='948'>
+      do j=1,n<a name='949'>
+       do i=1,m<a name='950'>
+        sdf(i,j)=0.0<a name='951'>
+        sclr(i,j)=1.0<a name='952'>
+       enddo<a name='953'>
+      enddo<a name='954'>
+<a name='955'>
+      do k=1,np<a name='956'>
+       do j=1,n<a name='957'>
+        do i=1,m<a name='958'>
+<a name='959'>
+<font color=#447700>!-----sclr is the fraction of clear sky.<a name='960'></font>
+<font color=#447700>!     sdf is the flux reduction below clouds.<a name='961'></font>
+<a name='962'>
+         if(fcld(i,j,k).gt.0.01) then<a name='963'>
+          sdf(i,j)=sdf(i,j)+df(i,j,k)*sclr(i,j)*fcld(i,j,k)<a name='964'>
+          sclr(i,j)=sclr(i,j)*(1.-fcld(i,j,k))<a name='965'>
+         endif<a name='966'>
+          flx(i,j,k+1)=flx(i,j,k+1)-sdf(i,j)-df(i,j,k+1)*sclr(i,j)<a name='967'>
+          flxu(i,j,k+1)=flxu(i,j,k+1)-sdf(i,j)-df(i,j,k+1)*sclr(i,j)<a name='968'>
+          flxd(i,j,k+1)=flxd(i,j,k+1)-sdf(i,j)-df(i,j,k+1)*sclr(i,j)<a name='969'>
+<a name='970'>
+        enddo<a name='971'>
+       enddo<a name='972'>
+      enddo<a name='973'>
+<a name='974'>
+<font color=#447700>!-----adjustment for the direct downward ir flux.<a name='975'></font>
+<a name='976'>
+      do j= 1, n<a name='977'>
+       do i= 1, m<a name='978'>
+        flc(i,j,np+1)=flc(i,j,np+1)+df(i,j,np+1)*rsirbm(i,j)<a name='979'>
+        flx(i,j,np+1)=flx(i,j,np+1)+(sdf(i,j)+ &amp;<a name='980'>
+                         df(i,j,np+1)*sclr(i,j))*rsirbm(i,j)<a name='981'>
+        flxu(i,j,np+1)=flxu(i,j,np+1)+(sdf(i,j)+ &amp;<a name='982'>
+                         df(i,j,np+1)*sclr(i,j))*rsirbm(i,j)<a name='983'>
+        flxd(i,j,np+1)=flxd(i,j,np+1)+(sdf(i,j)+ &amp;<a name='984'>
+                         df(i,j,np+1)*sclr(i,j))*rsirbm(i,j)<a name='985'>
+        fdirir(i,j)=fdirir(i,j)-(sdf(i,j)+df(i,j,np+1)*sclr(i,j))<a name='986'>
+       enddo<a name='987'>
+      enddo<a name='988'>
+<a name='989'>
+      end subroutine sorad <a name='990'>
+<a name='991'>
+<font color=#447700>!************************************************************************<a name='992'></font>
+<a name='993'>
+<A NAME='SOLUV'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='994'>
+      <font color=#993300>subroutine </font><font color=#cc0000>soluv</font> (m,n,ndim,np,oh,dp,overcast,cldwater,            &amp; <A href='../../call_to/SOLUV.html' TARGET='index'>1</A>,<A href='../../call_from/SOLUV.html' TARGET='index'>6</A><a name='995'>
+                cwp,taucld,reff,ict,icb,fcld,cosz,                      &amp;<a name='996'>
+                taual,ssaal,asyal,csm,rsuvbm,rsuvdf,                    &amp;<a name='997'>
+                flx,flc,flxu,flxd,fdiruv,fdifuv,fdirpar,fdifpar)<a name='998'>
+<a name='999'>
+<font color=#447700>!************************************************************************<a name='1000'></font>
+<font color=#447700>!  compute solar fluxes in the uv+par region. the spectrum is<a name='1001'></font>
+<font color=#447700>!  grouped into 8 bands:<a name='1002'></font>
+<font color=#447700>!  <a name='1003'></font>
+<font color=#447700>!              Band     Micrometer<a name='1004'></font>
+<font color=#447700>!<a name='1005'></font>
+<font color=#447700>!       UV-C    1.     .175 - .225<a name='1006'></font>
+<font color=#447700>!               2.     .225 - .245<a name='1007'></font>
+<font color=#447700>!                      .260 - .280<a name='1008'></font>
+<font color=#447700>!               3.     .245 - .260<a name='1009'></font>
+<font color=#447700>!<a name='1010'></font>
+<font color=#447700>!       UV-B    4.     .280 - .295<a name='1011'></font>
+<font color=#447700>!               5.     .295 - .310<a name='1012'></font>
+<font color=#447700>!               6.     .310 - .320<a name='1013'></font>
+<font color=#447700>!      <a name='1014'></font>
+<font color=#447700>!       UV-A    7.     .320 - .400<a name='1015'></font>
+<font color=#447700>!      <a name='1016'></font>
+<font color=#447700>!       PAR     8.     .400 - .700<a name='1017'></font>
+<font color=#447700>!<a name='1018'></font>
+<font color=#447700>!----- Input parameters:                            units      size<a name='1019'></font>
+<font color=#447700>!<a name='1020'></font>
+<font color=#447700>!  number of soundings in zonal direction (m)       n/d        1<a name='1021'></font>
+<font color=#447700>!  number of soundings in meridional direction (n)  n/d        1<a name='1022'></font>
+<font color=#447700>!  maximum number of soundings in                   n/d        1<a name='1023'></font>
+<font color=#447700>!        meridional direction (ndim)<a name='1024'></font>
+<font color=#447700>!  number of atmospheric layers (np)                n/d        1<a name='1025'></font>
+<font color=#447700>!  layer ozone content (oh)                      (cm-atm)stp m*n*np<a name='1026'></font>
+<font color=#447700>!  layer pressure thickness (dp)                    mb       m*n*np<a name='1027'></font>
+<font color=#447700>!  option for scaling cloud optical thickness       n/d        1<a name='1028'></font>
+<font color=#447700>!        overcast="true" if scaling is NOT required<a name='1029'></font>
+<font color=#447700>!        overcast="fasle" if scaling is required<a name='1030'></font>
+<font color=#447700>!  input option for cloud optical thickness         n/d        1<a name='1031'></font>
+<font color=#447700>!        cldwater="true" if taucld is provided<a name='1032'></font>
+<font color=#447700>!        cldwater="false" if cwp is provided<a name='1033'></font>
+<font color=#447700>!  cloud water amount (cwp)                        gm/m**2   m*n*np*2<a name='1034'></font>
+<font color=#447700>!        index 1 for ice particles<a name='1035'></font>
+<font color=#447700>!        index 2 for liquid drops<a name='1036'></font>
+<font color=#447700>!  cloud optical thickness (taucld)                 n/d     m*ndim*np*2<a name='1037'></font>
+<font color=#447700>!       index 1 for ice paticles<a name='1038'></font>
+<font color=#447700>!       index 2 for liquid particles<a name='1039'></font>
+<font color=#447700>!  effective cloud-particle size (reff)          micrometer m*ndim*np*2<a name='1040'></font>
+<font color=#447700>!       index 1 for ice paticles<a name='1041'></font>
+<font color=#447700>!       index 2 for liquid particles<a name='1042'></font>
+<font color=#447700>!  level indiex separating high and                 n/d      m*n<a name='1043'></font>
+<font color=#447700>!       middle clouds (ict)<a name='1044'></font>
+<font color=#447700>!  level indiex separating middle and               n/d      m*n<a name='1045'></font>
+<font color=#447700>!       low clouds (icb)<a name='1046'></font>
+<font color=#447700>!  cloud amount (fcld)                            fraction   m*ndim*np<a name='1047'></font>
+<font color=#447700>!  cosine of solar zenith angle (cosz)              n/d      m*ndim<a name='1048'></font>
+<font color=#447700>!  aerosol optical thickness (taual)                n/d    m*ndim*np*11<a name='1049'></font>
+<font color=#447700>!  aerosol single-scattering albedo (ssaal)         n/d    m*ndim*np*11<a name='1050'></font>
+<font color=#447700>!  aerosol asymmetry factor (asyal)                 n/d    m*ndim*np*11<a name='1051'></font>
+<font color=#447700>!  cosecant of the solar zenith angle (csm)         n/d      m*n<a name='1052'></font>
+<font color=#447700>!  uv+par surface albedo for beam                 fraction   m*ndim<a name='1053'></font>
+<font color=#447700>!       radiation (rsuvbm)<a name='1054'></font>
+<font color=#447700>!  uv+par surface albedo for diffuse              fraction   m*ndim<a name='1055'></font>
+<font color=#447700>!       radiation (rsuvdf)<a name='1056'></font>
+<font color=#447700>!<a name='1057'></font>
+<font color=#447700>!---- temporary array<a name='1058'></font>
+<font color=#447700>!<a name='1059'></font>
+<font color=#447700>!  scaled cloud optical thickness                   n/d      m*n*np<a name='1060'></font>
+<font color=#447700>!       for beam radiation (tauclb)<a name='1061'></font>
+<font color=#447700>!  scaled cloud optical thickness                   n/d      m*n*np<a name='1062'></font>
+<font color=#447700>!       for diffuse radiation  (tauclf)     <a name='1063'></font>
+<font color=#447700>!<a name='1064'></font>
+<font color=#447700>!----- output (updated) parameters:<a name='1065'></font>
+<font color=#447700>!<a name='1066'></font>
+<font color=#447700>!  all-sky net downward flux (flx)               fraction  m*ndim*(np+1)<a name='1067'></font>
+<font color=#447700>!  clear-sky net downward flux (flc)             fraction  m*ndim*(np+1)<a name='1068'></font>
+<font color=#447700>!  all-sky direct downward uv flux at<a name='1069'></font>
+<font color=#447700>!       the surface (fdiruv)                     fraction    m*ndim<a name='1070'></font>
+<font color=#447700>!  all-sky diffuse downward uv flux at<a name='1071'></font>
+<font color=#447700>!       the surface (fdifuv)                     fraction    m*ndim<a name='1072'></font>
+<font color=#447700>!  all-sky direct downward par flux at<a name='1073'></font>
+<font color=#447700>!       the surface (fdirpar)                    fraction    m*ndim<a name='1074'></font>
+<font color=#447700>!  all-sky diffuse downward par flux at<a name='1075'></font>
+<font color=#447700>!       the surface (fdifpar)                    fraction    m*ndim<a name='1076'></font>
+<font color=#447700>!<a name='1077'></font>
+<font color=#447700>!***********************************************************************<a name='1078'></font>
+      implicit none<a name='1079'>
+<font color=#447700>!***********************************************************************<a name='1080'></font>
+<a name='1081'>
+<font color=#447700>!-----input parameters<a name='1082'></font>
+<a name='1083'>
+      integer m,n,ndim,np<a name='1084'>
+      integer ict(m,ndim),icb(m,ndim)<a name='1085'>
+      real taucld(m,ndim,np,2),reff(m,ndim,np,2),fcld(m,ndim,np)<a name='1086'>
+      real cc(m,n,3),cosz(m,ndim)<a name='1087'>
+      real cwp(m,n,np,2),oh(m,n,np),dp(m,n,np)<a name='1088'>
+      real taual(m,ndim,np,11),ssaal(m,ndim,np,11),asyal(m,ndim,np,11)<a name='1089'>
+      real rsuvbm(m,ndim),rsuvdf(m,ndim),csm(m,n)<a name='1090'>
+      logical overcast,cldwater<a name='1091'>
+<a name='1092'>
+<font color=#447700>!-----output (updated) parameter<a name='1093'></font>
+<a name='1094'>
+      real flx(m,ndim,np+1),flc(m,ndim,np+1)<a name='1095'>
+      real flxu(m,ndim,np+1),flxd(m,ndim,np+1)<a name='1096'>
+      real fdiruv (m,ndim),fdifuv (m,ndim)<a name='1097'>
+      real fdirpar(m,ndim),fdifpar(m,ndim)<a name='1098'>
+<a name='1099'>
+<font color=#447700>!-----static parameters<a name='1100'></font>
+<a name='1101'>
+      integer nband<a name='1102'>
+      parameter (nband=8)<a name='1103'>
+      real hk(nband),xk(nband),ry(nband)<a name='1104'>
+      real aig(3),awg(3)<a name='1105'>
+<a name='1106'>
+<font color=#447700>!-----temporary array<a name='1107'></font>
+<a name='1108'>
+      integer i,j,k,ib<a name='1109'>
+      real tauclb(m,n,np),tauclf(m,n,np),asycl(m,n,np)<a name='1110'>
+      real taurs,tauoz,tausto,ssatau,asysto,tauto,ssato,asyto<a name='1111'>
+      real taux,reff1,reff2,g1,g2<a name='1112'>
+      real td(m,n,np+1,2),rr(m,n,np+1,2),tt(m,n,np+1,2), &amp;<a name='1113'>
+             rs(m,n,np+1,2),ts(m,n,np+1,2)<a name='1114'>
+      real fall(m,n,np+1),fclr(m,n,np+1),fsdir(m,n),fsdif(m,n)<a name='1115'>
+      real fallu(m,n,np+1),falld(m,n,np+1)<a name='1116'>
+      real asyclt(m,n)<a name='1117'>
+      real rr1t(m,n),tt1t(m,n),td1t(m,n),rs1t(m,n),ts1t(m,n)<a name='1118'>
+      real rr2t(m,n),tt2t(m,n),td2t(m,n),rs2t(m,n),ts2t(m,n)<a name='1119'>
+<a name='1120'>
+<font color=#447700>!-----hk is the fractional extra-terrestrial solar flux in each<a name='1121'></font>
+<font color=#447700>!     of the 8 bands.  the sum of hk is 0.47074.<a name='1122'></font>
+<a name='1123'>
+      data hk/.00057, .00367, .00083, .00417,  &amp;<a name='1124'>
+              .00600, .00556, .05913, .39081/<a name='1125'>
+<a name='1126'>
+<font color=#447700>!-----xk is the ozone absorption coefficient. unit: /(cm-atm)stp<a name='1127'></font>
+<a name='1128'>
+      data xk /30.47, 187.2,  301.9,   42.83, &amp;<a name='1129'>
+               7.09,  1.25,   0.0345,  0.0539/<a name='1130'>
+<a name='1131'>
+<font color=#447700>!-----ry is the extinction coefficient for Rayleigh scattering.<a name='1132'></font>
+<font color=#447700>!     unit: /mb.<a name='1133'></font>
+<a name='1134'>
+      data ry /.00604, .00170, .00222, .00132, &amp;<a name='1135'>
+               .00107, .00091, .00055, .00012/<a name='1136'>
+<a name='1137'>
+<font color=#447700>!-----coefficients for computing the asymmetry factor of ice clouds<a name='1138'></font>
+<font color=#447700>!     from asycl=aig(*,1)+aig(*,2)*reff+aig(*,3)*reff**2, independent<a name='1139'></font>
+<font color=#447700>!     of spectral band.<a name='1140'></font>
+<a name='1141'>
+      data aig/.74625000,.00105410,-.00000264/<a name='1142'>
+<a name='1143'>
+<font color=#447700>!-----coefficients for computing the asymmetry factor of liquid<a name='1144'></font>
+<font color=#447700>!     clouds from asycl=awg(*,1)+awg(*,2)*reff+awg(*,3)*reff**2,<a name='1145'></font>
+<font color=#447700>!     independent of spectral band.<a name='1146'></font>
+<a name='1147'>
+      data awg/.82562000,.00529000,-.00014866/<a name='1148'>
+<a name='1149'>
+<font color=#447700>!-----initialize fdiruv, fdifuv, surface reflectances and transmittances.<a name='1150'></font>
+<font color=#447700>!     cc is the maximum cloud cover in each of the three cloud groups.<a name='1151'></font>
+            <a name='1152'>
+      do j= 1, n<a name='1153'>
+       do i= 1, m                    <a name='1154'>
+         fdiruv(i,j)=0.0<a name='1155'>
+         fdifuv(i,j)=0.0<a name='1156'>
+         rr(i,j,np+1,1)=rsuvbm(i,j)<a name='1157'>
+         rr(i,j,np+1,2)=rsuvbm(i,j)<a name='1158'>
+         rs(i,j,np+1,1)=rsuvdf(i,j)<a name='1159'>
+         rs(i,j,np+1,2)=rsuvdf(i,j)<a name='1160'>
+         td(i,j,np+1,1)=0.0<a name='1161'>
+         td(i,j,np+1,2)=0.0<a name='1162'>
+         tt(i,j,np+1,1)=0.0<a name='1163'>
+         tt(i,j,np+1,2)=0.0<a name='1164'>
+         ts(i,j,np+1,1)=0.0<a name='1165'>
+         ts(i,j,np+1,2)=0.0<a name='1166'>
+         cc(i,j,1)=0.0<a name='1167'>
+         cc(i,j,2)=0.0<a name='1168'>
+         cc(i,j,3)=0.0<a name='1169'>
+       enddo<a name='1170'>
+      enddo<a name='1171'>
+<a name='1172'>
+<a name='1173'>
+<font color=#447700>!-----compute cloud optical thickness<a name='1174'></font>
+<a name='1175'>
+      if (cldwater) then<a name='1176'>
+<a name='1177'>
+       do k= 1, np<a name='1178'>
+        do j= 1, n<a name='1179'>
+         do i= 1, m<a name='1180'>
+          taucld(i,j,k,1)=cwp(i,j,k,1)*( 3.33e-4+2.52/reff(i,j,k,1))<a name='1181'>
+          taucld(i,j,k,2)=cwp(i,j,k,2)*(-6.59e-3+1.65/reff(i,j,k,2))<a name='1182'>
+         enddo<a name='1183'>
+        enddo<a name='1184'>
+       enddo<a name='1185'>
+<a name='1186'>
+      endif<a name='1187'>
+<a name='1188'>
+<font color=#447700>!-----options for scaling cloud optical thickness<a name='1189'></font>
+<a name='1190'>
+      if (overcast) then<a name='1191'>
+<a name='1192'>
+       do k= 1, np<a name='1193'>
+        do j= 1, n<a name='1194'>
+         do i= 1, m<a name='1195'>
+          tauclb(i,j,k)=taucld(i,j,k,1)+taucld(i,j,k,2)<a name='1196'>
+          tauclf(i,j,k)=tauclb(i,j,k)<a name='1197'>
+         enddo<a name='1198'>
+        enddo<a name='1199'>
+       enddo<a name='1200'>
+<a name='1201'>
+       do k= 1, 3<a name='1202'>
+        do j= 1, n<a name='1203'>
+         do i= 1, m<a name='1204'>
+           cc(i,j,k)=1.0<a name='1205'>
+         enddo<a name='1206'>
+        enddo<a name='1207'>
+       enddo<a name='1208'>
+<a name='1209'>
+      else<a name='1210'>
+<a name='1211'>
+<font color=#447700>!-----scale cloud optical thickness in each layer from taucld (with<a name='1212'></font>
+<font color=#447700>!     cloud amount fcld) to tauclb and tauclf (with cloud amount cc).<a name='1213'></font>
+<font color=#447700>!     tauclb is the scaled optical thickness for beam radiation and<a name='1214'></font>
+<font color=#447700>!     tauclf is for diffuse radiation.<a name='1215'></font>
+<a name='1216'>
+       call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#CLDSCALE'>cldscale</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLDSCALE_1">(m,n,ndim,np,cosz,fcld,taucld,ict,icb,  &amp;<a name='1217'>
+                    cc,tauclb,tauclf)<a name='1218'>
+<a name='1219'>
+      endif<a name='1220'>
+<a name='1221'>
+<font color=#447700>!-----compute cloud asymmetry factor for a mixture of<a name='1222'></font>
+<font color=#447700>!     liquid and ice particles.  unit of reff is micrometers.<a name='1223'></font>
+<a name='1224'>
+      do k= 1, np<a name='1225'>
+<a name='1226'>
+       do j= 1, n<a name='1227'>
+        do i= 1, m<a name='1228'>
+<a name='1229'>
+           asyclt(i,j)=1.0<a name='1230'>
+<a name='1231'>
+           taux=taucld(i,j,k,1)+taucld(i,j,k,2)<a name='1232'>
+          if (taux.gt.0.05 .and. fcld(i,j,k).gt.0.01) then<a name='1233'>
+<a name='1234'>
+           reff1=min(reff(i,j,k,1),130.)<a name='1235'>
+           reff2=min(reff(i,j,k,2),20.0)<a name='1236'>
+<a name='1237'>
+           g1=(aig(1)+(aig(2)+aig(3)*reff1)*reff1)*taucld(i,j,k,1)<a name='1238'>
+           g2=(awg(1)+(awg(2)+awg(3)*reff2)*reff2)*taucld(i,j,k,2)<a name='1239'>
+           asyclt(i,j)=(g1+g2)/taux<a name='1240'>
+<a name='1241'>
+          endif<a name='1242'>
+<a name='1243'>
+        enddo<a name='1244'>
+       enddo<a name='1245'>
+<a name='1246'>
+       do j=1,n<a name='1247'>
+        do i=1,m<a name='1248'>
+           asycl(i,j,k)=asyclt(i,j)<a name='1249'>
+        enddo<a name='1250'>
+       enddo<a name='1251'>
+<a name='1252'>
+      enddo<a name='1253'>
+<a name='1254'>
+<font color=#447700>!-----integration over spectral bands<a name='1255'></font>
+<a name='1256'>
+      do 100 ib=1,nband<a name='1257'>
+<a name='1258'>
+       do 300 k= 1, np<a name='1259'>
+<a name='1260'>
+        do j= 1, n<a name='1261'>
+         do i= 1, m<a name='1262'>
+<a name='1263'>
+<font color=#447700>!-----compute ozone and rayleigh optical thicknesses<a name='1264'></font>
+<a name='1265'>
+          taurs=ry(ib)*dp(i,j,k)<a name='1266'>
+          tauoz=xk(ib)*oh(i,j,k)<a name='1267'>
+ <a name='1268'>
+<font color=#447700>!-----compute clear-sky optical thickness, single scattering albedo,<a name='1269'></font>
+<font color=#447700>!     and asymmetry factor<a name='1270'></font>
+<a name='1271'>
+          tausto=taurs+tauoz+taual(i,j,k,ib)+1.0e-8<a name='1272'>
+          ssatau=ssaal(i,j,k,ib)*taual(i,j,k,ib)+taurs<a name='1273'>
+          asysto=asyal(i,j,k,ib)*ssaal(i,j,k,ib)*taual(i,j,k,ib)<a name='1274'>
+<a name='1275'>
+          tauto=tausto<a name='1276'>
+          ssato=ssatau/tauto+1.0e-8<a name='1277'>
+          ssato=min(ssato,0.999999)<a name='1278'>
+          asyto=asysto/(ssato*tauto)<a name='1279'>
+<a name='1280'>
+<font color=#447700>!-----compute reflectance and transmittance for cloudless layers<a name='1281'></font>
+<a name='1282'>
+<font color=#447700>!-                 for direct incident radiation<a name='1283'></font>
+<a name='1284'>
+          call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#DELEDD'>deledd</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DELEDD_1"> (tauto,ssato,asyto,csm(i,j),  &amp;<a name='1285'>
+                       rr1t(i,j),tt1t(i,j),td1t(i,j))<a name='1286'>
+<a name='1287'>
+<font color=#447700>!-                 for diffuse incident radiation<a name='1288'></font>
+<a name='1289'>
+          call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SAGPOL'>sagpol</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SAGPOL_1"> (tauto,ssato,asyto,rs1t(i,j),ts1t(i,j))<a name='1290'>
+<a name='1291'>
+<font color=#447700>!-----compute reflectance and transmittance for cloud layers<a name='1292'></font>
+<a name='1293'>
+         if (tauclb(i,j,k).lt.0.01 .or. fcld(i,j,k).lt.0.01) then<a name='1294'>
+<a name='1295'>
+          rr2t(i,j)=rr1t(i,j)<a name='1296'>
+          tt2t(i,j)=tt1t(i,j)<a name='1297'>
+          td2t(i,j)=td1t(i,j)<a name='1298'>
+          rs2t(i,j)=rs1t(i,j)<a name='1299'>
+          ts2t(i,j)=ts1t(i,j)<a name='1300'>
+<a name='1301'>
+         else<a name='1302'>
+<a name='1303'>
+<font color=#447700>!--                for direct incident radiation<a name='1304'></font>
+<a name='1305'>
+          tauto=tausto+tauclb(i,j,k)<a name='1306'>
+          ssato=(ssatau+tauclb(i,j,k))/tauto+1.0e-8<a name='1307'>
+          ssato=min(ssato,0.999999)<a name='1308'>
+          asyto=(asysto+asycl(i,j,k)*tauclb(i,j,k))/(ssato*tauto)<a name='1309'>
+<a name='1310'>
+          call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#DELEDD'>deledd</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DELEDD_2"> (tauto,ssato,asyto,csm(i,j),  &amp;<a name='1311'>
+                       rr2t(i,j),tt2t(i,j),td2t(i,j))<a name='1312'>
+<a name='1313'>
+<font color=#447700>!--                for diffuse incident radiation<a name='1314'></font>
+<a name='1315'>
+          tauto=tausto+tauclf(i,j,k)<a name='1316'>
+          ssato=(ssatau+tauclf(i,j,k))/tauto+1.0e-8<a name='1317'>
+          ssato=min(ssato,0.999999)<a name='1318'>
+          asyto=(asysto+asycl(i,j,k)*tauclf(i,j,k))/(ssato*tauto)<a name='1319'>
+<a name='1320'>
+          call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SAGPOL'>sagpol</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SAGPOL_2"> (tauto,ssato,asyto,rs2t(i,j),ts2t(i,j))<a name='1321'>
+<a name='1322'>
+         endif<a name='1323'>
+<a name='1324'>
+        enddo<a name='1325'>
+       enddo<a name='1326'>
+<a name='1327'>
+        do j=1,n<a name='1328'>
+         do i=1,m<a name='1329'>
+            rr(i,j,k,1)=rr1t(i,j)<a name='1330'>
+         enddo<a name='1331'>
+        enddo<a name='1332'>
+        do j=1,n<a name='1333'>
+         do i=1,m<a name='1334'>
+            tt(i,j,k,1)=tt1t(i,j)<a name='1335'>
+         enddo<a name='1336'>
+        enddo<a name='1337'>
+        do j=1,n<a name='1338'>
+         do i=1,m<a name='1339'>
+            td(i,j,k,1)=td1t(i,j)<a name='1340'>
+         enddo<a name='1341'>
+        enddo<a name='1342'>
+        do j=1,n<a name='1343'>
+         do i=1,m<a name='1344'>
+            rs(i,j,k,1)=rs1t(i,j)<a name='1345'>
+         enddo<a name='1346'>
+        enddo<a name='1347'>
+        do j=1,n<a name='1348'>
+         do i=1,m<a name='1349'>
+            ts(i,j,k,1)=ts1t(i,j)<a name='1350'>
+         enddo<a name='1351'>
+        enddo<a name='1352'>
+<a name='1353'>
+        do j=1,n<a name='1354'>
+         do i=1,m<a name='1355'>
+            rr(i,j,k,2)=rr2t(i,j)<a name='1356'>
+         enddo<a name='1357'>
+        enddo<a name='1358'>
+        do j=1,n<a name='1359'>
+         do i=1,m<a name='1360'>
+            tt(i,j,k,2)=tt2t(i,j)<a name='1361'>
+         enddo<a name='1362'>
+        enddo<a name='1363'>
+        do j=1,n<a name='1364'>
+         do i=1,m<a name='1365'>
+            td(i,j,k,2)=td2t(i,j)<a name='1366'>
+         enddo<a name='1367'>
+        enddo<a name='1368'>
+        do j=1,n<a name='1369'>
+         do i=1,m<a name='1370'>
+            rs(i,j,k,2)=rs2t(i,j)<a name='1371'>
+         enddo<a name='1372'>
+        enddo<a name='1373'>
+        do j=1,n<a name='1374'>
+         do i=1,m<a name='1375'>
+            ts(i,j,k,2)=ts2t(i,j)<a name='1376'>
+         enddo<a name='1377'>
+        enddo<a name='1378'>
+<a name='1379'>
+ 300  continue<a name='1380'>
+<a name='1381'>
+<font color=#447700>!-----flux calculations<a name='1382'></font>
+ <a name='1383'>
+        call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#CLDFLX'>cldflx</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLUV' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLDFLX_1"> (m,n,np,ict,icb,overcast,cc,rr,tt,td,rs,ts, &amp;<a name='1384'>
+                     fclr,fall,fallu,falld,fsdir,fsdif)<a name='1385'>
+<a name='1386'>
+       do k= 1, np+1<a name='1387'>
+        do j= 1, n<a name='1388'>
+         do i= 1, m<a name='1389'>
+          flx(i,j,k)=flx(i,j,k)+fall(i,j,k)*hk(ib)<a name='1390'>
+          flxu(i,j,k)=flxu(i,j,k)+fallu(i,j,k)*hk(ib)<a name='1391'>
+          flxd(i,j,k)=flxd(i,j,k)+falld(i,j,k)*hk(ib)<a name='1392'>
+         enddo<a name='1393'>
+        enddo<a name='1394'>
+        do j= 1, n<a name='1395'>
+         do i= 1, m<a name='1396'>
+          flc(i,j,k)=flc(i,j,k)+fclr(i,j,k)*hk(ib)<a name='1397'>
+         enddo<a name='1398'>
+        enddo<a name='1399'>
+       enddo<a name='1400'>
+<a name='1401'>
+<font color=#447700>!-----compute downward surface fluxes in the UV and par regions<a name='1402'></font>
+<a name='1403'>
+       if(ib.lt.8) then<a name='1404'>
+         do j=1,n<a name='1405'>
+          do i=1,m<a name='1406'>
+           fdiruv(i,j)=fdiruv(i,j)+fsdir(i,j)*hk(ib)<a name='1407'>
+           fdifuv(i,j)=fdifuv(i,j)+fsdif(i,j)*hk(ib)<a name='1408'>
+         enddo<a name='1409'>
+        enddo<a name='1410'>
+       else<a name='1411'>
+         do j=1,n<a name='1412'>
+          do i=1,m<a name='1413'>
+           fdirpar(i,j)=fsdir(i,j)*hk(ib)<a name='1414'>
+           fdifpar(i,j)=fsdif(i,j)*hk(ib)<a name='1415'>
+         enddo<a name='1416'>
+        enddo<a name='1417'>
+       endif<a name='1418'>
+<a name='1419'>
+ 100  continue<a name='1420'>
+<a name='1421'>
+      end subroutine soluv<a name='1422'>
+<a name='1423'>
+<font color=#447700>!************************************************************************<a name='1424'></font>
+<a name='1425'>
+<A NAME='SOLIR'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1426'>
+      <font color=#993300>subroutine </font><font color=#cc0000>solir</font> (m,n,ndim,np,wh,overcast,cldwater,               &amp; <A href='../../call_to/SOLIR.html' TARGET='index'>1</A>,<A href='../../call_from/SOLIR.html' TARGET='index'>6</A><a name='1427'>
+                        cwp,taucld,reff,ict,icb,fcld,cosz,              &amp;<a name='1428'>
+                        taual,ssaal,asyal,csm,rsirbm,rsirdf,            &amp;<a name='1429'>
+                        flx,flc,flxu,flxd,fdirir,fdifir)<a name='1430'>
+<a name='1431'>
+<font color=#447700>!************************************************************************<a name='1432'></font>
+<font color=#447700>!  compute solar flux in the infrared region. The spectrum is divided<a name='1433'></font>
+<font color=#447700>!   into three bands:<a name='1434'></font>
+<font color=#447700>!<a name='1435'></font>
+<font color=#447700>!          band   wavenumber(/cm)  wavelength (micron)<a name='1436'></font>
+<font color=#447700>!          1( 9)    14300-8200         0.70-1.22<a name='1437'></font>
+<font color=#447700>!          2(10)     8200-4400         1.22-2.27<a name='1438'></font>
+<font color=#447700>!          3(11)     4400-1000         2.27-10.0<a name='1439'></font>
+<font color=#447700>!<a name='1440'></font>
+<font color=#447700>!----- Input parameters:                            units      size<a name='1441'></font>
+<font color=#447700>!<a name='1442'></font>
+<font color=#447700>!  number of soundings in zonal direction (m)       n/d        1<a name='1443'></font>
+<font color=#447700>!  number of soundings in meridional direction (n)  n/d        1<a name='1444'></font>
+<font color=#447700>!  maximum number of soundings in                   n/d        1<a name='1445'></font>
+<font color=#447700>!         meridional direction (ndim)<a name='1446'></font>
+<font color=#447700>!  number of atmospheric layers (np)                n/d        1<a name='1447'></font>
+<font color=#447700>!  layer scaled-water vapor content (wh)          gm/cm^2    m*n*np<a name='1448'></font>
+<font color=#447700>!  option for scaling cloud optical thickness       n/d        1<a name='1449'></font>
+<font color=#447700>!        overcast="true" if scaling is NOT required<a name='1450'></font>
+<font color=#447700>!        overcast="fasle" if scaling is required<a name='1451'></font>
+<font color=#447700>!  input option for cloud optical thickness         n/d        1<a name='1452'></font>
+<font color=#447700>!        cldwater="true" if taucld is provided<a name='1453'></font>
+<font color=#447700>!        cldwater="false" if cwp is provided<a name='1454'></font>
+<font color=#447700>!  cloud water concentration (cwp)                gm/m**2    m*n*np*2<a name='1455'></font>
+<font color=#447700>!        index 1 for ice particles<a name='1456'></font>
+<font color=#447700>!        index 2 for liquid drops<a name='1457'></font>
+<font color=#447700>!  cloud optical thickness (taucld)                 n/d      m*ndim*np*2<a name='1458'></font>
+<font color=#447700>!        index 1 for ice paticles<a name='1459'></font>
+<font color=#447700>!  effective cloud-particle size (reff)           micrometer m*ndim*np*2<a name='1460'></font>
+<font color=#447700>!        index 1 for ice paticles<a name='1461'></font>
+<font color=#447700>!        index 2 for liquid particles<a name='1462'></font>
+<font color=#447700>!  level index separating high and                  n/d      m*n<a name='1463'></font>
+<font color=#447700>!        middle clouds (ict)<a name='1464'></font>
+<font color=#447700>!  level index separating middle and                n/d      m*n<a name='1465'></font>
+<font color=#447700>!        low clouds (icb)<a name='1466'></font>
+<font color=#447700>!  cloud amount (fcld)                            fraction   m*ndim*np<a name='1467'></font>
+<font color=#447700>!  aerosol optical thickness (taual)                n/d      m*ndim*np*11<a name='1468'></font>
+<font color=#447700>!  aerosol single-scattering albedo (ssaal)         n/d      m*ndim*np*11<a name='1469'></font>
+<font color=#447700>!  aerosol asymmetry factor (asyal)                 n/d      m*ndim*np*11 <a name='1470'></font>
+<font color=#447700>!  cosecant of the solar zenith angle (csm)         n/d      m*n<a name='1471'></font>
+<font color=#447700>!  near ir surface albedo for beam                fraction   m*ndim<a name='1472'></font>
+<font color=#447700>!        radiation (rsirbm)<a name='1473'></font>
+<font color=#447700>!  near ir surface albedo for diffuse             fraction   m*ndim<a name='1474'></font>
+<font color=#447700>!        radiation (rsirdf)<a name='1475'></font>
+<font color=#447700>!<a name='1476'></font>
+<font color=#447700>!---- temporary array<a name='1477'></font>
+<font color=#447700>!<a name='1478'></font>
+<font color=#447700>!  scaled cloud optical thickness                   n/d      m*n*np<a name='1479'></font>
+<font color=#447700>!          for beam radiation (tauclb)<a name='1480'></font>
+<font color=#447700>!  scaled cloud optical thickness                   n/d      m*n*np<a name='1481'></font>
+<font color=#447700>!          for diffuse radiation  (tauclf)     <a name='1482'></font>
+<font color=#447700>!<a name='1483'></font>
+<font color=#447700>!----- output (updated) parameters:<a name='1484'></font>
+<font color=#447700>!<a name='1485'></font>
+<font color=#447700>!  all-sky flux (downward-upward) (flx)           fraction   m*ndim*(np+1)<a name='1486'></font>
+<font color=#447700>!  clear-sky flux (downward-upward) (flc)         fraction   m*ndim*(np+1)<a name='1487'></font>
+<font color=#447700>!  all-sky direct downward ir flux at<a name='1488'></font>
+<font color=#447700>!          the surface (fdirir)                    fraction   m*ndim<a name='1489'></font>
+<font color=#447700>!  all-sky diffuse downward ir flux at<a name='1490'></font>
+<font color=#447700>!          the surface (fdifir)                    fraction   m*ndim<a name='1491'></font>
+<font color=#447700>!<a name='1492'></font>
+<font color=#447700>!**********************************************************************<a name='1493'></font>
+      implicit none<a name='1494'>
+<font color=#447700>!**********************************************************************<a name='1495'></font>
+<a name='1496'>
+<font color=#447700>!-----input parameters<a name='1497'></font>
+<a name='1498'>
+      integer m,n,ndim,np<a name='1499'>
+      integer ict(m,ndim),icb(m,ndim)<a name='1500'>
+      real cwp(m,n,np,2),taucld(m,ndim,np,2),reff(m,ndim,np,2)<a name='1501'>
+      real fcld(m,ndim,np),cc(m,n,3),cosz(m,ndim)<a name='1502'>
+      real rsirbm(m,ndim),rsirdf(m,ndim)<a name='1503'>
+      real taual(m,ndim,np,11),ssaal(m,ndim,np,11),asyal(m,ndim,np,11)<a name='1504'>
+      real wh(m,n,np),csm(m,n)<a name='1505'>
+      logical overcast,cldwater<a name='1506'>
+<a name='1507'>
+<font color=#447700>!-----output (updated) parameters<a name='1508'></font>
+<a name='1509'>
+      real flx(m,ndim,np+1),flc(m,ndim,np+1)<a name='1510'>
+      real flxu(m,ndim,np+1),flxd(m,ndim,np+1)<a name='1511'>
+      real fdirir(m,ndim),fdifir(m,ndim)<a name='1512'>
+<a name='1513'>
+<font color=#447700>!-----static parameters<a name='1514'></font>
+<a name='1515'>
+      integer nk,nband<a name='1516'>
+      parameter (nk=10,nband=3)<a name='1517'>
+      real xk(nk),hk(nband,nk),aib(nband,2),awb(nband,2)<a name='1518'>
+      real aia(nband,3),awa(nband,3),aig(nband,3),awg(nband,3)<a name='1519'>
+<a name='1520'>
+<font color=#447700>!-----temporary array<a name='1521'></font>
+<a name='1522'>
+      integer ib,iv,ik,i,j,k<a name='1523'>
+      real tauclb(m,n,np),tauclf(m,n,np)<a name='1524'>
+      real ssacl(m,n,np),asycl(m,n,np)<a name='1525'>
+      real rr(m,n,np+1,2),tt(m,n,np+1,2),td(m,n,np+1,2), &amp;<a name='1526'>
+             rs(m,n,np+1,2),ts(m,n,np+1,2)<a name='1527'>
+      real fall(m,n,np+1),fclr(m,n,np+1)<a name='1528'>
+      real fallu(m,n,np+1),falld(m,n,np+1)<a name='1529'>
+      real fsdir(m,n),fsdif(m,n)<a name='1530'>
+<a name='1531'>
+      real tauwv,tausto,ssatau,asysto,tauto,ssato,asyto<a name='1532'>
+      real taux,reff1,reff2,w1,w2,g1,g2<a name='1533'>
+      real ssaclt(m,n),asyclt(m,n)<a name='1534'>
+      real rr1t(m,n),tt1t(m,n),td1t(m,n),rs1t(m,n),ts1t(m,n)<a name='1535'>
+      real rr2t(m,n),tt2t(m,n),td2t(m,n),rs2t(m,n),ts2t(m,n)<a name='1536'>
+<a name='1537'>
+<font color=#447700>!-----water vapor absorption coefficient for 10 k-intervals.<a name='1538'></font>
+<font color=#447700>!     unit: cm^2/gm<a name='1539'></font>
+<a name='1540'>
+      data xk/  &amp;<a name='1541'>
+        0.0010, 0.0133, 0.0422, 0.1334, 0.4217, &amp;<a name='1542'>
+        1.334,  5.623,  31.62,  177.8,  1000.0/  <a name='1543'>
+<a name='1544'>
+<font color=#447700>!-----water vapor k-distribution function,<a name='1545'></font>
+<font color=#447700>!     the sum of hk is 0.52926. unit: fraction<a name='1546'></font>
+<a name='1547'>
+      data hk/  &amp;<a name='1548'>
+       .20673,.08236,.01074,  .03497,.01157,.00360, &amp;<a name='1549'>
+       .03011,.01133,.00411,  .02260,.01143,.00421, &amp;<a name='1550'>
+       .01336,.01240,.00389,  .00696,.01258,.00326, &amp;<a name='1551'>
+       .00441,.01381,.00499,  .00115,.00650,.00465, &amp;<a name='1552'>
+       .00026,.00244,.00245,  .00000,.00094,.00145/<a name='1553'>
+<a name='1554'>
+<font color=#447700>!-----coefficients for computing the extinction coefficient of<a name='1555'></font>
+<font color=#447700>!     ice clouds from b=aib(*,1)+aib(*,2)/reff<a name='1556'></font>
+<a name='1557'>
+      data aib/ &amp;<a name='1558'>
+        .000333, .000333, .000333, &amp;<a name='1559'>
+           2.52,    2.52,    2.52/<a name='1560'>
+<a name='1561'>
+<font color=#447700>!-----coefficients for computing the extinction coefficient of<a name='1562'></font>
+<font color=#447700>!     water clouds from b=awb(*,1)+awb(*,2)/reff<a name='1563'></font>
+<a name='1564'>
+      data awb/ &amp;<a name='1565'>
+        -0.0101, -0.0166, -0.0339, &amp;<a name='1566'>
+           1.72,    1.85,    2.16/<a name='1567'>
+<a name='1568'>
+<a name='1569'>
+<font color=#447700>!-----coefficients for computing the single scattering albedo of<a name='1570'></font>
+<font color=#447700>!     ice clouds from ssa=1-(aia(*,1)+aia(*,2)*reff+aia(*,3)*reff**2)<a name='1571'></font>
+<a name='1572'>
+      data aia/ &amp;<a name='1573'>
+       -.00000260, .00215346, .08938331, &amp;<a name='1574'>
+        .00000746, .00073709, .00299387, &amp;<a name='1575'>
+        .00000000,-.00000134,-.00001038/<a name='1576'>
+<a name='1577'>
+<font color=#447700>!-----coefficients for computing the single scattering albedo of<a name='1578'></font>
+<font color=#447700>!     liquid clouds from ssa=1-(awa(*,1)+awa(*,2)*reff+awa(*,3)*reff**2)<a name='1579'></font>
+<a name='1580'>
+      data awa/ &amp;<a name='1581'>
+        .00000007,-.00019934, .01209318, &amp;<a name='1582'>
+        .00000845, .00088757, .01784739, &amp;<a name='1583'>
+       -.00000004,-.00000650,-.00036910/<a name='1584'>
+<a name='1585'>
+<font color=#447700>!-----coefficients for computing the asymmetry factor of ice clouds<a name='1586'></font>
+<font color=#447700>!     from asycl=aig(*,1)+aig(*,2)*reff+aig(*,3)*reff**2<a name='1587'></font>
+<a name='1588'>
+      data aig/ &amp;<a name='1589'>
+        .74935228, .76098937, .84090400, &amp;<a name='1590'>
+        .00119715, .00141864, .00126222, &amp;<a name='1591'>
+       -.00000367,-.00000396,-.00000385/<a name='1592'>
+<a name='1593'>
+<font color=#447700>!-----coefficients for computing the asymmetry factor of liquid clouds<a name='1594'></font>
+<font color=#447700>!     from asycl=awg(*,1)+awg(*,2)*reff+awg(*,3)*reff**2<a name='1595'></font>
+<a name='1596'>
+      data awg/ &amp;<a name='1597'>
+        .79375035, .74513197, .83530748, &amp;<a name='1598'>
+        .00832441, .01370071, .00257181, &amp;<a name='1599'>
+       -.00023263,-.00038203, .00005519/<a name='1600'>
+<a name='1601'>
+<font color=#447700>!-----initialize surface fluxes, reflectances, and transmittances.<a name='1602'></font>
+<font color=#447700>!     cc is the maximum cloud cover in each of the three cloud groups.<a name='1603'></font>
+<a name='1604'>
+      do j= 1, n<a name='1605'>
+       do i= 1, m<a name='1606'>
+         fdirir(i,j)=0.0<a name='1607'>
+         fdifir(i,j)=0.0<a name='1608'>
+         rr(i,j,np+1,1)=rsirbm(i,j)<a name='1609'>
+         rr(i,j,np+1,2)=rsirbm(i,j)<a name='1610'>
+         rs(i,j,np+1,1)=rsirdf(i,j)<a name='1611'>
+         rs(i,j,np+1,2)=rsirdf(i,j)<a name='1612'>
+         td(i,j,np+1,1)=0.0<a name='1613'>
+         td(i,j,np+1,2)=0.0<a name='1614'>
+         tt(i,j,np+1,1)=0.0<a name='1615'>
+         tt(i,j,np+1,2)=0.0<a name='1616'>
+         ts(i,j,np+1,1)=0.0<a name='1617'>
+         ts(i,j,np+1,2)=0.0<a name='1618'>
+         cc(i,j,1)=0.0<a name='1619'>
+         cc(i,j,2)=0.0<a name='1620'>
+         cc(i,j,3)=0.0<a name='1621'>
+       enddo<a name='1622'>
+      enddo<a name='1623'>
+<a name='1624'>
+<font color=#447700>!-----integration over spectral bands<a name='1625'></font>
+<a name='1626'>
+      do 100 ib=1,nband<a name='1627'>
+<a name='1628'>
+       iv=ib+8<a name='1629'>
+<a name='1630'>
+<font color=#447700>!-----compute cloud optical thickness<a name='1631'></font>
+<a name='1632'>
+      if (cldwater) then<a name='1633'>
+<a name='1634'>
+       do k= 1, np<a name='1635'>
+        do j= 1, n<a name='1636'>
+         do i= 1, m<a name='1637'>
+          taucld(i,j,k,1)=cwp(i,j,k,1)*(aib(ib,1) &amp;<a name='1638'>
+                          +aib(ib,2)/reff(i,j,k,1))<a name='1639'>
+          taucld(i,j,k,2)=cwp(i,j,k,2)*(awb(ib,1) &amp;<a name='1640'>
+                          +awb(ib,2)/reff(i,j,k,2))<a name='1641'>
+         enddo<a name='1642'>
+        enddo<a name='1643'>
+       enddo<a name='1644'>
+<a name='1645'>
+      endif<a name='1646'>
+<a name='1647'>
+<font color=#447700>!-----options for scaling cloud optical thickness<a name='1648'></font>
+<a name='1649'>
+      if (overcast) then<a name='1650'>
+<a name='1651'>
+       do k= 1, np<a name='1652'>
+        do j= 1, n<a name='1653'>
+         do i= 1, m<a name='1654'>
+          tauclb(i,j,k)=taucld(i,j,k,1)+taucld(i,j,k,2)<a name='1655'>
+          tauclf(i,j,k)=tauclb(i,j,k)<a name='1656'>
+         enddo<a name='1657'>
+        enddo<a name='1658'>
+       enddo<a name='1659'>
+<a name='1660'>
+       do k= 1, 3<a name='1661'>
+        do j= 1, n<a name='1662'>
+         do i= 1, m<a name='1663'>
+           cc(i,j,k)=1.0<a name='1664'>
+         enddo<a name='1665'>
+        enddo<a name='1666'>
+       enddo<a name='1667'>
+<a name='1668'>
+      else<a name='1669'>
+<a name='1670'>
+<font color=#447700>!-----scale cloud optical thickness in each layer from taucld (with<a name='1671'></font>
+<font color=#447700>!     cloud amount fcld) to tauclb and tauclf (with cloud amount cc).<a name='1672'></font>
+<font color=#447700>!     tauclb is the scaled optical thickness for beam radiation and<a name='1673'></font>
+<font color=#447700>!     tauclf is for diffuse radiation.<a name='1674'></font>
+<a name='1675'>
+       call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#CLDSCALE'>cldscale</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLDSCALE_2">(m,n,ndim,np,cosz,fcld,taucld,ict,icb, &amp;<a name='1676'>
+                    cc,tauclb,tauclf)<a name='1677'>
+<a name='1678'>
+      endif<a name='1679'>
+<a name='1680'>
+<font color=#447700>!-----compute cloud single scattering albedo and asymmetry factor<a name='1681'></font>
+<font color=#447700>!     for a mixture of ice and liquid particles.<a name='1682'></font>
+<a name='1683'>
+       do k= 1, np<a name='1684'>
+<a name='1685'>
+        do j= 1, n<a name='1686'>
+         do i= 1, m<a name='1687'>
+<a name='1688'>
+           ssaclt(i,j)=1.0<a name='1689'>
+           asyclt(i,j)=1.0<a name='1690'>
+<a name='1691'>
+           taux=taucld(i,j,k,1)+taucld(i,j,k,2)<a name='1692'>
+          if (taux.gt.0.05 .and. fcld(i,j,k).gt.0.01) then<a name='1693'>
+<a name='1694'>
+           reff1=min(reff(i,j,k,1),130.)<a name='1695'>
+           reff2=min(reff(i,j,k,2),20.0)<a name='1696'>
+<a name='1697'>
+           w1=(1.-(aia(ib,1)+(aia(ib,2)+ &amp;<a name='1698'>
+               aia(ib,3)*reff1)*reff1))*taucld(i,j,k,1)<a name='1699'>
+           w2=(1.-(awa(ib,1)+(awa(ib,2)+ &amp;<a name='1700'>
+               awa(ib,3)*reff2)*reff2))*taucld(i,j,k,2)<a name='1701'>
+           ssaclt(i,j)=(w1+w2)/taux<a name='1702'>
+<a name='1703'>
+           g1=(aig(ib,1)+(aig(ib,2)+aig(ib,3)*reff1)*reff1)*w1<a name='1704'>
+           g2=(awg(ib,1)+(awg(ib,2)+awg(ib,3)*reff2)*reff2)*w2<a name='1705'>
+           asyclt(i,j)=(g1+g2)/(w1+w2)<a name='1706'>
+<a name='1707'>
+          endif<a name='1708'>
+<a name='1709'>
+         enddo<a name='1710'>
+        enddo<a name='1711'>
+<a name='1712'>
+        do j=1,n<a name='1713'>
+         do i=1,m<a name='1714'>
+            ssacl(i,j,k)=ssaclt(i,j)<a name='1715'>
+         enddo<a name='1716'>
+        enddo<a name='1717'>
+        do j=1,n<a name='1718'>
+         do i=1,m<a name='1719'>
+            asycl(i,j,k)=asyclt(i,j)<a name='1720'>
+         enddo<a name='1721'>
+        enddo<a name='1722'>
+<a name='1723'>
+       enddo<a name='1724'>
+<a name='1725'>
+<font color=#447700>!-----integration over the k-distribution function<a name='1726'></font>
+<a name='1727'>
+         do 200 ik=1,nk<a name='1728'>
+<a name='1729'>
+          do 300 k= 1, np<a name='1730'>
+<a name='1731'>
+           do j= 1, n<a name='1732'>
+            do i= 1, m<a name='1733'>
+<a name='1734'>
+             tauwv=xk(ik)*wh(i,j,k)<a name='1735'>
+ <a name='1736'>
+<font color=#447700>!-----compute clear-sky optical thickness, single scattering albedo,<a name='1737'></font>
+<font color=#447700>!     and asymmetry factor.<a name='1738'></font>
+ <a name='1739'>
+             tausto=tauwv+taual(i,j,k,iv)+1.0e-8<a name='1740'>
+             ssatau=ssaal(i,j,k,iv)*taual(i,j,k,iv)<a name='1741'>
+             asysto=asyal(i,j,k,iv)*ssaal(i,j,k,iv)*taual(i,j,k,iv)<a name='1742'>
+ <a name='1743'>
+<font color=#447700>!-----compute reflectance and transmittance for cloudless layers<a name='1744'></font>
+<a name='1745'>
+             tauto=tausto<a name='1746'>
+             ssato=ssatau/tauto+1.0e-8<a name='1747'>
+<a name='1748'>
+            if (ssato .gt. 0.001) then<a name='1749'>
+<a name='1750'>
+             ssato=min(ssato,0.999999)<a name='1751'>
+             asyto=asysto/(ssato*tauto)<a name='1752'>
+<a name='1753'>
+<font color=#447700>!-                 for direct incident radiation<a name='1754'></font>
+<a name='1755'>
+             call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#DELEDD'>deledd</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DELEDD_3"> (tauto,ssato,asyto,csm(i,j),  &amp;<a name='1756'>
+                          rr1t(i,j),tt1t(i,j),td1t(i,j))<a name='1757'>
+<a name='1758'>
+<font color=#447700>!-                 for diffuse incident radiation<a name='1759'></font>
+<a name='1760'>
+             call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SAGPOL'>sagpol</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SAGPOL_3"> (tauto,ssato,asyto,rs1t(i,j),ts1t(i,j))<a name='1761'>
+<a name='1762'>
+            else<a name='1763'>
+<a name='1764'>
+             td1t(i,j)=exp(-tauto*csm(i,j))<a name='1765'>
+             ts1t(i,j)=exp(-1.66*tauto)<a name='1766'>
+             tt1t(i,j)=0.0<a name='1767'>
+             rr1t(i,j)=0.0<a name='1768'>
+             rs1t(i,j)=0.0<a name='1769'>
+<a name='1770'>
+            endif<a name='1771'>
+<a name='1772'>
+<font color=#447700>!-----compute reflectance and transmittance for cloud layers<a name='1773'></font>
+<a name='1774'>
+            if (tauclb(i,j,k).lt.0.01 .or. fcld(i,j,k).lt.0.01) then<a name='1775'>
+<a name='1776'>
+             rr2t(i,j)=rr1t(i,j)<a name='1777'>
+             tt2t(i,j)=tt1t(i,j)<a name='1778'>
+             td2t(i,j)=td1t(i,j)<a name='1779'>
+             rs2t(i,j)=rs1t(i,j)<a name='1780'>
+             ts2t(i,j)=ts1t(i,j)<a name='1781'>
+<a name='1782'>
+            else<a name='1783'>
+<a name='1784'>
+<font color=#447700>!-                 for direct incident radiation<a name='1785'></font>
+<a name='1786'>
+             tauto=tausto+tauclb(i,j,k)<a name='1787'>
+             ssato=(ssatau+ssacl(i,j,k)*tauclb(i,j,k))/tauto+1.0e-8<a name='1788'>
+             ssato=min(ssato,0.999999)<a name='1789'>
+             asyto=(asysto+asycl(i,j,k)*ssacl(i,j,k)*tauclb(i,j,k))/ &amp;<a name='1790'>
+                   (ssato*tauto)<a name='1791'>
+<a name='1792'>
+             call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#DELEDD'>deledd</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="DELEDD_4"> (tauto,ssato,asyto,csm(i,j),  &amp;<a name='1793'>
+                          rr2t(i,j),tt2t(i,j),td2t(i,j))<a name='1794'>
+<a name='1795'>
+<font color=#447700>!-                 for diffuse incident radiation<a name='1796'></font>
+<a name='1797'>
+             tauto=tausto+tauclf(i,j,k)<a name='1798'>
+             ssato=(ssatau+ssacl(i,j,k)*tauclf(i,j,k))/tauto+1.0e-8<a name='1799'>
+             ssato=min(ssato,0.999999)<a name='1800'>
+             asyto=(asysto+asycl(i,j,k)*ssacl(i,j,k)*tauclf(i,j,k))/ &amp;<a name='1801'>
+                   (ssato*tauto)<a name='1802'>
+<a name='1803'>
+             call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#SAGPOL'>sagpol</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SAGPOL_4"> (tauto,ssato,asyto,rs2t(i,j),ts2t(i,j))<a name='1804'>
+<a name='1805'>
+            endif<a name='1806'>
+<a name='1807'>
+           enddo<a name='1808'>
+          enddo<a name='1809'>
+<a name='1810'>
+           do j=1,n<a name='1811'>
+            do i=1,m<a name='1812'>
+               rr(i,j,k,1)=rr1t(i,j)<a name='1813'>
+            enddo<a name='1814'>
+           enddo<a name='1815'>
+           do j=1,n<a name='1816'>
+            do i=1,m<a name='1817'>
+               tt(i,j,k,1)=tt1t(i,j)<a name='1818'>
+            enddo<a name='1819'>
+           enddo<a name='1820'>
+           do j=1,n<a name='1821'>
+            do i=1,m<a name='1822'>
+               td(i,j,k,1)=td1t(i,j)<a name='1823'>
+            enddo<a name='1824'>
+           enddo<a name='1825'>
+           do j=1,n<a name='1826'>
+            do i=1,m<a name='1827'>
+               rs(i,j,k,1)=rs1t(i,j)<a name='1828'>
+            enddo<a name='1829'>
+           enddo<a name='1830'>
+           do j=1,n<a name='1831'>
+            do i=1,m<a name='1832'>
+               ts(i,j,k,1)=ts1t(i,j)<a name='1833'>
+            enddo<a name='1834'>
+           enddo<a name='1835'>
+ <a name='1836'>
+           do j=1,n<a name='1837'>
+            do i=1,m<a name='1838'>
+               rr(i,j,k,2)=rr2t(i,j)<a name='1839'>
+            enddo<a name='1840'>
+           enddo<a name='1841'>
+           do j=1,n<a name='1842'>
+            do i=1,m<a name='1843'>
+               tt(i,j,k,2)=tt2t(i,j)<a name='1844'>
+            enddo<a name='1845'>
+           enddo<a name='1846'>
+           do j=1,n<a name='1847'>
+            do i=1,m<a name='1848'>
+               td(i,j,k,2)=td2t(i,j)<a name='1849'>
+            enddo<a name='1850'>
+           enddo<a name='1851'>
+           do j=1,n<a name='1852'>
+            do i=1,m<a name='1853'>
+               rs(i,j,k,2)=rs2t(i,j)<a name='1854'>
+            enddo<a name='1855'>
+           enddo<a name='1856'>
+           do j=1,n<a name='1857'>
+            do i=1,m<a name='1858'>
+               ts(i,j,k,2)=ts2t(i,j)<a name='1859'>
+            enddo<a name='1860'>
+           enddo<a name='1861'>
+<a name='1862'>
+ 300  continue<a name='1863'>
+<a name='1864'>
+<font color=#447700>!-----flux calculations<a name='1865'></font>
+<a name='1866'>
+        call <A href='../../html_code/phys/module_ra_gsfcsw.F.html#CLDFLX'>cldflx</A><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SOLIR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="CLDFLX_2"> (m,n,np,ict,icb,overcast,cc,rr,tt,td,rs,ts, &amp;<a name='1867'>
+                     fclr,fall,fallu,falld,fsdir,fsdif)<a name='1868'>
+<a name='1869'>
+       do k= 1, np+1<a name='1870'>
+        do j= 1, n<a name='1871'>
+         do i= 1, m<a name='1872'>
+          flx(i,j,k) = flx(i,j,k)+fall(i,j,k)*hk(ib,ik)<a name='1873'>
+          flxu(i,j,k) = flxu(i,j,k)+fallu(i,j,k)*hk(ib,ik)<a name='1874'>
+          flxd(i,j,k) = flxd(i,j,k)+falld(i,j,k)*hk(ib,ik)<a name='1875'>
+         enddo<a name='1876'>
+        enddo<a name='1877'>
+        do j= 1, n<a name='1878'>
+         do i= 1, m<a name='1879'>
+          flc(i,j,k) = flc(i,j,k)+fclr(i,j,k)*hk(ib,ik)<a name='1880'>
+         enddo<a name='1881'>
+        enddo<a name='1882'>
+       enddo<a name='1883'>
+<a name='1884'>
+<font color=#447700>!-----compute downward surface fluxes in the ir region<a name='1885'></font>
+<a name='1886'>
+       do j= 1, n<a name='1887'>
+        do i= 1, m<a name='1888'>
+          fdirir(i,j) = fdirir(i,j)+fsdir(i,j)*hk(ib,ik)<a name='1889'>
+          fdifir(i,j) = fdifir(i,j)+fsdif(i,j)*hk(ib,ik)<a name='1890'>
+        enddo<a name='1891'>
+       enddo<a name='1892'>
+<a name='1893'>
+  200 continue<a name='1894'>
+  100 continue<a name='1895'>
+ <a name='1896'>
+      end subroutine solir <a name='1897'>
+<a name='1898'>
+<font color=#447700>!********************************************************************<a name='1899'></font>
+<a name='1900'>
+<A NAME='CLDSCALE'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#CLDSCALE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1901'>
+      <font color=#993300>subroutine </font><font color=#cc0000>cldscale</font> (m,n,ndim,np,cosz,fcld,taucld,ict,icb,    &amp; <A href='../../call_to/CLDSCALE.html' TARGET='index'>2</A><a name='1902'>
+                           cc,tauclb,tauclf)<a name='1903'>
+<a name='1904'>
+<font color=#447700>!********************************************************************<a name='1905'></font>
+<font color=#447700>!<a name='1906'></font>
+<font color=#447700>!   This subroutine computes the high, middle, and<a name='1907'></font>
+<font color=#447700>!    low cloud amounts and scales the cloud optical thickness.<a name='1908'></font>
+<font color=#447700>!<a name='1909'></font>
+<font color=#447700>!   To simplify calculations in a cloudy atmosphere, clouds are<a name='1910'></font>
+<font color=#447700>!    grouped into high, middle and low clouds separated by the levels<a name='1911'></font>
+<font color=#447700>!    ict and icb (level 1 is the top of the model atmosphere).<a name='1912'></font>
+<font color=#447700>!<a name='1913'></font>
+<font color=#447700>!   Within each of the three groups, clouds are assumed maximally<a name='1914'></font>
+<font color=#447700>!    overlapped, and the cloud cover (cc) of a group is the maximum<a name='1915'></font>
+<font color=#447700>!    cloud cover of all the layers in the group.  The optical thickness<a name='1916'></font>
+<font color=#447700>!    (taucld) of a given layer is then scaled to new values (tauclb and<a name='1917'></font>
+<font color=#447700>!    tauclf) so that the layer reflectance corresponding to the cloud<a name='1918'></font>
+<font color=#447700>!    cover cc is the same as the original reflectance with optical<a name='1919'></font>
+<font color=#447700>!    thickness taucld and cloud cover fcld.<a name='1920'></font>
+<font color=#447700>!<a name='1921'></font>
+<font color=#447700>!---input parameters<a name='1922'></font>
+<font color=#447700>!<a name='1923'></font>
+<font color=#447700>!    number of grid intervals in zonal direction (m)<a name='1924'></font>
+<font color=#447700>!    number of grid intervals in meridional direction (n)<a name='1925'></font>
+<font color=#447700>!    maximum number of grid intervals in meridional direction (ndim)<a name='1926'></font>
+<font color=#447700>!    number of atmospheric layers (np)<a name='1927'></font>
+<font color=#447700>!    cosine of the solar zenith angle (cosz)<a name='1928'></font>
+<font color=#447700>!    fractional cloud cover (fcld)<a name='1929'></font>
+<font color=#447700>!    cloud optical thickness (taucld)<a name='1930'></font>
+<font color=#447700>!    index separating high and middle clouds (ict)<a name='1931'></font>
+<font color=#447700>!    index separating middle and low clouds (icb)<a name='1932'></font>
+<font color=#447700>!<a name='1933'></font>
+<font color=#447700>!---output parameters<a name='1934'></font>
+<font color=#447700>!<a name='1935'></font>
+<font color=#447700>!    fractional cover of high, middle, and low clouds (cc)<a name='1936'></font>
+<font color=#447700>!    scaled cloud optical thickness for beam radiation (tauclb)<a name='1937'></font>
+<font color=#447700>!    scaled cloud optical thickness for diffuse radiation (tauclf)<a name='1938'></font>
+<font color=#447700>!<a name='1939'></font>
+<font color=#447700>!********************************************************************<a name='1940'></font>
+      implicit none<a name='1941'>
+<font color=#447700>!********************************************************************<a name='1942'></font>
+<a name='1943'>
+<font color=#447700>!-----input parameters<a name='1944'></font>
+<a name='1945'>
+      integer m,n,ndim,np<a name='1946'>
+      integer ict(m,ndim),icb(m,ndim)<a name='1947'>
+      real cosz(m,ndim),fcld(m,ndim,np),taucld(m,ndim,np,2)<a name='1948'>
+<a name='1949'>
+<font color=#447700>!-----output parameters<a name='1950'></font>
+<a name='1951'>
+      real cc(m,n,3),tauclb(m,n,np),tauclf(m,n,np)<a name='1952'>
+<a name='1953'>
+<font color=#447700>!-----temporary variables<a name='1954'></font>
+<a name='1955'>
+      integer i,j,k,im,it,ia,kk<a name='1956'>
+      real  fm,ft,fa,xai,taux<a name='1957'>
+<a name='1958'>
+<font color=#447700>!-----pre-computed table<a name='1959'></font>
+<a name='1960'>
+      integer   nm,nt,na<a name='1961'>
+      parameter (nm=11,nt=9,na=11) <a name='1962'>
+      real  dm,dt,da,t1,caib(nm,nt,na),caif(nt,na)<a name='1963'>
+      parameter (dm=0.1,dt=0.30103,da=0.1,t1=-0.9031)<a name='1964'>
+<a name='1965'>
+<font color=#447700>!-----include the pre-computed table of mcai for scaling the cloud optical<a name='1966'></font>
+<font color=#447700>!     thickness under the assumption that clouds are maximally overlapped<a name='1967'></font>
+<font color=#447700>!<a name='1968'></font>
+<font color=#447700>!     caib is for scaling the cloud optical thickness for direct radiation<a name='1969'></font>
+<font color=#447700>!     caif is for scaling the cloud optical thickness for diffuse radiation<a name='1970'></font>
+<a name='1971'>
+<a name='1972'>
+      data ((caib(1,i,j),j=1,11),i=1,9)/  &amp;<a name='1973'>
+       .000,0.068,0.140,0.216,0.298,0.385,0.481,0.586,0.705,0.840,1.000, &amp;<a name='1974'>
+       .000,0.052,0.106,0.166,0.230,0.302,0.383,0.478,0.595,0.752,1.000, &amp;<a name='1975'>
+       .000,0.038,0.078,0.120,0.166,0.218,0.276,0.346,0.438,0.582,1.000, &amp;<a name='1976'>
+       .000,0.030,0.060,0.092,0.126,0.164,0.206,0.255,0.322,0.442,1.000, &amp;<a name='1977'>
+       .000,0.025,0.051,0.078,0.106,0.136,0.170,0.209,0.266,0.462,1.000, &amp;<a name='1978'>
+       .000,0.023,0.046,0.070,0.095,0.122,0.150,0.187,0.278,0.577,1.000, &amp;<a name='1979'>
+       .000,0.022,0.043,0.066,0.089,0.114,0.141,0.187,0.354,0.603,1.000, &amp;<a name='1980'>
+       .000,0.021,0.042,0.063,0.086,0.108,0.135,0.214,0.349,0.565,1.000, &amp;<a name='1981'>
+       .000,0.021,0.041,0.062,0.083,0.105,0.134,0.202,0.302,0.479,1.000/<a name='1982'>
+      data ((caib(2,i,j),j=1,11),i=1,9)/ &amp;<a name='1983'>
+       .000,0.088,0.179,0.272,0.367,0.465,0.566,0.669,0.776,0.886,1.000, &amp;<a name='1984'>
+       .000,0.079,0.161,0.247,0.337,0.431,0.531,0.637,0.749,0.870,1.000, &amp;<a name='1985'>
+       .000,0.065,0.134,0.207,0.286,0.372,0.466,0.572,0.692,0.831,1.000, &amp;<a name='1986'>
+       .000,0.049,0.102,0.158,0.221,0.290,0.370,0.465,0.583,0.745,1.000, &amp;<a name='1987'>
+       .000,0.037,0.076,0.118,0.165,0.217,0.278,0.354,0.459,0.638,1.000, &amp;<a name='1988'>
+       .000,0.030,0.061,0.094,0.130,0.171,0.221,0.286,0.398,0.631,1.000, &amp;<a name='1989'>
+       .000,0.026,0.052,0.081,0.111,0.146,0.189,0.259,0.407,0.643,1.000, &amp;<a name='1990'>
+       .000,0.023,0.047,0.072,0.098,0.129,0.170,0.250,0.387,0.598,1.000, &amp;<a name='1991'>
+       .000,0.022,0.044,0.066,0.090,0.118,0.156,0.224,0.328,0.508,1.000/<a name='1992'>
+      data ((caib(3,i,j),j=1,11),i=1,9)/ &amp;<a name='1993'>
+       .000,0.094,0.189,0.285,0.383,0.482,0.582,0.685,0.788,0.894,1.000, &amp;<a name='1994'>
+       .000,0.088,0.178,0.271,0.366,0.465,0.565,0.669,0.776,0.886,1.000, &amp;<a name='1995'>
+       .000,0.079,0.161,0.247,0.337,0.431,0.531,0.637,0.750,0.870,1.000, &amp;<a name='1996'>
+       .000,0.066,0.134,0.209,0.289,0.375,0.470,0.577,0.697,0.835,1.000, &amp;<a name='1997'>
+       .000,0.050,0.104,0.163,0.227,0.300,0.383,0.483,0.606,0.770,1.000, &amp;<a name='1998'>
+       .000,0.038,0.080,0.125,0.175,0.233,0.302,0.391,0.518,0.710,1.000, &amp;<a name='1999'>
+       .000,0.031,0.064,0.100,0.141,0.188,0.249,0.336,0.476,0.689,1.000, &amp;<a name='2000'>
+       .000,0.026,0.054,0.084,0.118,0.158,0.213,0.298,0.433,0.638,1.000, &amp;<a name='2001'>
+       .000,0.023,0.048,0.074,0.102,0.136,0.182,0.254,0.360,0.542,1.000/<a name='2002'>
+      data ((caib(4,i,j),j=1,11),i=1,9)/ &amp;<a name='2003'>
+       .000,0.096,0.193,0.290,0.389,0.488,0.589,0.690,0.792,0.896,1.000, &amp;<a name='2004'>
+       .000,0.092,0.186,0.281,0.378,0.477,0.578,0.680,0.785,0.891,1.000, &amp;<a name='2005'>
+       .000,0.086,0.174,0.264,0.358,0.455,0.556,0.660,0.769,0.882,1.000, &amp;<a name='2006'>
+       .000,0.074,0.153,0.235,0.323,0.416,0.514,0.622,0.737,0.862,1.000, &amp;<a name='2007'>
+       .000,0.061,0.126,0.195,0.271,0.355,0.449,0.555,0.678,0.823,1.000, &amp;<a name='2008'>
+       .000,0.047,0.098,0.153,0.215,0.286,0.370,0.471,0.600,0.770,1.000, &amp;<a name='2009'>
+       .000,0.037,0.077,0.120,0.170,0.230,0.303,0.401,0.537,0.729,1.000, &amp;<a name='2010'>
+       .000,0.030,0.062,0.098,0.138,0.187,0.252,0.343,0.476,0.673,1.000, &amp;<a name='2011'>
+       .000,0.026,0.053,0.082,0.114,0.154,0.207,0.282,0.391,0.574,1.000/<a name='2012'>
+      data ((caib(5,i,j),j=1,11),i=1,9)/ &amp;<a name='2013'>
+       .000,0.097,0.194,0.293,0.392,0.492,0.592,0.693,0.794,0.897,1.000, &amp;<a name='2014'>
+       .000,0.094,0.190,0.286,0.384,0.483,0.584,0.686,0.789,0.894,1.000, &amp;<a name='2015'>
+       .000,0.090,0.181,0.274,0.370,0.468,0.569,0.672,0.778,0.887,1.000, &amp;<a name='2016'>
+       .000,0.081,0.165,0.252,0.343,0.439,0.539,0.645,0.757,0.874,1.000, &amp;<a name='2017'>
+       .000,0.069,0.142,0.218,0.302,0.392,0.490,0.598,0.717,0.850,1.000, &amp;<a name='2018'>
+       .000,0.054,0.114,0.178,0.250,0.330,0.422,0.529,0.656,0.810,1.000, &amp;<a name='2019'>
+       .000,0.042,0.090,0.141,0.200,0.269,0.351,0.455,0.589,0.764,1.000, &amp;<a name='2020'>
+       .000,0.034,0.070,0.112,0.159,0.217,0.289,0.384,0.515,0.703,1.000, &amp;<a name='2021'>
+       .000,0.028,0.058,0.090,0.128,0.174,0.231,0.309,0.420,0.602,1.000/<a name='2022'>
+      data ((caib(6,i,j),j=1,11),i=1,9)/ &amp;<a name='2023'>
+       .000,0.098,0.196,0.295,0.394,0.494,0.594,0.695,0.796,0.898,1.000, &amp;<a name='2024'>
+       .000,0.096,0.193,0.290,0.389,0.488,0.588,0.690,0.792,0.895,1.000, &amp;<a name='2025'>
+       .000,0.092,0.186,0.281,0.378,0.477,0.577,0.680,0.784,0.891,1.000, &amp;<a name='2026'>
+       .000,0.086,0.174,0.264,0.358,0.455,0.556,0.661,0.769,0.882,1.000, &amp;<a name='2027'>
+       .000,0.075,0.154,0.237,0.325,0.419,0.518,0.626,0.741,0.865,1.000, &amp;<a name='2028'>
+       .000,0.062,0.129,0.201,0.279,0.366,0.462,0.571,0.694,0.836,1.000, &amp;<a name='2029'>
+       .000,0.049,0.102,0.162,0.229,0.305,0.394,0.501,0.631,0.793,1.000, &amp;<a name='2030'>
+       .000,0.038,0.080,0.127,0.182,0.245,0.323,0.422,0.550,0.730,1.000, &amp;<a name='2031'>
+       .000,0.030,0.064,0.100,0.142,0.192,0.254,0.334,0.448,0.627,1.000/<a name='2032'>
+      data ((caib(7,i,j),j=1,11),i=1,9)/ &amp;<a name='2033'>
+       .000,0.098,0.198,0.296,0.396,0.496,0.596,0.696,0.797,0.898,1.000, &amp;<a name='2034'>
+       .000,0.097,0.194,0.293,0.392,0.491,0.591,0.693,0.794,0.897,1.000, &amp;<a name='2035'>
+       .000,0.094,0.190,0.286,0.384,0.483,0.583,0.686,0.789,0.894,1.000, &amp;<a name='2036'>
+       .000,0.089,0.180,0.274,0.369,0.467,0.568,0.672,0.778,0.887,1.000, &amp;<a name='2037'>
+       .000,0.081,0.165,0.252,0.344,0.440,0.541,0.646,0.758,0.875,1.000, &amp;<a name='2038'>
+       .000,0.069,0.142,0.221,0.306,0.397,0.496,0.604,0.722,0.854,1.000, &amp;<a name='2039'>
+       .000,0.056,0.116,0.182,0.256,0.338,0.432,0.540,0.666,0.816,1.000, &amp;<a name='2040'>
+       .000,0.043,0.090,0.143,0.203,0.273,0.355,0.455,0.583,0.754,1.000, &amp;<a name='2041'>
+       .000,0.034,0.070,0.111,0.157,0.210,0.276,0.359,0.474,0.650,1.000/<a name='2042'>
+      data ((caib(8,i,j),j=1,11),i=1,9)/ &amp;<a name='2043'>
+       .000,0.099,0.198,0.298,0.398,0.497,0.598,0.698,0.798,0.899,1.000, &amp;<a name='2044'>
+       .000,0.098,0.196,0.295,0.394,0.494,0.594,0.695,0.796,0.898,1.000, &amp;<a name='2045'>
+       .000,0.096,0.193,0.290,0.390,0.489,0.589,0.690,0.793,0.896,1.000, &amp;<a name='2046'>
+       .000,0.093,0.186,0.282,0.379,0.478,0.578,0.681,0.786,0.892,1.000, &amp;<a name='2047'>
+       .000,0.086,0.175,0.266,0.361,0.458,0.558,0.663,0.771,0.883,1.000, &amp;<a name='2048'>
+       .000,0.076,0.156,0.240,0.330,0.423,0.523,0.630,0.744,0.867,1.000, &amp;<a name='2049'>
+       .000,0.063,0.130,0.203,0.282,0.369,0.465,0.572,0.694,0.834,1.000, &amp;<a name='2050'>
+       .000,0.049,0.102,0.161,0.226,0.299,0.385,0.486,0.611,0.774,1.000, &amp;<a name='2051'>
+       .000,0.038,0.078,0.122,0.172,0.229,0.297,0.382,0.498,0.672,1.000/<a name='2052'>
+      data ((caib(9,i,j),j=1,11),i=1,9)/ &amp;<a name='2053'>
+       .000,0.099,0.199,0.298,0.398,0.498,0.598,0.699,0.799,0.899,1.000, &amp;<a name='2054'>
+       .000,0.099,0.198,0.298,0.398,0.497,0.598,0.698,0.798,0.899,1.000, &amp;<a name='2055'>
+       .000,0.098,0.196,0.295,0.394,0.494,0.594,0.695,0.796,0.898,1.000, &amp;<a name='2056'>
+       .000,0.096,0.193,0.290,0.389,0.488,0.588,0.690,0.792,0.895,1.000, &amp;<a name='2057'>
+       .000,0.092,0.185,0.280,0.376,0.474,0.575,0.678,0.782,0.890,1.000, &amp;<a name='2058'>
+       .000,0.084,0.170,0.259,0.351,0.447,0.547,0.652,0.762,0.878,1.000, &amp;<a name='2059'>
+       .000,0.071,0.146,0.224,0.308,0.398,0.494,0.601,0.718,0.850,1.000, &amp;<a name='2060'>
+       .000,0.056,0.114,0.178,0.248,0.325,0.412,0.514,0.638,0.793,1.000, &amp;<a name='2061'>
+       .000,0.042,0.086,0.134,0.186,0.246,0.318,0.405,0.521,0.691,1.000/<a name='2062'>
+      data ((caib(10,i,j),j=1,11),i=1,9)/ &amp;<a name='2063'>
+       .000,0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,1.000, &amp;<a name='2064'>
+       .000,0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,1.000, &amp;<a name='2065'>
+       .000,0.100,0.200,0.300,0.400,0.500,0.600,0.700,0.800,0.900,1.000, &amp;<a name='2066'>
+       .000,0.100,0.199,0.298,0.398,0.498,0.598,0.698,0.798,0.899,1.000, &amp;<a name='2067'>
+       .000,0.098,0.196,0.294,0.392,0.491,0.590,0.691,0.793,0.896,1.000, &amp;<a name='2068'>
+       .000,0.092,0.185,0.278,0.374,0.470,0.570,0.671,0.777,0.886,1.000, &amp;<a name='2069'>
+       .000,0.081,0.162,0.246,0.333,0.424,0.521,0.625,0.738,0.862,1.000, &amp;<a name='2070'>
+       .000,0.063,0.128,0.196,0.270,0.349,0.438,0.540,0.661,0.809,1.000, &amp;<a name='2071'>
+       .000,0.046,0.094,0.146,0.202,0.264,0.337,0.426,0.542,0.710,1.000/ <a name='2072'>
+      data ((caib(11,i,j),j=1,11),i=1,9)/ &amp;<a name='2073'>
+       .000,0.101,0.202,0.302,0.402,0.502,0.602,0.702,0.802,0.901,1.000, &amp;<a name='2074'>
+       .000,0.102,0.202,0.303,0.404,0.504,0.604,0.703,0.802,0.902,1.000, &amp;<a name='2075'>
+       .000,0.102,0.205,0.306,0.406,0.506,0.606,0.706,0.804,0.902,1.000, &amp;<a name='2076'>
+       .000,0.104,0.207,0.309,0.410,0.510,0.609,0.707,0.805,0.902,1.000, &amp;<a name='2077'>
+       .000,0.106,0.208,0.309,0.409,0.508,0.606,0.705,0.803,0.902,1.000, &amp;<a name='2078'>
+       .000,0.102,0.202,0.298,0.395,0.493,0.590,0.690,0.790,0.894,1.000, &amp;<a name='2079'>
+       .000,0.091,0.179,0.267,0.357,0.449,0.545,0.647,0.755,0.872,1.000, &amp;<a name='2080'>
+       .000,0.073,0.142,0.214,0.290,0.372,0.462,0.563,0.681,0.822,1.000, &amp;<a name='2081'>
+       .000,0.053,0.104,0.158,0.217,0.281,0.356,0.446,0.562,0.726,1.000/<a name='2082'>
+      data ((caif(i,j),j=1,11),i=1,9)/ &amp;<a name='2083'>
+       .000,0.099,0.198,0.297,0.397,0.496,0.597,0.697,0.798,0.899,1.000, &amp;<a name='2084'>
+       .000,0.098,0.196,0.294,0.394,0.494,0.594,0.694,0.796,0.898,1.000, &amp;<a name='2085'>
+       .000,0.096,0.192,0.290,0.388,0.487,0.587,0.689,0.792,0.895,1.000, &amp;<a name='2086'>
+       .000,0.092,0.185,0.280,0.376,0.476,0.576,0.678,0.783,0.890,1.000, &amp;<a name='2087'>
+       .000,0.085,0.173,0.263,0.357,0.454,0.555,0.659,0.768,0.881,1.000, &amp;<a name='2088'>
+       .000,0.076,0.154,0.237,0.324,0.418,0.517,0.624,0.738,0.864,1.000, &amp;<a name='2089'>
+       .000,0.063,0.131,0.203,0.281,0.366,0.461,0.567,0.688,0.830,1.000, &amp;<a name='2090'>
+       .000,0.052,0.107,0.166,0.232,0.305,0.389,0.488,0.610,0.770,1.000, &amp;<a name='2091'>
+       .000,0.043,0.088,0.136,0.189,0.248,0.317,0.400,0.510,0.675,1.000/<a name='2092'>
+<a name='2093'>
+<font color=#447700>!-----clouds within each of the high, middle, and low clouds are assumed<a name='2094'></font>
+<font color=#447700>!     to be maximally overlapped, and the cloud cover (cc) for a group<a name='2095'></font>
+<font color=#447700>!     (high, middle, or low) is the maximum cloud cover of all the layers<a name='2096'></font>
+<font color=#447700>!     within a group<a name='2097'></font>
+<a name='2098'>
+      do j=1,n<a name='2099'>
+       do i=1,m<a name='2100'>
+         cc(i,j,1)=0.0<a name='2101'>
+         cc(i,j,2)=0.0<a name='2102'>
+         cc(i,j,3)=0.0<a name='2103'>
+       enddo<a name='2104'>
+      enddo<a name='2105'>
+      do j=1,n<a name='2106'>
+       do i=1,m<a name='2107'>
+        do k=1,ict(i,j)-1<a name='2108'>
+          cc(i,j,1)=max(cc(i,j,1),fcld(i,j,k))<a name='2109'>
+        enddo<a name='2110'>
+       enddo<a name='2111'>
+      enddo<a name='2112'>
+<a name='2113'>
+      do j=1,n<a name='2114'>
+       do i=1,m<a name='2115'>
+        do k=ict(i,j),icb(i,j)-1<a name='2116'>
+          cc(i,j,2)=max(cc(i,j,2),fcld(i,j,k))<a name='2117'>
+        enddo<a name='2118'>
+       enddo<a name='2119'>
+      enddo<a name='2120'>
+<a name='2121'>
+      do j=1,n<a name='2122'>
+       do i=1,m<a name='2123'>
+        do k=icb(i,j),np<a name='2124'>
+          cc(i,j,3)=max(cc(i,j,3),fcld(i,j,k))<a name='2125'>
+        enddo<a name='2126'>
+       enddo<a name='2127'>
+      enddo<a name='2128'>
+<a name='2129'>
+<font color=#447700>!-----scale the cloud optical thickness.<a name='2130'></font>
+<font color=#447700>!     taucld(i,j,k,1) is the optical thickness for ice particles, and<a name='2131'></font>
+<font color=#447700>!     taucld(i,j,k,2) is the optical thickness for liquid particles.<a name='2132'></font>
+      <a name='2133'>
+      do j=1,n<a name='2134'>
+       do i=1,m<a name='2135'>
+<a name='2136'>
+        do k=1,np<a name='2137'>
+<a name='2138'>
+         if(k.lt.ict(i,j)) then<a name='2139'>
+            kk=1<a name='2140'>
+         elseif(k.ge.ict(i,j) .and. k.lt.icb(i,j)) then<a name='2141'>
+            kk=2<a name='2142'>
+         else<a name='2143'>
+            kk=3<a name='2144'>
+         endif<a name='2145'>
+<a name='2146'>
+         tauclb(i,j,k) = 0.0<a name='2147'>
+         tauclf(i,j,k) = 0.0<a name='2148'>
+<a name='2149'>
+         taux=taucld(i,j,k,1)+taucld(i,j,k,2)<a name='2150'>
+         if (taux.gt.0.05 .and. fcld(i,j,k).gt.0.01) then<a name='2151'>
+<a name='2152'>
+<font color=#447700>!-----normalize cloud cover<a name='2153'></font>
+<a name='2154'>
+           fa=fcld(i,j,k)/cc(i,j,kk)<a name='2155'>
+<a name='2156'>
+<font color=#447700>!-----table look-up<a name='2157'></font>
+<a name='2158'>
+           taux=min(taux,32.)<a name='2159'>
+<a name='2160'>
+           fm=cosz(i,j)/dm<a name='2161'>
+           ft=(log10(taux)-t1)/dt<a name='2162'>
+           fa=fa/da<a name='2163'>
+ <a name='2164'>
+           im=int(fm+1.5)<a name='2165'>
+           it=int(ft+1.5)<a name='2166'>
+           ia=int(fa+1.5)<a name='2167'>
+  <a name='2168'>
+           im=max(im,2)<a name='2169'>
+           it=max(it,2)<a name='2170'>
+           ia=max(ia,2)<a name='2171'>
+     <a name='2172'>
+           im=min(im,nm-1)<a name='2173'>
+           it=min(it,nt-1)<a name='2174'>
+           ia=min(ia,na-1)<a name='2175'>
+<a name='2176'>
+           fm=fm-float(im-1)<a name='2177'>
+           ft=ft-float(it-1)<a name='2178'>
+           fa=fa-float(ia-1)<a name='2179'>
+<a name='2180'>
+<font color=#447700>!-----scale cloud optical thickness for beam radiation.<a name='2181'></font>
+<font color=#447700>!     the scaling factor, xai, is a function of the solar zenith<a name='2182'></font>
+<font color=#447700>!     angle, optical thickness, and cloud cover.<a name='2183'></font>
+ <a name='2184'>
+           xai=    (-caib(im-1,it,ia)*(1.-fm)+ &amp;<a name='2185'>
+            caib(im+1,it,ia)*(1.+fm))*fm*.5+caib(im,it,ia)*(1.-fm*fm)<a name='2186'>
+         <a name='2187'>
+           xai=xai+(-caib(im,it-1,ia)*(1.-ft)+ &amp;<a name='2188'>
+            caib(im,it+1,ia)*(1.+ft))*ft*.5+caib(im,it,ia)*(1.-ft*ft)<a name='2189'>
+<a name='2190'>
+           xai=xai+(-caib(im,it,ia-1)*(1.-fa)+ &amp;<a name='2191'>
+           caib(im,it,ia+1)*(1.+fa))*fa*.5+caib(im,it,ia)*(1.-fa*fa)<a name='2192'>
+<a name='2193'>
+           xai= xai-2.*caib(im,it,ia)<a name='2194'>
+           xai=max(xai,0.0)<a name='2195'>
+     <a name='2196'>
+           tauclb(i,j,k) = taux*xai<a name='2197'>
+<a name='2198'>
+<font color=#447700>!-----scale cloud optical thickness for diffuse radiation.<a name='2199'></font>
+<font color=#447700>!     the scaling factor, xai, is a function of the cloud optical<a name='2200'></font>
+<font color=#447700>!     thickness and cover but not the solar zenith angle.<a name='2201'></font>
+<a name='2202'>
+           xai=    (-caif(it-1,ia)*(1.-ft)+ &amp;<a name='2203'>
+            caif(it+1,ia)*(1.+ft))*ft*.5+caif(it,ia)*(1.-ft*ft)<a name='2204'>
+<a name='2205'>
+           xai=xai+(-caif(it,ia-1)*(1.-fa)+ &amp;<a name='2206'>
+            caif(it,ia+1)*(1.+fa))*fa*.5+caif(it,ia)*(1.-fa*fa)<a name='2207'>
+<a name='2208'>
+           xai= xai-caif(it,ia)<a name='2209'>
+           xai=max(xai,0.0)<a name='2210'>
+     <a name='2211'>
+           tauclf(i,j,k) = taux*xai<a name='2212'>
+<a name='2213'>
+         endif<a name='2214'>
+<a name='2215'>
+        enddo<a name='2216'>
+       enddo<a name='2217'>
+      enddo<a name='2218'>
+<a name='2219'>
+      end subroutine cldscale<a name='2220'>
+<a name='2221'>
+<font color=#447700>!*********************************************************************<a name='2222'></font>
+<a name='2223'>
+<A NAME='DELEDD'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#DELEDD' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2224'>
+      <font color=#993300>subroutine </font><font color=#cc0000>deledd</font>(tau,ssc,g0,csm,rr,tt,td) <A href='../../call_to/DELEDD.html' TARGET='index'>4</A><a name='2225'>
+<a name='2226'>
+<font color=#447700>!*********************************************************************<a name='2227'></font>
+<font color=#447700>!<a name='2228'></font>
+<font color=#447700>!-----uses the delta-eddington approximation to compute the<a name='2229'></font>
+<font color=#447700>!     bulk scattering properties of a single layer<a name='2230'></font>
+<font color=#447700>!     coded following King and Harshvardhan (JAS, 1986)<a name='2231'></font>
+<font color=#447700>!<a name='2232'></font>
+<font color=#447700>!  inputs:<a name='2233'></font>
+<font color=#447700>!<a name='2234'></font>
+<font color=#447700>!     tau: the effective optical thickness<a name='2235'></font>
+<font color=#447700>!     ssc: the effective single scattering albedo<a name='2236'></font>
+<font color=#447700>!     g0:  the effective asymmetry factor<a name='2237'></font>
+<font color=#447700>!     csm: the effective secant of the zenith angle<a name='2238'></font>
+<font color=#447700>!<a name='2239'></font>
+<font color=#447700>!  outputs:<a name='2240'></font>
+<font color=#447700>!<a name='2241'></font>
+<font color=#447700>!     rr: the layer reflection of the direct beam<a name='2242'></font>
+<font color=#447700>!     tt: the layer diffuse transmission of the direct beam<a name='2243'></font>
+<font color=#447700>!     td: the layer direct transmission of the direct beam<a name='2244'></font>
+<font color=#447700>!<a name='2245'></font>
+<font color=#447700>!*********************************************************************<a name='2246'></font>
+      implicit none<a name='2247'>
+<font color=#447700>!*********************************************************************<a name='2248'></font>
+<a name='2249'>
+      real zero,one,two,three,four,fourth,seven,thresh<a name='2250'>
+      parameter (one =1., three=3.)<a name='2251'>
+      parameter (two =2., seven=7.)<a name='2252'>
+      parameter (four=4., fourth=.25)<a name='2253'>
+      parameter (zero=0., thresh=1.e-8)<a name='2254'>
+<a name='2255'>
+<font color=#447700>!-----input parameters<a name='2256'></font>
+      real tau,ssc,g0,csm<a name='2257'>
+<a name='2258'>
+<font color=#447700>!-----output parameters<a name='2259'></font>
+      real rr,tt,td<a name='2260'>
+<a name='2261'>
+<font color=#447700>!-----temporary parameters<a name='2262'></font>
+<a name='2263'>
+      real zth,ff,xx,taup,sscp,gp,gm1,gm2,gm3,akk,alf1,alf2, &amp;<a name='2264'>
+           all,bll,st7,st8,cll,dll,fll,ell,st1,st2,st3,st4<a name='2265'>
+ <a name='2266'>
+<font color=#447700>!---------------------------------------------------------------------<a name='2267'></font>
+<a name='2268'>
+                zth = one / csm<a name='2269'>
+ <a name='2270'>
+<font color=#447700>!  delta-eddington scaling of single scattering albedo,<a name='2271'></font>
+<font color=#447700>!  optical thickness, and asymmetry factor,<a name='2272'></font>
+<font color=#447700>!  K &amp; H eqs(27-29)<a name='2273'></font>
+<a name='2274'>
+                ff  = g0*g0<a name='2275'>
+                xx  = one-ff*ssc<a name='2276'>
+                taup= tau*xx<a name='2277'>
+                sscp= ssc*(one-ff)/xx<a name='2278'>
+                gp  = g0/(one+g0)<a name='2279'>
+ <a name='2280'>
+<font color=#447700>!  gamma1, gamma2, and gamma3. see table 2 and eq(26) K &amp; H<a name='2281'></font>
+<font color=#447700>!  ssc and gp are the d-s single scattering<a name='2282'></font>
+<font color=#447700>!  albedo and asymmetry factor.<a name='2283'></font>
+<a name='2284'>
+                xx  =  three*gp <a name='2285'>
+                gm1 =  (seven - sscp*(four+xx))*fourth<a name='2286'>
+                gm2 = -(one   - sscp*(four-xx))*fourth<a name='2287'>
+ <a name='2288'>
+<font color=#447700>!  akk is k as defined in eq(25) of K &amp; H<a name='2289'></font>
+ <a name='2290'>
+                akk = sqrt((gm1+gm2)*(gm1-gm2))<a name='2291'>
+ <a name='2292'>
+                xx  = akk * zth<a name='2293'>
+                st7 = one - xx<a name='2294'>
+                st8 = one + xx<a name='2295'>
+                st3 = st7 * st8<a name='2296'>
+<a name='2297'>
+                if (abs(st3) .lt. thresh) then<a name='2298'>
+                    zth = zth + 0.001<a name='2299'>
+                    xx  = akk * zth<a name='2300'>
+                    st7 = one - xx<a name='2301'>
+                    st8 = one + xx<a name='2302'>
+                    st3 = st7 * st8<a name='2303'>
+                endif<a name='2304'>
+<a name='2305'>
+<font color=#447700>!  extinction of the direct beam transmission<a name='2306'></font>
+ <a name='2307'>
+                td  = exp(-taup/zth)<a name='2308'>
+<a name='2309'>
+<font color=#447700>!  alf1 and alf2 are alpha1 and alpha2 from eqs (23) &amp; (24) of K &amp; H<a name='2310'></font>
+ <a name='2311'>
+                gm3  = (two - zth*three*gp)*fourth<a name='2312'>
+                xx   = gm1 - gm2<a name='2313'>
+                alf1 = gm1 - gm3 * xx<a name='2314'>
+                alf2 = gm2 + gm3 * xx<a name='2315'>
+ <a name='2316'>
+<font color=#447700>!  all is last term in eq(21) of K &amp; H<a name='2317'></font>
+<font color=#447700>!  bll is last term in eq(22) of K &amp; H<a name='2318'></font>
+ <a name='2319'>
+                xx  = akk * two<a name='2320'>
+                all = (gm3 - alf2 * zth    )*xx*td<a name='2321'>
+                bll = (one - gm3 + alf1*zth)*xx<a name='2322'>
+ <a name='2323'>
+                xx  = akk * gm3<a name='2324'>
+                cll = (alf2 + xx) * st7<a name='2325'>
+                dll = (alf2 - xx) * st8<a name='2326'>
+ <a name='2327'>
+                xx  = akk * (one-gm3)<a name='2328'>
+                fll = (alf1 + xx) * st8<a name='2329'>
+                ell = (alf1 - xx) * st7<a name='2330'>
+  <a name='2331'>
+                st2 = exp(-akk*taup)<a name='2332'>
+                st4 = st2 * st2<a name='2333'>
+ <a name='2334'>
+                st1 =  sscp / ((akk+gm1 + (akk-gm1)*st4) * st3)<a name='2335'>
+ <a name='2336'>
+<font color=#447700>!  rr is r-hat of eq(21) of K &amp; H<a name='2337'></font>
+<font color=#447700>!  tt is diffuse part of t-hat of eq(22) of K &amp; H<a name='2338'></font>
+ <a name='2339'>
+                rr =   ( cll-dll*st4    -all*st2)*st1<a name='2340'>
+                tt = - ((fll-ell*st4)*td-bll*st2)*st1<a name='2341'>
+ <a name='2342'>
+                rr = max(rr,zero)<a name='2343'>
+                tt = max(tt,zero)<a name='2344'>
+<a name='2345'>
+      end subroutine deledd<a name='2346'>
+<a name='2347'>
+<font color=#447700>!*********************************************************************<a name='2348'></font>
+<a name='2349'>
+<A NAME='SAGPOL'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#SAGPOL' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2350'>
+      <font color=#993300>subroutine </font><font color=#cc0000>sagpol</font>(tau,ssc,g0,rll,tll) <A href='../../call_to/SAGPOL.html' TARGET='index'>4</A><a name='2351'>
+<a name='2352'>
+<font color=#447700>!*********************************************************************<a name='2353'></font>
+<font color=#447700>!-----transmittance (tll) and reflectance (rll) of diffuse radiation<a name='2354'></font>
+<font color=#447700>!     follows Sagan and Pollock (JGR, 1967).<a name='2355'></font>
+<font color=#447700>!     also, eq.(31) of Lacis and Hansen (JAS, 1974).<a name='2356'></font>
+<font color=#447700>!<a name='2357'></font>
+<font color=#447700>!-----input parameters:<a name='2358'></font>
+<font color=#447700>!<a name='2359'></font>
+<font color=#447700>!      tau: the effective optical thickness<a name='2360'></font>
+<font color=#447700>!      ssc: the effective single scattering albedo<a name='2361'></font>
+<font color=#447700>!      g0:  the effective asymmetry factor<a name='2362'></font>
+<font color=#447700>!<a name='2363'></font>
+<font color=#447700>!-----output parameters:<a name='2364'></font>
+<font color=#447700>!<a name='2365'></font>
+<font color=#447700>!      rll: the layer reflection of diffuse radiation<a name='2366'></font>
+<font color=#447700>!      tll: the layer transmission of diffuse radiation<a name='2367'></font>
+<font color=#447700>!<a name='2368'></font>
+<font color=#447700>!*********************************************************************<a name='2369'></font>
+      implicit none<a name='2370'>
+<font color=#447700>!*********************************************************************<a name='2371'></font>
+<a name='2372'>
+      real one,three,four<a name='2373'>
+      parameter (one=1., three=3., four=4.)<a name='2374'>
+<a name='2375'>
+<font color=#447700>!-----output parameters:<a name='2376'></font>
+<a name='2377'>
+      real tau,ssc,g0<a name='2378'>
+<a name='2379'>
+<font color=#447700>!-----output parameters:<a name='2380'></font>
+<a name='2381'>
+      real rll,tll<a name='2382'>
+<a name='2383'>
+<font color=#447700>!-----temporary arrays<a name='2384'></font>
+<a name='2385'>
+      real xx,uuu,ttt,emt,up1,um1,st1<a name='2386'>
+<a name='2387'>
+             xx  = one-ssc*g0<a name='2388'>
+             uuu = sqrt( xx/(one-ssc))<a name='2389'>
+             ttt = sqrt( xx*(one-ssc)*three )*tau<a name='2390'>
+             emt = exp(-ttt)<a name='2391'>
+             up1 = uuu + one<a name='2392'>
+             um1 = uuu - one<a name='2393'>
+             xx  = um1*emt<a name='2394'>
+             st1 = one / ((up1+xx) * (up1-xx))<a name='2395'>
+             rll = up1*um1*(one-emt*emt)*st1<a name='2396'>
+             tll = uuu*four*emt         *st1<a name='2397'>
+<a name='2398'>
+      end subroutine sagpol<a name='2399'>
+<a name='2400'>
+<font color=#447700>!*******************************************************************<a name='2401'></font>
+<a name='2402'>
+<A NAME='CLDFLX'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#CLDFLX' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2403'>
+      <font color=#993300>subroutine </font><font color=#cc0000>cldflx</font> (m,n,np,ict,icb,overcast,cc,rr,tt,td,rs,ts,&amp; <A href='../../call_to/CLDFLX.html' TARGET='index'>2</A><a name='2404'>
+                 fclr,fall,fallu,falld,fsdir,fsdif)<a name='2405'>
+<a name='2406'>
+<font color=#447700>!*******************************************************************<a name='2407'></font>
+<font color=#447700>!  compute upward and downward fluxes using a two-stream adding method<a name='2408'></font>
+<font color=#447700>!  following equations (3)-(5) of Chou (1992, JAS).<a name='2409'></font>
+<font color=#447700>!<a name='2410'></font>
+<font color=#447700>!  clouds are grouped into high, middle, and low clouds which are <a name='2411'></font>
+<font color=#447700>!  assumed randomly overlapped. It involves eight sets of calculations.<a name='2412'></font>
+<font color=#447700>!  In each set of calculations, each atmospheric layer is homogeneous,<a name='2413'></font>
+<font color=#447700>!  either totally filled with clouds or without clouds.<a name='2414'></font>
+<a name='2415'>
+<font color=#447700>!  input parameters:<a name='2416'></font>
+<font color=#447700>!<a name='2417'></font>
+<font color=#447700>!     m:   number of soundings in zonal direction<a name='2418'></font>
+<font color=#447700>!     n:   number of soundings in meridional direction<a name='2419'></font>
+<font color=#447700>!     np:  number of atmospheric layers<a name='2420'></font>
+<font color=#447700>!     ict: the level separating high and middle clouds<a name='2421'></font>
+<font color=#447700>!     icb: the level separating middle and low clouds<a name='2422'></font>
+<font color=#447700>!     cc:  effective cloud covers for high, middle and low clouds<a name='2423'></font>
+<font color=#447700>!     tt:  diffuse transmission of a layer illuminated by beam radiation<a name='2424'></font>
+<font color=#447700>!     td:  direct beam tranmssion<a name='2425'></font>
+<font color=#447700>!     ts:  transmission of a layer illuminated by diffuse radiation<a name='2426'></font>
+<font color=#447700>!     rr:  reflection of a layer illuminated by beam radiation<a name='2427'></font>
+<font color=#447700>!     rs:  reflection of a layer illuminated by diffuse radiation<a name='2428'></font>
+<font color=#447700>!<a name='2429'></font>
+<font color=#447700>!  output parameters:<a name='2430'></font>
+<font color=#447700>!<a name='2431'></font>
+<font color=#447700>!     fclr:  clear-sky flux (downward minus upward)<a name='2432'></font>
+<font color=#447700>!     fall:  all-sky flux (downward minus upward)<a name='2433'></font>
+<font color=#447700>!     fsdir: surface direct downward flux<a name='2434'></font>
+<font color=#447700>!     fsdif: surface diffuse downward flux<a name='2435'></font>
+<font color=#447700>!<a name='2436'></font>
+<font color=#447700>!*********************************************************************c<a name='2437'></font>
+      implicit none<a name='2438'>
+<font color=#447700>!*********************************************************************c<a name='2439'></font>
+<a name='2440'>
+<font color=#447700>!-----input parameters<a name='2441'></font>
+<a name='2442'>
+      integer m,n,np<a name='2443'>
+      integer ict(m,n),icb(m,n)<a name='2444'>
+<a name='2445'>
+      real rr(m,n,np+1,2),tt(m,n,np+1,2),td(m,n,np+1,2)<a name='2446'>
+      real rs(m,n,np+1,2),ts(m,n,np+1,2)<a name='2447'>
+      real cc(m,n,3)<a name='2448'>
+      logical overcast<a name='2449'>
+<a name='2450'>
+<font color=#447700>!-----temporary array<a name='2451'></font>
+<a name='2452'>
+      integer i,j,k,ih,im,is,itm<a name='2453'>
+      real rra(m,n,np+1,2,2),tta(m,n,np+1,2,2),tda(m,n,np+1,2,2)<a name='2454'>
+      real rsa(m,n,np+1,2,2),rxa(m,n,np+1,2,2)<a name='2455'>
+      real ch(m,n),cm(m,n),ct(m,n),flxdn(m,n,np+1)<a name='2456'>
+      real flxdnu(m,n,np+1),flxdnd(m,n,np+1)<a name='2457'>
+      real fdndir(m,n),fdndif(m,n),fupdif<a name='2458'>
+      real denm,xx<a name='2459'>
+<a name='2460'>
+<font color=#447700>!-----output parameters<a name='2461'></font>
+<a name='2462'>
+      real fclr(m,n,np+1),fall(m,n,np+1)<a name='2463'>
+      real fallu(m,n,np+1),falld(m,n,np+1)<a name='2464'>
+      real fsdir(m,n),fsdif(m,n)<a name='2465'>
+<a name='2466'>
+<font color=#447700>!-----initialize all-sky flux (fall) and surface downward fluxes<a name='2467'></font>
+<a name='2468'>
+      do k=1,np+1<a name='2469'>
+       do j=1,n<a name='2470'>
+        do i=1,m<a name='2471'>
+           fclr(i,j,k)=0.0<a name='2472'>
+           fall(i,j,k)=0.0<a name='2473'>
+           fallu(i,j,k)=0.0<a name='2474'>
+           falld(i,j,k)=0.0<a name='2475'>
+        enddo<a name='2476'>
+       enddo<a name='2477'>
+      enddo<a name='2478'>
+<a name='2479'>
+       do j=1,n<a name='2480'>
+        do i=1,m<a name='2481'>
+           fsdir(i,j)=0.0<a name='2482'>
+           fsdif(i,j)=0.0<a name='2483'>
+        enddo<a name='2484'>
+       enddo<a name='2485'>
+<a name='2486'>
+<font color=#447700>!-----compute transmittances and reflectances for a composite of<a name='2487'></font>
+<font color=#447700>!     layers. layers are added one at a time, going down from the top.<a name='2488'></font>
+<font color=#447700>!     tda is the composite transmittance illuminated by beam radiation<a name='2489'></font>
+<font color=#447700>!     tta is the composite diffuse transmittance illuminated by<a name='2490'></font>
+<font color=#447700>!         beam radiation<a name='2491'></font>
+<font color=#447700>!     rsa is the composite reflectance illuminated from below<a name='2492'></font>
+<font color=#447700>!         by diffuse radiation<a name='2493'></font>
+<font color=#447700>!     tta and rsa are computed from eqs. (4b) and (3b) of Chou<a name='2494'></font>
+<a name='2495'>
+      itm=1<a name='2496'>
+<a name='2497'>
+<font color=#447700>!-----if overcas.=.true., set itm=2, and only one set of fluxes is computed<a name='2498'></font>
+<a name='2499'>
+      if (overcast) itm=2<a name='2500'>
+<a name='2501'>
+<font color=#447700>!-----for high clouds. indices 1 and 2 denote clear and cloudy<a name='2502'></font>
+<font color=#447700>!     situations, respectively.<a name='2503'></font>
+<a name='2504'>
+      do 10 ih=itm,2<a name='2505'>
+<a name='2506'>
+       do j= 1, n<a name='2507'>
+        do i= 1, m<a name='2508'>
+          tda(i,j,1,ih,1)=td(i,j,1,ih)<a name='2509'>
+          tta(i,j,1,ih,1)=tt(i,j,1,ih)<a name='2510'>
+          rsa(i,j,1,ih,1)=rs(i,j,1,ih)<a name='2511'>
+          tda(i,j,1,ih,2)=td(i,j,1,ih)<a name='2512'>
+          tta(i,j,1,ih,2)=tt(i,j,1,ih)<a name='2513'>
+          rsa(i,j,1,ih,2)=rs(i,j,1,ih)<a name='2514'>
+        enddo<a name='2515'>
+       enddo<a name='2516'>
+<a name='2517'>
+       do j= 1, n<a name='2518'>
+        do i= 1, m<a name='2519'>
+         do k= 2, ict(i,j)-1<a name='2520'>
+          denm = ts(i,j,k,ih)/( 1.-rsa(i,j,k-1,ih,1)*rs(i,j,k,ih))<a name='2521'>
+          tda(i,j,k,ih,1)= tda(i,j,k-1,ih,1)*td(i,j,k,ih)<a name='2522'>
+          tta(i,j,k,ih,1)= tda(i,j,k-1,ih,1)*tt(i,j,k,ih) &amp;<a name='2523'>
+                        +(tda(i,j,k-1,ih,1)*rr(i,j,k,ih)  &amp;<a name='2524'>
+                        *rsa(i,j,k-1,ih,1)+tta(i,j,k-1,ih,1))*denm<a name='2525'>
+          rsa(i,j,k,ih,1)= rs(i,j,k,ih)+ts(i,j,k,ih) &amp;<a name='2526'>
+                        *rsa(i,j,k-1,ih,1)*denm<a name='2527'>
+          tda(i,j,k,ih,2)= tda(i,j,k,ih,1)<a name='2528'>
+          tta(i,j,k,ih,2)= tta(i,j,k,ih,1)<a name='2529'>
+          rsa(i,j,k,ih,2)= rsa(i,j,k,ih,1)<a name='2530'>
+         enddo<a name='2531'>
+        enddo<a name='2532'>
+       enddo<a name='2533'>
+<a name='2534'>
+<font color=#447700>!-----for middle clouds<a name='2535'></font>
+<a name='2536'>
+      do 10 im=itm,2<a name='2537'>
+<a name='2538'>
+      do j= 1, n<a name='2539'>
+       do i= 1, m<a name='2540'>
+        do k= ict(i,j), icb(i,j)-1<a name='2541'>
+          denm = ts(i,j,k,im)/( 1.-rsa(i,j,k-1,ih,im)*rs(i,j,k,im))<a name='2542'>
+          tda(i,j,k,ih,im)= tda(i,j,k-1,ih,im)*td(i,j,k,im)<a name='2543'>
+          tta(i,j,k,ih,im)= tda(i,j,k-1,ih,im)*tt(i,j,k,im) &amp;<a name='2544'>
+                        +(tda(i,j,k-1,ih,im)*rr(i,j,k,im)   &amp;<a name='2545'>
+                        *rsa(i,j,k-1,ih,im)+tta(i,j,k-1,ih,im))*denm<a name='2546'>
+          rsa(i,j,k,ih,im)= rs(i,j,k,im)+ts(i,j,k,im)  &amp;<a name='2547'>
+                        *rsa(i,j,k-1,ih,im)*denm<a name='2548'>
+         enddo<a name='2549'>
+        enddo<a name='2550'>
+       enddo<a name='2551'>
+<a name='2552'>
+  10  continue<a name='2553'>
+<a name='2554'>
+<font color=#447700>!-----layers are added one at a time, going up from the surface.<a name='2555'></font>
+<font color=#447700>!     rra is the composite reflectance illuminated by beam radiation<a name='2556'></font>
+<font color=#447700>!     rxa is the composite reflectance illuminated from above<a name='2557'></font>
+<font color=#447700>!         by diffuse radiation<a name='2558'></font>
+<font color=#447700>!     rra and rxa are computed from eqs. (4a) and (3a) of Chou<a name='2559'></font>
+ <a name='2560'>
+<font color=#447700>!-----for the low clouds<a name='2561'></font>
+<a name='2562'>
+      do 20 is=itm,2<a name='2563'>
+<a name='2564'>
+       do j= 1, n<a name='2565'>
+        do i= 1, m<a name='2566'>
+         rra(i,j,np+1,1,is)=rr(i,j,np+1,is)<a name='2567'>
+         rxa(i,j,np+1,1,is)=rs(i,j,np+1,is)<a name='2568'>
+         rra(i,j,np+1,2,is)=rr(i,j,np+1,is)<a name='2569'>
+         rxa(i,j,np+1,2,is)=rs(i,j,np+1,is)<a name='2570'>
+        enddo<a name='2571'>
+       enddo<a name='2572'>
+<a name='2573'>
+       do j= 1, n<a name='2574'>
+        do i= 1, m<a name='2575'>
+         do k=np,icb(i,j),-1<a name='2576'>
+          denm=ts(i,j,k,is)/( 1.-rs(i,j,k,is)*rxa(i,j,k+1,1,is) )<a name='2577'>
+          rra(i,j,k,1,is)=rr(i,j,k,is)+(td(i,j,k,is) &amp;<a name='2578'>
+              *rra(i,j,k+1,1,is)+tt(i,j,k,is)*rxa(i,j,k+1,1,is))*denm<a name='2579'>
+          rxa(i,j,k,1,is)= rs(i,j,k,is)+ts(i,j,k,is) &amp;<a name='2580'>
+              *rxa(i,j,k+1,1,is)*denm<a name='2581'>
+          rra(i,j,k,2,is)=rra(i,j,k,1,is)<a name='2582'>
+          rxa(i,j,k,2,is)=rxa(i,j,k,1,is)<a name='2583'>
+         enddo<a name='2584'>
+        enddo<a name='2585'>
+       enddo<a name='2586'>
+<a name='2587'>
+<font color=#447700>!-----for middle clouds<a name='2588'></font>
+<a name='2589'>
+      do 20 im=itm,2<a name='2590'>
+<a name='2591'>
+       do j= 1, n<a name='2592'>
+        do i= 1, m<a name='2593'>
+         do k= icb(i,j)-1,ict(i,j),-1<a name='2594'>
+          denm=ts(i,j,k,im)/( 1.-rs(i,j,k,im)*rxa(i,j,k+1,im,is) )<a name='2595'>
+          rra(i,j,k,im,is)= rr(i,j,k,im)+(td(i,j,k,im)  &amp;<a name='2596'>
+              *rra(i,j,k+1,im,is)+tt(i,j,k,im)*rxa(i,j,k+1,im,is))*denm<a name='2597'>
+          rxa(i,j,k,im,is)= rs(i,j,k,im)+ts(i,j,k,im)   &amp;<a name='2598'>
+              *rxa(i,j,k+1,im,is)*denm<a name='2599'>
+         enddo<a name='2600'>
+        enddo<a name='2601'>
+       enddo<a name='2602'>
+<a name='2603'>
+  20  continue<a name='2604'>
+<a name='2605'>
+<font color=#447700>!-----integration over eight sky situations.<a name='2606'></font>
+<font color=#447700>!     ih, im, is denotes high, middle and low cloud groups.<a name='2607'></font>
+<a name='2608'>
+      do 100 ih=itm,2<a name='2609'>
+<a name='2610'>
+<font color=#447700>!-----clear portion <a name='2611'></font>
+<a name='2612'>
+         if(ih.eq.1) then<a name='2613'>
+           do j=1,n<a name='2614'>
+            do i=1,m<a name='2615'>
+             ch(i,j)=1.0-cc(i,j,1)<a name='2616'>
+            enddo<a name='2617'>
+           enddo<a name='2618'>
+<a name='2619'>
+          else<a name='2620'>
+<a name='2621'>
+<font color=#447700>!-----cloudy portion<a name='2622'></font>
+<a name='2623'>
+           do j=1,n<a name='2624'>
+            do i=1,m<a name='2625'>
+             ch(i,j)=cc(i,j,1)<a name='2626'>
+            enddo<a name='2627'>
+           enddo<a name='2628'>
+<a name='2629'>
+          endif<a name='2630'>
+<a name='2631'>
+      do 100 im=itm,2<a name='2632'>
+<a name='2633'>
+<font color=#447700>!-----clear portion<a name='2634'></font>
+<a name='2635'>
+         if(im.eq.1) then<a name='2636'>
+<a name='2637'>
+           do j=1,n<a name='2638'>
+            do i=1,m<a name='2639'>
+              cm(i,j)=ch(i,j)*(1.0-cc(i,j,2))<a name='2640'>
+            enddo<a name='2641'>
+           enddo<a name='2642'>
+<a name='2643'>
+         else<a name='2644'>
+<a name='2645'>
+<font color=#447700>!-----cloudy portion<a name='2646'></font>
+<a name='2647'>
+           do j=1,n<a name='2648'>
+            do i=1,m<a name='2649'>
+              cm(i,j)=ch(i,j)*cc(i,j,2) <a name='2650'>
+            enddo<a name='2651'>
+           enddo<a name='2652'>
+<a name='2653'>
+         endif<a name='2654'>
+<a name='2655'>
+      do 100 is=itm,2<a name='2656'>
+<a name='2657'>
+<font color=#447700>!-----clear portion<a name='2658'></font>
+<a name='2659'>
+         if(is.eq.1) then<a name='2660'>
+<a name='2661'>
+           do j=1,n<a name='2662'>
+            do i=1,m<a name='2663'>
+             ct(i,j)=cm(i,j)*(1.0-cc(i,j,3)) <a name='2664'>
+            enddo<a name='2665'>
+           enddo<a name='2666'>
+<a name='2667'>
+         else<a name='2668'>
+<a name='2669'>
+<font color=#447700>!-----cloudy portion<a name='2670'></font>
+<a name='2671'>
+           do j=1,n<a name='2672'>
+            do i=1,m<a name='2673'>
+             ct(i,j)=cm(i,j)*cc(i,j,3)<a name='2674'>
+            enddo<a name='2675'>
+           enddo<a name='2676'>
+<a name='2677'>
+         endif<a name='2678'>
+<a name='2679'>
+<font color=#447700>!-----add one layer at a time, going down.<a name='2680'></font>
+<a name='2681'>
+       do j= 1, n<a name='2682'>
+        do i= 1, m<a name='2683'>
+         do k= icb(i,j), np<a name='2684'>
+          denm = ts(i,j,k,is)/( 1.-rsa(i,j,k-1,ih,im)*rs(i,j,k,is) )<a name='2685'>
+          tda(i,j,k,ih,im)= tda(i,j,k-1,ih,im)*td(i,j,k,is)<a name='2686'>
+          tta(i,j,k,ih,im)=  tda(i,j,k-1,ih,im)*tt(i,j,k,is) &amp;<a name='2687'>
+               +(tda(i,j,k-1,ih,im)*rr(i,j,k,is) &amp;<a name='2688'>
+               *rsa(i,j,k-1,ih,im)+tta(i,j,k-1,ih,im))*denm<a name='2689'>
+          rsa(i,j,k,ih,im)= rs(i,j,k,is)+ts(i,j,k,is) &amp;<a name='2690'>
+               *rsa(i,j,k-1,ih,im)*denm<a name='2691'>
+         enddo<a name='2692'>
+        enddo<a name='2693'>
+       enddo<a name='2694'>
+<a name='2695'>
+<font color=#447700>!-----add one layer at a time, going up.<a name='2696'></font>
+<a name='2697'>
+       do j= 1, n<a name='2698'>
+        do i= 1, m<a name='2699'>
+         do k= ict(i,j)-1,1,-1<a name='2700'>
+          denm =ts(i,j,k,ih)/(1.-rs(i,j,k,ih)*rxa(i,j,k+1,im,is))<a name='2701'>
+          rra(i,j,k,im,is)= rr(i,j,k,ih)+(td(i,j,k,ih)  &amp;<a name='2702'>
+              *rra(i,j,k+1,im,is)+tt(i,j,k,ih)*rxa(i,j,k+1,im,is))*denm<a name='2703'>
+          rxa(i,j,k,im,is)= rs(i,j,k,ih)+ts(i,j,k,ih)   &amp;<a name='2704'>
+              *rxa(i,j,k+1,im,is)*denm<a name='2705'>
+         enddo<a name='2706'>
+        enddo<a name='2707'>
+       enddo<a name='2708'>
+<a name='2709'>
+<font color=#447700>!-----compute fluxes following eq (5) of Chou (1992)<a name='2710'></font>
+ <a name='2711'>
+<font color=#447700>!     fdndir is the direct  downward flux<a name='2712'></font>
+<font color=#447700>!     fdndif is the diffuse downward flux<a name='2713'></font>
+<font color=#447700>!     fupdif is the diffuse upward flux<a name='2714'></font>
+<a name='2715'>
+      do k=2,np+1<a name='2716'>
+       do j=1, n<a name='2717'>
+        do i=1, m<a name='2718'>
+         denm= 1./(1.- rxa(i,j,k,im,is)*rsa(i,j,k-1,ih,im))<a name='2719'>
+         fdndir(i,j)= tda(i,j,k-1,ih,im)<a name='2720'>
+         xx = tda(i,j,k-1,ih,im)*rra(i,j,k,im,is)<a name='2721'>
+         fdndif(i,j)= (xx*rsa(i,j,k-1,ih,im)+tta(i,j,k-1,ih,im))*denm<a name='2722'>
+         fupdif= (xx+tta(i,j,k-1,ih,im)*rxa(i,j,k,im,is))*denm<a name='2723'>
+         flxdn(i,j,k)=fdndir(i,j)+fdndif(i,j)-fupdif<a name='2724'>
+         flxdnu(i,j,k)=-fupdif<a name='2725'>
+         flxdnd(i,j,k)=fdndir(i,j)+fdndif(i,j)<a name='2726'>
+        enddo<a name='2727'>
+       enddo<a name='2728'>
+      enddo<a name='2729'>
+<a name='2730'>
+       do j=1, n<a name='2731'>
+        do i=1, m<a name='2732'>
+         flxdn(i,j,1)=1.0-rra(i,j,1,im,is)<a name='2733'>
+         flxdnu(i,j,1)=-rra(i,j,1,im,is)<a name='2734'>
+         flxdnd(i,j,1)=1.0<a name='2735'>
+        enddo<a name='2736'>
+       enddo<a name='2737'>
+<a name='2738'>
+<font color=#447700>!-----summation of fluxes over all (eight) sky situations.<a name='2739'></font>
+<a name='2740'>
+       do k=1,np+1<a name='2741'>
+        do j=1,n<a name='2742'>
+         do i=1,m<a name='2743'>
+           if(ih.eq.1 .and. im.eq.1 .and. is.eq.1) then<a name='2744'>
+             fclr(i,j,k)=flxdn(i,j,k)<a name='2745'>
+           endif<a name='2746'>
+             fall(i,j,k)=fall(i,j,k)+flxdn(i,j,k)*ct(i,j)<a name='2747'>
+             fallu(i,j,k)=fallu(i,j,k)+flxdnu(i,j,k)*ct(i,j)<a name='2748'>
+             falld(i,j,k)=falld(i,j,k)+flxdnd(i,j,k)*ct(i,j)<a name='2749'>
+         enddo<a name='2750'>
+        enddo<a name='2751'>
+       enddo<a name='2752'>
+<a name='2753'>
+        do j=1,n<a name='2754'>
+         do i=1,m<a name='2755'>
+            fsdir(i,j)=fsdir(i,j)+fdndir(i,j)*ct(i,j)<a name='2756'>
+            fsdif(i,j)=fsdif(i,j)+fdndif(i,j)*ct(i,j)<a name='2757'>
+         enddo<a name='2758'>
+        enddo<a name='2759'>
+<a name='2760'>
+  100 continue<a name='2761'>
+<a name='2762'>
+      end subroutine cldflx<a name='2763'>
+<a name='2764'>
+<font color=#447700>!*****************************************************************<a name='2765'></font>
+<a name='2766'>
+<A NAME='FLXCO2'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#FLXCO2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2767'>
+      <font color=#993300>subroutine </font><font color=#cc0000>flxco2</font>(m,n,np,swc,swh,csm,df) <A href='../../call_to/FLXCO2.html' TARGET='index'>1</A><a name='2768'>
+<a name='2769'>
+<font color=#447700>!*****************************************************************<a name='2770'></font>
+<a name='2771'>
+<font color=#447700>!-----compute the reduction of clear-sky downward solar flux<a name='2772'></font>
+<font color=#447700>!     due to co2 absorption.<a name='2773'></font>
+<a name='2774'>
+      implicit none<a name='2775'>
+<a name='2776'>
+<font color=#447700>!-----input parameters<a name='2777'></font>
+<a name='2778'>
+      integer m,n,np<a name='2779'>
+      real csm(m,n),swc(m,n,np+1),swh(m,n,np+1),cah(22,19)<a name='2780'>
+<a name='2781'>
+<font color=#447700>!-----output (undated) parameter<a name='2782'></font>
+<a name='2783'>
+      real df(m,n,np+1)<a name='2784'>
+<a name='2785'>
+<font color=#447700>!-----temporary array<a name='2786'></font>
+<a name='2787'>
+      integer i,j,k,ic,iw <a name='2788'>
+      real xx,clog,wlog,dc,dw,x1,x2,y2<a name='2789'>
+<a name='2790'>
+<font color=#447700>!********************************************************************<a name='2791'></font>
+<font color=#447700>!-----include co2 look-up table<a name='2792'></font>
+<a name='2793'>
+      data ((cah(i,j),i=1,22),j= 1, 5)/ &amp;                                     <a name='2794'>
+       0.9923, 0.9922, 0.9921, 0.9920, 0.9916, 0.9910, 0.9899, 0.9882, &amp;      <a name='2795'>
+       0.9856, 0.9818, 0.9761, 0.9678, 0.9558, 0.9395, 0.9188, 0.8945, &amp;      <a name='2796'>
+       0.8675, 0.8376, 0.8029, 0.7621, 0.7154, 0.6647, 0.9876, 0.9876, &amp;      <a name='2797'>
+       0.9875, 0.9873, 0.9870, 0.9864, 0.9854, 0.9837, 0.9811, 0.9773, &amp;      <a name='2798'>
+       0.9718, 0.9636, 0.9518, 0.9358, 0.9153, 0.8913, 0.8647, 0.8350, &amp;      <a name='2799'>
+       0.8005, 0.7599, 0.7133, 0.6627, 0.9808, 0.9807, 0.9806, 0.9805, &amp;      <a name='2800'>
+       0.9802, 0.9796, 0.9786, 0.9769, 0.9744, 0.9707, 0.9653, 0.9573, &amp;      <a name='2801'>
+       0.9459, 0.9302, 0.9102, 0.8866, 0.8604, 0.8311, 0.7969, 0.7565, &amp;      <a name='2802'>
+       0.7101, 0.6596, 0.9708, 0.9708, 0.9707, 0.9705, 0.9702, 0.9697, &amp;      <a name='2803'>
+       0.9687, 0.9671, 0.9647, 0.9612, 0.9560, 0.9483, 0.9372, 0.9221, &amp;      <a name='2804'>
+       0.9027, 0.8798, 0.8542, 0.8253, 0.7916, 0.7515, 0.7054, 0.6551, &amp;      <a name='2805'>
+       0.9568, 0.9568, 0.9567, 0.9565, 0.9562, 0.9557, 0.9548, 0.9533, &amp;      <a name='2806'>
+       0.9510, 0.9477, 0.9428, 0.9355, 0.9250, 0.9106, 0.8921, 0.8700, &amp;      <a name='2807'>
+       0.8452, 0.8171, 0.7839, 0.7443, 0.6986, 0.6486/                        <a name='2808'>
+ <a name='2809'>
+      data ((cah(i,j),i=1,22),j= 6,10)/  &amp;                                    <a name='2810'>
+       0.9377, 0.9377, 0.9376, 0.9375, 0.9372, 0.9367, 0.9359, 0.9345, &amp;      <a name='2811'>
+       0.9324, 0.9294, 0.9248, 0.9181, 0.9083, 0.8948, 0.8774, 0.8565, &amp;      <a name='2812'>
+       0.8328, 0.8055, 0.7731, 0.7342, 0.6890, 0.6395, 0.9126, 0.9126, &amp;      <a name='2813'>
+       0.9125, 0.9124, 0.9121, 0.9117, 0.9110, 0.9098, 0.9079, 0.9052, &amp;      <a name='2814'>
+       0.9012, 0.8951, 0.8862, 0.8739, 0.8579, 0.8385, 0.8161, 0.7900, &amp;      <a name='2815'>
+       0.7585, 0.7205, 0.6760, 0.6270, 0.8809, 0.8809, 0.8808, 0.8807, &amp;      <a name='2816'>
+       0.8805, 0.8802, 0.8796, 0.8786, 0.8770, 0.8747, 0.8712, 0.8659, &amp;      <a name='2817'>
+       0.8582, 0.8473, 0.8329, 0.8153, 0.7945, 0.7697, 0.7394, 0.7024, &amp;      <a name='2818'>
+       0.6588, 0.6105, 0.8427, 0.8427, 0.8427, 0.8426, 0.8424, 0.8422, &amp;      <a name='2819'>
+       0.8417, 0.8409, 0.8397, 0.8378, 0.8350, 0.8306, 0.8241, 0.8148, &amp;      <a name='2820'>
+       0.8023, 0.7866, 0.7676, 0.7444, 0.7154, 0.6796, 0.6370, 0.5897, &amp;      <a name='2821'>
+       0.7990, 0.7990, 0.7990, 0.7989, 0.7988, 0.7987, 0.7983, 0.7978, &amp;      <a name='2822'>
+       0.7969, 0.7955, 0.7933, 0.7899, 0.7846, 0.7769, 0.7664, 0.7528, &amp;      <a name='2823'>
+       0.7357, 0.7141, 0.6866, 0.6520, 0.6108, 0.5646/                        <a name='2824'>
+ <a name='2825'>
+      data ((cah(i,j),i=1,22),j=11,15)/  &amp;                                    <a name='2826'>
+       0.7515, 0.7515, 0.7515, 0.7515, 0.7514, 0.7513, 0.7511, 0.7507, &amp;      <a name='2827'>
+       0.7501, 0.7491, 0.7476, 0.7450, 0.7409, 0.7347, 0.7261, 0.7144, &amp;      <a name='2828'>
+       0.6992, 0.6793, 0.6533, 0.6203, 0.5805, 0.5357, 0.7020, 0.7020, &amp;      <a name='2829'>
+       0.7020, 0.7019, 0.7019, 0.7018, 0.7017, 0.7015, 0.7011, 0.7005, &amp;      <a name='2830'>
+       0.6993, 0.6974, 0.6943, 0.6894, 0.6823, 0.6723, 0.6588, 0.6406, &amp;      <a name='2831'>
+       0.6161, 0.5847, 0.5466, 0.5034, 0.6518, 0.6518, 0.6518, 0.6518, &amp;      <a name='2832'>
+       0.6518, 0.6517, 0.6517, 0.6515, 0.6513, 0.6508, 0.6500, 0.6485, &amp;      <a name='2833'>
+       0.6459, 0.6419, 0.6359, 0.6273, 0.6151, 0.5983, 0.5755, 0.5458, &amp;      <a name='2834'>
+       0.5095, 0.4681, 0.6017, 0.6017, 0.6017, 0.6017, 0.6016, 0.6016, &amp;      <a name='2835'>
+       0.6016, 0.6015, 0.6013, 0.6009, 0.6002, 0.5989, 0.5967, 0.5932, &amp;      <a name='2836'>
+       0.5879, 0.5801, 0.5691, 0.5535, 0.5322, 0.5043, 0.4700, 0.4308, &amp;      <a name='2837'>
+       0.5518, 0.5518, 0.5518, 0.5518, 0.5518, 0.5518, 0.5517, 0.5516, &amp;      <a name='2838'>
+       0.5514, 0.5511, 0.5505, 0.5493, 0.5473, 0.5441, 0.5393, 0.5322, &amp;      <a name='2839'>
+       0.5220, 0.5076, 0.4878, 0.4617, 0.4297, 0.3929/                        <a name='2840'>
+ <a name='2841'>
+      data ((cah(i,j),i=1,22),j=16,19)/ &amp;                                     <a name='2842'>
+       0.5031, 0.5031, 0.5031, 0.5031, 0.5031, 0.5030, 0.5030, 0.5029, &amp;      <a name='2843'>
+       0.5028, 0.5025, 0.5019, 0.5008, 0.4990, 0.4960, 0.4916, 0.4850, &amp;      <a name='2844'>
+       0.4757, 0.4624, 0.4441, 0.4201, 0.3904, 0.3564, 0.4565, 0.4565, &amp;      <a name='2845'>
+       0.4565, 0.4564, 0.4564, 0.4564, 0.4564, 0.4563, 0.4562, 0.4559, &amp;      <a name='2846'>
+       0.4553, 0.4544, 0.4527, 0.4500, 0.4460, 0.4400, 0.4315, 0.4194, &amp;      <a name='2847'>
+       0.4028, 0.3809, 0.3538, 0.3227, 0.4122, 0.4122, 0.4122, 0.4122, &amp;      <a name='2848'>
+       0.4122, 0.4122, 0.4122, 0.4121, 0.4120, 0.4117, 0.4112, 0.4104, &amp;      <a name='2849'>
+       0.4089, 0.4065, 0.4029, 0.3976, 0.3900, 0.3792, 0.3643, 0.3447, &amp;      <a name='2850'>
+       0.3203, 0.2923, 0.3696, 0.3696, 0.3696, 0.3696, 0.3696, 0.3696, &amp;      <a name='2851'>
+       0.3695, 0.3695, 0.3694, 0.3691, 0.3687, 0.3680, 0.3667, 0.3647, &amp;      <a name='2852'>
+       0.3615, 0.3570, 0.3504, 0.3409, 0.3279, 0.3106, 0.2892, 0.2642/        <a name='2853'>
+<a name='2854'>
+<font color=#447700>!********************************************************************<a name='2855'></font>
+<font color=#447700>!-----table look-up for the reduction of clear-sky solar<a name='2856'></font>
+<font color=#447700>!     radiation due to co2. The fraction 0.0343 is the<a name='2857'></font>
+<font color=#447700>!     extraterrestrial solar flux in the co2 bands.<a name='2858'></font>
+<a name='2859'>
+      do k= 2, np+1<a name='2860'>
+       do j= 1, n<a name='2861'>
+        do i= 1, m<a name='2862'>
+          xx=1./.3<a name='2863'>
+          clog=log10(swc(i,j,k)*csm(i,j))<a name='2864'>
+          wlog=log10(swh(i,j,k)*csm(i,j))<a name='2865'>
+          ic=int( (clog+3.15)*xx+1.)<a name='2866'>
+          iw=int( (wlog+4.15)*xx+1.)<a name='2867'>
+          if(ic.lt.2)ic=2<a name='2868'>
+          if(iw.lt.2)iw=2<a name='2869'>
+          if(ic.gt.22)ic=22<a name='2870'>
+          if(iw.gt.19)iw=19     <a name='2871'>
+          dc=clog-float(ic-2)*.3+3.<a name='2872'>
+          dw=wlog-float(iw-2)*.3+4.   <a name='2873'>
+          x1=cah(1,iw-1)+(cah(1,iw)-cah(1,iw-1))*xx*dw<a name='2874'>
+          x2=cah(ic-1,iw-1)+(cah(ic-1,iw)-cah(ic-1,iw-1))*xx*dw<a name='2875'>
+          y2=x2+(cah(ic,iw-1)-cah(ic-1,iw-1))*xx*dc<a name='2876'>
+          if (x1.lt.y2) x1=y2<a name='2877'>
+          df(i,j,k)=df(i,j,k)+0.0343*(x1-y2)<a name='2878'>
+        enddo     <a name='2879'>
+       enddo      <a name='2880'>
+      enddo      <a name='2881'>
+<a name='2882'>
+      end subroutine flxco2<a name='2883'>
+<a name='2884'>
+<font color=#447700>!*****************************************************************<a name='2885'></font>
+<a name='2886'>
+<A NAME='O3PROF'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#O3PROF' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2887'>
+      <font color=#993300>subroutine </font><font color=#cc0000>o3prof</font> (np, pres, ozone, its, ite, kts, kte, p, o3) <A href='../../call_to/O3PROF.html' TARGET='index'>1</A><a name='2888'>
+<a name='2889'>
+<font color=#447700>!*****************************************************************<a name='2890'></font>
+      implicit none<a name='2891'>
+<font color=#447700>!*****************************************************************<a name='2892'></font>
+<font color=#447700>!<a name='2893'></font>
+      integer iprof,m,np,its,ite,kts,kte<a name='2894'>
+      integer i,k,ko,kk<a name='2895'>
+      real pres(np),ozone(np)<a name='2896'>
+      real p(its:ite,kts:kte),o3(its:ite,kts:kte)<a name='2897'>
+ <a name='2898'>
+<font color=#447700>!     Statement function <a name='2899'></font>
+ <a name='2900'>
+      real Linear, x1, y1, x2, y2, x<a name='2901'>
+      Linear(x1, y1, x2, y2, x) =  &amp;<a name='2902'>
+            (y1 * (x2 - x) + y2 * (x - x1)) / (x2 - x1)<a name='2903'>
+<font color=#447700>!<a name='2904'></font>
+      do k = 1,np<a name='2905'>
+        pres(k) = alog(pres(k))<a name='2906'>
+      enddo<a name='2907'>
+      do k = kts,kte<a name='2908'>
+        do i = its, ite<a name='2909'>
+          p(i,k) = alog(p(i,k))<a name='2910'>
+        end do<a name='2911'>
+      end do<a name='2912'>
+<a name='2913'>
+<font color=#447700>! assume the pressure at model top is greater than pres(1)<a name='2914'></font>
+<font color=#447700>! if it is not, this part needs to change<a name='2915'></font>
+<a name='2916'>
+      do i = its, ite<a name='2917'>
+        ko = 1<a name='2918'>
+        do k = kts+1, kte<a name='2919'>
+          do while (ko .lt. np .and. p(i,k) .gt. pres(ko))<a name='2920'>
+            ko = ko + 1<a name='2921'>
+          end do<a name='2922'>
+          o3(i,k) =  Linear (pres(ko),   ozone(ko),    &amp;<a name='2923'>
+                             pres(ko-1), ozone(ko-1),  &amp;<a name='2924'>
+                             p(i,k))<a name='2925'>
+          ko = ko - 1<a name='2926'>
+        end do<a name='2927'>
+      end do<a name='2928'>
+<a name='2929'>
+<font color=#447700>! calculate top lay O3<a name='2930'></font>
+<a name='2931'>
+      do i = its, ite<a name='2932'>
+        ko = 1<a name='2933'>
+        k = kts<a name='2934'>
+        do while (ko .le. np .and. p(i,k) .gt. pres(ko))<a name='2935'>
+           ko = ko + 1<a name='2936'>
+        end do<a name='2937'>
+        IF (ko-1 .le. 1) then<a name='2938'>
+           O3(i,k)=ozone(k)<a name='2939'>
+        ELSE<a name='2940'>
+           O3(i,k)=0.<a name='2941'>
+           do kk=ko-2,1,-1<a name='2942'>
+              O3(i,k)=O3(i,k)+ozone(kk)*(pres(kk+1)-pres(kk))<a name='2943'>
+           enddo<a name='2944'>
+           O3(i,k)=O3(i,k)/(pres(ko-1)-pres(1))<a name='2945'>
+        ENDIF<a name='2946'>
+<font color=#447700>!       print*,O3=,i,k,ko,O3(i,k),p(i,k),ko,pres(ko),pres(ko-1)<a name='2947'></font>
+      end do<a name='2948'>
+      <a name='2949'>
+      end subroutine o3prof<a name='2950'>
+<a name='2951'>
+<font color=#447700>!-----------------------------------------<a name='2952'></font>
+<A NAME='GSFC_SWINIT'><A href='../../html_code/phys/module_ra_gsfcsw.F.html#GSFC_SWINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2953'>
+    <font color=#993300>SUBROUTINE </font><font color=#cc0000>gsfc_swinit</font>(cen_lat, allowed_to_read) <A href='../../call_to/GSFC_SWINIT.html' TARGET='index'>1</A><a name='2954'>
+<a name='2955'>
+    REAL, INTENT(IN    )      ::        cen_lat<a name='2956'>
+    LOGICAL, INTENT(IN    )   ::       allowed_to_read<a name='2957'>
+<a name='2958'>
+        center_lat=cen_lat<a name='2959'>
+<a name='2960'>
+    END SUBROUTINE gsfc_swinit<a name='2961'>
+<a name='2962'>
+<a name='2963'>
+END MODULE module_ra_gsfcsw<a name='2964'>
+</pre></body></html>

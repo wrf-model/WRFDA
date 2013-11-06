@@ -1,0 +1,222 @@
+<html>
+
+<head>
+
+<title>WRFDA Updates prior to version 3.2</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="./scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="./scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="./images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<link href="./images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="./images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="./images/goldrule.jpg"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td width="100%" height="838" valign="top" bgcolor="#CBFFCD"><table width="780" height="863" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+        <td height="900" bgcolor="#009933"><p align="right">&nbsp;</p>
+           <p align="center"><a href="system.html" class="leftnavlink">System Overview</a></p>
+           <p align="center"><a href="updates-3.5.1.html" class="leftnavlink">WRFDA V3.5.1</a></p>
+           <p align="center"><a href="updates-3.5.0.1.html" class="leftnavlink">WRFDA V3.5.0.1</a></p>
+           <p align="center"><a href="updates-3.5.html" class="leftnavlink">WRFDA V3.5</a></p>
+           <p align="center"><a href="updates-3.4.1.html" class="leftnavlink">WRFDA V3.4.1</a></p>
+           <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
+           <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
+           <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
+           <p align="center"><a href="updates-3.2.1.html" class="leftnavlink">WRFDA V3.2.1</a></p>
+           <p align="center"><a href="updates-3.2.html" class="leftnavlink">WRFDA V3.2</a></p>
+           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color:
+#CBFFCD;font-family: Arial; line-height: 10pt;font-size:15.5;font-weight: bold;">Older versions</p>
+           <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
+           <p align="center"><a href="download/tools.html" class="leftnavlink">Tools</a></p>
+           <p align="center"><a href="known-prob.html" class="leftnavlink">Known Problems and Fixes</a></p></td>
+
+        <td width="663" bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle">WRF Var Version 3.1.1: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">The WRF-Var tar file was updated to Version 3.1.1 on July 31, 2009. </p>
+              <p class="bodytext">In this release, the following new features and updates are provided:</p>
+              <p class="bodytext">- Radiance data assimilation using K Matrix capability has been completed, which dramatically speeds up the analysis. To use K Matrix , please set USE_CRTM_KMATRIX=true in wrfvar14@namelist.input. Note: it is only applied on CRTM in V3.1.1.</p>
+              <p class="bodytext">- Improved software portability; if only LITTLE_R formatted conventional observations are to be assimilated, the NETCDF library is the only mandatory library. To use PREPBUFR observational files, set environmental variable BUFR equal to 1. To use radiance BUFR format data, CRTM or RTTOV is needed.</p>
+              <p class="bodytext">- Most of the scripts under WRFDA/var/scripts were removed from the main source<br>
+                code tar file. They can still be downloaded separately. See <a href="http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">WRFDA Tools</a>.</p>
+            </blockquote>
+            <p class="pagetitle">WRF Var Version 3.1: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">The WRF-Var tar file was updated to Version 3.1 on April 9, 2009. </p>
+              <p class="bodytext">In this release, the following new features and updates are provided:</p>
+              <p class="bodytext">- 4DVAR and radiance data assimilation capabilities are included.</p>
+              <p class="bodytext">- Improved software portability; if only LITTLE_R formatted conventional observations are to be assimilated, the NETCDF, LAPACK and BLAS libraries are the only mandatory libraries.</p>
+              <p class="bodytext">- New &quot;CV3&quot; background error statistics file is provided, which is a generic background error statistics for any domain/case.</p>
+              <p class="bodytext">- New README files under WRFDA/var (README.namelist, README.basics, README.radiance)</p>
+              <p class="bodytext">- WRFDA V3.1 executable will work with V3.0 wrfinput/wrfbdy (but requires inserting a new namelist variable use_baseparam_fr_nml in &amp;dynamics). However, rerunning V3.1 WPS and real.exe is recommended.</p>
+              <p class="bodytext">- Changes to namelist variables.<br>
+                * Some obsolete or unused namelist variables are removed, some new namelist variables are added, purposes of some namelist variables are changed. See WRFDA/var/README.namelist for descriptions of supported namelist variables.<br>
+              </p>
+              <p class="bodytext">- Changes to obsproc:<br>
+                * the executable 3dvar_obs.exe is renamed to obsproc.exe and namelist.3dvar_obs is renamed to namelist.obsproc to reflect its capabilitiy of producing WRFDA-ready observations for 3DVAR, FGAT, or 4DVAR applications. See WRFDA/var/obsproc/README.<br>
+                * compilation of obsproc.exe is included in &quot;compile all_wrfvar&quot;</p>
+              <p class="bodytext">- Changes to diagnostic output files<br>
+                * gts_omb_oma becomes gts_omb_oma_01 (01 indicates outer loop index)<br>
+                * observations that fail check_max_iv are listed in rej_obs_conv_01.000<br>
+                ( 01 is outer loop index, 000 is processor id)<br>
+                * qcstat_conv_01 (01 indicates outer loop index) contains observation <br>
+                number counts</p>
+              <p class="bodytext">- Most of the scripts under WRFDA/var/scripts are removed from the main source code tar file. They can still be downloaded separately. See <a href="http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">WRFDA Tools</a>.</p>
+            </blockquote>
+            <p class="pagetitle">WRF Var Version 3.0.1.1: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">WRF Var Updates in <a href="./updates.html">3.0</a>.<br>
+                WRF Var Updates in <a href="./updates-3.0.1.html">3.0.1</a>.</p>
+              <p class="bodytext">The WRF-Var tar file
+                has been updated to Version 3.0.1.1 on August 29, 2008. </p>
+              <p class="bodytext">In this release, the following new features and updates are provided:</p>
+              <p class="bodytext">1) Improved compile mechanism to speed up WRF Var compile.</p>
+              <p class="bodytext">2) Improved portability.</p>
+              <p class="bodytext">3)  Bug fix for analysis_type = &quot;VERFIY&quot;.</p>
+              <p class="bodytext">4) Bug fix for pseudo obs (spurious moisture increments).</p>
+              <p class="bodytext">5) Bug fix for incorrect sonde_sfc number in diagnostic output file jo.</p>
+              <p class="bodytext">6) <a href="../tutorial/200807/VAR/wrfvar_tools.pdf"></a>Note: To compile libraries used by WRF-Var, please refer to scripts in WRFDA/var/scripts/compile_external. </p>
+            </blockquote>
+            <p class="pagetitle">WRF Var Update 3.0.1</p>
+            <blockquote>
+              <p class="bodytext">The WRF-Var tar file was updated to Version 3.0.1 on August 4, 2008. </p>
+              <p class="bodytext">In this release, the following new features and updates are provided:</p>
+              <p class="bodytext">1) Changes to the WRF build system to allow WRF-Var to be compiled without setting the WRF_DA_CORE environment variable. Now, WRF-Var can be compiled by typing &quot;./configure wrfda&quot; followed by &quot;./compile all_wrfvar&quot;, without setting WRF_DA_CORE. However, the existing procedure for building WRF-Var will still work exactly as before.</p>
+              <p class="bodytext">2) Unified WRF/WRF-Var namelist.</p>
+              <p class="bodytext">3)  Update the var directory with the head of the WRF-Var developmental repository.</p>
+              <p class="bodytext">4) Fix several bugs.</p>
+              <p class="bodytext">5) Remove obsolete features (e.g. MM5/GFS-based background errors).</p>
+              <p class="bodytext">6) <a href="Tutorials/2008_July/wrfvar_tools.pdf">Verification package</a> (provided only as tools, with limited documentation and caveats). <br>
+               With analysis_type=&quot;VERIFY&quot;, there are two problems: a) statistics files are not written out; b) model data below lowest model levels and above highest model level are incorrectly set to zero, which leads to incorrect O minus B values (<em>fixed in 3.0.1.1</em>). </p>
+              <p class="bodytext">7) Utilization of observations packed in NCEP PREPBUFR format - beta feature, requires more testing. </p>
+              <p class="bodytext">8) Inclusion of various scripts and NCL based graphics (provided only as tools, but not supported) </p>
+            </blockquote>
+            <p align="left" class="pagetitle">WRF Var Version 3.0: UPDATES</p>
+            <blockquote>
+              <p align="left" class="bodytext">The WRF-Var variational data assimilation system was updated to Version 3.0 on April 4, 2008. </p>
+              <p align="left" class="bodytext">In this release, WRF-Var is merged with the latest WRF code directory structure. They now share the same build mechanism. The update_bc and obsproc codes are part of the tar file. For compile and run instructions, please refer to the updated <a href="../docs/user_guide_V3/contents.html">User's Guide</a>. </p>
+              <p align="left" class="bodytext"><strong>Note</strong>, the released Var code is re-tared to avoid some confusion at the compile stage. The top directory is now named WRFDA. </p>
+
+            </blockquote>
+            <p class="pagetitle">Helpful links</p>
+            <blockquote>
+              <p class="bodytext"><em>NOTE: These links point to the User Guide for the newer WRFDA version 3.2. You may need to follow a slightly different procedure.</em></p>
+                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.2/users_guide_chap6.htm#_Installing_
+WRF-Var">Compiling WRFDA</a></big></li>
+                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.2/users_guide_chap6.htm#_Running_WRF
+-Var_1">Running WRFDA</a></big></li>
+                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.2/users_guide_chap6.htm#_Description
+_of_Namelist_1">List and description of namelist variables</a></big></li>
+
+              <p align="center" class="detailtextRed">
+
+                <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+              </p>
+              <p class="bodytext"><br>
+                <br>
+              </p>
+          </blockquote>            </td>
+        </tr>
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

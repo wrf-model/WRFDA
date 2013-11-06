@@ -1,0 +1,2134 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:BOUNDARY<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_BC'><A href='../../html_code/share/module_bc.F.html#MODULE_BC' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_bc</font> <A href='../../call_to/MODULE_BC.html' TARGET='index'>33</A><a name='5'>
+<a name='6'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/module_bc.F.html#module_bc.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_175"><a name='7'>
+   USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/share/module_bc.F.html#module_bc.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_48"><a name='8'>
+<a name='9'>
+<font color=#447700>!   TYPE bcs<a name='10'></font>
+<font color=#447700>!<a name='11'></font>
+<font color=#447700>!     LOGICAL                     :: periodic_x<a name='12'></font>
+<font color=#447700>!     LOGICAL                     :: symmetric_xs<a name='13'></font>
+<font color=#447700>!     LOGICAL                     :: symmetric_xe<a name='14'></font>
+<font color=#447700>!     LOGICAL                     :: open_xs<a name='15'></font>
+<font color=#447700>!     LOGICAL                     :: open_xe<a name='16'></font>
+<font color=#447700>!     LOGICAL                     :: periodic_y<a name='17'></font>
+<font color=#447700>!     LOGICAL                     :: symmetric_ys<a name='18'></font>
+<font color=#447700>!     LOGICAL                     :: symmetric_ye<a name='19'></font>
+<font color=#447700>!     LOGICAL                     :: open_ys<a name='20'></font>
+<font color=#447700>!     LOGICAL                     :: open_ye<a name='21'></font>
+<font color=#447700>!     LOGICAL                     :: nested<a name='22'></font>
+<font color=#447700>!     LOGICAL                     :: specified<a name='23'></font>
+<font color=#447700>!     LOGICAL                     :: top_radiation<a name='24'></font>
+<font color=#447700>!<a name='25'></font>
+<font color=#447700>!   END TYPE bcs<a name='26'></font>
+<a name='27'>
+<font color=#447700>!  set the bdyzone.  We are hardwiring this here and we'll<a name='28'></font>
+<font color=#447700>!  decide later where it should be set and stored<a name='29'></font>
+<a name='30'>
+   INTEGER, PARAMETER            :: bdyzone = 3<a name='31'>
+   INTEGER, PARAMETER            :: bdyzone_x = bdyzone<a name='32'>
+   INTEGER, PARAMETER            :: bdyzone_y = bdyzone<a name='33'>
+<a name='34'>
+CONTAINS<a name='35'>
+<a name='36'>
+<A NAME='BOUNDARY_CONDITION_CHECK'><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='37'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>boundary_condition_check</font> ( config_flags, bzone, error, gn ) <A href='../../call_to/BOUNDARY_CONDITION_CHECK.html' TARGET='index'>8</A>,<A href='../../call_from/BOUNDARY_CONDITION_CHECK.html' TARGET='index'>23</A><a name='38'>
+<a name='39'>
+<font color=#447700>!  this routine checks the boundary condition logicals <a name='40'></font>
+<font color=#447700>!  to make sure that the boundary conditions are not over<a name='41'></font>
+<font color=#447700>!  or under specified.  The routine also checks that the<a name='42'></font>
+<font color=#447700>!  boundary zone is sufficiently sized for the specified<a name='43'></font>
+<font color=#447700>!  boundary conditions<a name='44'></font>
+<a name='45'>
+  IMPLICIT NONE<a name='46'>
+<a name='47'>
+  TYPE( grid_config_rec_type ) config_flags<a name='48'>
+<a name='49'>
+  INTEGER, INTENT(IN   ) :: bzone, gn<a name='50'>
+  INTEGER, INTENT(INOUT) :: error<a name='51'>
+<a name='52'>
+<font color=#447700>! local variables<a name='53'></font>
+<a name='54'>
+  INTEGER :: xs_bc, xe_bc, ys_bc, ye_bc, bzone_min<a name='55'>
+<a name='56'>
+  CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_229">( 100 , ' checking boundary conditions for grid ' )<a name='57'>
+<a name='58'>
+  error = 0<a name='59'>
+  xs_bc = 0<a name='60'>
+  xe_bc = 0<a name='61'>
+  ys_bc = 0<a name='62'>
+  ye_bc = 0<a name='63'>
+<a name='64'>
+<font color=#447700>!  sum the number of conditions specified for each lateral boundary.<a name='65'></font>
+<font color=#447700>!  obviously, this number should be 1<a name='66'></font>
+<a name='67'>
+  IF( config_flags%periodic_x ) THEN<a name='68'>
+    xs_bc = xs_bc+1<a name='69'>
+    xe_bc = xe_bc+1<a name='70'>
+  ENDIF<a name='71'>
+<a name='72'>
+  IF( config_flags%periodic_y ) THEN<a name='73'>
+    ys_bc = ys_bc+1<a name='74'>
+    ye_bc = ye_bc+1<a name='75'>
+  ENDIF<a name='76'>
+<a name='77'>
+  IF( config_flags%symmetric_xs ) xs_bc = xs_bc + 1<a name='78'>
+  IF( config_flags%symmetric_xe ) xe_bc = xe_bc + 1<a name='79'>
+  IF( config_flags%open_xs )      xs_bc = xs_bc + 1<a name='80'>
+  IF( config_flags%open_xe )      xe_bc = xe_bc + 1<a name='81'>
+<a name='82'>
+<a name='83'>
+  IF( config_flags%symmetric_ys ) ys_bc = ys_bc + 1<a name='84'>
+  IF( config_flags%symmetric_ye ) ye_bc = ye_bc + 1<a name='85'>
+  IF( config_flags%open_ys )      ys_bc = ys_bc + 1<a name='86'>
+  IF( config_flags%open_ye )      ye_bc = ye_bc + 1<a name='87'>
+<a name='88'>
+  IF( config_flags%nested ) THEN<a name='89'>
+     xs_bc = xs_bc + 1<a name='90'>
+     xe_bc = xe_bc + 1<a name='91'>
+     ys_bc = ys_bc + 1<a name='92'>
+     ye_bc = ye_bc + 1<a name='93'>
+   ENDIF<a name='94'>
+<a name='95'>
+  IF( config_flags%specified ) THEN<a name='96'>
+     xs_bc = xs_bc + 1<a name='97'>
+     xe_bc = xe_bc + 1<a name='98'>
+     ys_bc = ys_bc + 1<a name='99'>
+     ye_bc = ye_bc + 1<a name='100'>
+   ENDIF<a name='101'>
+<a name='102'>
+<font color=#447700>!  check the number of conditions for each boundary<a name='103'></font>
+<a name='104'>
+   IF( (xs_bc /= 1) .or. &amp;<a name='105'>
+       (xe_bc /= 1) .or. &amp;<a name='106'>
+       (ys_bc /= 1) .or. &amp;<a name='107'>
+       (ye_bc /= 1)         ) THEN<a name='108'>
+<a name='109'>
+     error = 1<a name='110'>
+<a name='111'>
+     write( wrf_err_message ,*) ' *** Error in boundary condition specification '<a name='112'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_88"> ( wrf_err_message )<a name='113'>
+     write( wrf_err_message ,*) ' boundary conditions at xs ', xs_bc<a name='114'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_89"> ( wrf_err_message )<a name='115'>
+     write( wrf_err_message ,*) ' boundary conditions at xe ', xe_bc<a name='116'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_90"> ( wrf_err_message )<a name='117'>
+     write( wrf_err_message ,*) ' boundary conditions at ys ', ys_bc<a name='118'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_91"> ( wrf_err_message )<a name='119'>
+     write( wrf_err_message ,*) ' boundary conditions at ye ', ye_bc<a name='120'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_92"> ( wrf_err_message )<a name='121'>
+     write( wrf_err_message ,*) ' boundary conditions logicals are '<a name='122'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_93"> ( wrf_err_message )<a name='123'>
+     write( wrf_err_message ,*) ' periodic_x   ',config_flags%periodic_x<a name='124'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_94"> ( wrf_err_message )<a name='125'>
+     write( wrf_err_message ,*) ' periodic_y   ',config_flags%periodic_y<a name='126'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_95"> ( wrf_err_message )<a name='127'>
+     write( wrf_err_message ,*) ' symmetric_xs ',config_flags%symmetric_xs<a name='128'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_96"> ( wrf_err_message )<a name='129'>
+     write( wrf_err_message ,*) ' symmetric_xe ',config_flags%symmetric_xe<a name='130'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_97"> ( wrf_err_message )<a name='131'>
+     write( wrf_err_message ,*) ' symmetric_ys ',config_flags%symmetric_ys<a name='132'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_98"> ( wrf_err_message )<a name='133'>
+     write( wrf_err_message ,*) ' symmetric_ye ',config_flags%symmetric_ye<a name='134'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_99"> ( wrf_err_message )<a name='135'>
+     write( wrf_err_message ,*) ' open_xs      ',config_flags%open_xs<a name='136'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_100"> ( wrf_err_message )<a name='137'>
+     write( wrf_err_message ,*) ' open_xe      ',config_flags%open_xe<a name='138'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_101"> ( wrf_err_message )<a name='139'>
+     write( wrf_err_message ,*) ' open_ys      ',config_flags%open_ys<a name='140'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_102"> ( wrf_err_message )<a name='141'>
+     write( wrf_err_message ,*) ' open_ye      ',config_flags%open_ye<a name='142'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_103"> ( wrf_err_message )<a name='143'>
+     write( wrf_err_message ,*) ' nested       ',config_flags%nested<a name='144'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_104"> ( wrf_err_message )<a name='145'>
+     write( wrf_err_message ,*) ' specified    ',config_flags%specified<a name='146'>
+     CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_228">( ' *** Error in boundary condition specification ' )<a name='147'>
+<a name='148'>
+   ENDIF<a name='149'>
+<a name='150'>
+<font color=#447700>!  now check to see if boundary zone size is sufficient.<a name='151'></font>
+<font color=#447700>!  we could have the necessary boundary zone size be returned<a name='152'></font>
+<font color=#447700>!  to the calling routine.<a name='153'></font>
+<a name='154'>
+   IF( config_flags%periodic_x   .or. &amp;<a name='155'>
+       config_flags%periodic_y   .or. &amp;<a name='156'>
+       config_flags%symmetric_xs .or. &amp;<a name='157'>
+       config_flags%symmetric_xe .or. &amp;<a name='158'>
+       config_flags%symmetric_ys .or. &amp;<a name='159'>
+       config_flags%symmetric_ye        )  THEN<a name='160'>
+<a name='161'>
+       bzone_min = MAX( 1,                                  &amp;<a name='162'>
+                        (config_flags%h_mom_adv_order+1)/2, &amp;<a name='163'>
+                        (config_flags%h_sca_adv_order+1)/2 )<a name='164'>
+<a name='165'>
+       IF( bzone &lt; bzone_min) THEN  <a name='166'>
+<a name='167'>
+         error = 2<a name='168'>
+         WRITE ( wrf_err_message , * ) ' boundary zone not large enough '<a name='169'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_105"> ( wrf_err_message )<a name='170'>
+         WRITE ( wrf_err_message , * ) ' boundary zone specified      ',bzone<a name='171'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>wrf_message</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_106"> ( wrf_err_message )<a name='172'>
+         WRITE ( wrf_err_message , * ) ' minimum boundary zone needed ',bzone_min<a name='173'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_229"> ( wrf_err_message )<a name='174'>
+<a name='175'>
+       ENDIF<a name='176'>
+   ENDIF<a name='177'>
+<a name='178'>
+   CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/share/module_bc.F.html#BOUNDARY_CONDITION_CHECK' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_230"> ( 100 , ' boundary conditions OK for grid ' )<a name='179'>
+<a name='180'>
+   END subroutine boundary_condition_check<a name='181'>
+<a name='182'>
+<font color=#447700>!--------------------------------------------------------------------------<a name='183'></font>
+<A NAME='SET_PHYSICAL_BC2D'><A href='../../html_code/share/module_bc.F.html#SET_PHYSICAL_BC2D' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='184'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_physical_bc2d</font>( data, variable_in,  &amp; <A href='../../call_to/SET_PHYSICAL_BC2D.html' TARGET='index'>39</A><a name='185'>
+                                 config_flags,           &amp; <a name='186'>
+                                 ids,ide, jds,jde,   &amp; <font color=#447700>! domain dims<a name='187'></font>
+                                 ims,ime, jms,jme,   &amp; <font color=#447700>! memory dims<a name='188'></font>
+                                 ips,ipe, jps,jpe,   &amp; <font color=#447700>! patch  dims<a name='189'></font>
+                                 its,ite, jts,jte   )      <a name='190'>
+<a name='191'>
+<font color=#447700>!  This subroutine sets the data in the boundary region, by direct<a name='192'></font>
+<font color=#447700>!  assignment if possible, for periodic and symmetric (wall)<a name='193'></font>
+<font color=#447700>!  boundary conditions.  Currently, we are only doing 1 variable<a name='194'></font>
+<font color=#447700>!  at a time - lots of overhead, so maybe this routine can be easily <a name='195'></font>
+<font color=#447700>!  inlined later or we could pass multiple variables -<a name='196'></font>
+<font color=#447700>!  would probably want a largestep and smallstep version.<a name='197'></font>
+<a name='198'>
+<font color=#447700>!  15 Jan 99, Dave<a name='199'></font>
+<font color=#447700>!  Modified the incoming its,ite,jts,jte to truly be the tile size.<a name='200'></font>
+<font color=#447700>!  This required modifying the loop limits when the "istag" or "jstag"<a name='201'></font>
+<font color=#447700>!  is used, as this is only required at the end of the domain.<a name='202'></font>
+<a name='203'>
+      IMPLICIT NONE<a name='204'>
+<a name='205'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde<a name='206'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme<a name='207'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe<a name='208'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte<a name='209'>
+      CHARACTER,    INTENT(IN   )    :: variable_in<a name='210'>
+<a name='211'>
+      CHARACTER                      :: variable<a name='212'>
+<a name='213'>
+      REAL,  DIMENSION( ims:ime , jms:jme ) :: data<a name='214'>
+      TYPE( grid_config_rec_type ) config_flags<a name='215'>
+<a name='216'>
+      INTEGER  :: i, j, istag, jstag, itime<a name='217'>
+<a name='218'>
+      LOGICAL  :: debug, open_bc_copy<a name='219'>
+<a name='220'>
+<font color=#447700>!------------<a name='221'></font>
+<a name='222'>
+      debug = .false.<a name='223'>
+<a name='224'>
+      open_bc_copy = .false.<a name='225'>
+<a name='226'>
+      variable = variable_in<a name='227'>
+      IF ( variable_in .ge. 'A' .and. variable_in .le. 'Z' ) THEN<a name='228'>
+        variable = CHAR( ICHAR(variable_in) - ICHAR('A') + ICHAR('a') )<a name='229'>
+      ENDIF<a name='230'>
+      IF ((variable == 'u') .or. (variable == 'v') .or.  &amp;<a name='231'>
+          (variable == 'w') .or. (variable == 't') .or.  &amp;<a name='232'>
+          (variable == 'x') .or. (variable == 'y') .or.  &amp;<a name='233'>
+          (variable == 'r')                        ) open_bc_copy = .true.<a name='234'>
+<a name='235'>
+<font color=#447700>!  begin, first set a staggering variable<a name='236'></font>
+<a name='237'>
+      istag = -1<a name='238'>
+      jstag = -1<a name='239'>
+<a name='240'>
+      IF ((variable == 'u') .or. (variable == 'x')) istag = 0<a name='241'>
+      IF ((variable == 'v') .or. (variable == 'y')) jstag = 0<a name='242'>
+<a name='243'>
+      if(debug) then<a name='244'>
+        write(6,*) ' in bc2d, var is ',variable, istag, jstag<a name='245'>
+        write(6,*) ' b.cs are ',  &amp;<a name='246'>
+      config_flags%periodic_x,  &amp;<a name='247'>
+      config_flags%periodic_y<a name='248'>
+      end if<a name='249'>
+      <a name='250'>
+<a name='251'>
+<a name='252'>
+<font color=#447700>!  periodic conditions.<a name='253'></font>
+<font color=#447700>!  note, patch must cover full range in periodic dir, or else<a name='254'></font>
+<font color=#447700>!  its intra-patch communication that is handled elsewheres.<a name='255'></font>
+<font color=#447700>!  symmetry conditions can always be handled here, because no<a name='256'></font>
+<font color=#447700>!  outside patch communication is needed<a name='257'></font>
+<a name='258'>
+      periodicity_x:  IF( ( config_flags%periodic_x ) .and.  &amp;<a name='259'>
+                          ( ids == ips )          .and.  &amp;<a name='260'>
+                          ( ide == ipe )                ) THEN<a name='261'>
+<a name='262'>
+        IF ( its == ids ) THEN<a name='263'>
+<a name='264'>
+          DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='265'>
+          DO i = 0,-(bdyzone-1),-1<a name='266'>
+            data(ids+i-1,j) = data(ide+i-1,j)<a name='267'>
+          ENDDO<a name='268'>
+          ENDDO<a name='269'>
+<a name='270'>
+        ENDIF<a name='271'>
+<a name='272'>
+        IF ( ite == ide ) THEN<a name='273'>
+<a name='274'>
+          DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='275'>
+<font color=#447700>!!          DO i = 1 , bdyzone<a name='276'></font>
+          DO i = -istag , bdyzone<a name='277'>
+            data(ide+i+istag,j) = data(ids+i+istag,j)<a name='278'>
+          ENDDO<a name='279'>
+          ENDDO<a name='280'>
+<a name='281'>
+        ENDIF<a name='282'>
+<a name='283'>
+      ELSE <a name='284'>
+<a name='285'>
+        symmetry_xs: IF( ( config_flags%symmetric_xs ) .and.  &amp;<a name='286'>
+                         ( its == ids )                  )  THEN<a name='287'>
+<a name='288'>
+          IF ( (variable /= 'u') .and. (variable /= 'x') ) THEN<a name='289'>
+<a name='290'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='291'>
+            DO i = 1, bdyzone<a name='292'>
+              data(ids-i,j) = data(ids+i-1,j) <font color=#447700>!  here, data(0) = data(1), etc<a name='293'></font>
+            ENDDO                             <font color=#447700>!  symmetry about data(0.5) (u=0 pt)<a name='294'></font>
+            ENDDO<a name='295'>
+<a name='296'>
+          ELSE<a name='297'>
+<a name='298'>
+            IF( variable == 'u' ) THEN<a name='299'>
+<a name='300'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='301'>
+              DO i = 0, bdyzone-1<a name='302'>
+                data(ids-i,j) = - data(ids+i,j) <font color=#447700>! here, u(0) = - u(2), etc<a name='303'></font>
+              ENDDO                             <font color=#447700>!  normal b.c symmetry at u(1)<a name='304'></font>
+              ENDDO<a name='305'>
+<a name='306'>
+            ELSE<a name='307'>
+<a name='308'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='309'>
+              DO i = 0, bdyzone-1<a name='310'>
+                data(ids-i,j) =   data(ids+i,j) <font color=#447700>! here, phi(0) = phi(2), etc<a name='311'></font>
+              ENDDO                             <font color=#447700>!  normal b.c symmetry at phi(1)<a name='312'></font>
+              ENDDO<a name='313'>
+<a name='314'>
+            END IF<a name='315'>
+<a name='316'>
+          ENDIF<a name='317'>
+<a name='318'>
+        ENDIF symmetry_xs<a name='319'>
+<a name='320'>
+<a name='321'>
+<font color=#447700>!  now the symmetry boundary at xe<a name='322'></font>
+<a name='323'>
+        symmetry_xe: IF( ( config_flags%symmetric_xe ) .and.  &amp;<a name='324'>
+                         ( ite == ide )                  )  THEN<a name='325'>
+<a name='326'>
+          IF ( (variable /= 'u') .and. (variable /= 'x') ) THEN<a name='327'>
+<a name='328'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='329'>
+            DO i = 1, bdyzone<a name='330'>
+              data(ide+i-1,j) = data(ide-i,j)  <font color=#447700>!  sym. about data(ide-0.5)<a name='331'></font>
+            ENDDO<a name='332'>
+            ENDDO<a name='333'>
+<a name='334'>
+          ELSE<a name='335'>
+<a name='336'>
+            IF (variable == 'u' ) THEN<a name='337'>
+<a name='338'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='339'>
+              DO i = 0, bdyzone-1<a name='340'>
+                data(ide+i,j) = - data(ide-i,j)  <font color=#447700>! u(ide+1) = - u(ide-1), etc.<a name='341'></font>
+              ENDDO<a name='342'>
+              ENDDO<a name='343'>
+<a name='344'>
+<a name='345'>
+            ELSE<a name='346'>
+<a name='347'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='348'>
+              DO i = 0, bdyzone-1<a name='349'>
+                data(ide+i,j) = data(ide-i,j)  <font color=#447700>!  phi(ide+1) = phi(ide-1), etc.<a name='350'></font>
+              ENDDO<a name='351'>
+              ENDDO<a name='352'>
+<a name='353'>
+            END IF<a name='354'>
+<a name='355'>
+          END IF <a name='356'>
+<a name='357'>
+        END IF symmetry_xe<a name='358'>
+<a name='359'>
+<a name='360'>
+<font color=#447700>!  set open b.c in X copy into boundary zone here.  WCS, 19 March 2000<a name='361'></font>
+<a name='362'>
+        open_xs: IF( ( config_flags%open_xs   .or. &amp;<a name='363'>
+                       config_flags%specified .or. &amp;<a name='364'>
+                       config_flags%nested            ) .and.  &amp;<a name='365'>
+                         ( its == ids ) .and. open_bc_copy  )  THEN<a name='366'>
+<a name='367'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='368'>
+              data(ids-1,j) = data(ids,j) <font color=#447700>!  here, data(0) = data(1)<a name='369'></font>
+            ENDDO<a name='370'>
+<a name='371'>
+        ENDIF open_xs<a name='372'>
+<a name='373'>
+<a name='374'>
+<font color=#447700>!  now the open boundary copy at xe<a name='375'></font>
+<a name='376'>
+        open_xe: IF( ( config_flags%open_xe   .or. &amp;<a name='377'>
+                       config_flags%specified .or. &amp;<a name='378'>
+                       config_flags%nested            ) .and.  &amp;<a name='379'>
+                          ( ite == ide ) .and. open_bc_copy  )  THEN<a name='380'>
+<a name='381'>
+          IF ( variable /= 'u' .and. variable /= 'x') THEN<a name='382'>
+<a name='383'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='384'>
+              data(ide,j) = data(ide-1,j) <a name='385'>
+            ENDDO<a name='386'>
+<a name='387'>
+          ELSE<a name='388'>
+<a name='389'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='390'>
+              data(ide+1,j) = data(ide,j)<a name='391'>
+            ENDDO<a name='392'>
+<a name='393'>
+          END IF <a name='394'>
+<a name='395'>
+        END IF open_xe<a name='396'>
+<a name='397'>
+<font color=#447700>!  end open b.c in X copy into boundary zone addition.  WCS, 19 March 2000<a name='398'></font>
+<a name='399'>
+      END IF periodicity_x<a name='400'>
+<a name='401'>
+<font color=#447700>!  same procedure in y<a name='402'></font>
+<a name='403'>
+      periodicity_y:  IF( ( config_flags%periodic_y ) .and.  &amp;<a name='404'>
+                          ( jds == jps )          .and.  &amp; <a name='405'>
+                          ( jde == jpe )                  )  THEN <a name='406'>
+<a name='407'>
+        IF( jts == jds ) then<a name='408'>
+<a name='409'>
+          DO j = 0, -(bdyzone-1), -1<a name='410'>
+          DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='411'>
+            data(i,jds+j-1) = data(i,jde+j-1)<a name='412'>
+          ENDDO<a name='413'>
+          ENDDO<a name='414'>
+<a name='415'>
+        END IF<a name='416'>
+<a name='417'>
+        IF( jte == jde ) then<a name='418'>
+<a name='419'>
+<font color=#447700>!!          DO j = 1, bdyzone<a name='420'></font>
+          DO j = -jstag, bdyzone<a name='421'>
+          DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='422'>
+            data(i,jde+j+jstag) = data(i,jds+j+jstag)<a name='423'>
+          ENDDO<a name='424'>
+          ENDDO<a name='425'>
+<a name='426'>
+        END IF<a name='427'>
+<a name='428'>
+      ELSE<a name='429'>
+<a name='430'>
+        symmetry_ys: IF( ( config_flags%symmetric_ys ) .and.  &amp;<a name='431'>
+                         ( jts == jds)                   )  THEN<a name='432'>
+<a name='433'>
+          IF ( (variable /= 'v') .and. (variable /= 'y') ) THEN<a name='434'>
+<a name='435'>
+            DO j = 1, bdyzone<a name='436'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='437'>
+              data(i,jds-j) = data(i,jds+j-1) <a name='438'>
+            ENDDO<a name='439'>
+            ENDDO<a name='440'>
+<a name='441'>
+          ELSE<a name='442'>
+<a name='443'>
+            IF (variable == 'v') THEN<a name='444'>
+<a name='445'>
+              DO j = 1, bdyzone<a name='446'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='447'>
+                data(i,jds-j) = - data(i,jds+j) <a name='448'>
+              ENDDO              <a name='449'>
+              ENDDO<a name='450'>
+<a name='451'>
+            ELSE<a name='452'>
+<a name='453'>
+              DO j = 1, bdyzone<a name='454'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='455'>
+                data(i,jds-j) = data(i,jds+j) <a name='456'>
+              ENDDO              <a name='457'>
+              ENDDO<a name='458'>
+<a name='459'>
+            END IF<a name='460'>
+<a name='461'>
+          ENDIF<a name='462'>
+<a name='463'>
+        ENDIF symmetry_ys<a name='464'>
+<a name='465'>
+<font color=#447700>!  now the symmetry boundary at ye<a name='466'></font>
+<a name='467'>
+        symmetry_ye: IF( ( config_flags%symmetric_ye ) .and.  &amp;<a name='468'>
+                         ( jte == jde )                  )  THEN<a name='469'>
+<a name='470'>
+          IF ( (variable /= 'v') .and. (variable /= 'y') ) THEN<a name='471'>
+<a name='472'>
+            DO j = 1, bdyzone<a name='473'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='474'>
+              data(i,jde+j-1) = data(i,jde-j) <a name='475'>
+            ENDDO                               <a name='476'>
+            ENDDO<a name='477'>
+<a name='478'>
+          ELSE<a name='479'>
+<a name='480'>
+            IF (variable == 'v' ) THEN<a name='481'>
+<a name='482'>
+              DO j = 1, bdyzone<a name='483'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='484'>
+                data(i,jde+j) = - data(i,jde-j)    <font color=#447700>! bugfix: changed jds on rhs to jde , JM 20020410<a name='485'></font>
+              ENDDO                               <a name='486'>
+              ENDDO<a name='487'>
+<a name='488'>
+            ELSE<a name='489'>
+<a name='490'>
+              DO j = 1, bdyzone<a name='491'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='492'>
+                data(i,jde+j) = data(i,jde-j)<a name='493'>
+              ENDDO                               <a name='494'>
+              ENDDO<a name='495'>
+<a name='496'>
+            END IF<a name='497'>
+<a name='498'>
+          ENDIF<a name='499'>
+<a name='500'>
+        END IF symmetry_ye<a name='501'>
+<a name='502'>
+<font color=#447700>!  set open b.c in Y copy into boundary zone here.  WCS, 19 March 2000<a name='503'></font>
+<a name='504'>
+        open_ys: IF( ( config_flags%open_ys   .or. &amp;<a name='505'>
+                       config_flags%specified .or. &amp;<a name='506'>
+                       config_flags%nested            ) .and.  &amp;<a name='507'>
+                         ( jts == jds) .and. open_bc_copy )  THEN<a name='508'>
+<a name='509'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='510'>
+              data(i,jds-1) = data(i,jds) <a name='511'>
+            ENDDO<a name='512'>
+<a name='513'>
+        ENDIF open_ys<a name='514'>
+<a name='515'>
+<font color=#447700>!  now the open boundary copy at ye<a name='516'></font>
+<a name='517'>
+        open_ye: IF( ( config_flags%open_ye   .or. &amp;<a name='518'>
+                       config_flags%specified .or. &amp;<a name='519'>
+                       config_flags%nested            ) .and.  &amp;<a name='520'>
+                         ( jte == jde ) .and. open_bc_copy )  THEN<a name='521'>
+<a name='522'>
+          IF  (variable /= 'v' .and. variable /= 'y' ) THEN<a name='523'>
+<a name='524'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='525'>
+              data(i,jde) = data(i,jde-1) <a name='526'>
+            ENDDO                               <a name='527'>
+<a name='528'>
+          ELSE<a name='529'>
+<a name='530'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='531'>
+              data(i,jde+1) = data(i,jde) <a name='532'>
+            ENDDO                               <a name='533'>
+<a name='534'>
+          ENDIF<a name='535'>
+<a name='536'>
+        END IF open_ye<a name='537'>
+      <a name='538'>
+<font color=#447700>!  end open b.c in Y copy into boundary zone addition.  WCS, 19 March 2000<a name='539'></font>
+<a name='540'>
+      END IF periodicity_y<a name='541'>
+<a name='542'>
+<font color=#447700>!  fix corners for doubly periodic domains<a name='543'></font>
+<a name='544'>
+      IF ( config_flags%periodic_x .and. config_flags%periodic_y &amp;<a name='545'>
+           .and. (ids == ips) .and. (ide == ipe)                 &amp;<a name='546'>
+           .and. (jds == jps) .and. (jde == jpe)                   ) THEN<a name='547'>
+<a name='548'>
+         IF ( (its == ids) .and. (jts == jds) ) THEN  <font color=#447700>! lower left corner fill<a name='549'></font>
+           DO j = 0, -(bdyzone-1), -1<a name='550'>
+           DO i = 0, -(bdyzone-1), -1<a name='551'>
+             data(ids+i-1,jds+j-1) = data(ide+i-1,jde+j-1)<a name='552'>
+           ENDDO<a name='553'>
+           ENDDO<a name='554'>
+         END IF<a name='555'>
+<a name='556'>
+         IF ( (ite == ide) .and. (jts == jds) ) THEN  <font color=#447700>! lower right corner fill<a name='557'></font>
+           DO j = 0, -(bdyzone-1), -1<a name='558'>
+           DO i = 1, bdyzone<a name='559'>
+             data(ide+i+istag,jds+j-1) = data(ids+i+istag,jde+j-1)<a name='560'>
+           ENDDO<a name='561'>
+           ENDDO<a name='562'>
+         END IF<a name='563'>
+<a name='564'>
+         IF ( (ite == ide) .and. (jte == jde) ) THEN  <font color=#447700>! upper right corner fill<a name='565'></font>
+           DO j = 1, bdyzone<a name='566'>
+           DO i = 1, bdyzone<a name='567'>
+             data(ide+i+istag,jde+j+jstag) = data(ids+i+istag,jds+j+jstag)<a name='568'>
+           ENDDO<a name='569'>
+           ENDDO<a name='570'>
+         END IF<a name='571'>
+<a name='572'>
+         IF ( (its == ids) .and. (jte == jde) ) THEN  <font color=#447700>! upper left corner fill<a name='573'></font>
+           DO j = 1, bdyzone<a name='574'>
+           DO i = 0, -(bdyzone-1), -1<a name='575'>
+             data(ids+i-1,jde+j+jstag) = data(ide+i-1,jds+j+jstag)<a name='576'>
+           ENDDO<a name='577'>
+           ENDDO<a name='578'>
+         END IF<a name='579'>
+<a name='580'>
+       END IF<a name='581'>
+<a name='582'>
+   END SUBROUTINE set_physical_bc2d<a name='583'>
+<a name='584'>
+<font color=#447700>!-----------------------------------<a name='585'></font>
+<a name='586'>
+<A NAME='SET_PHYSICAL_BC3D'><A href='../../html_code/share/module_bc.F.html#SET_PHYSICAL_BC3D' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='587'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_physical_bc3d</font>( data, variable_in,        &amp; <A href='../../call_to/SET_PHYSICAL_BC3D.html' TARGET='index'>166</A><a name='588'>
+                               config_flags,                   &amp; <a name='589'>
+                               ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='590'></font>
+                               ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='591'></font>
+                               ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='592'></font>
+                               its,ite, jts,jte, kts,kte )<a name='593'>
+<a name='594'>
+<font color=#447700>!  This subroutine sets the data in the boundary region, by direct<a name='595'></font>
+<font color=#447700>!  assignment if possible, for periodic and symmetric (wall)<a name='596'></font>
+<font color=#447700>!  boundary conditions.  Currently, we are only doing 1 variable<a name='597'></font>
+<font color=#447700>!  at a time - lots of overhead, so maybe this routine can be easily <a name='598'></font>
+<font color=#447700>!  inlined later or we could pass multiple variables -<a name='599'></font>
+<font color=#447700>!  would probably want a largestep and smallstep version.<a name='600'></font>
+<a name='601'>
+<font color=#447700>!  15 Jan 99, Dave<a name='602'></font>
+<font color=#447700>!  Modified the incoming its,ite,jts,jte to truly be the tile size.<a name='603'></font>
+<font color=#447700>!  This required modifying the loop limits when the "istag" or "jstag"<a name='604'></font>
+<font color=#447700>!  is used, as this is only required at the end of the domain.<a name='605'></font>
+<a name='606'>
+      IMPLICIT NONE<a name='607'>
+<a name='608'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='609'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='610'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='611'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='612'>
+      CHARACTER,    INTENT(IN   )    :: variable_in<a name='613'>
+<a name='614'>
+      CHARACTER                      :: variable<a name='615'>
+<a name='616'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ) :: data<a name='617'>
+      TYPE( grid_config_rec_type ) config_flags<a name='618'>
+<a name='619'>
+      INTEGER  :: i, j, k, istag, jstag, itime, k_end<a name='620'>
+<a name='621'>
+      LOGICAL  :: debug, open_bc_copy<a name='622'>
+<a name='623'>
+<font color=#447700>!------------<a name='624'></font>
+<a name='625'>
+      debug = .false.<a name='626'>
+<a name='627'>
+      open_bc_copy = .false.<a name='628'>
+<a name='629'>
+      variable = variable_in<a name='630'>
+      IF ( variable_in .ge. 'A' .and. variable_in .le. 'Z' ) THEN<a name='631'>
+        variable = CHAR( ICHAR(variable_in) - ICHAR('A') + ICHAR('a') )<a name='632'>
+      ENDIF<a name='633'>
+<a name='634'>
+      IF ((variable == 'u') .or. (variable == 'v') .or.     &amp;<a name='635'>
+          (variable == 'w') .or. (variable == 't') .or.     &amp;<a name='636'>
+          (variable == 'd') .or. (variable == 'e') .or. &amp;<a name='637'>
+          (variable == 'x') .or. (variable == 'y') .or. &amp;<a name='638'>
+          (variable == 'f') .or. (variable == 'r') ) open_bc_copy = .true.<a name='639'>
+<a name='640'>
+<font color=#447700>!  begin, first set a staggering variable<a name='641'></font>
+<a name='642'>
+      istag = -1<a name='643'>
+      jstag = -1<a name='644'>
+      k_end = max(1,min(kde-1,kte))<a name='645'>
+<a name='646'>
+<a name='647'>
+      IF ((variable == 'u') .or. (variable == 'x')) istag = 0<a name='648'>
+      IF ((variable == 'v') .or. (variable == 'y')) jstag = 0<a name='649'>
+      IF ((variable == 'd') .or. (variable == 'xy')) then<a name='650'>
+         istag = 0<a name='651'>
+         jstag = 0<a name='652'>
+      ENDIF<a name='653'>
+      IF ((variable == 'e') ) then<a name='654'>
+         istag = 0<a name='655'>
+         k_end = min(kde,kte)<a name='656'>
+      ENDIF<a name='657'>
+<a name='658'>
+      IF ((variable == 'f') ) then<a name='659'>
+         jstag = 0<a name='660'>
+         k_end = min(kde,kte)<a name='661'>
+      ENDIF<a name='662'>
+<a name='663'>
+      IF ( variable == 'w')  k_end = min(kde,kte)<a name='664'>
+<a name='665'>
+<font color=#447700>!      k_end = kte<a name='666'></font>
+<a name='667'>
+      if(debug) then<a name='668'>
+        write(6,*) ' in bc, var is ',variable, istag, jstag, kte, k_end<a name='669'>
+        write(6,*) ' b.cs are ',  &amp;<a name='670'>
+      config_flags%periodic_x,  &amp;<a name='671'>
+      config_flags%periodic_y<a name='672'>
+      end if<a name='673'>
+      <a name='674'>
+<a name='675'>
+<a name='676'>
+<font color=#447700>!  periodic conditions.<a name='677'></font>
+<font color=#447700>!  note, patch must cover full range in periodic dir, or else<a name='678'></font>
+<font color=#447700>!  its intra-patch communication that is handled elsewheres.<a name='679'></font>
+<font color=#447700>!  symmetry conditions can always be handled here, because no<a name='680'></font>
+<font color=#447700>!  outside patch communication is needed<a name='681'></font>
+<a name='682'>
+      periodicity_x:  IF( ( config_flags%periodic_x ) .and.  &amp;<a name='683'>
+                          ( ids == ips )          .and.  &amp;<a name='684'>
+                          ( ide == ipe )                ) THEN<a name='685'>
+<a name='686'>
+        IF ( its == ids ) THEN<a name='687'>
+<a name='688'>
+          DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='689'>
+          DO k = kts, k_end<a name='690'>
+          DO i = 0,-(bdyzone-1),-1<a name='691'>
+            data(ids+i-1,k,j) = data(ide+i-1,k,j)<a name='692'>
+          ENDDO<a name='693'>
+          ENDDO<a name='694'>
+          ENDDO<a name='695'>
+<a name='696'>
+        ENDIF<a name='697'>
+<a name='698'>
+        IF ( ite == ide ) THEN<a name='699'>
+<a name='700'>
+          DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='701'>
+          DO k = kts, k_end<a name='702'>
+<font color=#447700>!!          DO i = 1 , bdyzone<a name='703'></font>
+          DO i = -istag , bdyzone<a name='704'>
+            data(ide+i+istag,k,j) = data(ids+i+istag,k,j)<a name='705'>
+          ENDDO<a name='706'>
+          ENDDO<a name='707'>
+          ENDDO<a name='708'>
+<a name='709'>
+        ENDIF<a name='710'>
+<a name='711'>
+      ELSE <a name='712'>
+<a name='713'>
+        symmetry_xs: IF( ( config_flags%symmetric_xs ) .and.  &amp;<a name='714'>
+                         ( its == ids )                  )  THEN<a name='715'>
+<a name='716'>
+          IF ( (variable /= 'u') .and. (variable /= 'x') ) THEN<a name='717'>
+<a name='718'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='719'>
+            DO k = kts, k_end<a name='720'>
+            DO i = 1, bdyzone<a name='721'>
+              data(ids-i,k,j) = data(ids+i-1,k,j) <font color=#447700>!  here, data(0) = data(1), etc<a name='722'></font>
+            ENDDO                                 <font color=#447700>!  symmetry about data(0.5) (u = 0 pt)<a name='723'></font>
+            ENDDO<a name='724'>
+            ENDDO<a name='725'>
+<a name='726'>
+          ELSE<a name='727'>
+<a name='728'>
+            IF ( variable == 'u' ) THEN<a name='729'>
+<a name='730'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='731'>
+              DO k = kts, k_end<a name='732'>
+              DO i = 1, bdyzone<a name='733'>
+                data(ids-i,k,j) = - data(ids+i,k,j) <font color=#447700>! here, u(0) = - u(2), etc<a name='734'></font>
+              ENDDO                                 <font color=#447700>!  normal b.c symmetry at u(1)<a name='735'></font>
+              ENDDO<a name='736'>
+              ENDDO<a name='737'>
+<a name='738'>
+            ELSE<a name='739'>
+<a name='740'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='741'>
+              DO k = kts, k_end<a name='742'>
+              DO i = 1, bdyzone<a name='743'>
+                data(ids-i,k,j) = data(ids+i,k,j) <font color=#447700>! here, phi(0) = phi(2), etc<a name='744'></font>
+              ENDDO                               <font color=#447700>!  normal b.c symmetry at phi(1)<a name='745'></font>
+              ENDDO<a name='746'>
+              ENDDO<a name='747'>
+<a name='748'>
+            END IF<a name='749'>
+<a name='750'>
+          ENDIF<a name='751'>
+<a name='752'>
+        ENDIF symmetry_xs<a name='753'>
+<a name='754'>
+<a name='755'>
+<font color=#447700>!  now the symmetry boundary at xe<a name='756'></font>
+<a name='757'>
+        symmetry_xe: IF( ( config_flags%symmetric_xe ) .and.  &amp;<a name='758'>
+                         ( ite == ide )                  )  THEN<a name='759'>
+<a name='760'>
+          IF ( (variable /= 'u') .and. (variable /= 'x') ) THEN<a name='761'>
+<a name='762'>
+            DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='763'>
+            DO k = kts, k_end<a name='764'>
+            DO i = 1, bdyzone<a name='765'>
+              data(ide+i-1,k,j) = data(ide-i,k,j)  <font color=#447700>!  sym. about data(ide-0.5)<a name='766'></font>
+            ENDDO<a name='767'>
+            ENDDO<a name='768'>
+            ENDDO<a name='769'>
+<a name='770'>
+          ELSE<a name='771'>
+<a name='772'>
+            IF (variable == 'u') THEN<a name='773'>
+<a name='774'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='775'>
+              DO k = kts, k_end<a name='776'>
+              DO i = 1, bdyzone<a name='777'>
+                data(ide+i,k,j) = - data(ide-i,k,j)  <font color=#447700>! u(ide+1) = - u(ide-1), etc.<a name='778'></font>
+              ENDDO<a name='779'>
+              ENDDO<a name='780'>
+              ENDDO<a name='781'>
+<a name='782'>
+            ELSE<a name='783'>
+<a name='784'>
+              DO j = MAX(jds,jts-1), MIN(jte+1,jde+jstag)<a name='785'>
+              DO k = kts, k_end<a name='786'>
+              DO i = 1, bdyzone<a name='787'>
+                data(ide+i,k,j) = data(ide-i,k,j)  <font color=#447700>! phi(ide+1) = - phi(ide-1), etc.<a name='788'></font>
+              ENDDO<a name='789'>
+              ENDDO<a name='790'>
+              ENDDO<a name='791'>
+<a name='792'>
+             END IF<a name='793'>
+<a name='794'>
+          END IF <a name='795'>
+<a name='796'>
+        END IF symmetry_xe<a name='797'>
+<a name='798'>
+<font color=#447700>!  set open b.c in X copy into boundary zone here.  WCS, 19 March 2000<a name='799'></font>
+<a name='800'>
+        open_xs: IF( ( config_flags%open_xs   .or. &amp;<a name='801'>
+                       config_flags%specified .or. &amp;<a name='802'>
+                       config_flags%nested            ) .and.  &amp;<a name='803'>
+                         ( its == ids ) .and. open_bc_copy  )  THEN<a name='804'>
+<a name='805'>
+            DO j = jts-bdyzone, MIN(jte,jde+jstag)+bdyzone<a name='806'>
+            DO k = kts, k_end<a name='807'>
+              data(ids-1,k,j) = data(ids,k,j) <font color=#447700>!  here, data(0) = data(1), etc<a name='808'></font>
+            ENDDO<a name='809'>
+            ENDDO<a name='810'>
+<a name='811'>
+        ENDIF open_xs<a name='812'>
+<a name='813'>
+<a name='814'>
+<font color=#447700>!  now the open_xe boundary copy <a name='815'></font>
+<a name='816'>
+        open_xe: IF( ( config_flags%open_xe   .or. &amp;<a name='817'>
+                       config_flags%specified .or. &amp;<a name='818'>
+                       config_flags%nested            ) .and.  &amp;<a name='819'>
+                         ( ite == ide ) .and. open_bc_copy )  THEN<a name='820'>
+<a name='821'>
+          IF (variable /= 'u' .and. variable /= 'x' ) THEN<a name='822'>
+<a name='823'>
+            DO j = jts-bdyzone, MIN(jte,jde+jstag)+bdyzone<a name='824'>
+            DO k = kts, k_end<a name='825'>
+              data(ide,k,j) = data(ide-1,k,j)<a name='826'>
+            ENDDO<a name='827'>
+            ENDDO<a name='828'>
+<a name='829'>
+          ELSE<a name='830'>
+<a name='831'>
+<font color=#447700>!!!!!!! I am not sure about this one!  JM 20020402<a name='832'></font>
+            DO j = MAX(jds,jts-1)-bdyzone, MIN(jte+1,jde+jstag)+bdyzone<a name='833'>
+            DO k = kts, k_end<a name='834'>
+              data(ide+1,k,j) = data(ide,k,j)<a name='835'>
+            ENDDO<a name='836'>
+            ENDDO<a name='837'>
+<a name='838'>
+          END IF <a name='839'>
+<a name='840'>
+        END IF open_xe<a name='841'>
+<a name='842'>
+<font color=#447700>!  end open b.c in X copy into boundary zone addition.  WCS, 19 March 2000<a name='843'></font>
+<a name='844'>
+      END IF periodicity_x<a name='845'>
+<a name='846'>
+<font color=#447700>!  same procedure in y<a name='847'></font>
+<a name='848'>
+      periodicity_y:  IF( ( config_flags%periodic_y ) .and.  &amp;<a name='849'>
+                          ( jds == jps )          .and.  &amp; <a name='850'>
+                          ( jde == jpe )                  )  THEN <a name='851'>
+<a name='852'>
+        IF( jts == jds ) then<a name='853'>
+<a name='854'>
+          DO j = 0, -(bdyzone-1), -1<a name='855'>
+          DO k = kts, k_end<a name='856'>
+          DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='857'>
+            data(i,k,jds+j-1) = data(i,k,jde+j-1)<a name='858'>
+          ENDDO<a name='859'>
+          ENDDO<a name='860'>
+          ENDDO<a name='861'>
+<a name='862'>
+        END IF<a name='863'>
+<a name='864'>
+        IF( jte == jde ) then<a name='865'>
+<a name='866'>
+<font color=#447700>!!          DO j = 1, bdyzone<a name='867'></font>
+          DO j = -jstag, bdyzone<a name='868'>
+          DO k = kts, k_end<a name='869'>
+          DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='870'>
+            data(i,k,jde+j+jstag) = data(i,k,jds+j+jstag)<a name='871'>
+          ENDDO<a name='872'>
+          ENDDO<a name='873'>
+          ENDDO<a name='874'>
+<a name='875'>
+        END IF<a name='876'>
+<a name='877'>
+      ELSE<a name='878'>
+<a name='879'>
+        symmetry_ys: IF( ( config_flags%symmetric_ys ) .and.  &amp;<a name='880'>
+                         ( jts == jds)                   )  THEN<a name='881'>
+<a name='882'>
+          IF ( (variable /= 'v') .and. (variable /= 'y') ) THEN<a name='883'>
+<a name='884'>
+            DO j = 1, bdyzone<a name='885'>
+            DO k = kts, k_end<a name='886'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='887'>
+              data(i,k,jds-j) = data(i,k,jds+j-1) <a name='888'>
+            ENDDO                               <a name='889'>
+            ENDDO<a name='890'>
+            ENDDO<a name='891'>
+<a name='892'>
+          ELSE<a name='893'>
+<a name='894'>
+            IF (variable == 'v') THEN<a name='895'>
+<a name='896'>
+              DO j = 1, bdyzone<a name='897'>
+              DO k = kts, k_end<a name='898'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='899'>
+                data(i,k,jds-j) = - data(i,k,jds+j) <a name='900'>
+              ENDDO              <a name='901'>
+              ENDDO<a name='902'>
+              ENDDO<a name='903'>
+<a name='904'>
+            ELSE<a name='905'>
+<a name='906'>
+              DO j = 1, bdyzone<a name='907'>
+              DO k = kts, k_end<a name='908'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='909'>
+                data(i,k,jds-j) = data(i,k,jds+j) <a name='910'>
+              ENDDO              <a name='911'>
+              ENDDO<a name='912'>
+              ENDDO<a name='913'>
+<a name='914'>
+            END IF<a name='915'>
+<a name='916'>
+          ENDIF<a name='917'>
+<a name='918'>
+        ENDIF symmetry_ys<a name='919'>
+<a name='920'>
+<font color=#447700>!  now the symmetry boundary at ye<a name='921'></font>
+<a name='922'>
+        symmetry_ye: IF( ( config_flags%symmetric_ye ) .and.  &amp;<a name='923'>
+                         ( jte == jde )                  )  THEN<a name='924'>
+<a name='925'>
+          IF ( (variable /= 'v') .and. (variable /= 'y') ) THEN<a name='926'>
+<a name='927'>
+            DO j = 1, bdyzone<a name='928'>
+            DO k = kts, k_end<a name='929'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='930'>
+              data(i,k,jde+j-1) = data(i,k,jde-j) <a name='931'>
+            ENDDO                               <a name='932'>
+            ENDDO<a name='933'>
+            ENDDO<a name='934'>
+<a name='935'>
+          ELSE<a name='936'>
+<a name='937'>
+            IF ( variable == 'v' ) THEN<a name='938'>
+<a name='939'>
+              DO j = 1, bdyzone<a name='940'>
+              DO k = kts, k_end<a name='941'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='942'>
+                data(i,k,jde+j) = - data(i,k,jde-j) <a name='943'>
+              ENDDO                               <a name='944'>
+              ENDDO<a name='945'>
+              ENDDO<a name='946'>
+<a name='947'>
+            ELSE<a name='948'>
+<a name='949'>
+              DO j = 1, bdyzone<a name='950'>
+              DO k = kts, k_end<a name='951'>
+              DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='952'>
+                data(i,k,jde+j) = data(i,k,jde-j) <a name='953'>
+              ENDDO                               <a name='954'>
+              ENDDO<a name='955'>
+              ENDDO<a name='956'>
+<a name='957'>
+            END IF<a name='958'>
+<a name='959'>
+          ENDIF<a name='960'>
+<a name='961'>
+        END IF symmetry_ye<a name='962'>
+      <a name='963'>
+<font color=#447700>!  set open b.c in Y copy into boundary zone here.  WCS, 19 March 2000<a name='964'></font>
+<a name='965'>
+        open_ys: IF( ( config_flags%open_ys   .or. &amp;<a name='966'>
+                       config_flags%specified .or. &amp;<a name='967'>
+                       config_flags%nested            ) .and.  &amp;<a name='968'>
+                         ( jts == jds) .and. open_bc_copy )  THEN<a name='969'>
+<a name='970'>
+            DO k = kts, k_end<a name='971'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='972'>
+              data(i,k,jds-1) = data(i,k,jds) <a name='973'>
+            ENDDO<a name='974'>
+            ENDDO<a name='975'>
+<a name='976'>
+        ENDIF open_ys<a name='977'>
+<a name='978'>
+<font color=#447700>!  now the open boundary copy at ye<a name='979'></font>
+<a name='980'>
+        open_ye: IF( ( config_flags%open_ye   .or. &amp;<a name='981'>
+                       config_flags%specified .or. &amp;<a name='982'>
+                       config_flags%nested            ) .and.  &amp;<a name='983'>
+                         ( jte == jde ) .and. open_bc_copy )  THEN<a name='984'>
+<a name='985'>
+          IF (variable /= 'v' .and. variable /= 'y' ) THEN<a name='986'>
+<a name='987'>
+            DO k = kts, k_end<a name='988'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='989'>
+              data(i,k,jde) = data(i,k,jde-1) <a name='990'>
+            ENDDO                               <a name='991'>
+            ENDDO<a name='992'>
+<a name='993'>
+          ELSE<a name='994'>
+<a name='995'>
+            DO k = kts, k_end<a name='996'>
+            DO i = MAX(ids,its-1), MIN(ite+1,ide+istag)<a name='997'>
+              data(i,k,jde+1) = data(i,k,jde) <a name='998'>
+            ENDDO                               <a name='999'>
+            ENDDO<a name='1000'>
+<a name='1001'>
+          ENDIF<a name='1002'>
+<a name='1003'>
+      END IF open_ye<a name='1004'>
+<a name='1005'>
+<font color=#447700>!  end open b.c in Y copy into boundary zone addition.  WCS, 19 March 2000<a name='1006'></font>
+<a name='1007'>
+      END IF periodicity_y<a name='1008'>
+<a name='1009'>
+<font color=#447700>!  fix corners for doubly periodic domains<a name='1010'></font>
+<a name='1011'>
+      IF ( config_flags%periodic_x .and. config_flags%periodic_y &amp;<a name='1012'>
+           .and. (ids == ips) .and. (ide == ipe)                 &amp;<a name='1013'>
+           .and. (jds == jps) .and. (jde == jpe)                   ) THEN<a name='1014'>
+<a name='1015'>
+         IF ( (its == ids) .and. (jts == jds) ) THEN  <font color=#447700>! lower left corner fill<a name='1016'></font>
+           DO j = 0, -(bdyzone-1), -1<a name='1017'>
+           DO k = kts, k_end<a name='1018'>
+           DO i = 0, -(bdyzone-1), -1<a name='1019'>
+             data(ids+i-1,k,jds+j-1) = data(ide+i-1,k,jde+j-1)<a name='1020'>
+           ENDDO<a name='1021'>
+           ENDDO<a name='1022'>
+           ENDDO<a name='1023'>
+         END IF<a name='1024'>
+<a name='1025'>
+         IF ( (ite == ide) .and. (jts == jds) ) THEN  <font color=#447700>! lower right corner fill<a name='1026'></font>
+           DO j = 0, -(bdyzone-1), -1<a name='1027'>
+           DO k = kts, k_end<a name='1028'>
+           DO i = 1, bdyzone<a name='1029'>
+             data(ide+i+istag,k,jds+j-1) = data(ids+i+istag,k,jde+j-1)<a name='1030'>
+           ENDDO<a name='1031'>
+           ENDDO<a name='1032'>
+           ENDDO<a name='1033'>
+         END IF<a name='1034'>
+<a name='1035'>
+         IF ( (ite == ide) .and. (jte == jde) ) THEN  <font color=#447700>! upper right corner fill<a name='1036'></font>
+           DO j = 1, bdyzone<a name='1037'>
+           DO k = kts, k_end<a name='1038'>
+           DO i = 1, bdyzone<a name='1039'>
+             data(ide+i+istag,k,jde+j+jstag) = data(ids+i+istag,k,jds+j+jstag)<a name='1040'>
+           ENDDO<a name='1041'>
+           ENDDO<a name='1042'>
+           ENDDO<a name='1043'>
+         END IF<a name='1044'>
+<a name='1045'>
+         IF ( (its == ids) .and. (jte == jde) ) THEN  <font color=#447700>! upper left corner fill<a name='1046'></font>
+           DO j = 1, bdyzone<a name='1047'>
+           DO k = kts, k_end<a name='1048'>
+           DO i = 0, -(bdyzone-1), -1<a name='1049'>
+             data(ids+i-1,k,jde+j+jstag) = data(ide+i-1,k,jds+j+jstag)<a name='1050'>
+           ENDDO<a name='1051'>
+           ENDDO<a name='1052'>
+           ENDDO<a name='1053'>
+         END IF<a name='1054'>
+<a name='1055'>
+       END IF<a name='1056'>
+<a name='1057'>
+   END SUBROUTINE set_physical_bc3d<a name='1058'>
+<a name='1059'>
+<A NAME='INIT_MODULE_BC'><A href='../../html_code/share/module_bc.F.html#INIT_MODULE_BC' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1060'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_bc</font> <A href='../../call_to/INIT_MODULE_BC.html' TARGET='index'>1</A><a name='1061'>
+   END SUBROUTINE init_module_bc<a name='1062'>
+<a name='1063'>
+<font color=#447700>!------------------------------------------------------------------------<a name='1064'></font>
+<a name='1065'>
+<A NAME='RELAX_BDYTEND'><A href='../../html_code/share/module_bc.F.html#RELAX_BDYTEND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1066'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>relax_bdytend</font>   ( field, field_tend,        &amp; <A href='../../call_to/RELAX_BDYTEND.html' TARGET='index'>7</A><a name='1067'>
+                               field_bdy, field_bdy_tend, &amp;<a name='1068'>
+<font color=#447700>!                              field_xbdy, field_ybdy,    &amp;<a name='1069'></font>
+                               variable_in, config_flags, &amp; <a name='1070'>
+                               spec_bdy_width, spec_zone, relax_zone, &amp;<a name='1071'>
+                               dtbc, fcx, gcx,             &amp;<a name='1072'>
+                               ijds, ijde,                 &amp; <font color=#447700>! min/max(id,jd)<a name='1073'></font>
+                               ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='1074'></font>
+                               ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='1075'></font>
+                               ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='1076'></font>
+                               its,ite, jts,jte, kts,kte )<a name='1077'>
+<a name='1078'>
+<font color=#447700>!  This subroutine adds the tendencies in the boundary relaxation region, for specified<a name='1079'></font>
+<font color=#447700>!  boundary conditions.  <a name='1080'></font>
+<font color=#447700>!  spec_bdy_width is only used to dimension the boundary arrays.<a name='1081'></font>
+<font color=#447700>!  relax_zone is the inner edge of the boundary relaxation zone treated here.<a name='1082'></font>
+<font color=#447700>!  spec_zone is the width of the outer specified b.c.s that are not changed here.<a name='1083'></font>
+<font color=#447700>!  (JD July 2000)<a name='1084'></font>
+<a name='1085'>
+      IMPLICIT NONE<a name='1086'>
+<a name='1087'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='1088'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='1089'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='1090'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='1091'>
+      INTEGER,      INTENT(IN   )    :: ijds,ijde<a name='1092'>
+      INTEGER,      INTENT(IN   )    :: spec_bdy_width, spec_zone, relax_zone<a name='1093'>
+      REAL,         INTENT(IN   )    :: dtbc<a name='1094'>
+      CHARACTER,    INTENT(IN   )    :: variable_in<a name='1095'>
+<a name='1096'>
+<a name='1097'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(IN   ) :: field<a name='1098'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(INOUT) :: field_tend<a name='1099'>
+      REAL,  DIMENSION( ijds:ijde , kds:kde , spec_bdy_width, 4 ), INTENT(IN   ) :: field_bdy<a name='1100'>
+      REAL,  DIMENSION( ijds:ijde , kds:kde , spec_bdy_width, 4 ), INTENT(IN   ) :: field_bdy_tend<a name='1101'>
+      REAL,  DIMENSION( spec_bdy_width ), INTENT(IN   ) :: fcx, gcx<a name='1102'>
+      TYPE( grid_config_rec_type ) config_flags<a name='1103'>
+<a name='1104'>
+      CHARACTER  :: variable<a name='1105'>
+      INTEGER    :: i, j, k, ibs, ibe, jbs, jbe, itf, jtf, ktf<a name='1106'>
+      INTEGER    :: b_dist<a name='1107'>
+      REAL       :: fls0, fls1, fls2, fls3, fls4<a name='1108'>
+<a name='1109'>
+      variable = variable_in<a name='1110'>
+<a name='1111'>
+      IF (variable == 'U') variable = 'u'<a name='1112'>
+      IF (variable == 'V') variable = 'v'<a name='1113'>
+      IF (variable == 'M') variable = 'm'<a name='1114'>
+      IF (variable == 'H') variable = 'h'<a name='1115'>
+<a name='1116'>
+      ibs = ids<a name='1117'>
+      ibe = ide-1<a name='1118'>
+      itf = min(ite,ide-1)<a name='1119'>
+      jbs = jds<a name='1120'>
+      jbe = jde-1<a name='1121'>
+      jtf = min(jte,jde-1)<a name='1122'>
+      ktf = kde-1<a name='1123'>
+      IF (variable == 'u') ibe = ide<a name='1124'>
+      IF (variable == 'u') itf = min(ite,ide)<a name='1125'>
+      IF (variable == 'v') jbe = jde<a name='1126'>
+      IF (variable == 'v') jtf = min(jte,jde)<a name='1127'>
+      IF (variable == 'm') ktf = kte<a name='1128'>
+      IF (variable == 'h') ktf = kte<a name='1129'>
+<a name='1130'>
+      IF (jts - jbs .lt. relax_zone) THEN<a name='1131'>
+<font color=#447700>! Y-start boundary<a name='1132'></font>
+        DO j = max(jts,jbs+spec_zone), min(jtf,jbs+relax_zone-1)<a name='1133'>
+          b_dist = j - jbs<a name='1134'>
+          DO k = kts, ktf<a name='1135'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1136'>
+              fls0 = field_bdy(i, k, b_dist+1, P_YSB) &amp;<a name='1137'>
+                   + dtbc * field_bdy_tend(i, k, b_dist+1, P_YSB) &amp;<a name='1138'>
+                   - field(i,k,j)<a name='1139'>
+              fls1 = field_bdy(i-1, k, b_dist+1, P_YSB) &amp;<a name='1140'>
+                   + dtbc * field_bdy_tend(i-1, k, b_dist+1, P_YSB) &amp;<a name='1141'>
+                   - field(i-1,k,j)<a name='1142'>
+              fls2 = field_bdy(i+1, k, b_dist+1, P_YSB) &amp;<a name='1143'>
+                   + dtbc * field_bdy_tend(i+1, k, b_dist+1, P_YSB) &amp;<a name='1144'>
+                   - field(i+1,k,j)<a name='1145'>
+              fls3 = field_bdy(i, k, b_dist, P_YSB) &amp;<a name='1146'>
+                   + dtbc * field_bdy_tend(i, k, b_dist, P_YSB) &amp;<a name='1147'>
+                   - field(i,k,j-1)<a name='1148'>
+              fls4 = field_bdy(i, k, b_dist+2, P_YSB) &amp;<a name='1149'>
+                   + dtbc * field_bdy_tend(i, k, b_dist+2, P_YSB) &amp;<a name='1150'>
+                   - field(i,k,j+1)<a name='1151'>
+              field_tend(i,k,j) = field_tend(i,k,j) &amp;<a name='1152'>
+                                + fcx(b_dist+1)*fls0 &amp;<a name='1153'>
+                                - gcx(b_dist+1)*(fls1+fls2+fls3+fls4-4.*fls0)<a name='1154'>
+            ENDDO<a name='1155'>
+          ENDDO<a name='1156'>
+        ENDDO<a name='1157'>
+      ENDIF<a name='1158'>
+<a name='1159'>
+      IF (jbe - jtf .lt. relax_zone) THEN<a name='1160'>
+<font color=#447700>! Y-end boundary<a name='1161'></font>
+        DO j = max(jts,jbe-relax_zone+1), min(jtf,jbe-spec_zone)<a name='1162'>
+          b_dist = jbe - j<a name='1163'>
+          DO k = kts, ktf<a name='1164'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1165'>
+              fls0 = field_bdy(i, k, b_dist+1, P_YEB) &amp;<a name='1166'>
+                   + dtbc * field_bdy_tend(i, k, b_dist+1, P_YEB) &amp;<a name='1167'>
+                   - field(i,k,j)<a name='1168'>
+              fls1 = field_bdy(i-1, k, b_dist+1, P_YEB) &amp;<a name='1169'>
+                   + dtbc * field_bdy_tend(i-1, k, b_dist+1, P_YEB) &amp;<a name='1170'>
+                   - field(i-1,k,j)<a name='1171'>
+              fls2 = field_bdy(i+1, k, b_dist+1, P_YEB) &amp;<a name='1172'>
+                   + dtbc * field_bdy_tend(i+1, k, b_dist+1, P_YEB) &amp;<a name='1173'>
+                   - field(i+1,k,j)<a name='1174'>
+              fls3 = field_bdy(i, k, b_dist, P_YEB) &amp;<a name='1175'>
+                   + dtbc * field_bdy_tend(i, k, b_dist, P_YEB) &amp;<a name='1176'>
+                   - field(i,k,j+1)<a name='1177'>
+              fls4 = field_bdy(i, k, b_dist+2, P_YEB) &amp;<a name='1178'>
+                   + dtbc * field_bdy_tend(i, k, b_dist+2, P_YEB) &amp;<a name='1179'>
+                   - field(i,k,j-1)<a name='1180'>
+              field_tend(i,k,j) = field_tend(i,k,j) &amp;<a name='1181'>
+                                + fcx(b_dist+1)*fls0 &amp;<a name='1182'>
+                                - gcx(b_dist+1)*(fls1+fls2+fls3+fls4-4.*fls0)<a name='1183'>
+<a name='1184'>
+            ENDDO<a name='1185'>
+          ENDDO<a name='1186'>
+        ENDDO<a name='1187'>
+      ENDIF<a name='1188'>
+<a name='1189'>
+      IF (its - ibs .lt. relax_zone) THEN<a name='1190'>
+<font color=#447700>! X-start boundary<a name='1191'></font>
+        DO i = max(its,ibs+spec_zone), min(itf,ibs+relax_zone-1)<a name='1192'>
+          b_dist = i - ibs<a name='1193'>
+          DO k = kts, ktf<a name='1194'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1195'>
+              fls0 = field_bdy(j, k, b_dist+1, P_XSB) &amp;<a name='1196'>
+                   + dtbc * field_bdy_tend(j, k, b_dist+1, P_XSB) &amp;<a name='1197'>
+                   - field(i,k,j)<a name='1198'>
+              fls1 = field_bdy(j-1, k, b_dist+1, P_XSB) &amp;<a name='1199'>
+                   + dtbc * field_bdy_tend(j-1, k, b_dist+1, P_XSB) &amp;<a name='1200'>
+                   - field(i,k,j-1)<a name='1201'>
+              fls2 = field_bdy(j+1, k, b_dist+1, P_XSB) &amp;<a name='1202'>
+                   + dtbc * field_bdy_tend(j+1, k, b_dist+1, P_XSB) &amp;<a name='1203'>
+                   - field(i,k,j+1)<a name='1204'>
+              fls3 = field_bdy(j, k, b_dist, P_XSB) &amp;<a name='1205'>
+                   + dtbc * field_bdy_tend(j, k, b_dist, P_XSB) &amp;<a name='1206'>
+                   - field(i-1,k,j)<a name='1207'>
+              fls4 = field_bdy(j, k, b_dist+2, P_XSB) &amp;<a name='1208'>
+                   + dtbc * field_bdy_tend(j, k, b_dist+2, P_XSB) &amp;<a name='1209'>
+                   - field(i+1,k,j)<a name='1210'>
+              field_tend(i,k,j) = field_tend(i,k,j) &amp;<a name='1211'>
+                                + fcx(b_dist+1)*fls0 &amp;<a name='1212'>
+                                - gcx(b_dist+1)*(fls1+fls2+fls3+fls4-4.*fls0)<a name='1213'>
+<a name='1214'>
+            ENDDO<a name='1215'>
+          ENDDO<a name='1216'>
+        ENDDO<a name='1217'>
+      ENDIF<a name='1218'>
+<a name='1219'>
+      IF (ibe - itf .lt. relax_zone) THEN<a name='1220'>
+<font color=#447700>! X-end boundary<a name='1221'></font>
+        DO i = max(its,ibe-relax_zone+1), min(itf,ibe-spec_zone)<a name='1222'>
+          b_dist = ibe - i<a name='1223'>
+          DO k = kts, ktf<a name='1224'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1225'>
+              fls0 = field_bdy(j, k, b_dist+1, P_XEB) &amp;<a name='1226'>
+                   + dtbc * field_bdy_tend(j, k, b_dist+1, P_XEB) &amp;<a name='1227'>
+                   - field(i,k,j)<a name='1228'>
+              fls1 = field_bdy(j-1, k, b_dist+1, P_XEB) &amp;<a name='1229'>
+                   + dtbc * field_bdy_tend(j-1, k, b_dist+1, P_XEB) &amp;<a name='1230'>
+                   - field(i,k,j-1)<a name='1231'>
+              fls2 = field_bdy(j+1, k, b_dist+1, P_XEB) &amp;<a name='1232'>
+                   + dtbc * field_bdy_tend(j+1, k, b_dist+1, P_XEB) &amp;<a name='1233'>
+                   - field(i,k,j+1)<a name='1234'>
+              fls3 = field_bdy(j, k, b_dist, P_XEB) &amp;<a name='1235'>
+                   + dtbc * field_bdy_tend(j, k, b_dist, P_XEB) &amp;<a name='1236'>
+                   - field(i+1,k,j)<a name='1237'>
+              fls4 = field_bdy(j, k, b_dist+2, P_XEB) &amp;<a name='1238'>
+                   + dtbc * field_bdy_tend(j, k, b_dist+2, P_XEB) &amp;<a name='1239'>
+                   - field(i-1,k,j)<a name='1240'>
+              field_tend(i,k,j) = field_tend(i,k,j) &amp;<a name='1241'>
+                                + fcx(b_dist+1)*fls0 &amp;<a name='1242'>
+                                - gcx(b_dist+1)*(fls1+fls2+fls3+fls4-4.*fls0)<a name='1243'>
+            ENDDO<a name='1244'>
+          ENDDO<a name='1245'>
+        ENDDO<a name='1246'>
+      ENDIF<a name='1247'>
+<a name='1248'>
+<a name='1249'>
+   END SUBROUTINE relax_bdytend<a name='1250'>
+<font color=#447700>!------------------------------------------------------------------------<a name='1251'></font>
+<a name='1252'>
+<A NAME='SPEC_BDYTEND'><A href='../../html_code/share/module_bc.F.html#SPEC_BDYTEND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1253'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>spec_bdytend</font>   ( field_tend,                &amp; <A href='../../call_to/SPEC_BDYTEND.html' TARGET='index'>7</A><a name='1254'>
+                               field_bdy, field_bdy_tend, &amp;<a name='1255'>
+                               variable_in, config_flags, &amp; <a name='1256'>
+                               spec_bdy_width, spec_zone, &amp;<a name='1257'>
+                               ijds, ijde,                 &amp; <font color=#447700>! min/max(id,jd)<a name='1258'></font>
+                               ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='1259'></font>
+                               ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='1260'></font>
+                               ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='1261'></font>
+                               its,ite, jts,jte, kts,kte )<a name='1262'>
+<a name='1263'>
+<font color=#447700>!  This subroutine sets the tendencies in the boundary specified region.<a name='1264'></font>
+<font color=#447700>!  spec_bdy_width is only used to dimension the boundary arrays.<a name='1265'></font>
+<font color=#447700>!  spec_zone is the width of the outer specified b.c.s that are set here.<a name='1266'></font>
+<font color=#447700>!  (JD July 2000)<a name='1267'></font>
+<a name='1268'>
+      IMPLICIT NONE<a name='1269'>
+<a name='1270'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='1271'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='1272'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='1273'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='1274'>
+      INTEGER,      INTENT(IN   )    :: ijds,ijde<a name='1275'>
+      INTEGER,      INTENT(IN   )    :: spec_bdy_width, spec_zone<a name='1276'>
+      CHARACTER,    INTENT(IN   )    :: variable_in<a name='1277'>
+<a name='1278'>
+<a name='1279'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(OUT  ) :: field_tend<a name='1280'>
+      REAL,  DIMENSION( ijds:ijde , kds:kde , spec_bdy_width, 4 ), INTENT(IN   ) :: field_bdy<a name='1281'>
+      REAL,  DIMENSION( ijds:ijde , kds:kde , spec_bdy_width, 4 ), INTENT(IN   ) :: field_bdy_tend<a name='1282'>
+<font color=#447700>!     REAL,  DIMENSION( jms:jme , kms:kme , spec_bdy_width, 4 ), INTENT(IN   ) :: field_xbdy<a name='1283'></font>
+<font color=#447700>!     REAL,  DIMENSION( ims:ime , kms:kme , spec_bdy_width, 4 ), INTENT(IN   ) :: field_ybdy<a name='1284'></font>
+      TYPE( grid_config_rec_type ) config_flags<a name='1285'>
+<a name='1286'>
+      CHARACTER  :: variable<a name='1287'>
+      INTEGER    :: i, j, k, ibs, ibe, jbs, jbe, itf, jtf, ktf<a name='1288'>
+      INTEGER    :: b_dist<a name='1289'>
+<a name='1290'>
+      variable = variable_in<a name='1291'>
+<a name='1292'>
+      IF (variable == 'U') variable = 'u'<a name='1293'>
+      IF (variable == 'V') variable = 'v'<a name='1294'>
+      IF (variable == 'M') variable = 'm'<a name='1295'>
+      IF (variable == 'H') variable = 'h'<a name='1296'>
+<a name='1297'>
+      ibs = ids<a name='1298'>
+      ibe = ide-1<a name='1299'>
+      itf = min(ite,ide-1)<a name='1300'>
+      jbs = jds<a name='1301'>
+      jbe = jde-1<a name='1302'>
+      jtf = min(jte,jde-1)<a name='1303'>
+      ktf = kde-1<a name='1304'>
+      IF (variable == 'u') ibe = ide<a name='1305'>
+      IF (variable == 'u') itf = min(ite,ide)<a name='1306'>
+      IF (variable == 'v') jbe = jde<a name='1307'>
+      IF (variable == 'v') jtf = min(jte,jde)<a name='1308'>
+      IF (variable == 'm') ktf = kte<a name='1309'>
+      IF (variable == 'h') ktf = kte<a name='1310'>
+<a name='1311'>
+      IF (jts - jbs .lt. spec_zone) THEN<a name='1312'>
+<font color=#447700>! Y-start boundary<a name='1313'></font>
+        DO j = jts, min(jtf,jbs+spec_zone-1)<a name='1314'>
+          b_dist = j - jbs<a name='1315'>
+          DO k = kts, ktf<a name='1316'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1317'>
+              field_tend(i,k,j) = field_bdy_tend(i, k, b_dist+1, P_YSB)<a name='1318'>
+<font color=#447700>!             field_tend(i,k,j) = field_ybdy(i, k, b_dist+1, P_SBT)<a name='1319'></font>
+            ENDDO<a name='1320'>
+          ENDDO<a name='1321'>
+        ENDDO<a name='1322'>
+      ENDIF <a name='1323'>
+      IF (jbe - jtf .lt. spec_zone) THEN <a name='1324'>
+<font color=#447700>! Y-end boundary <a name='1325'></font>
+        DO j = max(jts,jbe-spec_zone+1), jtf <a name='1326'>
+          b_dist = jbe - j <a name='1327'>
+          DO k = kts, ktf <a name='1328'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1329'>
+              field_tend(i,k,j) = field_bdy_tend(i, k, b_dist+1, P_YEB)<a name='1330'>
+<font color=#447700>!             field_tend(i,k,j) = field_ybdy(i, k, b_dist+1, P_EBT)<a name='1331'></font>
+            ENDDO<a name='1332'>
+          ENDDO<a name='1333'>
+        ENDDO<a name='1334'>
+      ENDIF <a name='1335'>
+<a name='1336'>
+      IF (its - ibs .lt. spec_zone) THEN<a name='1337'>
+<font color=#447700>! X-start boundary<a name='1338'></font>
+        DO i = its, min(itf,ibs+spec_zone-1)<a name='1339'>
+          b_dist = i - ibs<a name='1340'>
+          DO k = kts, ktf<a name='1341'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1342'>
+              field_tend(i,k,j) = field_bdy_tend(j, k, b_dist+1, P_XSB)<a name='1343'>
+<font color=#447700>!             field_tend(i,k,j) = field_xbdy(i, k, b_dist+1, P_SBT)<a name='1344'></font>
+            ENDDO<a name='1345'>
+          ENDDO<a name='1346'>
+        ENDDO<a name='1347'>
+      ENDIF <a name='1348'>
+<a name='1349'>
+      IF (ibe - itf .lt. spec_zone) THEN<a name='1350'>
+<font color=#447700>! X-end boundary<a name='1351'></font>
+        DO i = max(its,ibe-spec_zone+1), itf<a name='1352'>
+          b_dist = ibe - i<a name='1353'>
+          DO k = kts, ktf<a name='1354'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1355'>
+              field_tend(i,k,j) = field_bdy_tend(j, k, b_dist+1, P_XEB)<a name='1356'>
+<font color=#447700>!             field_tend(i,k,j) = field_xbdy(i, k, b_dist+1, P_EBT)<a name='1357'></font>
+            ENDDO<a name='1358'>
+          ENDDO<a name='1359'>
+        ENDDO<a name='1360'>
+      ENDIF <a name='1361'>
+<a name='1362'>
+   END SUBROUTINE spec_bdytend<a name='1363'>
+<font color=#447700>!------------------------------------------------------------------------<a name='1364'></font>
+<a name='1365'>
+<A NAME='SPEC_BDYUPDATE'><A href='../../html_code/share/module_bc.F.html#SPEC_BDYUPDATE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1366'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>spec_bdyupdate</font>(  field,      &amp; <A href='../../call_to/SPEC_BDYUPDATE.html' TARGET='index'>62</A><a name='1367'>
+                               field_tend, dt,            &amp;<a name='1368'>
+                               variable_in, config_flags, &amp; <a name='1369'>
+                               spec_zone,                  &amp;<a name='1370'>
+                               ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='1371'></font>
+                               ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='1372'></font>
+                               ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='1373'></font>
+                               its,ite, jts,jte, kts,kte )<a name='1374'>
+<a name='1375'>
+<font color=#447700>!  This subroutine adds the tendencies in the boundary specified region.<a name='1376'></font>
+<font color=#447700>!  spec_zone is the width of the outer specified b.c.s that are set here.<a name='1377'></font>
+<font color=#447700>!  (JD August 2000)<a name='1378'></font>
+<a name='1379'>
+      IMPLICIT NONE<a name='1380'>
+<a name='1381'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='1382'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='1383'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='1384'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='1385'>
+      INTEGER,      INTENT(IN   )    :: spec_zone<a name='1386'>
+      CHARACTER,    INTENT(IN   )    :: variable_in<a name='1387'>
+      REAL,         INTENT(IN   )    :: dt<a name='1388'>
+<a name='1389'>
+<a name='1390'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(INOUT) :: field<a name='1391'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(IN   ) :: field_tend<a name='1392'>
+      TYPE( grid_config_rec_type ) config_flags<a name='1393'>
+<a name='1394'>
+      CHARACTER  :: variable<a name='1395'>
+      INTEGER    :: i, j, k, ibs, ibe, jbs, jbe, itf, jtf, ktf<a name='1396'>
+      INTEGER    :: b_dist<a name='1397'>
+<a name='1398'>
+      variable = variable_in<a name='1399'>
+<a name='1400'>
+      IF (variable == 'U') variable = 'u'<a name='1401'>
+      IF (variable == 'V') variable = 'v'<a name='1402'>
+      IF (variable == 'M') variable = 'm'<a name='1403'>
+      IF (variable == 'H') variable = 'h'<a name='1404'>
+<a name='1405'>
+      ibs = ids<a name='1406'>
+      ibe = ide-1<a name='1407'>
+      itf = min(ite,ide-1)<a name='1408'>
+      jbs = jds<a name='1409'>
+      jbe = jde-1<a name='1410'>
+      jtf = min(jte,jde-1)<a name='1411'>
+      ktf = kde-1<a name='1412'>
+      IF (variable == 'u') ibe = ide<a name='1413'>
+      IF (variable == 'u') itf = min(ite,ide)<a name='1414'>
+      IF (variable == 'v') jbe = jde<a name='1415'>
+      IF (variable == 'v') jtf = min(jte,jde)<a name='1416'>
+      IF (variable == 'm') ktf = kte<a name='1417'>
+      IF (variable == 'h') ktf = kte<a name='1418'>
+<a name='1419'>
+      IF (jts - jbs .lt. spec_zone) THEN<a name='1420'>
+<font color=#447700>! Y-start boundary<a name='1421'></font>
+        DO j = jts, min(jtf,jbs+spec_zone-1)<a name='1422'>
+          b_dist = j - jbs<a name='1423'>
+          DO k = kts, ktf<a name='1424'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1425'>
+              field(i,k,j) = field(i,k,j) + dt*field_tend(i,k,j) <a name='1426'>
+            ENDDO<a name='1427'>
+          ENDDO<a name='1428'>
+        ENDDO<a name='1429'>
+      ENDIF <a name='1430'>
+      IF (jbe - jtf .lt. spec_zone) THEN <a name='1431'>
+<font color=#447700>! Y-end boundary <a name='1432'></font>
+        DO j = max(jts,jbe-spec_zone+1), jtf <a name='1433'>
+          b_dist = jbe - j <a name='1434'>
+          DO k = kts, ktf <a name='1435'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1436'>
+              field(i,k,j) = field(i,k,j) + dt*field_tend(i,k,j) <a name='1437'>
+            ENDDO<a name='1438'>
+          ENDDO<a name='1439'>
+        ENDDO<a name='1440'>
+      ENDIF <a name='1441'>
+<a name='1442'>
+      IF (its - ibs .lt. spec_zone) THEN<a name='1443'>
+<font color=#447700>! X-start boundary<a name='1444'></font>
+        DO i = its, min(itf,ibs+spec_zone-1)<a name='1445'>
+          b_dist = i - ibs<a name='1446'>
+          DO k = kts, ktf<a name='1447'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1448'>
+              field(i,k,j) = field(i,k,j) + dt*field_tend(i,k,j) <a name='1449'>
+            ENDDO<a name='1450'>
+          ENDDO<a name='1451'>
+        ENDDO<a name='1452'>
+      ENDIF <a name='1453'>
+<a name='1454'>
+      IF (ibe - itf .lt. spec_zone) THEN<a name='1455'>
+<font color=#447700>! X-end boundary<a name='1456'></font>
+        DO i = max(its,ibe-spec_zone+1), itf<a name='1457'>
+          b_dist = ibe - i<a name='1458'>
+          DO k = kts, ktf<a name='1459'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1460'>
+              field(i,k,j) = field(i,k,j) + dt*field_tend(i,k,j) <a name='1461'>
+            ENDDO<a name='1462'>
+          ENDDO<a name='1463'>
+        ENDDO<a name='1464'>
+      ENDIF <a name='1465'>
+<a name='1466'>
+   END SUBROUTINE spec_bdyupdate<a name='1467'>
+<font color=#447700>!------------------------------------------------------------------------<a name='1468'></font>
+<a name='1469'>
+<A NAME='ZERO_GRAD_BDY'><A href='../../html_code/share/module_bc.F.html#ZERO_GRAD_BDY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1470'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>zero_grad_bdy</font> (  field,                     &amp; <A href='../../call_to/ZERO_GRAD_BDY.html' TARGET='index'>10</A><a name='1471'>
+                               variable_in, config_flags, &amp; <a name='1472'>
+                               spec_zone,                  &amp;<a name='1473'>
+                               ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='1474'></font>
+                               ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='1475'></font>
+                               ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='1476'></font>
+                               its,ite, jts,jte, kts,kte )<a name='1477'>
+<a name='1478'>
+<font color=#447700>!  This subroutine sets zero gradient conditions in the boundary specified region.<a name='1479'></font>
+<font color=#447700>!  spec_zone is the width of the outer specified b.c.s that are set here.<a name='1480'></font>
+<font color=#447700>!  (JD August 2000)<a name='1481'></font>
+<a name='1482'>
+      IMPLICIT NONE<a name='1483'>
+<a name='1484'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='1485'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='1486'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='1487'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='1488'>
+      INTEGER,      INTENT(IN   )    :: spec_zone<a name='1489'>
+      CHARACTER,    INTENT(IN   )    :: variable_in<a name='1490'>
+<a name='1491'>
+<a name='1492'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(INOUT) :: field<a name='1493'>
+      TYPE( grid_config_rec_type ) config_flags<a name='1494'>
+<a name='1495'>
+      CHARACTER  :: variable<a name='1496'>
+      INTEGER    :: i, j, k, ibs, ibe, jbs, jbe, itf, jtf, ktf, i_inner, j_inner<a name='1497'>
+      INTEGER    :: b_dist<a name='1498'>
+<a name='1499'>
+      variable = variable_in<a name='1500'>
+<a name='1501'>
+      IF (variable == 'U') variable = 'u'<a name='1502'>
+      IF (variable == 'V') variable = 'v'<a name='1503'>
+<a name='1504'>
+      ibs = ids<a name='1505'>
+      ibe = ide-1<a name='1506'>
+      itf = min(ite,ide-1)<a name='1507'>
+      jbs = jds<a name='1508'>
+      jbe = jde-1<a name='1509'>
+      jtf = min(jte,jde-1)<a name='1510'>
+      ktf = kde-1<a name='1511'>
+      IF (variable == 'u') ibe = ide<a name='1512'>
+      IF (variable == 'u') itf = min(ite,ide)<a name='1513'>
+      IF (variable == 'v') jbe = jde<a name='1514'>
+      IF (variable == 'v') jtf = min(jte,jde)<a name='1515'>
+      IF (variable == 'w') ktf = kde<a name='1516'>
+<a name='1517'>
+      IF (jts - jbs .lt. spec_zone) THEN<a name='1518'>
+<font color=#447700>! Y-start boundary<a name='1519'></font>
+        DO j = jts, min(jtf,jbs+spec_zone-1)<a name='1520'>
+          b_dist = j - jbs<a name='1521'>
+          DO k = kts, ktf<a name='1522'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1523'>
+              i_inner = max(i,ibs+spec_zone)<a name='1524'>
+              i_inner = min(i_inner,ibe-spec_zone)<a name='1525'>
+              field(i,k,j) = field(i_inner,k,jbs+spec_zone)<a name='1526'>
+            ENDDO<a name='1527'>
+          ENDDO<a name='1528'>
+        ENDDO<a name='1529'>
+      ENDIF <a name='1530'>
+      IF (jbe - jtf .lt. spec_zone) THEN <a name='1531'>
+<font color=#447700>! Y-end boundary <a name='1532'></font>
+        DO j = max(jts,jbe-spec_zone+1), jtf <a name='1533'>
+          b_dist = jbe - j <a name='1534'>
+          DO k = kts, ktf <a name='1535'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1536'>
+              i_inner = max(i,ibs+spec_zone)<a name='1537'>
+              i_inner = min(i_inner,ibe-spec_zone)<a name='1538'>
+              field(i,k,j) = field(i_inner,k,jbe-spec_zone)<a name='1539'>
+            ENDDO<a name='1540'>
+          ENDDO<a name='1541'>
+        ENDDO<a name='1542'>
+      ENDIF <a name='1543'>
+<a name='1544'>
+      IF (its - ibs .lt. spec_zone) THEN<a name='1545'>
+<font color=#447700>! X-start boundary<a name='1546'></font>
+        DO i = its, min(itf,ibs+spec_zone-1)<a name='1547'>
+          b_dist = i - ibs<a name='1548'>
+          DO k = kts, ktf<a name='1549'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1550'>
+              j_inner = max(j,jbs+spec_zone)<a name='1551'>
+              j_inner = min(j_inner,jbe-spec_zone)<a name='1552'>
+              field(i,k,j) = field(ibs+spec_zone,k,j_inner)<a name='1553'>
+            ENDDO<a name='1554'>
+          ENDDO<a name='1555'>
+        ENDDO<a name='1556'>
+      ENDIF <a name='1557'>
+<a name='1558'>
+      IF (ibe - itf .lt. spec_zone) THEN<a name='1559'>
+<font color=#447700>! X-end boundary<a name='1560'></font>
+        DO i = max(its,ibe-spec_zone+1), itf<a name='1561'>
+          b_dist = ibe - i<a name='1562'>
+          DO k = kts, ktf<a name='1563'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1564'>
+              j_inner = max(j,jbs+spec_zone)<a name='1565'>
+              j_inner = min(j_inner,jbe-spec_zone)<a name='1566'>
+              field(i,k,j) = field(ibe-spec_zone,k,j_inner)<a name='1567'>
+            ENDDO<a name='1568'>
+          ENDDO<a name='1569'>
+        ENDDO<a name='1570'>
+      ENDIF <a name='1571'>
+<a name='1572'>
+   END SUBROUTINE zero_grad_bdy<a name='1573'>
+<font color=#447700>!------------------------------------------------------------------------<a name='1574'></font>
+<a name='1575'>
+<A NAME='FLOW_DEP_BDY'><A href='../../html_code/share/module_bc.F.html#FLOW_DEP_BDY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1576'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>flow_dep_bdy</font>  (  field,                     &amp; <A href='../../call_to/FLOW_DEP_BDY.html' TARGET='index'>9</A><a name='1577'>
+                               u, v, config_flags, &amp; <a name='1578'>
+                               spec_zone,                  &amp;<a name='1579'>
+                               ids,ide, jds,jde, kds,kde,  &amp; <font color=#447700>! domain dims<a name='1580'></font>
+                               ims,ime, jms,jme, kms,kme,  &amp; <font color=#447700>! memory dims<a name='1581'></font>
+                               ips,ipe, jps,jpe, kps,kpe,  &amp; <font color=#447700>! patch  dims<a name='1582'></font>
+                               its,ite, jts,jte, kts,kte )<a name='1583'>
+<a name='1584'>
+<font color=#447700>!  This subroutine sets zero gradient conditions for outflow and zero value<a name='1585'></font>
+<font color=#447700>!  for inflow in the boundary specified region. Note that field must be unstaggered.<a name='1586'></font>
+<font color=#447700>!  The velocities, u and v, will only be used to check their sign (coupled vels OK)<a name='1587'></font>
+<font color=#447700>!  spec_zone is the width of the outer specified b.c.s that are set here.<a name='1588'></font>
+<font color=#447700>!  (JD August 2000)<a name='1589'></font>
+<a name='1590'>
+      IMPLICIT NONE<a name='1591'>
+<a name='1592'>
+      INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde<a name='1593'>
+      INTEGER,      INTENT(IN   )    :: ims,ime, jms,jme, kms,kme<a name='1594'>
+      INTEGER,      INTENT(IN   )    :: ips,ipe, jps,jpe, kps,kpe<a name='1595'>
+      INTEGER,      INTENT(IN   )    :: its,ite, jts,jte, kts,kte<a name='1596'>
+      INTEGER,      INTENT(IN   )    :: spec_zone<a name='1597'>
+<a name='1598'>
+<a name='1599'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(INOUT) :: field<a name='1600'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(IN   ) :: u<a name='1601'>
+      REAL,  DIMENSION( ims:ime , kms:kme , jms:jme ), INTENT(IN   ) :: v<a name='1602'>
+      TYPE( grid_config_rec_type ) config_flags<a name='1603'>
+<a name='1604'>
+      INTEGER    :: i, j, k, ibs, ibe, jbs, jbe, itf, jtf, ktf, i_inner, j_inner<a name='1605'>
+      INTEGER    :: b_dist<a name='1606'>
+<a name='1607'>
+      ibs = ids<a name='1608'>
+      ibe = ide-1<a name='1609'>
+      itf = min(ite,ide-1)<a name='1610'>
+      jbs = jds<a name='1611'>
+      jbe = jde-1<a name='1612'>
+      jtf = min(jte,jde-1)<a name='1613'>
+      ktf = kde-1<a name='1614'>
+<a name='1615'>
+      IF (jts - jbs .lt. spec_zone) THEN<a name='1616'>
+<font color=#447700>! Y-start boundary<a name='1617'></font>
+        DO j = jts, min(jtf,jbs+spec_zone-1)<a name='1618'>
+          b_dist = j - jbs<a name='1619'>
+          DO k = kts, ktf<a name='1620'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1621'>
+              i_inner = max(i,ibs+spec_zone)<a name='1622'>
+              i_inner = min(i_inner,ibe-spec_zone)<a name='1623'>
+              IF(v(i,k,j) .lt. 0.)THEN<a name='1624'>
+                field(i,k,j) = field(i_inner,k,jbs+spec_zone)<a name='1625'>
+              ELSE<a name='1626'>
+                field(i,k,j) = 0.<a name='1627'>
+              ENDIF<a name='1628'>
+            ENDDO<a name='1629'>
+          ENDDO<a name='1630'>
+        ENDDO<a name='1631'>
+      ENDIF <a name='1632'>
+      IF (jbe - jtf .lt. spec_zone) THEN <a name='1633'>
+<font color=#447700>! Y-end boundary <a name='1634'></font>
+        DO j = max(jts,jbe-spec_zone+1), jtf <a name='1635'>
+          b_dist = jbe - j <a name='1636'>
+          DO k = kts, ktf <a name='1637'>
+            DO i = max(its,b_dist+ibs), min(itf,ibe-b_dist)<a name='1638'>
+              i_inner = max(i,ibs+spec_zone)<a name='1639'>
+              i_inner = min(i_inner,ibe-spec_zone)<a name='1640'>
+              IF(v(i,k,j+1) .gt. 0.)THEN<a name='1641'>
+                field(i,k,j) = field(i_inner,k,jbe-spec_zone)<a name='1642'>
+              ELSE<a name='1643'>
+                field(i,k,j) = 0.<a name='1644'>
+              ENDIF<a name='1645'>
+            ENDDO<a name='1646'>
+          ENDDO<a name='1647'>
+        ENDDO<a name='1648'>
+      ENDIF <a name='1649'>
+<a name='1650'>
+      IF (its - ibs .lt. spec_zone) THEN<a name='1651'>
+<font color=#447700>! X-start boundary<a name='1652'></font>
+        DO i = its, min(itf,ibs+spec_zone-1)<a name='1653'>
+          b_dist = i - ibs<a name='1654'>
+          DO k = kts, ktf<a name='1655'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1656'>
+              j_inner = max(j,jbs+spec_zone)<a name='1657'>
+              j_inner = min(j_inner,jbe-spec_zone)<a name='1658'>
+              IF(u(i,k,j) .lt. 0.)THEN<a name='1659'>
+                field(i,k,j) = field(ibs+spec_zone,k,j_inner)<a name='1660'>
+              ELSE<a name='1661'>
+                field(i,k,j) = 0.<a name='1662'>
+              ENDIF<a name='1663'>
+            ENDDO<a name='1664'>
+          ENDDO<a name='1665'>
+        ENDDO<a name='1666'>
+      ENDIF <a name='1667'>
+<a name='1668'>
+      IF (ibe - itf .lt. spec_zone) THEN<a name='1669'>
+<font color=#447700>! X-end boundary<a name='1670'></font>
+        DO i = max(its,ibe-spec_zone+1), itf<a name='1671'>
+          b_dist = ibe - i<a name='1672'>
+          DO k = kts, ktf<a name='1673'>
+            DO j = max(jts,b_dist+jbs+1), min(jtf,jbe-b_dist-1)<a name='1674'>
+              j_inner = max(j,jbs+spec_zone)<a name='1675'>
+              j_inner = min(j_inner,jbe-spec_zone)<a name='1676'>
+              IF(u(i+1,k,j) .gt. 0.)THEN<a name='1677'>
+                field(i,k,j) = field(ibe-spec_zone,k,j_inner)<a name='1678'>
+              ELSE<a name='1679'>
+                field(i,k,j) = 0.<a name='1680'>
+              ENDIF<a name='1681'>
+            ENDDO<a name='1682'>
+          ENDDO<a name='1683'>
+        ENDDO<a name='1684'>
+      ENDIF <a name='1685'>
+<a name='1686'>
+   END SUBROUTINE flow_dep_bdy<a name='1687'>
+<a name='1688'>
+<font color=#447700>!------------------------------------------------------------------------------<a name='1689'></font>
+<a name='1690'>
+<A NAME='STUFF_BDY'><A href='../../html_code/share/module_bc.F.html#STUFF_BDY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1691'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>stuff_bdy</font> ( data3d , space_bdy , char_stagger , &amp; <A href='../../call_to/STUFF_BDY.html' TARGET='index'>38</A><a name='1692'>
+                             ijds , ijde , spec_bdy_width , &amp;<a name='1693'>
+                             ids, ide, jds, jde, kds, kde , &amp;<a name='1694'>
+                             ims, ime, jms, jme, kms, kme , &amp; <a name='1695'>
+                             its, ite, jts, jte, kts, kte )<a name='1696'>
+ <a name='1697'>
+ <font color=#447700>!  This routine puts the data in the 3d arrays into the proper locations<a name='1698'></font>
+ <font color=#447700>!  for the lateral boundary arrays.<a name='1699'></font>
+ <a name='1700'>
+    USE module_state_description<a name='1701'>
+    <a name='1702'>
+    IMPLICIT NONE<a name='1703'>
+ <a name='1704'>
+    INTEGER , INTENT(IN) :: ids, ide, jds, jde, kds, kde<a name='1705'>
+    INTEGER , INTENT(IN) :: ims, ime, jms, jme, kms, kme<a name='1706'>
+    INTEGER , INTENT(IN) :: its, ite, jts, jte, kts, kte<a name='1707'>
+    INTEGER , INTENT(IN) :: ijds , ijde , spec_bdy_width<a name='1708'>
+    REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(IN) :: data3d<a name='1709'>
+<font color=#447700>!    REAL , DIMENSION(:,:,:,:) , INTENT(OUT) :: space_bdy<a name='1710'></font>
+    REAL , DIMENSION(ijds:ijde,kds:kde,spec_bdy_width,4) , INTENT(OUT) :: space_bdy<a name='1711'>
+    CHARACTER (LEN=1) , INTENT(IN) :: char_stagger<a name='1712'>
+ <a name='1713'>
+    INTEGER :: i , ii , j , jj , k<a name='1714'>
+ <a name='1715'>
+    <font color=#447700>!  There are four lateral boundary locations that are stored.<a name='1716'></font>
+ <a name='1717'>
+    <font color=#447700>!  X start boundary<a name='1718'></font>
+ <a name='1719'>
+    IF ( char_stagger .EQ. 'W' ) THEN<a name='1720'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1721'>
+       DO k = kds , kde<a name='1722'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1723'>
+          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)<a name='1724'>
+       END DO<a name='1725'>
+       END DO<a name='1726'>
+       END DO<a name='1727'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='1728'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1729'>
+       DO k = kds , kde<a name='1730'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1731'>
+          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)<a name='1732'>
+       END DO<a name='1733'>
+       END DO<a name='1734'>
+       END DO<a name='1735'>
+    ELSE IF ( char_stagger .EQ. 'V' ) THEN<a name='1736'>
+       DO j = MAX(jds,jts) , MIN(jde,jte)<a name='1737'>
+       DO k = kds , kde - 1<a name='1738'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1739'>
+          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)<a name='1740'>
+       END DO<a name='1741'>
+       END DO<a name='1742'>
+       END DO<a name='1743'>
+    ELSE<a name='1744'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1745'>
+       DO k = kds , kde - 1<a name='1746'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1747'>
+          space_bdy(j,k,i,P_XSB) = data3d(i,k,j)<a name='1748'>
+       END DO<a name='1749'>
+       END DO<a name='1750'>
+       END DO<a name='1751'>
+    END IF<a name='1752'>
+ <a name='1753'>
+    <font color=#447700>!  X end boundary<a name='1754'></font>
+ <a name='1755'>
+    IF      ( char_stagger .EQ. 'U' ) THEN<a name='1756'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1757'>
+       DO k = kds , kde - 1<a name='1758'>
+       DO i = MIN(ide,ite) , MAX(ide - spec_bdy_width + 1,its) , -1<a name='1759'>
+          ii = ide - i + 1<a name='1760'>
+          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)<a name='1761'>
+       END DO<a name='1762'>
+       END DO<a name='1763'>
+       END DO<a name='1764'>
+    ELSE IF ( char_stagger .EQ. 'V' ) THEN<a name='1765'>
+       DO j = MAX(jds,jts) , MIN(jde,jte)<a name='1766'>
+       DO k = kds , kde - 1<a name='1767'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1768'>
+          ii = ide - i<a name='1769'>
+          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)<a name='1770'>
+       END DO<a name='1771'>
+       END DO<a name='1772'>
+       END DO<a name='1773'>
+    ELSE IF ( char_stagger .EQ. 'W' ) THEN<a name='1774'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1775'>
+       DO k = kds , kde<a name='1776'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1777'>
+          ii = ide - i<a name='1778'>
+          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)<a name='1779'>
+       END DO<a name='1780'>
+       END DO<a name='1781'>
+       END DO<a name='1782'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='1783'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1784'>
+       DO k = kds , kde<a name='1785'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1786'>
+          ii = ide - i<a name='1787'>
+          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)<a name='1788'>
+       END DO<a name='1789'>
+       END DO<a name='1790'>
+       END DO<a name='1791'>
+    ELSE<a name='1792'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1793'>
+       DO k = kds , kde - 1<a name='1794'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1795'>
+          ii = ide - i<a name='1796'>
+          space_bdy(j,k,ii,P_XEB) = data3d(i,k,j)<a name='1797'>
+       END DO<a name='1798'>
+       END DO<a name='1799'>
+       END DO<a name='1800'>
+    END IF<a name='1801'>
+ <a name='1802'>
+    <font color=#447700>!  Y start boundary<a name='1803'></font>
+ <a name='1804'>
+    IF ( char_stagger .EQ. 'W' ) THEN<a name='1805'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='1806'>
+       DO k = kds , kde<a name='1807'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1808'>
+          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)<a name='1809'>
+       END DO<a name='1810'>
+       END DO<a name='1811'>
+       END DO<a name='1812'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='1813'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='1814'>
+       DO k = kds , kde<a name='1815'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1816'>
+          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)<a name='1817'>
+       END DO<a name='1818'>
+       END DO<a name='1819'>
+       END DO<a name='1820'>
+    ELSE IF ( char_stagger .EQ. 'U' ) THEN<a name='1821'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='1822'>
+       DO k = kds , kde - 1<a name='1823'>
+       DO i = MAX(ids,its) , MIN(ide,ite)<a name='1824'>
+          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)<a name='1825'>
+       END DO<a name='1826'>
+       END DO<a name='1827'>
+       END DO<a name='1828'>
+    ELSE<a name='1829'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='1830'>
+       DO k = kds , kde - 1<a name='1831'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1832'>
+          space_bdy(i,k,j,P_YSB) = data3d(i,k,j)<a name='1833'>
+       END DO<a name='1834'>
+       END DO<a name='1835'>
+       END DO<a name='1836'>
+    END IF<a name='1837'>
+ <a name='1838'>
+    <font color=#447700>!  Y end boundary<a name='1839'></font>
+ <a name='1840'>
+    IF      ( char_stagger .EQ. 'V' ) THEN<a name='1841'>
+       DO j = MIN(jde,jte) , MAX(jde - spec_bdy_width + 1,jts) , -1<a name='1842'>
+       DO k = kds , kde - 1<a name='1843'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1844'>
+          jj = jde - j + 1<a name='1845'>
+          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)<a name='1846'>
+       END DO<a name='1847'>
+       END DO<a name='1848'>
+       END DO<a name='1849'>
+    ELSE IF ( char_stagger .EQ. 'U' ) THEN<a name='1850'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='1851'>
+       DO k = kds , kde - 1<a name='1852'>
+       DO i = MAX(ids,its) , MIN(ide,ite)<a name='1853'>
+          jj = jde - j<a name='1854'>
+          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)<a name='1855'>
+       END DO<a name='1856'>
+       END DO<a name='1857'>
+       END DO<a name='1858'>
+    ELSE IF ( char_stagger .EQ. 'W' ) THEN<a name='1859'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='1860'>
+       DO k = kds , kde<a name='1861'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1862'>
+          jj = jde - j<a name='1863'>
+          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)<a name='1864'>
+       END DO<a name='1865'>
+       END DO<a name='1866'>
+       END DO<a name='1867'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='1868'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='1869'>
+       DO k = kds , kde<a name='1870'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1871'>
+          jj = jde - j<a name='1872'>
+          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)<a name='1873'>
+       END DO<a name='1874'>
+       END DO<a name='1875'>
+       END DO<a name='1876'>
+    ELSE<a name='1877'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='1878'>
+       DO k = kds , kde - 1<a name='1879'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='1880'>
+          jj = jde - j<a name='1881'>
+          space_bdy(i,k,jj,P_YEB) = data3d(i,k,j)<a name='1882'>
+       END DO<a name='1883'>
+       END DO<a name='1884'>
+       END DO<a name='1885'>
+    END IF<a name='1886'>
+    <a name='1887'>
+ END SUBROUTINE stuff_bdy<a name='1888'>
+ <a name='1889'>
+<A NAME='STUFF_BDYTEND'><A href='../../html_code/share/module_bc.F.html#STUFF_BDYTEND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='1890'>
+ <font color=#993300>SUBROUTINE </font><font color=#cc0000>stuff_bdytend</font> ( data3dnew , data3dold , time_diff , space_bdy , char_stagger , &amp; <A href='../../call_to/STUFF_BDYTEND.html' TARGET='index'>25</A><a name='1891'>
+                             ijds , ijde , spec_bdy_width , &amp;<a name='1892'>
+                             ids, ide, jds, jde, kds, kde , &amp;<a name='1893'>
+                             ims, ime, jms, jme, kms, kme , &amp; <a name='1894'>
+                             its, ite, jts, jte, kts, kte )<a name='1895'>
+ <a name='1896'>
+ <font color=#447700>!  This routine puts the tendency data into the proper locations<a name='1897'></font>
+ <font color=#447700>!  for the lateral boundary arrays.<a name='1898'></font>
+ <a name='1899'>
+    USE module_state_description<a name='1900'>
+    <a name='1901'>
+    IMPLICIT NONE<a name='1902'>
+ <a name='1903'>
+    INTEGER , INTENT(IN) :: ids, ide, jds, jde, kds, kde<a name='1904'>
+    INTEGER , INTENT(IN) :: ims, ime, jms, jme, kms, kme<a name='1905'>
+    INTEGER , INTENT(IN) :: its, ite, jts, jte, kts, kte<a name='1906'>
+    INTEGER , INTENT(IN) :: ijds , ijde , spec_bdy_width<a name='1907'>
+    REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(IN) :: data3dnew , data3dold<a name='1908'>
+<font color=#447700>!    REAL , DIMENSION(:,:,:,:) , INTENT(OUT) :: space_bdy<a name='1909'></font>
+    REAL , DIMENSION(ijds:ijde,kds:kde,spec_bdy_width,4) , INTENT(OUT) :: space_bdy<a name='1910'>
+    CHARACTER (LEN=1) , INTENT(IN) :: char_stagger<a name='1911'>
+    REAL , INTENT(IN) :: time_diff <font color=#447700>! seconds<a name='1912'></font>
+ <a name='1913'>
+    INTEGER :: i , ii , j , jj , k<a name='1914'>
+ <a name='1915'>
+    <font color=#447700>!  There are four lateral boundary locations that are stored.<a name='1916'></font>
+ <a name='1917'>
+    <font color=#447700>!  X start boundary<a name='1918'></font>
+ <a name='1919'>
+    IF ( char_stagger .EQ. 'W' ) THEN<a name='1920'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1921'>
+       DO k = kds , kde<a name='1922'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1923'>
+          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1924'>
+<font color=#447700>!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout<a name='1925'></font>
+       END DO<a name='1926'>
+       END DO<a name='1927'>
+       END DO<a name='1928'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='1929'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1930'>
+       DO k = kds , kde<a name='1931'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1932'>
+          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1933'>
+<font color=#447700>!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout<a name='1934'></font>
+       END DO<a name='1935'>
+       END DO<a name='1936'>
+       END DO<a name='1937'>
+    ELSE IF ( char_stagger .EQ. 'V' ) THEN<a name='1938'>
+       DO j = MAX(jds,jts) , MIN(jde,jte)<a name='1939'>
+       DO k = kds , kde - 1<a name='1940'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1941'>
+          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1942'>
+<font color=#447700>!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout<a name='1943'></font>
+       END DO<a name='1944'>
+       END DO<a name='1945'>
+       END DO<a name='1946'>
+    ELSE<a name='1947'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1948'>
+       DO k = kds , kde - 1<a name='1949'>
+       DO i = MAX(ids,its) , MIN(ids + spec_bdy_width - 1,ite)<a name='1950'>
+          space_bdy(j,k,i,P_XSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1951'>
+<font color=#447700>!         space_bdy(j,k,i,P_XSB) = 0. ! zeroout<a name='1952'></font>
+       END DO<a name='1953'>
+       END DO<a name='1954'>
+       END DO<a name='1955'>
+    END IF<a name='1956'>
+ <a name='1957'>
+    <font color=#447700>!  X end boundary<a name='1958'></font>
+ <a name='1959'>
+    IF      ( char_stagger .EQ. 'U' ) THEN<a name='1960'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1961'>
+       DO k = kds , kde - 1<a name='1962'>
+       DO i = MIN(ide,ite) , MAX(ide - spec_bdy_width + 1,its) , -1<a name='1963'>
+          ii = ide - i + 1<a name='1964'>
+          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1965'>
+<font color=#447700>!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout<a name='1966'></font>
+       END DO<a name='1967'>
+       END DO<a name='1968'>
+       END DO<a name='1969'>
+    ELSE IF ( char_stagger .EQ. 'V' ) THEN<a name='1970'>
+       DO j = MAX(jds,jts) , MIN(jde,jte)<a name='1971'>
+       DO k = kds , kde - 1<a name='1972'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1973'>
+          ii = ide - i<a name='1974'>
+          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1975'>
+<font color=#447700>!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout<a name='1976'></font>
+       END DO<a name='1977'>
+       END DO<a name='1978'>
+       END DO<a name='1979'>
+    ELSE IF ( char_stagger .EQ. 'W' ) THEN<a name='1980'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1981'>
+       DO k = kds , kde<a name='1982'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1983'>
+          ii = ide - i<a name='1984'>
+          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1985'>
+<font color=#447700>!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout<a name='1986'></font>
+       END DO<a name='1987'>
+       END DO<a name='1988'>
+       END DO<a name='1989'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='1990'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='1991'>
+       DO k = kds , kde<a name='1992'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='1993'>
+          ii = ide - i<a name='1994'>
+          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='1995'>
+<font color=#447700>!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout<a name='1996'></font>
+       END DO<a name='1997'>
+       END DO<a name='1998'>
+       END DO<a name='1999'>
+    ELSE<a name='2000'>
+       DO j = MAX(jds,jts) , MIN(jde-1,jte)<a name='2001'>
+       DO k = kds , kde - 1<a name='2002'>
+       DO i = MIN(ide - 1,ite) , MAX(ide - spec_bdy_width,its) , -1<a name='2003'>
+          ii = ide - i<a name='2004'>
+          space_bdy(j,k,ii,P_XEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2005'>
+<font color=#447700>!         space_bdy(j,k,ii,P_XEB) = 0. ! zeroout<a name='2006'></font>
+       END DO<a name='2007'>
+       END DO<a name='2008'>
+       END DO<a name='2009'>
+    END IF<a name='2010'>
+ <a name='2011'>
+    <font color=#447700>!  Y start boundary<a name='2012'></font>
+ <a name='2013'>
+    IF ( char_stagger .EQ. 'W' ) THEN<a name='2014'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='2015'>
+       DO k = kds , kde<a name='2016'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2017'>
+          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2018'>
+<font color=#447700>!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout<a name='2019'></font>
+       END DO<a name='2020'>
+       END DO<a name='2021'>
+       END DO<a name='2022'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='2023'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='2024'>
+       DO k = kds , kde<a name='2025'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2026'>
+          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2027'>
+<font color=#447700>!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout<a name='2028'></font>
+       END DO<a name='2029'>
+       END DO<a name='2030'>
+       END DO<a name='2031'>
+    ELSE IF ( char_stagger .EQ. 'U' ) THEN<a name='2032'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='2033'>
+       DO k = kds , kde - 1<a name='2034'>
+       DO i = MAX(ids,its) , MIN(ide,ite)<a name='2035'>
+          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2036'>
+<font color=#447700>!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout<a name='2037'></font>
+       END DO<a name='2038'>
+       END DO<a name='2039'>
+       END DO<a name='2040'>
+    ELSE<a name='2041'>
+       DO j = MAX(jds,jts) , MIN(jds + spec_bdy_width - 1,jte)<a name='2042'>
+       DO k = kds , kde - 1<a name='2043'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2044'>
+          space_bdy(i,k,j,P_YSB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2045'>
+<font color=#447700>!         space_bdy(i,k,j,P_YSB) = 0. ! zeroout<a name='2046'></font>
+       END DO<a name='2047'>
+       END DO<a name='2048'>
+       END DO<a name='2049'>
+    END IF<a name='2050'>
+ <a name='2051'>
+    <font color=#447700>!  Y end boundary<a name='2052'></font>
+ <a name='2053'>
+    IF      ( char_stagger .EQ. 'V' ) THEN<a name='2054'>
+       DO j = MIN(jde,jte) , MAX(jde - spec_bdy_width + 1,jts) , -1<a name='2055'>
+       DO k = kds , kde - 1<a name='2056'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2057'>
+          jj = jde - j + 1<a name='2058'>
+          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2059'>
+<font color=#447700>!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout<a name='2060'></font>
+       END DO<a name='2061'>
+       END DO<a name='2062'>
+       END DO<a name='2063'>
+    ELSE IF ( char_stagger .EQ. 'U' ) THEN<a name='2064'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='2065'>
+       DO k = kds , kde - 1<a name='2066'>
+       DO i = MAX(ids,its) , MIN(ide,ite)<a name='2067'>
+          jj = jde - j<a name='2068'>
+          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2069'>
+<font color=#447700>!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout<a name='2070'></font>
+       END DO<a name='2071'>
+       END DO<a name='2072'>
+       END DO<a name='2073'>
+    ELSE IF ( char_stagger .EQ. 'W' ) THEN<a name='2074'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='2075'>
+       DO k = kds , kde<a name='2076'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2077'>
+          jj = jde - j<a name='2078'>
+          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2079'>
+<font color=#447700>!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout<a name='2080'></font>
+       END DO<a name='2081'>
+       END DO<a name='2082'>
+       END DO<a name='2083'>
+    ELSE IF ( char_stagger .EQ. 'M' ) THEN<a name='2084'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='2085'>
+       DO k = kds , kde<a name='2086'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2087'>
+          jj = jde - j<a name='2088'>
+          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2089'>
+<font color=#447700>!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout<a name='2090'></font>
+       END DO<a name='2091'>
+       END DO<a name='2092'>
+       END DO<a name='2093'>
+    ELSE<a name='2094'>
+       DO j = MIN(jde-1,jte) , MAX(jde - spec_bdy_width,jts) , -1<a name='2095'>
+       DO k = kds , kde - 1<a name='2096'>
+       DO i = MAX(ids,its) , MIN(ide-1,ite)<a name='2097'>
+          jj = jde - j<a name='2098'>
+          space_bdy(i,k,jj,P_YEB) = ( data3dnew(i,k,j) - data3dold(i,k,j) ) / time_diff<a name='2099'>
+<font color=#447700>!         space_bdy(i,k,jj,P_YEB) = 0. ! zeroout<a name='2100'></font>
+       END DO<a name='2101'>
+       END DO<a name='2102'>
+       END DO<a name='2103'>
+    END IF<a name='2104'>
+    <a name='2105'>
+ END SUBROUTINE stuff_bdytend<a name='2106'>
+<a name='2107'>
+END MODULE module_bc<a name='2108'>
+<a name='2109'>
+<A NAME='GET_BDYZONE_X'><A href='../../html_code/share/module_bc.F.html#GET_BDYZONE_X' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2110'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>get_bdyzone_x</font> ( bzx ) <A href='../../call_to/GET_BDYZONE_X.html' TARGET='index'>1</A>,<A href='../../call_from/GET_BDYZONE_X.html' TARGET='index'>2</A><a name='2111'>
+  USE <A href='../../html_code/share/module_bc.F.html#MODULE_BC'>module_bc</A><A href='../../html_code/share/module_bdyzone.F.html#GET_BDYZONE_X' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_31"><a name='2112'>
+  IMPLICIT NONE<a name='2113'>
+  INTEGER bzx<a name='2114'>
+  bzx = bdyzone_x<a name='2115'>
+END SUBROUTINE get_bdyzone_x<a name='2116'>
+<a name='2117'>
+<A NAME='GET_BDYZONE_Y'><A href='../../html_code/share/module_bc.F.html#GET_BDYZONE_Y' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2118'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>get_bdyzone_y</font> ( bzy) <A href='../../call_to/GET_BDYZONE_Y.html' TARGET='index'>1</A>,<A href='../../call_from/GET_BDYZONE_Y.html' TARGET='index'>2</A><a name='2119'>
+  USE <A href='../../html_code/share/module_bc.F.html#MODULE_BC'>module_bc</A><A href='../../html_code/share/module_bdyzone.F.html#GET_BDYZONE_Y' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_32"><a name='2120'>
+  IMPLICIT NONE<a name='2121'>
+  INTEGER bzy<a name='2122'>
+  bzy = bdyzone_y<a name='2123'>
+END SUBROUTINE get_bdyzone_y<a name='2124'>
+<a name='2125'>
+<A NAME='GET_BDYZONE'><A href='../../html_code/share/module_bc.F.html#GET_BDYZONE' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2126'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>get_bdyzone</font> ( bz),<A href='../../call_from/GET_BDYZONE.html' TARGET='index'>2</A><a name='2127'>
+  USE <A href='../../html_code/share/module_bc.F.html#MODULE_BC'>module_bc</A><A href='../../html_code/share/module_bdyzone.F.html#GET_BDYZONE' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_BC_33"><a name='2128'>
+  IMPLICIT NONE<a name='2129'>
+  INTEGER bz<a name='2130'>
+  bz = bdyzone<a name='2131'>
+END SUBROUTINE get_bdyzone<a name='2132'>
+<a name='2133'>
+</pre></body></html>

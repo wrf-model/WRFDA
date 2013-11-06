@@ -1,0 +1,214 @@
+<html>
+
+<head>
+
+<title>Help for reading BUFR and PREPBUFR files in WRFDA</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="images/goldrule.jpg" bgcolor="#009933"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td width="100%" height="573" valign="top" bgcolor="#CBFFCD"><table width="780" height="851" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+
+        <td width="117" height="731" bordercolor="#009933" bgcolor="#009933"><p>&nbsp;</p>
+
+            <table width="100" border="0" align="center" cellpadding="0" cellspacing="0">
+
+              <tr> 
+           <p align="center"><a href="support.html" class="leftnavlink">General info</a></p>
+           <p align="center"><a href="usersguide.html" class="leftnavlink">Users' Guide</a></p>
+           <p align="center"><a href="known-prob.html" class="leftnavlink">Known problems</a></p>
+           <p align="center"><a href="wrfhelp.html" class="leftnavlink">About wrfhelp</a></p>
+           <p align="center"><a href="wrfnews.html" class="leftnavlink">wrf-news list</a></p>
+           <p align="center"><a href="wrfusers.html" class="leftnavlink">wrf-users list</a></p>
+           <p align="center"><a href="regist.html" class="leftnavlink">Becoming a registered user</a></p>
+           <p align="center"><a href="workshop.html" class="leftnavlink">WRF Workshop</a></p>
+           <p align="center"><a href="tutorial.html" class="leftnavlink">WRFDA Tutorials</a></p>
+           <p align="center"><a href="yellowstone.html" class="leftnavlink">WRFDA on Yellowstone</a></p>
+           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; font-size: 15; line-height: 9pt;font-weight: bold;">Reading BUFR files</p>
+              </tr>
+            </table>
+
+            <p>&nbsp;</p>          <p>&nbsp;</p>            <img src="images/shim112.gif" width="112" height="1"></td>
+
+          <td bgcolor="#CBFFCD"><p>&nbsp;</p>
+
+            <p style="padding-right: 35px;padding-left: 35px;"><table width="100%" border="1" class="bodytable"><tr><td><b>With WRFDA Version 3.5.1 and later you should not experience these problems. <br><br>If you are using Version 3.5.1 or later and have trouble assimilating BUFR or PREPBUFR files, <a href="wrfhelp.html">contact wrfhelp</a>.</b></td></tr></table></p>
+            <p>&nbsp;</p>
+
+        <h1>Issues with reading PREPBUFR  and BUFR radiance data with gfortran and intel compilers</h1>
+
+          <h2><strong>Symptoms</strong></h2>
+          <p class="bodytext">WRFDA compiled with gfortran or ifort to read BUFR files will likely return the following error message when trying to read a file which has been unblocked and re-blocked by the &quot;cwordsh&quot; program</p>
+          <p class="bodytext">**************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+            BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26 WHEN<br>
+            CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+            **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
+
+
+          <h2><strong>For WRFDA 3.3 through 3.5</strong> : Set environment variable</h2>
+          <p class="bodytext">GFORTRAN_CONVERT_UNIT (Gfortran) and F_UFMTENDIAN (ifort) environment variables will override the CONVERT specifier in the open statement.
+             It just needs to reserve and fix the units used to open BUFR files. It is not necessary to amend the open statement for different compilers.</p>
+          <p class="bodytext">For csh</p>
+          <p class="bodytext">gfortran: setenv GFORTRAN_CONVERT_UNIT &quot;little_endian:94-99&quot;<br>
+            ifort: setenv F_UFMTENDIAN &quot;little:94-99&quot;<br>
+          </p>
+          <p class="bodytext">For bash</p>
+          <p class="bodytext">gfortran: export GFORTRAN_CONVERT_UNIT=&quot;little_endian:94-99&quot;<br>
+            ifort: export F_UFMTENDIAN=&quot;little:94-99&quot;<br>
+          </p>
+          <p class="bodytext">Side effect: In order not to interfere with other applications, it is good practice to unset the environment<br>
+            variable after da_wrfvar.exe is completed. <br>
+          </p>
+          <p class="bodytext">For the reblocking utility, reblock.c writen by Baoyu YIN is recommended. <br>
+            (http://www.math.ucdavis.edu/~cheung/PROJECTS/DAO_Projects/halem/iret/reblock.c)<br>
+            It reads a blocked BUFR file, byteswap the f77 control words and <br>
+            writes out the file directly, no bufrlib is needed.</p>
+
+
+          <h2><strong>For WRFDA v3.2.1 or eariler</strong>: Adding convert='little_endian' to the open statement</h2>
+          <p class="bodytext">1. da/da_obs_io/da_read_obs_bufr.inc</p>
+          <p class="bodytext">At the section &quot;bufrfile:&quot;, add convert='little_endian' to the open statement</p>
+          <p class="bodytext">open(unit   = iunit, FILE   = trim(filename), &amp;<br>
+            iostat =  iost, form = 'unformatted', STATUS = 'OLD' &amp;<br>
+            convert='little_endian')</p>
+          <p class="bodytext">2. da/da_radiance/da_read_obs_bufrairs.inc</p>
+          <p class="bodytext">At the section &quot;Open BUFR file&quot; , add convert='little_endian' to the open statement<br>
+            <br>
+            open(unit   = lnbufr, FILE   = trim(infile), &amp;<br>
+            form = 'unformatted', iostat =  iost,  &amp;<br>
+            convert='little_endian')</p>
+          <p class="bodytext">3. da/da_radiance/da_read_obs_bufrtovs.inc</p>
+          <p class="bodytext">At the section &quot;! 0.0  Open unit to satellite bufr file and read file header&quot;, add convert='little_endian' to the open statement<br>
+            <br>
+            open(unit   = lnbufr, FILE   = trim(infile), &amp;<br>
+            form = 'unformatted', iostat =  iost, status = 'old',  &amp;<br>
+            convert='little_endian')</p>
+          <p class="bodytext">4. da/da_radiance/da_read_obs_bufrssmis.inc </p>
+          <p class="bodytext">At the section &quot;! 0.0  Open unit to satellite bufr file and read file header&quot;, add convert='little_endian' to the open statement<br>
+            <br>
+            open(unit   = lnbufr, FILE   = trim(infile), &amp;<br>
+            form = 'unformatted', iostat =  iost, status = 'old',  &amp;<br>
+            convert='little_endian')<br>
+          </p>
+          <p class="bodytext">5. da/da_obs_io/da_read_obs_bufrgpsro.inc</p>
+          <p class="bodytext">At the section &quot;! open file &quot; add convert='little_endian' to the open statement<br>
+            <br>
+            open(unit = iunit, FILE = trim(filename), &amp;<br>
+            iostat = iost, form = 'unformatted', STATUS ='OLD' , &amp; <br>
+            convert='little_endian')<br>
+          </p>
+          <p class="bodytext">Side effect: After the modification, the code will work just for gfortran and ifort compilers<br>
+          </p>
+            <p align="center" class="detailtextRed"> 
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+                  </p>
+            <p class="bodytext">&nbsp; </p>
+            <br> <br> <img src="images/transgif.gif" width="1" height="1"><img src="images/shim162.gif" width="162" height="1"></td>
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

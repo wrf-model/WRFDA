@@ -1,0 +1,490 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_MP_NCONVP'><A href='../../html_code/phys/module_mp_nconvp.F.html#MODULE_MP_NCONVP' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_mp_nconvp</font> <A href='../../call_to/MODULE_MP_NCONVP.html' TARGET='index'>5</A><a name='6'>
+<a name='7'>
+CONTAINS<a name='8'>
+<font color=#447700>!----------------------------------------------------------------<a name='9'></font>
+<A NAME='LSCOND'><A href='../../html_code/phys/module_mp_nconvp.F.html#LSCOND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='10'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>lscond</font>( th, p, qv, rho, pii                       &amp; <A href='../../call_to/LSCOND.html' TARGET='index'>4</A><a name='11'>
+                      ,r_v, xlv, cp                             &amp;<a name='12'>
+                      ,EP2,SVP1,SVP2,SVP3,SVPT0                 &amp;<a name='13'>
+                      ,dz8w                                     &amp;<a name='14'>
+                      ,RAINNC, RAINNCV                          &amp;<a name='15'>
+                      ,ids,ide, jds,jde, kds,kde                &amp; <font color=#447700>! domain dims<a name='16'></font>
+                      ,ims,ime, jms,jme, kms,kme                &amp; <font color=#447700>! memory dims<a name='17'></font>
+                      ,its,ite, jts,jte, kts,kte                &amp; <font color=#447700>! tile   dims<a name='18'></font>
+                                                                )<a name='19'>
+<font color=#447700>!----------------------------------------------------------------<a name='20'></font>
+   IMPLICIT NONE<a name='21'>
+<font color=#447700>!----------------------------------------------------------------<a name='22'></font>
+   <font color=#447700>!  based on MM5 code (JD November 2006)<a name='23'></font>
+<font color=#447700>!----------------------------------------------------------------<a name='24'></font>
+   INTEGER,      INTENT(IN   )    :: ids,ide, jds,jde, kds,kde, &amp;<a name='25'>
+                                     ims,ime, jms,jme, kms,kme, &amp;<a name='26'>
+                                     its,ite, jts,jte, kts,kte<a name='27'>
+   REAL   ,      INTENT(IN   )    :: r_v, xlv, cp<a name='28'>
+   REAL   ,      INTENT(IN   )    :: EP2,SVP1,SVP2,SVP3,SVPT0<a name='29'>
+<a name='30'>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),              &amp;<a name='31'>
+         INTENT(INOUT) ::                                       &amp;<a name='32'>
+                                                            th, &amp;<a name='33'>
+                                                            qv<a name='34'>
+<a name='35'>
+   REAL, DIMENSION( ims:ime , kms:kme , jms:jme ),              &amp;<a name='36'>
+         INTENT(IN   ) ::                                       &amp;<a name='37'>
+                                                           rho, &amp;<a name='38'>
+                                                           pii, &amp;<a name='39'>
+                                                           p  , &amp;<a name='40'>
+                                                          dz8w <a name='41'>
+<a name='42'>
+<a name='43'>
+   REAL, DIMENSION( ims:ime , jms:jme ),                        &amp;<a name='44'>
+         INTENT(INOUT) ::                               RAINNC, &amp;<a name='45'>
+                                                       RAINNCV<a name='46'>
+<a name='47'>
+   <font color=#447700>! local variables<a name='48'></font>
+<a name='49'>
+   REAL :: TTEMP, ES1, QS1, DQV, COND, R1<a name='50'>
+   INTEGER :: i,j,k<a name='51'>
+<font color=#447700>!----------------------------------------------------------------<a name='52'></font>
+<a name='53'>
+   DO j = jts, jte<a name='54'>
+   DO k = 1, kte<a name='55'>
+   DO i = its,ite<a name='56'>
+      TTEMP = PII(I,K,J)*TH(I,K,J)<a name='57'>
+      ES1 = 1000.*SVP1*EXP(SVP2*(TTEMP-SVPT0)/(TTEMP-SVP3))<a name='58'>
+      QS1 = EP2*ES1/(P(I,K,J)-ES1)<a name='59'>
+      DQV = QV(I,K,J) - QS1<a name='60'>
+      IF(DQV.GT.0.0)THEN<a name='61'>
+        R1 = 1. + XLV*XLV/(R_V*CP)*QS1/(TTEMP*TTEMP)<a name='62'>
+        COND = DQV/R1<a name='63'>
+        QV(I,K,J) = QV(I,K,J) - COND<a name='64'>
+        TTEMP = TTEMP + XLV/CP*COND<a name='65'>
+        TH(I,K,J) = TTEMP/PII(I,K,J)<a name='66'>
+        RAINNC(I,J) = RAINNC(I,J) + RHO(I,K,J)*COND*DZ8W(I,K,J)<a name='67'>
+      ENDIF<a name='68'>
+   ENDDO<a name='69'>
+   ENDDO<a name='70'>
+   ENDDO<a name='71'>
+  RETURN<a name='72'>
+<a name='73'>
+  END SUBROUTINE lscond<a name='74'>
+<a name='75'>
+<font color=#447700>!                           DISCLAIMER<a name='76'></font>
+<font color=#447700>!<a name='77'></font>
+<font color=#447700>!   This file was generated by TAF version 1.8.77<a name='78'></font>
+<font color=#447700>!<a name='79'></font>
+<font color=#447700>!   FASTOPT DISCLAIMS  ALL  WARRANTIES,  EXPRESS  OR  IMPLIED,<a name='80'></font>
+<font color=#447700>!   INCLUDING (WITHOUT LIMITATION) ALL IMPLIED  WARRANTIES  OF<a name='81'></font>
+<font color=#447700>!   MERCHANTABILITY  OR FITNESS FOR A PARTICULAR PURPOSE, WITH<a name='82'></font>
+<font color=#447700>!   RESPECT TO THE SOFTWARE AND USER PROGRAMS.   IN  NO  EVENT<a name='83'></font>
+<font color=#447700>!   SHALL  FASTOPT BE LIABLE FOR ANY LOST OR ANTICIPATED PROF-<a name='84'></font>
+<font color=#447700>!   ITS, OR ANY INDIRECT, INCIDENTAL, EXEMPLARY,  SPECIAL,  OR<a name='85'></font>
+<font color=#447700>!   CONSEQUENTIAL  DAMAGES, WHETHER OR NOT FASTOPT WAS ADVISED<a name='86'></font>
+<font color=#447700>!   OF THE POSSIBILITY OF SUCH DAMAGES.<a name='87'></font>
+<font color=#447700>!<a name='88'></font>
+<font color=#447700>!                           Haftungsbeschraenkung<a name='89'></font>
+<font color=#447700>!   FastOpt gibt ausdruecklich keine Gewaehr, explizit oder indirekt,<a name='90'></font>
+<font color=#447700>!   bezueglich der Brauchbarkeit  der Software  fuer einen bestimmten<a name='91'></font>
+<font color=#447700>!   Zweck.   Unter  keinen  Umstaenden   ist  FastOpt   haftbar  fuer<a name='92'></font>
+<font color=#447700>!   irgendeinen Verlust oder nicht eintretenden erwarteten Gewinn und<a name='93'></font>
+<font color=#447700>!   allen indirekten,  zufaelligen,  exemplarischen  oder  speziellen<a name='94'></font>
+<font color=#447700>!   Schaeden  oder  Folgeschaeden  unabhaengig  von einer eventuellen<a name='95'></font>
+<font color=#447700>!   Mitteilung darueber an FastOpt.<a name='96'></font>
+<font color=#447700>!<a name='97'></font>
+<a name='98'>
+<a name='99'>
+<A NAME='G_LSCOND'><A href='../../html_code/phys/module_mp_nconvp.F.html#G_LSCOND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='100'>
+<font color=#993300>subroutine </font><font color=#cc0000>g_lscond</font>( th, g_th, p, g_p, qv, g_qv, rho, g_rho, pii, g_pii, r_v, xlv, cp, ep2, svp1, svp2, svp3, svpt0, dz8w, g_dz8w, &amp; <A href='../../call_to/G_LSCOND.html' TARGET='index'>3</A><a name='101'>
+&amp;rainnc, g_rainnc, rainncv, g_rainncv, ids, ide, jds, jde, kds, kde, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kts, kte )<a name='102'>
+<font color=#447700>!******************************************************************<a name='103'></font>
+<font color=#447700>!******************************************************************<a name='104'></font>
+<font color=#447700>!** This routine was generated by Automatic differentiation.     **<a name='105'></font>
+<font color=#447700>!** FastOpt: Transformation of Algorithm in Fortran, TAF 1.8.77  **<a name='106'></font>
+<font color=#447700>!******************************************************************<a name='107'></font>
+<font color=#447700>!******************************************************************<a name='108'></font>
+<font color=#447700>!==============================================<a name='109'></font>
+<font color=#447700>! all entries are defined explicitly<a name='110'></font>
+<font color=#447700>!==============================================<a name='111'></font>
+implicit none<a name='112'>
+<a name='113'>
+<font color=#447700>!==============================================<a name='114'></font>
+<font color=#447700>! declare arguments<a name='115'></font>
+<font color=#447700>!==============================================<a name='116'></font>
+real, intent(in) :: cp<a name='117'>
+integer, intent(in) :: ime<a name='118'>
+integer, intent(in) :: ims<a name='119'>
+integer, intent(in) :: jme<a name='120'>
+integer, intent(in) :: jms<a name='121'>
+integer, intent(in) :: kme<a name='122'>
+integer, intent(in) :: kms<a name='123'>
+real, intent(in) :: dz8w(ims:ime,kms:kme,jms:jme)<a name='124'>
+real, intent(in) :: ep2<a name='125'>
+real, intent(in) :: g_dz8w(ims:ime,kms:kme,jms:jme)<a name='126'>
+real, intent(in) :: g_p(ims:ime,kms:kme,jms:jme)<a name='127'>
+real, intent(in) :: g_pii(ims:ime,kms:kme,jms:jme)<a name='128'>
+real, intent(inout) :: g_qv(ims:ime,kms:kme,jms:jme)<a name='129'>
+real, intent(inout) :: g_rainnc(ims:ime,jms:jme)<a name='130'>
+real, intent(inout) :: g_rainncv(ims:ime,jms:jme)<a name='131'>
+real, intent(in) :: g_rho(ims:ime,kms:kme,jms:jme)<a name='132'>
+real, intent(inout) :: g_th(ims:ime,kms:kme,jms:jme)<a name='133'>
+integer, intent(in) :: ide<a name='134'>
+integer, intent(in) :: ids<a name='135'>
+integer, intent(in) :: ite<a name='136'>
+integer, intent(in) :: its<a name='137'>
+integer, intent(in) :: jde<a name='138'>
+integer, intent(in) :: jds<a name='139'>
+integer, intent(in) :: jte<a name='140'>
+integer, intent(in) :: jts<a name='141'>
+integer, intent(in) :: kde<a name='142'>
+integer, intent(in) :: kds<a name='143'>
+integer, intent(in) :: kte<a name='144'>
+integer, intent(in) :: kts<a name='145'>
+real, intent(in) :: p(ims:ime,kms:kme,jms:jme)<a name='146'>
+real, intent(in) :: pii(ims:ime,kms:kme,jms:jme)<a name='147'>
+real, intent(inout) :: qv(ims:ime,kms:kme,jms:jme)<a name='148'>
+real, intent(in) :: r_v<a name='149'>
+real, intent(inout) :: rainnc(ims:ime,jms:jme)<a name='150'>
+real, intent(inout) :: rainncv(ims:ime,jms:jme)<a name='151'>
+real, intent(in) :: rho(ims:ime,kms:kme,jms:jme)<a name='152'>
+real, intent(in) :: svp1<a name='153'>
+real, intent(in) :: svp2<a name='154'>
+real, intent(in) :: svp3<a name='155'>
+real, intent(in) :: svpt0<a name='156'>
+real, intent(inout) :: th(ims:ime,kms:kme,jms:jme)<a name='157'>
+real, intent(in) :: xlv<a name='158'>
+<a name='159'>
+<font color=#447700>!==============================================<a name='160'></font>
+<font color=#447700>! declare local variables<a name='161'></font>
+<font color=#447700>!==============================================<a name='162'></font>
+real cond<a name='163'>
+real dqv<a name='164'>
+real es1<a name='165'>
+real es1h<a name='166'>
+real g_cond<a name='167'>
+real g_dqv<a name='168'>
+real g_es1<a name='169'>
+real g_qs1<a name='170'>
+real g_r1<a name='171'>
+real g_ttemp<a name='172'>
+integer i<a name='173'>
+integer j<a name='174'>
+integer k<a name='175'>
+real qs1<a name='176'>
+real r1<a name='177'>
+real ttemp<a name='178'>
+<a name='179'>
+<font color=#447700>!----------------------------------------------<a name='180'></font>
+<font color=#447700>! TANGENT LINEAR AND FUNCTION STATEMENTS<a name='181'></font>
+<font color=#447700>!----------------------------------------------<a name='182'></font>
+do j = jts, jte<a name='183'>
+  do k = 1, kte<a name='184'>
+    do i = its, ite<a name='185'>
+      g_ttemp = g_pii(i,k,j)*th(i,k,j)+g_th(i,k,j)*pii(i,k,j)<a name='186'>
+      ttemp = pii(i,k,j)*th(i,k,j)<a name='187'>
+      es1h = svp2*(ttemp-svpt0)/(ttemp-svp3)<a name='188'>
+      g_es1 = 1000.*g_ttemp*(svp2/(ttemp-svp3)-svp2*(ttemp-svpt0)/((ttemp-svp3)*(ttemp-svp3)))*svp1*exp(es1h)<a name='189'>
+      es1 = 1000.*svp1*exp(es1h)<a name='190'>
+      g_qs1 = g_es1*(ep2/(p(i,k,j)-es1)+ep2*es1/((p(i,k,j)-es1)*(p(i,k,j)-es1)))-g_p(i,k,j)*(ep2*es1/((p(i,k,j)-es1)*(p(i,k,j)-es1)&amp;<a name='191'>
+&amp;))<a name='192'>
+      qs1 = ep2*es1/(p(i,k,j)-es1)<a name='193'>
+      g_dqv = (-g_qs1)+g_qv(i,k,j)<a name='194'>
+      dqv = qv(i,k,j)-qs1<a name='195'>
+      if (dqv .gt. 0.) then<a name='196'>
+        g_r1 = g_qs1*(xlv*xlv/(r_v*cp)/(ttemp*ttemp))-g_ttemp*(2*xlv*xlv/(r_v*cp)*qs1*ttemp/(ttemp*ttemp*ttemp*ttemp))<a name='197'>
+        r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)<a name='198'>
+        g_cond = g_dqv/r1-g_r1*(dqv/(r1*r1))<a name='199'>
+        cond = dqv/r1<a name='200'>
+        g_qv(i,k,j) = (-g_cond)+g_qv(i,k,j)<a name='201'>
+        g_ttemp = g_cond*(xlv/cp)+g_ttemp<a name='202'>
+        ttemp = ttemp+xlv/cp*cond<a name='203'>
+        g_th(i,k,j) = (-(g_pii(i,k,j)*(ttemp/(pii(i,k,j)*pii(i,k,j)))))+g_ttemp/pii(i,k,j)<a name='204'>
+        g_rainnc(i,j) = g_cond*rho(i,k,j)*dz8w(i,k,j)+g_dz8w(i,k,j)*rho(i,k,j)*cond+g_rainnc(i,j)+g_rho(i,k,j)*cond*dz8w(i,k,j)<a name='205'>
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)<a name='206'>
+      endif<a name='207'>
+    end do<a name='208'>
+  end do<a name='209'>
+end do<a name='210'>
+<a name='211'>
+end subroutine g_lscond<a name='212'>
+<a name='213'>
+<a name='214'>
+<font color=#447700>!                           DISCLAIMER<a name='215'></font>
+<font color=#447700>!<a name='216'></font>
+<font color=#447700>!   This file was generated by TAF version 1.8.77<a name='217'></font>
+<font color=#447700>!<a name='218'></font>
+<font color=#447700>!   FASTOPT DISCLAIMS  ALL  WARRANTIES,  EXPRESS  OR  IMPLIED,<a name='219'></font>
+<font color=#447700>!   INCLUDING (WITHOUT LIMITATION) ALL IMPLIED  WARRANTIES  OF<a name='220'></font>
+<font color=#447700>!   MERCHANTABILITY  OR FITNESS FOR A PARTICULAR PURPOSE, WITH<a name='221'></font>
+<font color=#447700>!   RESPECT TO THE SOFTWARE AND USER PROGRAMS.   IN  NO  EVENT<a name='222'></font>
+<font color=#447700>!   SHALL  FASTOPT BE LIABLE FOR ANY LOST OR ANTICIPATED PROF-<a name='223'></font>
+<font color=#447700>!   ITS, OR ANY INDIRECT, INCIDENTAL, EXEMPLARY,  SPECIAL,  OR<a name='224'></font>
+<font color=#447700>!   CONSEQUENTIAL  DAMAGES, WHETHER OR NOT FASTOPT WAS ADVISED<a name='225'></font>
+<font color=#447700>!   OF THE POSSIBILITY OF SUCH DAMAGES.<a name='226'></font>
+<font color=#447700>!<a name='227'></font>
+<font color=#447700>!                           Haftungsbeschraenkung<a name='228'></font>
+<font color=#447700>!   FastOpt gibt ausdruecklich keine Gewaehr, explizit oder indirekt,<a name='229'></font>
+<font color=#447700>!   bezueglich der Brauchbarkeit  der Software  fuer einen bestimmten<a name='230'></font>
+<font color=#447700>!   Zweck.   Unter  keinen  Umstaenden   ist  FastOpt   haftbar  fuer<a name='231'></font>
+<font color=#447700>!   irgendeinen Verlust oder nicht eintretenden erwarteten Gewinn und<a name='232'></font>
+<font color=#447700>!   allen indirekten,  zufaelligen,  exemplarischen  oder  speziellen<a name='233'></font>
+<font color=#447700>!   Schaeden  oder  Folgeschaeden  unabhaengig  von einer eventuellen<a name='234'></font>
+<font color=#447700>!   Mitteilung darueber an FastOpt.<a name='235'></font>
+<font color=#447700>!<a name='236'></font>
+<a name='237'>
+<font color=#447700>!----------------------------------------------------------------<a name='238'></font>
+<A NAME='A_LSCOND'><A href='../../html_code/phys/module_mp_nconvp.F.html#A_LSCOND' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='239'>
+<font color=#993300>subroutine </font><font color=#cc0000>a_lscond</font>( th, a_th, p, a_p, qv, a_qv, rho, a_rho, pii, a_pii, r_v, xlv, cp, ep2, svp1, svp2, svp3, svpt0, dz8w, a_dz8w, &amp; <A href='../../call_to/A_LSCOND.html' TARGET='index'>2</A><a name='240'>
+&amp;rainnc, a_rainnc, rainncv, a_rainncv, ims, ime, jms, jme, kms, kme, its, ite, jts, jte, kte )<a name='241'>
+<font color=#447700>!******************************************************************<a name='242'></font>
+<font color=#447700>!******************************************************************<a name='243'></font>
+<font color=#447700>!** This routine was generated by Automatic differentiation.     **<a name='244'></font>
+<font color=#447700>!** FastOpt: Transformation of Algorithm in Fortran, TAF 1.8.77  **<a name='245'></font>
+<font color=#447700>!******************************************************************<a name='246'></font>
+<font color=#447700>!******************************************************************<a name='247'></font>
+<font color=#447700>!==============================================<a name='248'></font>
+<font color=#447700>! all entries are defined explicitly<a name='249'></font>
+<font color=#447700>!==============================================<a name='250'></font>
+implicit none<a name='251'>
+<a name='252'>
+<font color=#447700>!==============================================<a name='253'></font>
+<font color=#447700>! declare arguments<a name='254'></font>
+<font color=#447700>!==============================================<a name='255'></font>
+integer, intent(in) :: ime<a name='256'>
+integer, intent(in) :: ims<a name='257'>
+integer, intent(in) :: jme<a name='258'>
+integer, intent(in) :: jms<a name='259'>
+integer, intent(in) :: kme<a name='260'>
+integer, intent(in) :: kms<a name='261'>
+real, intent(inout) :: a_dz8w(ims:ime,kms:kme,jms:jme)<a name='262'>
+real, intent(inout) :: a_p(ims:ime,kms:kme,jms:jme)<a name='263'>
+real, intent(inout) :: a_pii(ims:ime,kms:kme,jms:jme)<a name='264'>
+real, intent(inout) :: a_qv(ims:ime,kms:kme,jms:jme)<a name='265'>
+real, intent(inout) :: a_rainnc(ims:ime,jms:jme)<a name='266'>
+real, intent(inout) :: a_rainncv(ims:ime,jms:jme)<a name='267'>
+real, intent(inout) :: a_rho(ims:ime,kms:kme,jms:jme)<a name='268'>
+real, intent(inout) :: a_th(ims:ime,kms:kme,jms:jme)<a name='269'>
+real, intent(in) :: cp<a name='270'>
+real, intent(in) :: dz8w(ims:ime,kms:kme,jms:jme)<a name='271'>
+real, intent(in) :: ep2<a name='272'>
+integer, intent(in) :: ite<a name='273'>
+integer, intent(in) :: its<a name='274'>
+integer, intent(in) :: jte<a name='275'>
+integer, intent(in) :: jts<a name='276'>
+integer, intent(in) :: kte<a name='277'>
+real, intent(in) :: p(ims:ime,kms:kme,jms:jme)<a name='278'>
+real, intent(in) :: pii(ims:ime,kms:kme,jms:jme)<a name='279'>
+real, intent(inout) :: qv(ims:ime,kms:kme,jms:jme)<a name='280'>
+real, intent(in) :: r_v<a name='281'>
+real, intent(inout) :: rainnc(ims:ime,jms:jme)<a name='282'>
+real, intent(inout) :: rainncv(ims:ime,jms:jme)<a name='283'>
+real, intent(in) :: rho(ims:ime,kms:kme,jms:jme)<a name='284'>
+real, intent(in) :: svp1<a name='285'>
+real, intent(in) :: svp2<a name='286'>
+real, intent(in) :: svp3<a name='287'>
+real, intent(in) :: svpt0<a name='288'>
+real, intent(inout) :: th(ims:ime,kms:kme,jms:jme)<a name='289'>
+real, intent(in) :: xlv<a name='290'>
+<a name='291'>
+<font color=#447700>!==============================================<a name='292'></font>
+<font color=#447700>! declare local variables<a name='293'></font>
+<font color=#447700>!==============================================<a name='294'></font>
+real a_cond<a name='295'>
+real a_dqv<a name='296'>
+real a_es1<a name='297'>
+real a_qs1<a name='298'>
+real a_r1<a name='299'>
+real a_ttemp<a name='300'>
+real cond<a name='301'>
+real dqv<a name='302'>
+real es1<a name='303'>
+integer i<a name='304'>
+integer j<a name='305'>
+integer k<a name='306'>
+integer k2<a name='307'>
+real qs1<a name='308'>
+real qvh(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))<a name='309'>
+real r1<a name='310'>
+real thh(lbound(th,1):ubound(th,1),lbound(th,2):ubound(th,2),lbound(th,3):ubound(th,3))<a name='311'>
+#ifdef ADJOINT_NO_OPTIMIZE<a name='312'>
+real qvi(lbound(qv,1):ubound(qv,1),lbound(qv,2):ubound(qv,2),lbound(qv,3):ubound(qv,3))<a name='313'>
+real thi(lbound(th,1):ubound(th,1),lbound(th,2):ubound(th,2),lbound(th,3):ubound(th,3))<a name='314'>
+#endif<a name='315'>
+real ttemp<a name='316'>
+<a name='317'>
+<font color=#447700>!----------------------------------------------<a name='318'></font>
+<font color=#447700>! SAVE REQUIRED INPUT VARIABLES<a name='319'></font>
+<font color=#447700>!----------------------------------------------<a name='320'></font>
+thh(:,:,:) = th(:,:,:)<a name='321'>
+qvh(:,:,:) = qv(:,:,:)<a name='322'>
+<a name='323'>
+<font color=#447700>!----------------------------------------------<a name='324'></font>
+<font color=#447700>! RESET LOCAL ADJOINT VARIABLES<a name='325'></font>
+<font color=#447700>!----------------------------------------------<a name='326'></font>
+a_cond = 0.<a name='327'>
+a_dqv = 0.<a name='328'>
+a_es1 = 0.<a name='329'>
+a_qs1 = 0.<a name='330'>
+a_r1 = 0.<a name='331'>
+a_ttemp = 0.<a name='332'>
+<a name='333'>
+<font color=#447700>!----------------------------------------------<a name='334'></font>
+<font color=#447700>! ROUTINE BODY<a name='335'></font>
+<font color=#447700>!----------------------------------------------<a name='336'></font>
+#ifdef ADJOINT_NO_OPTIMIZE<a name='337'>
+<font color=#447700>!----------------------------------------------<a name='338'></font>
+<font color=#447700>! FUNCTION AND TAPE COMPUTATIONS<a name='339'></font>
+<font color=#447700>!----------------------------------------------<a name='340'></font>
+do j = jts, jte<a name='341'>
+  do k = 1, kte<a name='342'>
+    do i = its, ite<a name='343'>
+      ttemp = pii(i,k,j)*th(i,k,j)<a name='344'>
+      es1 = 1000.*svp1*exp(svp2*(ttemp-svpt0)/(ttemp-svp3))<a name='345'>
+      qs1 = ep2*es1/(p(i,k,j)-es1)<a name='346'>
+      dqv = qv(i,k,j)-qs1<a name='347'>
+      if (dqv .gt. 0.) then<a name='348'>
+        r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)<a name='349'>
+        cond = dqv/r1<a name='350'>
+        ttemp = ttemp+xlv/cp*cond<a name='351'>
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)<a name='352'>
+      endif<a name='353'>
+    end do<a name='354'>
+  end do<a name='355'>
+end do<a name='356'>
+<a name='357'>
+<font color=#447700>!----------------------------------------------<a name='358'></font>
+<font color=#447700>! SAVE DEPENDEND VARIABLES<a name='359'></font>
+<font color=#447700>!----------------------------------------------<a name='360'></font>
+thi(:,:,:) = th(:,:,:)<a name='361'>
+qvi(:,:,:) = qv(:,:,:)<a name='362'>
+<font color=#447700>!----------------------------------------------<a name='363'></font>
+<font color=#447700>! ADJOINT COMPUTATIONS<a name='364'></font>
+<font color=#447700>!----------------------------------------------<a name='365'></font>
+qv(:,:,:) = qvh(:,:,:)<a name='366'>
+th(:,:,:) = thh(:,:,:)<a name='367'>
+#endif<a name='368'>
+do j = jts, jte<a name='369'>
+  a_cond = 0.<a name='370'>
+  a_dqv = 0.<a name='371'>
+  a_es1 = 0.<a name='372'>
+  a_qs1 = 0.<a name='373'>
+  a_r1 = 0.<a name='374'>
+  a_ttemp = 0.<a name='375'>
+  do k = kte, 1, -1<a name='376'>
+#ifdef ADJOINT_NO_OPTIMIZE<a name='377'>
+    qv(:,:,:) = qvh(:,:,:)<a name='378'>
+    th(:,:,:) = thh(:,:,:)<a name='379'>
+    do k2 = 1, k-1<a name='380'>
+      do i = its, ite<a name='381'>
+        ttemp = pii(i,k2,j)*th(i,k2,j)<a name='382'>
+        es1 = 1000.*svp1*exp(svp2*(ttemp-svpt0)/(ttemp-svp3))<a name='383'>
+        qs1 = ep2*es1/(p(i,k2,j)-es1)<a name='384'>
+        dqv = qv(i,k2,j)-qs1<a name='385'>
+        if (dqv .gt. 0.) then<a name='386'>
+          r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)<a name='387'>
+          cond = dqv/r1<a name='388'>
+          qv(i,k2,j) = qv(i,k2,j)-cond<a name='389'>
+          ttemp = ttemp+xlv/cp*cond<a name='390'>
+          th(i,k2,j) = ttemp/pii(i,k2,j)<a name='391'>
+        endif<a name='392'>
+      end do<a name='393'>
+    end do<a name='394'>
+#endif<a name='395'>
+    do i = its, ite<a name='396'>
+      a_cond = 0.<a name='397'>
+      a_dqv = 0.<a name='398'>
+      a_es1 = 0.<a name='399'>
+      a_qs1 = 0.<a name='400'>
+      a_r1 = 0.<a name='401'>
+      a_ttemp = 0.<a name='402'>
+      ttemp = pii(i,k,j)*th(i,k,j)<a name='403'>
+<font color=#447700>! recompute : ttemp<a name='404'></font>
+<font color=#447700>! recompute : ttemp<a name='405'></font>
+      es1 = 1000.*svp1*exp(svp2*(ttemp-svpt0)/(ttemp-svp3))<a name='406'>
+<font color=#447700>! recompute : es1<a name='407'></font>
+<font color=#447700>! recompute : es1<a name='408'></font>
+      qs1 = ep2*es1/(p(i,k,j)-es1)<a name='409'>
+<font color=#447700>! recompute : qs1<a name='410'></font>
+<font color=#447700>! recompute : qs1<a name='411'></font>
+      dqv = qv(i,k,j)-qs1<a name='412'>
+<font color=#447700>! recompute : dqv<a name='413'></font>
+<font color=#447700>! recompute : dqv<a name='414'></font>
+      if (dqv .gt. 0.) then<a name='415'>
+        r1 = 1.+xlv*xlv/(r_v*cp)*qs1/(ttemp*ttemp)<a name='416'>
+<font color=#447700>! recompute : r1<a name='417'></font>
+<font color=#447700>! recompute : r1<a name='418'></font>
+        cond = dqv/r1<a name='419'>
+<font color=#447700>! recompute : cond<a name='420'></font>
+<font color=#447700>! recompute : cond<a name='421'></font>
+        ttemp = ttemp+xlv/cp*cond<a name='422'>
+#ifndef ADJOINT_NO_OPTIMIZE<a name='423'>
+        rainnc(i,j) = rainnc(i,j)+rho(i,k,j)*cond*dz8w(i,k,j)<a name='424'>
+#endif<a name='425'>
+<font color=#447700>! recompute : ttemp<a name='426'></font>
+<font color=#447700>! recompute : ttemp<a name='427'></font>
+        a_cond = a_cond+a_rainnc(i,j)*rho(i,k,j)*dz8w(i,k,j)<a name='428'>
+        a_dz8w(i,k,j) = a_dz8w(i,k,j)+a_rainnc(i,j)*rho(i,k,j)*cond<a name='429'>
+        a_rho(i,k,j) = a_rho(i,k,j)+a_rainnc(i,j)*cond*dz8w(i,k,j)<a name='430'>
+        a_pii(i,k,j) = a_pii(i,k,j)-a_th(i,k,j)*(ttemp/(pii(i,k,j)*pii(i,k,j)))<a name='431'>
+        a_ttemp = a_ttemp+a_th(i,k,j)/pii(i,k,j)<a name='432'>
+        a_th(i,k,j) = 0.<a name='433'>
+        a_cond = a_cond+a_ttemp*(xlv/cp)<a name='434'>
+        a_cond = a_cond-a_qv(i,k,j)<a name='435'>
+        a_dqv = a_dqv+a_cond/r1<a name='436'>
+        a_r1 = a_r1-a_cond*(dqv/(r1*r1))<a name='437'>
+        a_cond = 0.<a name='438'>
+<font color=#447700>! recdepend vars : i,j,k,pii,th<a name='439'></font>
+<font color=#447700>! recompute pos : ASSIGN_STMT lscond.F90:48<a name='440'></font>
+<font color=#447700>! recompute vars : ttemp<a name='441'></font>
+        ttemp = pii(i,k,j)*th(i,k,j)<a name='442'>
+<font color=#447700>! recompute : ttemp<a name='443'></font>
+<font color=#447700>! recompute vars : ttemp<a name='444'></font>
+        a_qs1 = a_qs1+a_r1*(xlv*xlv/(r_v*cp)/(ttemp*ttemp))<a name='445'>
+        a_ttemp = a_ttemp-a_r1*(2*xlv*xlv/(r_v*cp)*qs1*ttemp/(ttemp*ttemp*ttemp*ttemp))<a name='446'>
+        a_r1 = 0.<a name='447'>
+      endif<a name='448'>
+      a_qs1 = a_qs1-a_dqv<a name='449'>
+      a_qv(i,k,j) = a_qv(i,k,j)+a_dqv<a name='450'>
+      a_dqv = 0.<a name='451'>
+      a_es1 = a_es1+a_qs1*(ep2/(p(i,k,j)-es1)+ep2*es1/((p(i,k,j)-es1)*(p(i,k,j)-es1)))<a name='452'>
+      a_p(i,k,j) = a_p(i,k,j)-a_qs1*(ep2*es1/((p(i,k,j)-es1)*(p(i,k,j)-es1)))<a name='453'>
+      a_qs1 = 0.<a name='454'>
+<font color=#447700>! recdepend vars : i,j,k,pii,th<a name='455'></font>
+<font color=#447700>! recompute pos : ASSIGN_STMT lscond.F90:48<a name='456'></font>
+<font color=#447700>! recompute vars : ttemp<a name='457'></font>
+      ttemp = pii(i,k,j)*th(i,k,j)<a name='458'>
+<font color=#447700>! recompute : ttemp<a name='459'></font>
+<font color=#447700>! recompute vars : ttemp<a name='460'></font>
+      a_ttemp = a_ttemp+1000.*a_es1*svp1*(svp2/(ttemp-svp3)-svp2*(ttemp-svpt0)/((ttemp-svp3)*(ttemp-svp3)))*exp(svp2*(ttemp-svpt0)/&amp;<a name='461'>
+&amp;(ttemp-svp3))<a name='462'>
+      a_es1 = 0.<a name='463'>
+      a_pii(i,k,j) = a_pii(i,k,j)+a_ttemp*th(i,k,j)<a name='464'>
+      a_th(i,k,j) = a_th(i,k,j)+a_ttemp*pii(i,k,j)<a name='465'>
+      a_ttemp = 0.<a name='466'>
+    end do<a name='467'>
+  end do<a name='468'>
+end do<a name='469'>
+<a name='470'>
+<font color=#447700>!----------------------------------------------<a name='471'></font>
+<font color=#447700>! GET DEPENDEND VARIABLES<a name='472'></font>
+<font color=#447700>!----------------------------------------------<a name='473'></font>
+#ifdef ADJOINT_NO_OPTIMIZE<a name='474'>
+qv(:,:,:) = qvi(:,:,:)<a name='475'>
+th(:,:,:) = thi(:,:,:)<a name='476'>
+#else<a name='477'>
+qv(:,:,:) = qvh(:,:,:)<a name='478'>
+th(:,:,:) = thh(:,:,:)<a name='479'>
+#endif<a name='480'>
+<a name='481'>
+<a name='482'>
+<font color=#447700>!----------------------------------------------<a name='483'></font>
+<font color=#447700>! FREE DYNAMIC MEMORY<a name='484'></font>
+<font color=#447700>!----------------------------------------------<a name='485'></font>
+<a name='486'>
+end subroutine a_lscond<a name='487'>
+<a name='488'>
+END MODULE module_mp_nconvp<a name='489'>
+</pre></body></html>

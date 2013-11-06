@@ -1,0 +1,95 @@
+<HTML> <BODY BGCOLOR=#bbeeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:DYNAMICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_EXP'><A href='../../html_code/dyn_exp/module_exp.F.html#MODULE_EXP' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_exp</font> <A href='../../call_to/MODULE_EXP.html' TARGET='index'>1</A><a name='6'>
+<a name='7'>
+   USE module_state_description<a name='8'>
+<a name='9'>
+CONTAINS<a name='10'>
+<a name='11'>
+<font color=#447700>!------------------------------------------------------------------------<a name='12'></font>
+<a name='13'>
+<A NAME='RELAX_1_INTO_2'><A href='../../html_code/dyn_exp/module_exp.F.html#RELAX_1_INTO_2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='14'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>relax_1_into_2</font>  ( x1, x2,                        &amp; <A href='../../call_to/RELAX_1_INTO_2.html' TARGET='index'>1</A><a name='15'>
+                           ids, ide, jds, jde, kds, kde,    &amp;<a name='16'>
+                           ims, ime, jms, jme, kms, kme,    &amp;<a name='17'>
+                           its, ite, jts, jte, kts, kte    )<a name='18'>
+<a name='19'>
+   IMPLICIT NONE<a name='20'>
+<a name='21'>
+<a name='22'>
+   <font color=#447700>!  Input data.<a name='23'></font>
+<a name='24'>
+   INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='25'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='26'>
+                                    its, ite, jts, jte, kts, kte<a name='27'>
+<a name='28'>
+   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &amp;<a name='29'>
+                                               INTENT(IN   ) ::  x1<a name='30'>
+<a name='31'>
+   REAL , DIMENSION( ims:ime , kms:kme , jms:jme  ) ,                     &amp;<a name='32'>
+                                               INTENT(  OUT) ::  x2<a name='33'>
+<a name='34'>
+   integer :: k, i, j<a name='35'>
+<a name='36'>
+<a name='37'>
+   DO j = jts, jte<a name='38'>
+     IF ( j &gt; jds .AND. j &lt; jde-1 ) THEN    <font color=#447700>! jde-1 because x is not staggered in Y<a name='39'></font>
+       DO k = kts, kte<a name='40'>
+         DO i = its, ite<a name='41'>
+           IF ( i &gt; ids .AND. i &lt; ide-1 ) THEN    <font color=#447700>! ide-1 because x is not staggered in X<a name='42'></font>
+             x2(i,k,j) = 0.25*(x1(i+1,k,j)+x1(i-1,k,j)+x1(i,k,j+1)+x1(i,k,j-1))<a name='43'>
+           ENDIF<a name='44'>
+         ENDDO<a name='45'>
+       ENDDO<a name='46'>
+     ENDIF<a name='47'>
+   ENDDO<a name='48'>
+<a name='49'>
+END SUBROUTINE relax_1_into_2<a name='50'>
+<a name='51'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='52'></font>
+<a name='53'>
+<A NAME='COPY_2_INTO_1'><A href='../../html_code/dyn_exp/module_exp.F.html#COPY_2_INTO_1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='54'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>copy_2_into_1</font>  ( x2, x1,                        &amp; <A href='../../call_to/COPY_2_INTO_1.html' TARGET='index'>1</A><a name='55'>
+                           ids, ide, jds, jde, kds, kde,    &amp;<a name='56'>
+                           ims, ime, jms, jme, kms, kme,    &amp;<a name='57'>
+                           its, ite, jts, jte, kts, kte    )<a name='58'>
+<a name='59'>
+   IMPLICIT NONE<a name='60'>
+<a name='61'>
+<a name='62'>
+   <font color=#447700>!  Input data.<a name='63'></font>
+<a name='64'>
+   INTEGER ,       INTENT(IN   ) :: ids, ide, jds, jde, kds, kde, &amp;<a name='65'>
+                                    ims, ime, jms, jme, kms, kme, &amp;<a name='66'>
+                                    its, ite, jts, jte, kts, kte<a name='67'>
+<a name='68'>
+   REAL , DIMENSION(  ims:ime , kms:kme, jms:jme ) ,                      &amp;<a name='69'>
+                                               INTENT(IN   ) ::  x2<a name='70'>
+<a name='71'>
+   REAL , DIMENSION( ims:ime , kms:kme , jms:jme  ) ,                     &amp;<a name='72'>
+                                               INTENT(  OUT) ::  x1<a name='73'>
+<a name='74'>
+   integer :: k, i, j<a name='75'>
+<a name='76'>
+   DO j = jts, jte<a name='77'>
+     IF ( j &gt; jds .AND. j &lt; jde-1 ) THEN<a name='78'>
+       DO k = kts, kte<a name='79'>
+         DO i = its, ite<a name='80'>
+           IF ( i &gt; ids .AND. i &lt; ide-1 ) THEN<a name='81'>
+             x1(i,k,j) = x2(i,k,j)<a name='82'>
+           ENDIF<a name='83'>
+         ENDDO<a name='84'>
+       ENDDO<a name='85'>
+     ENDIF<a name='86'>
+   ENDDO<a name='87'>
+<a name='88'>
+END SUBROUTINE copy_2_into_1<a name='89'>
+<a name='90'>
+<font color=#447700>!-------------------------------------------------------------------------------<a name='91'></font>
+<a name='92'>
+END MODULE module_exp<a name='93'>
+<a name='94'>
+</pre></body></html>

@@ -1,0 +1,28 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='FAST_COPY_LINT'><A href='../../html_code/frame/fast_copy.F.html#FAST_COPY_LINT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>fast_copy_lint</font> ( outbuf, inbuf, n ) <A href='../../call_to/FAST_COPY_LINT.html' TARGET='index'>406</A><a name='3'>
+        IMPLICIT NONE<a name='4'>
+        INTEGER n<a name='5'>
+        INTEGER*8 inbuf(*), outbuf(*)<a name='6'>
+        <font color=#447700>! Local<a name='7'></font>
+        INTEGER i<a name='8'>
+        DO i = 1,n<a name='9'>
+           outbuf(i) = inbuf(i)<a name='10'>
+        ENDDO<a name='11'>
+        RETURN<a name='12'>
+      END SUBROUTINE fast_copy_lint<a name='13'>
+<a name='14'>
+<A NAME='FAST_ZERO_LINT'><A href='../../html_code/frame/fast_copy.F.html#FAST_ZERO_LINT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='15'>
+      <font color=#993300>SUBROUTINE </font><font color=#cc0000>fast_zero_lint</font> ( outbuf, n ) <A href='../../call_to/FAST_ZERO_LINT.html' TARGET='index'>52</A><a name='16'>
+        IMPLICIT NONE<a name='17'>
+        INTEGER n<a name='18'>
+        INTEGER*8 outbuf(*)<a name='19'>
+        <font color=#447700>! Local<a name='20'></font>
+        INTEGER i<a name='21'>
+        DO i = 1,n<a name='22'>
+           outbuf(i) = 0<a name='23'>
+        ENDDO<a name='24'>
+        RETURN<a name='25'>
+      END SUBROUTINE fast_zero_lint<a name='26'>
+<a name='27'>
+</pre></body></html>

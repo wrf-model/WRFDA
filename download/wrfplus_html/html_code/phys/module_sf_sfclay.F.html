@@ -1,0 +1,717 @@
+<HTML> <BODY BGCOLOR=#ddddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:MODEL_LAYER:PHYSICS<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<A NAME='MODULE_SF_SFCLAY'><A href='../../html_code/phys/module_sf_sfclay.F.html#MODULE_SF_SFCLAY' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='4'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_sf_sfclay</font> <A href='../../call_to/MODULE_SF_SFCLAY.html' TARGET='index'>2</A><a name='5'>
+<a name='6'>
+ REAL    , PARAMETER ::  VCONVC=1.<a name='7'>
+ REAL    , PARAMETER ::  CZO=0.032<a name='8'>
+ REAL    , PARAMETER ::  OZO=1.E-4<a name='9'>
+<a name='10'>
+ REAL,   DIMENSION(0:1000 ),SAVE          :: PSIMTB,PSIHTB<a name='11'>
+<a name='12'>
+CONTAINS<a name='13'>
+<a name='14'>
+<font color=#447700>!-------------------------------------------------------------------<a name='15'></font>
+<A NAME='SFCLAY'><A href='../../html_code/phys/module_sf_sfclay.F.html#SFCLAY' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='16'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>SFCLAY</font>(U3D,V3D,T3D,QV3D,P3D,dz8w,                    &amp; <A href='../../call_to/SFCLAY.html' TARGET='index'>1</A>,<A href='../../call_from/SFCLAY.html' TARGET='index'>1</A><a name='17'>
+                     CP,G,ROVCP,R,XLV,PSFC,CHS,CHS2,CQS2,CPM,      &amp;<a name='18'>
+                     ZNT,UST,PBLH,MAVAIL,ZOL,MOL,REGIME,PSIM,PSIH, &amp;<a name='19'>
+                     XLAND,HFX,QFX,LH,TSK,FLHC,FLQC,QGH,QSFC,RMOL, &amp;<a name='20'>
+                     U10,V10,TH2,T2,Q2,                            &amp;<a name='21'>
+                     GZ1OZ0,WSPD,BR,ISFFLX,DX,                     &amp;<a name='22'>
+                     SVP1,SVP2,SVP3,SVPT0,EP1,EP2,                 &amp;<a name='23'>
+                     KARMAN,EOMEG,STBOLT,                          &amp;<a name='24'>
+                     ids,ide, jds,jde, kds,kde,                    &amp;<a name='25'>
+                     ims,ime, jms,jme, kms,kme,                    &amp;<a name='26'>
+                     its,ite, jts,jte, kts,kte                     )<a name='27'>
+<font color=#447700>!-------------------------------------------------------------------<a name='28'></font>
+      IMPLICIT NONE<a name='29'>
+<font color=#447700>!-------------------------------------------------------------------<a name='30'></font>
+<font color=#447700>!-- U3D         3D u-velocity interpolated to theta points (m/s)<a name='31'></font>
+<font color=#447700>!-- V3D         3D v-velocity interpolated to theta points (m/s)<a name='32'></font>
+<font color=#447700>!-- T3D         temperature (K)<a name='33'></font>
+<font color=#447700>!-- QV3D        3D water vapor mixing ratio (Kg/Kg)<a name='34'></font>
+<font color=#447700>!-- P3D         3D pressure (Pa)<a name='35'></font>
+<font color=#447700>!-- dz8w        dz between full levels (m)<a name='36'></font>
+<font color=#447700>!-- CP          heat capacity at constant pressure for dry air (J/kg/K)<a name='37'></font>
+<font color=#447700>!-- G           acceleration due to gravity (m/s^2)<a name='38'></font>
+<font color=#447700>!-- ROVCP       R/CP<a name='39'></font>
+<font color=#447700>!-- R           gas constant for dry air (J/kg/K)<a name='40'></font>
+<font color=#447700>!-- XLV         latent heat of vaporization for water (J/kg)<a name='41'></font>
+<font color=#447700>!-- PSFC        surface pressure (Pa)<a name='42'></font>
+<font color=#447700>!-- ZNT         roughness length (m)<a name='43'></font>
+<font color=#447700>!-- UST         u* in similarity theory (m/s)<a name='44'></font>
+<font color=#447700>!-- PBLH        PBL height from previous time (m)<a name='45'></font>
+<font color=#447700>!-- MAVAIL      surface moisture availability (between 0 and 1)<a name='46'></font>
+<font color=#447700>!-- ZOL         z/L height over Monin-Obukhov length<a name='47'></font>
+<font color=#447700>!-- MOL         T* (similarity theory) (K)<a name='48'></font>
+<font color=#447700>!-- REGIME      flag indicating PBL regime (stable, unstable, etc.)<a name='49'></font>
+<font color=#447700>!-- PSIM        similarity stability function for momentum<a name='50'></font>
+<font color=#447700>!-- PSIH        similarity stability function for heat<a name='51'></font>
+<font color=#447700>!-- XLAND       land mask (1 for land, 2 for water)<a name='52'></font>
+<font color=#447700>!-- HFX         upward heat flux at the surface (W/m^2)<a name='53'></font>
+<font color=#447700>!-- QFX         upward moisture flux at the surface (kg/m^2/s)<a name='54'></font>
+<font color=#447700>!-- LH          net upward latent heat flux at surface (W/m^2)<a name='55'></font>
+<font color=#447700>!-- TSK         surface temperature (K)<a name='56'></font>
+<font color=#447700>!-- FLHC        exchange coefficient for heat (m/s)<a name='57'></font>
+<font color=#447700>!-- FLQC        exchange coefficient for moisture (m/s)<a name='58'></font>
+<font color=#447700>!-- QGH         lowest-level saturated mixing ratio<a name='59'></font>
+<font color=#447700>!-- U10         diagnostic 10m u wind<a name='60'></font>
+<font color=#447700>!-- V10         diagnostic 10m v wind<a name='61'></font>
+<font color=#447700>!-- TH2         diagnostic 2m theta (K)<a name='62'></font>
+<font color=#447700>!-- T2          diagnostic 2m temperature (K)<a name='63'></font>
+<font color=#447700>!-- Q2          diagnostic 2m mixing ratio (kg/kg)<a name='64'></font>
+<font color=#447700>!-- GZ1OZ0      log(z/z0) where z0 is roughness length<a name='65'></font>
+<font color=#447700>!-- WSPD        wind speed at lowest model level (m/s)<a name='66'></font>
+<font color=#447700>!-- BR          bulk Richardson number in surface layer<a name='67'></font>
+<font color=#447700>!-- ISFFLX      isfflx=1 for surface heat and moisture fluxes<a name='68'></font>
+<font color=#447700>!-- DX          horizontal grid size (m)<a name='69'></font>
+<font color=#447700>!-- SVP1        constant for saturation vapor pressure (kPa)<a name='70'></font>
+<font color=#447700>!-- SVP2        constant for saturation vapor pressure (dimensionless)<a name='71'></font>
+<font color=#447700>!-- SVP3        constant for saturation vapor pressure (K)<a name='72'></font>
+<font color=#447700>!-- SVPT0       constant for saturation vapor pressure (K)<a name='73'></font>
+<font color=#447700>!-- EP1         constant for virtual temperature (R_v/R_d - 1) (dimensionless)<a name='74'></font>
+<font color=#447700>!-- EP2         constant for specific humidity calculation <a name='75'></font>
+<font color=#447700>!               (R_d/R_v) (dimensionless)<a name='76'></font>
+<font color=#447700>!-- KARMAN      Von Karman constant<a name='77'></font>
+<font color=#447700>!-- EOMEG       angular velocity of earth's rotation (rad/s)<a name='78'></font>
+<font color=#447700>!-- STBOLT      Stefan-Boltzmann constant (W/m^2/K^4)<a name='79'></font>
+<font color=#447700>!-- ids         start index for i in domain<a name='80'></font>
+<font color=#447700>!-- ide         end index for i in domain<a name='81'></font>
+<font color=#447700>!-- jds         start index for j in domain<a name='82'></font>
+<font color=#447700>!-- jde         end index for j in domain<a name='83'></font>
+<font color=#447700>!-- kds         start index for k in domain<a name='84'></font>
+<font color=#447700>!-- kde         end index for k in domain<a name='85'></font>
+<font color=#447700>!-- ims         start index for i in memory<a name='86'></font>
+<font color=#447700>!-- ime         end index for i in memory<a name='87'></font>
+<font color=#447700>!-- jms         start index for j in memory<a name='88'></font>
+<font color=#447700>!-- jme         end index for j in memory<a name='89'></font>
+<font color=#447700>!-- kms         start index for k in memory<a name='90'></font>
+<font color=#447700>!-- kme         end index for k in memory<a name='91'></font>
+<font color=#447700>!-- its         start index for i in tile<a name='92'></font>
+<font color=#447700>!-- ite         end index for i in tile<a name='93'></font>
+<font color=#447700>!-- jts         start index for j in tile<a name='94'></font>
+<font color=#447700>!-- jte         end index for j in tile<a name='95'></font>
+<font color=#447700>!-- kts         start index for k in tile<a name='96'></font>
+<font color=#447700>!-- kte         end index for k in tile<a name='97'></font>
+<font color=#447700>!-------------------------------------------------------------------<a name='98'></font>
+      INTEGER,  INTENT(IN )   ::        ids,ide, jds,jde, kds,kde, &amp;<a name='99'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='100'>
+                                        its,ite, jts,jte, kts,kte<a name='101'>
+<font color=#447700>!                                                               <a name='102'></font>
+      INTEGER,  INTENT(IN )   ::        ISFFLX<a name='103'>
+      REAL,     INTENT(IN )   ::        SVP1,SVP2,SVP3,SVPT0<a name='104'>
+      REAL,     INTENT(IN )   ::        EP1,EP2,KARMAN,EOMEG,STBOLT<a name='105'>
+<font color=#447700>!<a name='106'></font>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &amp;<a name='107'>
+                INTENT(IN   )   ::                           dz8w<a name='108'>
+                                        <a name='109'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &amp;<a name='110'>
+                INTENT(IN   )   ::                           QV3D, &amp;<a name='111'>
+                                                              P3D, &amp;<a name='112'>
+                                                              T3D<a name='113'>
+<a name='114'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='115'>
+                INTENT(IN   )               ::             MAVAIL, &amp;<a name='116'>
+                                                             PBLH, &amp;<a name='117'>
+                                                            XLAND, &amp;<a name='118'>
+                                                              TSK<a name='119'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='120'>
+                INTENT(OUT  )               ::                U10, &amp;<a name='121'>
+                                                              V10, &amp;<a name='122'>
+                                                              TH2, &amp;<a name='123'>
+                                                               T2, &amp;<a name='124'>
+                                                               Q2, &amp;<a name='125'>
+                                                             QSFC<a name='126'>
+<font color=#447700>!<a name='127'></font>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='128'>
+                INTENT(INOUT)               ::             REGIME, &amp;<a name='129'>
+                                                              HFX, &amp;<a name='130'>
+                                                              QFX, &amp;<a name='131'>
+                                                               LH, &amp;<a name='132'>
+                                                          MOL,RMOL<a name='133'>
+<font color=#447700>!m the following 5 are change to memory size<a name='134'></font>
+<font color=#447700>!<a name='135'></font>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='136'>
+                INTENT(INOUT)   ::                 GZ1OZ0,WSPD,BR, &amp;<a name='137'>
+                                                        PSIM,PSIH<a name='138'>
+<a name='139'>
+      REAL,     DIMENSION( ims:ime, kms:kme, jms:jme )           , &amp;<a name='140'>
+                INTENT(IN   )   ::                            U3D, &amp;<a name='141'>
+                                                              V3D<a name='142'>
+                                        <a name='143'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='144'>
+                INTENT(IN   )               ::               PSFC<a name='145'>
+<a name='146'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='147'>
+                INTENT(INOUT)   ::                            ZNT, &amp;<a name='148'>
+                                                              ZOL, &amp;<a name='149'>
+                                                              UST, &amp;<a name='150'>
+                                                              CPM, &amp;<a name='151'>
+                                                             CHS2, &amp;<a name='152'>
+                                                             CQS2, &amp;<a name='153'>
+                                                              CHS<a name='154'>
+<a name='155'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='156'>
+                INTENT(INOUT)   ::                      FLHC,FLQC<a name='157'>
+<a name='158'>
+      REAL,     DIMENSION( ims:ime, jms:jme )                    , &amp;<a name='159'>
+                INTENT(INOUT)   ::                                 &amp;<a name='160'>
+                                                              QGH<a name='161'>
+<a name='162'>
+<a name='163'>
+                                    <a name='164'>
+      REAL,     INTENT(IN   )               ::   CP,G,ROVCP,R,XLV,DX<a name='165'>
+ <a name='166'>
+<font color=#447700>! LOCAL VARS<a name='167'></font>
+<a name='168'>
+      REAL,     DIMENSION( its:ite ) ::                       U1D, &amp;<a name='169'>
+                                                              V1D, &amp;<a name='170'>
+                                                             QV1D, &amp;<a name='171'>
+                                                              P1D, &amp;<a name='172'>
+                                                              T1D<a name='173'>
+<a name='174'>
+      REAL,     DIMENSION( its:ite ) ::                    dz8w1d<a name='175'>
+<a name='176'>
+      INTEGER ::  I,J<a name='177'>
+<a name='178'>
+      DO J=jts,jte<a name='179'>
+        DO i=its,ite<a name='180'>
+          dz8w1d(I) = dz8w(i,1,j)<a name='181'>
+        ENDDO<a name='182'>
+   <a name='183'>
+        DO i=its,ite<a name='184'>
+           U1D(i) =U3D(i,1,j)<a name='185'>
+           V1D(i) =V3D(i,1,j)<a name='186'>
+           QV1D(i)=QV3D(i,1,j)<a name='187'>
+           P1D(i) =P3D(i,1,j)<a name='188'>
+           T1D(i) =T3D(i,1,j)<a name='189'>
+        ENDDO<a name='190'>
+<a name='191'>
+        CALL <A href='../../html_code/phys/module_sf_sfclay.F.html#SFCLAY1D'>SFCLAY1D</A><A href='../../html_code/phys/module_sf_sfclay.F.html#SFCLAY' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SFCLAY1D_1">(J,U1D,V1D,T1D,QV1D,P1D,dz8w1d,               &amp;<a name='192'>
+                CP,G,ROVCP,R,XLV,PSFC(ims,j),CHS(ims,j),CHS2(ims,j),&amp;<a name='193'>
+                CQS2(ims,j),CPM(ims,j),PBLH(ims,j), RMOL(ims,j),   &amp;<a name='194'>
+                ZNT(ims,j),UST(ims,j),MAVAIL(ims,j),ZOL(ims,j),    &amp;<a name='195'>
+                MOL(ims,j),REGIME(ims,j),PSIM(ims,j),PSIH(ims,j),  &amp;<a name='196'>
+                XLAND(ims,j),HFX(ims,j),QFX(ims,j),TSK(ims,j),     &amp;<a name='197'>
+                U10(ims,j),V10(ims,j),TH2(ims,j),T2(ims,j),        &amp;<a name='198'>
+                Q2(ims,j),FLHC(ims,j),FLQC(ims,j),QGH(ims,j),      &amp;<a name='199'>
+                QSFC(ims,j),LH(ims,j),                             &amp;<a name='200'>
+                GZ1OZ0(ims,j),WSPD(ims,j),BR(ims,j),ISFFLX,DX,     &amp;<a name='201'>
+                SVP1,SVP2,SVP3,SVPT0,EP1,EP2,KARMAN,EOMEG,STBOLT,  &amp;<a name='202'>
+                ids,ide, jds,jde, kds,kde,                         &amp;<a name='203'>
+                ims,ime, jms,jme, kms,kme,                         &amp;<a name='204'>
+                its,ite, jts,jte, kts,kte                          )<a name='205'>
+      ENDDO<a name='206'>
+<a name='207'>
+<a name='208'>
+   END SUBROUTINE SFCLAY<a name='209'>
+<a name='210'>
+<a name='211'>
+<font color=#447700>!-------------------------------------------------------------------<a name='212'></font>
+<A NAME='SFCLAY1D'><A href='../../html_code/phys/module_sf_sfclay.F.html#SFCLAY1D' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='213'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>SFCLAY1D</font>(J,UX,VX,T1D,QV1D,P1D,dz8w1d,                &amp; <A href='../../call_to/SFCLAY1D.html' TARGET='index'>1</A><a name='214'>
+                     CP,G,ROVCP,R,XLV,PSFCPA,CHS,CHS2,CQS2,CPM,PBLH,RMOL, &amp;<a name='215'>
+                     ZNT,UST,MAVAIL,ZOL,MOL,REGIME,PSIM,PSIH,      &amp;<a name='216'>
+                     XLAND,HFX,QFX,TSK,                            &amp;<a name='217'>
+                     U10,V10,TH2,T2,Q2,FLHC,FLQC,QGH,              &amp;<a name='218'>
+                     QSFC,LH,GZ1OZ0,WSPD,BR,ISFFLX,DX,             &amp;<a name='219'>
+                     SVP1,SVP2,SVP3,SVPT0,EP1,EP2,                 &amp;<a name='220'>
+                     KARMAN,EOMEG,STBOLT,                          &amp;<a name='221'>
+                     ids,ide, jds,jde, kds,kde,                    &amp;<a name='222'>
+                     ims,ime, jms,jme, kms,kme,                    &amp;<a name='223'>
+                     its,ite, jts,jte, kts,kte                     )<a name='224'>
+<font color=#447700>!-------------------------------------------------------------------<a name='225'></font>
+      IMPLICIT NONE<a name='226'>
+<font color=#447700>!-------------------------------------------------------------------<a name='227'></font>
+      REAL,     PARAMETER     ::        XKA=2.4E-5<a name='228'>
+      REAL,     PARAMETER     ::        PRT=1.<a name='229'>
+<a name='230'>
+      INTEGER,  INTENT(IN )   ::        ids,ide, jds,jde, kds,kde, &amp;<a name='231'>
+                                        ims,ime, jms,jme, kms,kme, &amp;<a name='232'>
+                                        its,ite, jts,jte, kts,kte, &amp;<a name='233'>
+                                        J<a name='234'>
+<font color=#447700>!                                                               <a name='235'></font>
+      INTEGER,  INTENT(IN )   ::        ISFFLX<a name='236'>
+      REAL,     INTENT(IN )   ::        SVP1,SVP2,SVP3,SVPT0<a name='237'>
+      REAL,     INTENT(IN )   ::        EP1,EP2,KARMAN,EOMEG,STBOLT<a name='238'>
+<a name='239'>
+<font color=#447700>!<a name='240'></font>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='241'>
+                INTENT(IN   )               ::             MAVAIL, &amp;<a name='242'>
+                                                             PBLH, &amp;<a name='243'>
+                                                            XLAND, &amp;<a name='244'>
+                                                              TSK<a name='245'>
+<font color=#447700>!<a name='246'></font>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='247'>
+                INTENT(IN   )               ::             PSFCPA<a name='248'>
+<a name='249'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='250'>
+                INTENT(INOUT)               ::             REGIME, &amp;<a name='251'>
+                                                              HFX, &amp;<a name='252'>
+                                                              QFX, &amp;<a name='253'>
+                                                         MOL,RMOL<a name='254'>
+<font color=#447700>!m the following 5 are changed to memory size---<a name='255'></font>
+<font color=#447700>!<a name='256'></font>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='257'>
+                INTENT(INOUT)   ::                 GZ1OZ0,WSPD,BR, &amp;<a name='258'>
+                                                        PSIM,PSIH<a name='259'>
+<a name='260'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='261'>
+                INTENT(INOUT)   ::                            ZNT, &amp;<a name='262'>
+                                                              ZOL, &amp;<a name='263'>
+                                                              UST, &amp;<a name='264'>
+                                                              CPM, &amp;<a name='265'>
+                                                             CHS2, &amp;<a name='266'>
+                                                             CQS2, &amp;<a name='267'>
+                                                              CHS<a name='268'>
+<a name='269'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='270'>
+                INTENT(INOUT)   ::                      FLHC,FLQC<a name='271'>
+<a name='272'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='273'>
+                INTENT(INOUT)   ::                                 &amp;<a name='274'>
+                                                              QGH<a name='275'>
+<a name='276'>
+      REAL,     DIMENSION( ims:ime )                             , &amp;<a name='277'>
+                INTENT(OUT)     ::                        U10,V10, &amp;<a name='278'>
+                                                TH2,T2,Q2,QSFC,LH<a name='279'>
+                                    <a name='280'>
+      REAL,     INTENT(IN   )               ::   CP,G,ROVCP,R,XLV,DX<a name='281'>
+<a name='282'>
+<font color=#447700>! MODULE-LOCAL VARIABLES, DEFINED IN SUBROUTINE SFCLAY<a name='283'></font>
+      REAL,     DIMENSION( its:ite ),  INTENT(IN   )   ::  dz8w1d<a name='284'>
+<a name='285'>
+      REAL,     DIMENSION( its:ite ),  INTENT(IN   )   ::      UX, &amp;<a name='286'>
+                                                               VX, &amp;<a name='287'>
+                                                             QV1D, &amp;<a name='288'>
+                                                              P1D, &amp;<a name='289'>
+                                                              T1D<a name='290'>
+ <a name='291'>
+<font color=#447700>! LOCAL VARS<a name='292'></font>
+<a name='293'>
+      REAL,     DIMENSION( its:ite )        ::                 ZA, &amp;<a name='294'>
+                                                        THVX,ZQKL, &amp;<a name='295'>
+                                                           ZQKLP1, &amp;<a name='296'>
+                                                           THX,QX, &amp;<a name='297'>
+                                                            PSIH2, &amp;<a name='298'>
+                                                            PSIM2, &amp;<a name='299'>
+                                                            PSIH10, &amp;<a name='300'>
+                                                            PSIM10, &amp;<a name='301'>
+                                                           GZ2OZ0, &amp;<a name='302'>
+                                                           GZ10OZ0<a name='303'>
+<font color=#447700>!<a name='304'></font>
+      REAL,     DIMENSION( its:ite )        ::                     &amp;<a name='305'>
+                                                      RHOX,GOVRTH, &amp;<a name='306'>
+                                                            TGDSA<a name='307'>
+<font color=#447700>!<a name='308'></font>
+      REAL,     DIMENSION( its:ite)         ::          SCR3,SCR4<a name='309'>
+      REAL,     DIMENSION( its:ite )        ::         THGB, PSFC<a name='310'>
+<font color=#447700>!<a name='311'></font>
+      INTEGER                               ::                 KL<a name='312'>
+<a name='313'>
+      INTEGER ::  N,I,K,KK,L,NZOL,NK,NZOL2,NZOL10<a name='314'>
+<a name='315'>
+      REAL    ::  PL,THCON,TVCON,E1<a name='316'>
+      REAL    ::  ZL,TSKV,DTHVDZ,DTHVM,VCONV,RZOL,RZOL2,RZOL10,ZOL2,ZOL10<a name='317'>
+      REAL    ::  DTG,PSIX,USTM,DTTHX,PSIX10,PSIT,PSIT2,PSIQ,PSIQ2<a name='318'>
+      REAL    ::  FLUXC,VSGD<a name='319'>
+<font color=#447700>!-------------------------------------------------------------------<a name='320'></font>
+      KL=kte<a name='321'>
+<a name='322'>
+      DO i=its,ite<a name='323'>
+<font color=#447700>! PSFC cmb<a name='324'></font>
+         PSFC(I)=PSFCPA(I)/1000.<a name='325'>
+      ENDDO<a name='326'>
+<font color=#447700>!                                                      <a name='327'></font>
+<font color=#447700>!----CONVERT GROUND TEMPERATURE TO POTENTIAL TEMPERATURE:  <a name='328'></font>
+<font color=#447700>!                                                            <a name='329'></font>
+      DO 5 I=its,ite                                   <a name='330'>
+        TGDSA(I)=TSK(I)                                    <a name='331'>
+<font color=#447700>! PSFC cmb<a name='332'></font>
+        THGB(I)=TSK(I)*(100./PSFC(I))**ROVCP                <a name='333'>
+    5 CONTINUE                                               <a name='334'>
+<font color=#447700>!                                                            <a name='335'></font>
+<font color=#447700>!-----DECOUPLE FLUX-FORM VARIABLES TO GIVE U,V,T,THETA,THETA-VIR.,<a name='336'></font>
+<font color=#447700>!     T-VIR., QV, AND QC AT CROSS POINTS AND AT KTAU-1.  <a name='337'></font>
+<font color=#447700>!                                                                 <a name='338'></font>
+<font color=#447700>!     *** NOTE ***                                           <a name='339'></font>
+<font color=#447700>!         THE BOUNDARY WINDS MAY NOT BE ADEQUATELY AFFECTED BY FRICTION,         <a name='340'></font>
+<font color=#447700>!         SO USE ONLY INTERIOR VALUES OF UX AND VX TO CALCULATE <a name='341'></font>
+<font color=#447700>!         TENDENCIES.                             <a name='342'></font>
+<font color=#447700>!                                                           <a name='343'></font>
+   10 CONTINUE                                                     <a name='344'>
+<a name='345'>
+<font color=#447700>!     DO 24 I=its,ite<a name='346'></font>
+<font color=#447700>!        UX(I)=U1D(I)<a name='347'></font>
+<font color=#447700>!        VX(I)=V1D(I)<a name='348'></font>
+<font color=#447700>!  24 CONTINUE                                             <a name='349'></font>
+                                                             <a name='350'>
+   26 CONTINUE                                               <a name='351'>
+                                                   <a name='352'>
+<font color=#447700>!.....SCR3(I,K) STORE TEMPERATURE,                           <a name='353'></font>
+<font color=#447700>!     SCR4(I,K) STORE VIRTUAL TEMPERATURE.                                       <a name='354'></font>
+                                                                                 <a name='355'>
+      DO 30 I=its,ite<a name='356'>
+<font color=#447700>! PL cmb<a name='357'></font>
+         PL=P1D(I)/1000.<a name='358'>
+         SCR3(I)=T1D(I)                                                   <a name='359'>
+         THCON=(100./PL)**ROVCP                                                 <a name='360'>
+         THX(I)=SCR3(I)*THCON                                               <a name='361'>
+         SCR4(I)=SCR3(I)                                                    <a name='362'>
+         THVX(I)=THX(I)                                                     <a name='363'>
+         QX(I)=0.                                                             <a name='364'>
+   30 CONTINUE                                                                 <a name='365'>
+<font color=#447700>!                                                                                <a name='366'></font>
+      DO I=its,ite<a name='367'>
+         QGH(I)=0.                                                                <a name='368'>
+         FLHC(I)=0.                                                               <a name='369'>
+         FLQC(I)=0.                                                               <a name='370'>
+         CPM(I)=CP                                                                <a name='371'>
+      ENDDO<a name='372'>
+<font color=#447700>!                                                                                <a name='373'></font>
+<font color=#447700>!     IF(IDRY.EQ.1)GOTO 80                                                   <a name='374'></font>
+      DO 50 I=its,ite<a name='375'>
+         QX(I)=QV1D(I)                                                    <a name='376'>
+         TVCON=(1.+EP1*QX(I))                                      <a name='377'>
+         THVX(I)=THX(I)*TVCON                                               <a name='378'>
+         SCR4(I)=SCR3(I)*TVCON                                              <a name='379'>
+   50 CONTINUE                                                                 <a name='380'>
+<font color=#447700>!                                                                                <a name='381'></font>
+      DO 60 I=its,ite<a name='382'>
+        E1=SVP1*EXP(SVP2*(TGDSA(I)-SVPT0)/(TGDSA(I)-SVP3))                       <a name='383'>
+        QSFC(I)=EP2*E1/(PSFC(I)-E1)                                                 <a name='384'>
+<font color=#447700>! QGH CHANGED TO USE LOWEST-LEVEL AIR TEMP CONSISTENT WITH MYJSFC CHANGE<a name='385'></font>
+<font color=#447700>! Q2SAT = QGH IN LSM<a name='386'></font>
+        E1=SVP1*EXP(SVP2*(T1D(I)-SVPT0)/(T1D(I)-SVP3))                       <a name='387'>
+        QGH(I)=EP2*E1/(PSFC(I)-E1)                                                 <a name='388'>
+        CPM(I)=CP*(1.+0.8*QX(I))                                   <a name='389'>
+   60 CONTINUE                                                                   <a name='390'>
+   80 CONTINUE<a name='391'>
+                                                                                 <a name='392'>
+<font color=#447700>!-----COMPUTE THE HEIGHT OF FULL- AND HALF-SIGMA LEVELS ABOVE GROUND             <a name='393'></font>
+<font color=#447700>!     LEVEL, AND THE LAYER THICKNESSES.                                          <a name='394'></font>
+                                                                                 <a name='395'>
+      DO 90 I=its,ite<a name='396'>
+        ZQKLP1(I)=0.<a name='397'>
+        RHOX(I)=PSFC(I)*1000./(R*SCR4(I))                                       <a name='398'>
+   90 CONTINUE                                                                   <a name='399'>
+<font color=#447700>!                                                                                <a name='400'></font>
+      DO 110 I=its,ite                                                   <a name='401'>
+           ZQKL(I)=dz8w1d(I)+ZQKLP1(I)<a name='402'>
+  110 CONTINUE                                                                 <a name='403'>
+<font color=#447700>!                                                                                <a name='404'></font>
+      DO 120 I=its,ite<a name='405'>
+         ZA(I)=0.5*(ZQKL(I)+ZQKLP1(I))                                        <a name='406'>
+  120 CONTINUE                                                                 <a name='407'>
+<font color=#447700>!                                                                                <a name='408'></font>
+      DO 160 I=its,ite<a name='409'>
+        GOVRTH(I)=G/THX(I)                                                    <a name='410'>
+  160 CONTINUE                                                                   <a name='411'>
+                                                                                 <a name='412'>
+<font color=#447700>!-----CALCULATE BULK RICHARDSON NO. OF SURFACE LAYER, ACCORDING TO               <a name='413'></font>
+<font color=#447700>!     AKB(1976), EQ(12).                                                         <a name='414'></font>
+                   <a name='415'>
+      DO 260 I=its,ite<a name='416'>
+        GZ1OZ0(I)=ALOG(ZA(I)/ZNT(I))                                        <a name='417'>
+        GZ2OZ0(I)=ALOG(2./ZNT(I))                                        <a name='418'>
+        GZ10OZ0(I)=ALOG(10./ZNT(I))                                        <a name='419'>
+        IF((XLAND(I)-1.5).GE.0)THEN                                            <a name='420'>
+          ZL=ZNT(I)                                                            <a name='421'>
+        ELSE                                                                     <a name='422'>
+          ZL=0.01                                                                <a name='423'>
+        ENDIF                                                                    <a name='424'>
+        WSPD(I)=SQRT(UX(I)*UX(I)+VX(I)*VX(I))                        <a name='425'>
+<a name='426'>
+        TSKV=THGB(I)*(1.+EP1*QSFC(I)*MAVAIL(I))                     <a name='427'>
+        DTHVDZ=(THVX(I)-TSKV)                                                 <a name='428'>
+<font color=#447700>!  Convective velocity scale Vc and subgrid-scale velocity Vsg<a name='429'></font>
+<font color=#447700>!  following Beljaars (1995, QJRMS) and Mahrt and Sun (1995, MWR)<a name='430'></font>
+<font color=#447700>!                                ... HONG Aug. 2001<a name='431'></font>
+<font color=#447700>!<a name='432'></font>
+<font color=#447700>!       VCONV = 0.25*sqrt(g/tskv*pblh(i)*dthvm)<a name='433'></font>
+        fluxc = max(hfx(i)/rhox(i)/cp                    &amp;<a name='434'>
+              + ep1*tskv*qfx(i)/rhox(i),0.)<a name='435'>
+        VCONV = vconvc*(g/tgdsa(i)*pblh(i)*fluxc)**.33<a name='436'>
+<font color=#447700>!       IF(-DTHVDZ.GE.0)THEN<a name='437'></font>
+<font color=#447700>!         DTHVM=-DTHVDZ<a name='438'></font>
+<font color=#447700>!       ELSE<a name='439'></font>
+<font color=#447700>!         DTHVM=0.<a name='440'></font>
+<font color=#447700>!       ENDIF<a name='441'></font>
+<font color=#447700>!       VCONV = max(vconv,VCONVC*SQRT(DTHVM))<a name='442'></font>
+<font color=#447700>! VCONV comes from Beljaars only<a name='443'></font>
+        VSGD = 0.32 * (max(dx/5000.-1.,0.))**.33<a name='444'>
+        WSPD(I)=SQRT(WSPD(I)*WSPD(I)+VCONV*VCONV+vsgd*vsgd)<a name='445'>
+        WSPD(I)=AMAX1(WSPD(I),0.1)<a name='446'>
+        BR(I)=GOVRTH(I)*ZA(I)*DTHVDZ/(WSPD(I)*WSPD(I))                        <a name='447'>
+<font color=#447700>!  IF PREVIOUSLY UNSTABLE, DO NOT LET INTO REGIMES 1 AND 2<a name='448'></font>
+        IF(MOL(I).LT.0.)BR(I)=AMIN1(BR(I),0.0)<a name='449'>
+  260 CONTINUE                                                                   <a name='450'>
+<a name='451'>
+<font color=#447700>!                                                                                <a name='452'></font>
+<font color=#447700>!-----DIAGNOSE BASIC PARAMETERS FOR THE APPROPRIATED STABILITY CLASS:            <a name='453'></font>
+<font color=#447700>!                                                                                <a name='454'></font>
+<font color=#447700>!                                                                                <a name='455'></font>
+<font color=#447700>!     THE STABILITY CLASSES ARE DETERMINED BY BR (BULK RICHARDSON NO.)           <a name='456'></font>
+<font color=#447700>!     AND HOL (HEIGHT OF PBL/MONIN-OBUKHOV LENGTH).                              <a name='457'></font>
+<font color=#447700>!                                                                                <a name='458'></font>
+<font color=#447700>!     CRITERIA FOR THE CLASSES ARE AS FOLLOWS:                                   <a name='459'></font>
+<font color=#447700>!                                                                                <a name='460'></font>
+<font color=#447700>!        1. BR .GE. 0.2;                                                         <a name='461'></font>
+<font color=#447700>!               REPRESENTS NIGHTTIME STABLE CONDITIONS (REGIME=1),               <a name='462'></font>
+<font color=#447700>!                                                                                <a name='463'></font>
+<font color=#447700>!        2. BR .LT. 0.2 .AND. BR .GT. 0.0;                                       <a name='464'></font>
+<font color=#447700>!               REPRESENTS DAMPED MECHANICAL TURBULENT CONDITIONS                <a name='465'></font>
+<font color=#447700>!               (REGIME=2),                                                      <a name='466'></font>
+<font color=#447700>!                                                                                <a name='467'></font>
+<font color=#447700>!        3. BR .EQ. 0.0                                                          <a name='468'></font>
+<font color=#447700>!               REPRESENTS FORCED CONVECTION CONDITIONS (REGIME=3),              <a name='469'></font>
+<font color=#447700>!                                                                                <a name='470'></font>
+<font color=#447700>!        4. BR .LT. 0.0                                                          <a name='471'></font>
+<font color=#447700>!               REPRESENTS FREE CONVECTION CONDITIONS (REGIME=4).                <a name='472'></font>
+<font color=#447700>!                                                                                <a name='473'></font>
+<font color=#447700>!CCCCC                                                                           <a name='474'></font>
+<a name='475'>
+      DO 320 I=its,ite<a name='476'>
+<font color=#447700>!CCCCC                                                                           <a name='477'></font>
+<font color=#447700>!CC     REMOVE REGIME 3 DEPENDENCE ON PBL HEIGHT                                 <a name='478'></font>
+<font color=#447700>!CC          IF(BR(I).LT.0..AND.HOL(I,J).GT.1.5)GOTO 310                         <a name='479'></font>
+        IF(BR(I).LT.0.)GOTO 310                                                  <a name='480'>
+<font color=#447700>!                                                                                <a name='481'></font>
+<font color=#447700>!-----CLASS 1; STABLE (NIGHTTIME) CONDITIONS:                                    <a name='482'></font>
+<font color=#447700>!                                                                                <a name='483'></font>
+        IF(BR(I).LT.0.2)GOTO 270                                                 <a name='484'>
+        REGIME(I)=1.                                                           <a name='485'>
+        PSIM(I)=-10.*GZ1OZ0(I)                                                   <a name='486'>
+<font color=#447700>!    LOWER LIMIT ON PSI IN STABLE CONDITIONS                                     <a name='487'></font>
+        PSIM(I)=AMAX1(PSIM(I),-10.)                                              <a name='488'>
+        PSIH(I)=PSIM(I)                                                          <a name='489'>
+        PSIM10(I)=10./ZA(I)*PSIM(I)<a name='490'>
+        PSIM10(I)=AMAX1(PSIM10(I),-10.)                               <a name='491'>
+        PSIH10(I)=PSIM10(I)                                          <a name='492'>
+        PSIM2(I)=2./ZA(I)*PSIM(I)<a name='493'>
+        PSIM2(I)=AMAX1(PSIM2(I),-10.)                              <a name='494'>
+        PSIH2(I)=PSIM2(I)                                         <a name='495'>
+<a name='496'>
+        GOTO 320                                                                 <a name='497'>
+<font color=#447700>!                                                                                <a name='498'></font>
+<font color=#447700>!-----CLASS 2; DAMPED MECHANICAL TURBULENCE:                                     <a name='499'></font>
+<font color=#447700>!                                                                                <a name='500'></font>
+  270   IF(BR(I).EQ.0.0)GOTO 280                                                 <a name='501'>
+        REGIME(I)=2.                                                           <a name='502'>
+        PSIM(I)=-5.0*BR(I)*GZ1OZ0(I)/(1.1-5.0*BR(I))                             <a name='503'>
+<font color=#447700>!    LOWER LIMIT ON PSI IN STABLE CONDITIONS                                     <a name='504'></font>
+        PSIM(I)=AMAX1(PSIM(I),-10.)                                              <a name='505'>
+<font color=#447700>!.....AKB(1976), EQ(16).                                                         <a name='506'></font>
+        PSIH(I)=PSIM(I)                                                          <a name='507'>
+        PSIM10(I)=10./ZA(I)*PSIM(I)<a name='508'>
+        PSIM10(I)=AMAX1(PSIM10(I),-10.)                               <a name='509'>
+        PSIH10(I)=PSIM10(I)                                          <a name='510'>
+        PSIM2(I)=2./ZA(I)*PSIM(I)<a name='511'>
+        PSIM2(I)=AMAX1(PSIM2(I),-10.)                              <a name='512'>
+        PSIH2(I)=PSIM2(I)                                         <a name='513'>
+        GOTO 320                                                                 <a name='514'>
+<font color=#447700>!                                                                                <a name='515'></font>
+<font color=#447700>!-----CLASS 3; FORCED CONVECTION:                                                <a name='516'></font>
+<font color=#447700>!                                                                                <a name='517'></font>
+  280   REGIME(I)=3.                                                           <a name='518'>
+        PSIM(I)=0.0                                                              <a name='519'>
+        PSIH(I)=PSIM(I)                                                          <a name='520'>
+        PSIM10(I)=0.                                                   <a name='521'>
+        PSIH10(I)=PSIM10(I)                                           <a name='522'>
+        PSIM2(I)=0.                                                  <a name='523'>
+        PSIH2(I)=PSIM2(I)                                           <a name='524'>
+<a name='525'>
+                                                                                 <a name='526'>
+        IF(UST(I).LT.0.01)THEN                                                 <a name='527'>
+          ZOL(I)=BR(I)*GZ1OZ0(I)                                               <a name='528'>
+        ELSE                                                                     <a name='529'>
+          ZOL(I)=KARMAN*GOVRTH(I)*ZA(I)*MOL(I)/(UST(I)*UST(I)) <a name='530'>
+        ENDIF                                                                    <a name='531'>
+<a name='532'>
+        GOTO 320                                                                 <a name='533'>
+<font color=#447700>!                                                                                <a name='534'></font>
+<font color=#447700>!-----CLASS 4; FREE CONVECTION:                                                  <a name='535'></font>
+<font color=#447700>!                                                                                <a name='536'></font>
+  310   CONTINUE                                                                 <a name='537'>
+        REGIME(I)=4.                                                           <a name='538'>
+        IF(UST(I).LT.0.01)THEN                                                 <a name='539'>
+          ZOL(I)=BR(I)*GZ1OZ0(I)                                               <a name='540'>
+        ELSE                                                                     <a name='541'>
+          ZOL(I)=KARMAN*GOVRTH(I)*ZA(I)*MOL(I)/(UST(I)*UST(I))<a name='542'>
+        ENDIF                                                                    <a name='543'>
+        ZOL10=10./ZA(I)*ZOL(I)                                    <a name='544'>
+        ZOL2=2./ZA(I)*ZOL(I)                                     <a name='545'>
+        ZOL(I)=AMIN1(ZOL(I),0.)                                              <a name='546'>
+        ZOL(I)=AMAX1(ZOL(I),-9.9999)                                         <a name='547'>
+        ZOL10=AMIN1(ZOL10,0.)                                          <a name='548'>
+        ZOL10=AMAX1(ZOL10,-9.9999)                                    <a name='549'>
+        ZOL2=AMIN1(ZOL2,0.)                                          <a name='550'>
+        ZOL2=AMAX1(ZOL2,-9.9999)                                    <a name='551'>
+        NZOL=INT(-ZOL(I)*100.)                                                 <a name='552'>
+        RZOL=-ZOL(I)*100.-NZOL                                                 <a name='553'>
+        NZOL10=INT(-ZOL10*100.)                                        <a name='554'>
+        RZOL10=-ZOL10*100.-NZOL10                                     <a name='555'>
+        NZOL2=INT(-ZOL2*100.)                                        <a name='556'>
+        RZOL2=-ZOL2*100.-NZOL2                                      <a name='557'>
+        PSIM(I)=PSIMTB(NZOL)+RZOL*(PSIMTB(NZOL+1)-PSIMTB(NZOL))                  <a name='558'>
+        PSIH(I)=PSIHTB(NZOL)+RZOL*(PSIHTB(NZOL+1)-PSIHTB(NZOL))                  <a name='559'>
+        PSIM10(I)=PSIMTB(NZOL10)+RZOL10*(PSIMTB(NZOL10+1)-PSIMTB(NZOL10))                                                    <a name='560'>
+        PSIH10(I)=PSIHTB(NZOL10)+RZOL10*(PSIHTB(NZOL10+1)-PSIHTB(NZOL10))<a name='561'>
+        PSIM2(I)=PSIMTB(NZOL2)+RZOL2*(PSIMTB(NZOL2+1)-PSIMTB(NZOL2))    <a name='562'>
+        PSIH2(I)=PSIHTB(NZOL2)+RZOL2*(PSIHTB(NZOL2+1)-PSIHTB(NZOL2))   <a name='563'>
+<a name='564'>
+<font color=#447700>!---LIMIT PSIH AND PSIM IN THE CASE OF THIN LAYERS AND HIGH ROUGHNESS            <a name='565'></font>
+<font color=#447700>!---  THIS PREVENTS DENOMINATOR IN FLUXES FROM GETTING TOO SMALL                 <a name='566'></font>
+        PSIH(I)=AMIN1(PSIH(I),0.9*GZ1OZ0(I))                                     <a name='567'>
+        PSIM(I)=AMIN1(PSIM(I),0.9*GZ1OZ0(I))                                     <a name='568'>
+        PSIH2(I)=AMIN1(PSIH2(I),0.9*GZ2OZ0(I))                                     <a name='569'>
+        PSIM10(I)=AMIN1(PSIM10(I),0.9*GZ10OZ0(I))                                     <a name='570'>
+  320 CONTINUE                                                                   <a name='571'>
+<font color=#447700>!                                                                                <a name='572'></font>
+<font color=#447700>!-----COMPUTE THE FRICTIONAL VELOCITY:                                           <a name='573'></font>
+<font color=#447700>!     ZA(1982) EQS(2.60),(2.61).                                                 <a name='574'></font>
+<font color=#447700>!                                                                                <a name='575'></font>
+      DO 330 I=its,ite<a name='576'>
+        DTG=THX(I)-THGB(I)                                                   <a name='577'>
+        PSIX=GZ1OZ0(I)-PSIM(I)                                                   <a name='578'>
+        PSIX10=GZ10OZ0(I)-PSIM10(I)<a name='579'>
+<font color=#447700>!     LOWER LIMIT ADDED TO PREVENT LARGE FLHC IN SOIL MODEL<a name='580'></font>
+<font color=#447700>!     ACTIVATES IN UNSTABLE CONDITIONS WITH THIN LAYERS OR HIGH Z0<a name='581'></font>
+        PSIT=AMAX1(GZ1OZ0(I)-PSIH(I),2.)<a name='582'>
+<a name='583'>
+        IF((XLAND(I)-1.5).GE.0)THEN                                            <a name='584'>
+          ZL=ZNT(I)                                                            <a name='585'>
+        ELSE                                                                     <a name='586'>
+          ZL=0.01                                                                <a name='587'>
+        ENDIF                                                                    <a name='588'>
+        PSIQ=ALOG(KARMAN*UST(I)*ZA(I)/XKA+ZA(I)/ZL)-PSIH(I)   <a name='589'>
+        PSIT2=GZ2OZ0(I)-PSIH2(I)                                     <a name='590'>
+        PSIQ2=ALOG(KARMAN*UST(I)*2./XKA+2./ZL)-PSIH2(I)                                   <a name='591'>
+<font color=#447700>! TO PREVENT OSCILLATIONS AVERAGE WITH OLD VALUE <a name='592'></font>
+        UST(I)=0.5*UST(I)+0.5*KARMAN*WSPD(I)/PSIX                                             <a name='593'>
+        U10(I)=UX(I)*PSIX10/PSIX                                    <a name='594'>
+        V10(I)=VX(I)*PSIX10/PSIX                                   <a name='595'>
+        TH2(I)=THGB(I)+DTG*PSIT2/PSIT                                <a name='596'>
+        Q2(I)=QSFC(I)+(QX(I)-QSFC(I))*PSIQ2/PSIQ                   <a name='597'>
+        T2(I) = TH2(I)*(PSFC(I)/100.)**ROVCP                     <a name='598'>
+<font color=#447700>!       LATER Q2 WILL BE OVERWRITTEN FOR LAND POINTS IN SURFCE     <a name='599'></font>
+<font color=#447700>!       QA2(I,J) = Q2(I)                                         <a name='600'></font>
+<font color=#447700>!       UA10(I,J) = U10(I)                                      <a name='601'></font>
+<font color=#447700>!       VA10(I,J) = V10(I)                                     <a name='602'></font>
+<font color=#447700>!       write(*,1002)UST(I),KARMAN*WSPD(I),PSIX,KARMAN*WSPD(I)/PSIX<a name='603'></font>
+<font color=#447700>!                                                                                <a name='604'></font>
+        USTM=AMAX1(UST(I),0.1)                                                 <a name='605'>
+        IF((XLAND(I)-1.5).GE.0)THEN                                            <a name='606'>
+          UST(I)=UST(I)                                                      <a name='607'>
+        ELSE                                                                     <a name='608'>
+          UST(I)=USTM                                                          <a name='609'>
+        ENDIF                                                                    <a name='610'>
+<font color=#447700>!       write(*,1002)UST(I),USTM,I,J<a name='611'></font>
+ 1002   format(f15.12,2x,f15.12,2x,f15.12,2x,f15.12,2x,f15.12)<a name='612'>
+        MOL(I)=KARMAN*DTG/PSIT/PRT                              <a name='613'>
+  330 CONTINUE                                                                   <a name='614'>
+<font color=#447700>!                                                                                <a name='615'></font>
+  335 CONTINUE                                                                   <a name='616'>
+                                                                                  <a name='617'>
+<font color=#447700>!-----COMPUTE THE SURFACE SENSIBLE AND LATENT HEAT FLUXES:                       <a name='618'></font>
+                                                                                 <a name='619'>
+      DO i=its,ite<a name='620'>
+        QFX(i)=0.                                                              <a name='621'>
+        HFX(i)=0.                                                              <a name='622'>
+      ENDDO<a name='623'>
+<a name='624'>
+      IF (ISFFLX.EQ.0) GOTO 410                                                <a name='625'>
+                                                                                 <a name='626'>
+<font color=#447700>!-----OVER WATER, ALTER ROUGHNESS LENGTH (ZNT) ACCORDING TO WIND (UST).          <a name='627'></font>
+                                                                                 <a name='628'>
+      DO 360 I=its,ite<a name='629'>
+        IF((XLAND(I)-1.5).GE.0)THEN                                            <a name='630'>
+          ZNT(I)=CZO*UST(I)*UST(I)/G+OZO                                   <a name='631'>
+        ENDIF                                                                    <a name='632'>
+        IF((XLAND(I)-1.5).GE.0)THEN                                            <a name='633'>
+          ZL=ZNT(I)                                                            <a name='634'>
+        ELSE                                                                     <a name='635'>
+          ZL=0.01                                                                <a name='636'>
+        ENDIF                                                                    <a name='637'>
+        FLQC(I)=RHOX(I)*MAVAIL(I)*UST(I)*KARMAN/(   &amp; <a name='638'>
+                ALOG(KARMAN*UST(I)*ZA(I)/XKA+ZA(I)/ZL)-PSIH(I))          <a name='639'>
+        DTTHX=ABS(THX(I)-THGB(I))                                            <a name='640'>
+        IF(DTTHX.GT.1.E-5)THEN                                                   <a name='641'>
+          FLHC(I)=CPM(I)*RHOX(I)*UST(I)*MOL(I)/(THX(I)-THGB(I))          <a name='642'>
+<font color=#447700>!         write(*,1001)FLHC(I),CPM(I),RHOX(I),UST(I),MOL(I),THX(I),THGB(I),I<a name='643'></font>
+ 1001   format(f8.5,2x,f12.7,2x,f12.10,2x,f12.10,2x,f13.10,2x,f12.8,f12.8,2x,i3)<a name='644'>
+        ELSE                                                                     <a name='645'>
+          FLHC(I)=0.                                                             <a name='646'>
+        ENDIF                                                                    <a name='647'>
+  360 CONTINUE                                                                   <a name='648'>
+<a name='649'>
+<font color=#447700>!                                                                                <a name='650'></font>
+<font color=#447700>!-----COMPUTE SURFACE MOIST FLUX:                                                <a name='651'></font>
+<font color=#447700>!                                                                                <a name='652'></font>
+<font color=#447700>!     IF(IDRY.EQ.1)GOTO 390                                                <a name='653'></font>
+<font color=#447700>!                                                                                <a name='654'></font>
+      DO 370 I=its,ite<a name='655'>
+        QFX(I)=FLQC(I)*(QSFC(I)-QX(I))                                     <a name='656'>
+        QFX(I)=AMAX1(QFX(I),0.)                                            <a name='657'>
+        LH(I)=XLV*QFX(I)<a name='658'>
+  370 CONTINUE                                                                 <a name='659'>
+                                                                                <a name='660'>
+<font color=#447700>!-----COMPUTE SURFACE HEAT FLUX:                                                 <a name='661'></font>
+<font color=#447700>!                                                                                <a name='662'></font>
+  390 CONTINUE                                                                 <a name='663'>
+      DO 400 I=its,ite<a name='664'>
+        IF(XLAND(I)-1.5.GT.0.)THEN                                           <a name='665'>
+          HFX(I)=FLHC(I)*(THGB(I)-THX(I))                                <a name='666'>
+        ELSEIF(XLAND(I)-1.5.LT.0.)THEN                                       <a name='667'>
+          HFX(I)=FLHC(I)*(THGB(I)-THX(I))                                <a name='668'>
+          HFX(I)=AMAX1(HFX(I),-250.)                                       <a name='669'>
+        ENDIF                                                                  <a name='670'>
+  400 CONTINUE                                                                 <a name='671'>
+         <a name='672'>
+      DO I=its,ite<a name='673'>
+         IF((XLAND(I)-1.5).GE.0)THEN<a name='674'>
+           ZL=ZNT(I)<a name='675'>
+         ELSE<a name='676'>
+           ZL=0.01<a name='677'>
+         ENDIF<a name='678'>
+         CHS(I)=UST(I)*KARMAN/(ALOG(KARMAN*UST(I)*ZA(I) &amp;<a name='679'>
+                /XKA+ZA(I)/ZL)-PSIH(I))<a name='680'>
+<font color=#447700>!        GZ2OZ0(I)=ALOG(2./ZNT(I))<a name='681'></font>
+<font color=#447700>!        PSIM2(I)=-10.*GZ2OZ0(I)<a name='682'></font>
+<font color=#447700>!        PSIM2(I)=AMAX1(PSIM2(I),-10.)<a name='683'></font>
+<font color=#447700>!        PSIH2(I)=PSIM2(I)<a name='684'></font>
+         CQS2(I)=UST(I)*KARMAN/(ALOG(KARMAN*UST(I)*2.0  &amp;<a name='685'>
+               /XKA+2.0/ZL)-PSIH2(I))<a name='686'>
+         CHS2(I)=UST(I)*KARMAN/(GZ2OZ0(I)-PSIH2(I))<a name='687'>
+      ENDDO<a name='688'>
+                                                                        <a name='689'>
+  410 CONTINUE                                                                   <a name='690'>
+  <a name='691'>
+<font color=#447700>!                                                                                <a name='692'></font>
+   END SUBROUTINE SFCLAY1D<a name='693'>
+<a name='694'>
+<font color=#447700>!====================================================================<a name='695'></font>
+<A NAME='SFCLAYINIT'><A href='../../html_code/phys/module_sf_sfclay.F.html#SFCLAYINIT' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='696'>
+   <font color=#993300>SUBROUTINE </font><font color=#cc0000>sfclayinit</font>( allowed_to_read )          <A href='../../call_to/SFCLAYINIT.html' TARGET='index'>1</A><a name='697'>
+<a name='698'>
+   LOGICAL , INTENT(IN)      ::      allowed_to_read<a name='699'>
+   INTEGER                   ::      N<a name='700'>
+   REAL                      ::      ZOLN,X,Y<a name='701'>
+<a name='702'>
+   DO N=0,1000<a name='703'>
+      ZOLN=-FLOAT(N)*0.01<a name='704'>
+      X=(1-16.*ZOLN)**0.25<a name='705'>
+      PSIMTB(N)=2*ALOG(0.5*(1+X))+ALOG(0.5*(1+X*X))- &amp;<a name='706'>
+                2.*ATAN(X)+2.*ATAN(1.)<a name='707'>
+      Y=(1-16*ZOLN)**0.5<a name='708'>
+      PSIHTB(N)=2*ALOG(0.5*(1+Y))<a name='709'>
+   ENDDO<a name='710'>
+<a name='711'>
+   END SUBROUTINE sfclayinit<a name='712'>
+<a name='713'>
+<font color=#447700>!-------------------------------------------------------------------          <a name='714'></font>
+<a name='715'>
+END MODULE module_sf_sfclay<a name='716'>
+</pre></body></html>

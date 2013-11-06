@@ -1,0 +1,99 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='MODULE_INIT_UTILITIES'><A href='../../html_code/dyn_em/module_init_utilities.F.html#MODULE_INIT_UTILITIES' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='2'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_init_utilities</font> <A href='../../call_to/MODULE_INIT_UTILITIES.html' TARGET='index'>6</A><a name='3'>
+<a name='4'>
+CONTAINS<a name='5'>
+<a name='6'>
+<A NAME='INTERP_0'><A href='../../html_code/dyn_em/module_init_utilities.F.html#INTERP_0' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='7'>
+ real <font color=#993300>function </font><font color=#cc0000>interp_0</font>( v_in,  &amp; <A href='../../call_to/INTERP_0.html' TARGET='index'>57</A><a name='8'>
+                         z_in, z_out, nz_in  )<a name='9'>
+ implicit none<a name='10'>
+ integer nz_in, nz_out<a name='11'>
+ real    v_in(nz_in), z_in(nz_in)<a name='12'>
+ real    z_out<a name='13'>
+<a name='14'>
+ integer kp, k, im, ip<a name='15'>
+ logical interp, increasing_z <a name='16'>
+ real    height, w1, w2<a name='17'>
+ logical debug<a name='18'>
+ parameter ( debug = .false. )<a name='19'>
+<a name='20'>
+<font color=#447700>! does vertical coordinate increase or decrease with increasing k?<a name='21'></font>
+<font color=#447700>! set offset appropriately<a name='22'></font>
+<a name='23'>
+ height = z_out<a name='24'>
+<a name='25'>
+ if(debug) write(6,*) ' height in interp_0 ',height<a name='26'>
+<a name='27'>
+ if (z_in(nz_in) .gt. z_in(1)) then<a name='28'>
+<a name='29'>
+    if(debug) write(6,*) ' monotonic increase in z in interp_0 '<a name='30'>
+    IF (height &gt; z_in(nz_in)) then<a name='31'>
+      if(debug) write(6,*) ' point 1 in interp_0 '<a name='32'>
+      w2 = (z_in(nz_in)-height)/(z_in(nz_in)-z_in(nz_in-1))<a name='33'>
+      w1 = 1.-w2<a name='34'>
+      interp_0 = w1*v_in(nz_in) + w2*v_in(nz_in-1)<a name='35'>
+    ELSE IF (height &lt; z_in(1)) then<a name='36'>
+      if(debug) write(6,*) ' point 2 in interp_0 '<a name='37'>
+      w2 = (z_in(2)-height)/(z_in(2)-z_in(1))<a name='38'>
+      w1 = 1.-w2<a name='39'>
+      interp_0 = w1*v_in(2) + w2*v_in(1)<a name='40'>
+    ELSE<a name='41'>
+      if(debug) write(6,*) ' point 3 in interp_0 '<a name='42'>
+      interp = .false.<a name='43'>
+      kp = nz_in<a name='44'>
+      DO WHILE ( (interp .eqv. .false.) .and. (kp .ge. 2) )<a name='45'>
+        IF(   ((z_in(kp)   .ge. height) .and.     &amp;<a name='46'>
+               (z_in(kp-1) .le. height))        )   THEN<a name='47'>
+          w2 = (height-z_in(kp))/(z_in(kp-1)-z_in(kp))<a name='48'>
+          w1 = 1.-w2<a name='49'>
+          interp_0 = w1*v_in(kp) + w2*v_in(kp-1)<a name='50'>
+          if(debug) write(6,*) ' interp data, kp, w1, w2 ',kp, w1, w2<a name='51'>
+          if(debug) write(6,*) ' interp data, v_in(kp), v_in(kp-1), interp_0 ', &amp;<a name='52'>
+                     v_in(kp), v_in(kp-1), interp_0<a name='53'>
+          interp = .true.<a name='54'>
+        END IF<a name='55'>
+        kp = kp-1<a name='56'>
+      ENDDO<a name='57'>
+    ENDIF<a name='58'>
+<a name='59'>
+ else<a name='60'>
+<a name='61'>
+    if(debug) write(6,*) ' monotonic decrease in z in interp_0 '<a name='62'>
+<a name='63'>
+    IF (height &lt; z_in(nz_in)) then<a name='64'>
+      if(debug) write(6,*) ' point 1 in interp_0 '<a name='65'>
+      w2 = (z_in(nz_in)-height)/(z_in(nz_in)-z_in(nz_in-1))<a name='66'>
+      w1 = 1.-w2<a name='67'>
+      interp_0 = w1*v_in(nz_in) + w2*v_in(nz_in-1)<a name='68'>
+    ELSE IF (height &gt; z_in(1)) then<a name='69'>
+      if(debug) write(6,*) ' point 2 in interp_0 '<a name='70'>
+      w2 = (z_in(2)-height)/(z_in(2)-z_in(1))<a name='71'>
+      w1 = 1.-w2<a name='72'>
+      interp_0 = w1*v_in(2) + w2*v_in(1)<a name='73'>
+    ELSE<a name='74'>
+      if(debug) write(6,*) ' point 3 in interp_0 '<a name='75'>
+      interp = .false.<a name='76'>
+      kp = nz_in<a name='77'>
+      height = z_out<a name='78'>
+      DO WHILE ( (interp .eqv. .false.) .and. (kp .ge. 2) )<a name='79'>
+        IF(   ((z_in(kp)   .le. height) .and.     &amp;<a name='80'>
+               (z_in(kp-1) .ge. height))             )   THEN<a name='81'>
+          w2 = (height-z_in(kp))/(z_in(kp-1)-z_in(kp))<a name='82'>
+          w1 = 1.-w2<a name='83'>
+          interp_0 = w1*v_in(kp) + w2*v_in(kp-1)<a name='84'>
+          interp = .true.<a name='85'>
+        END IF<a name='86'>
+        kp = kp-1<a name='87'>
+      ENDDO<a name='88'>
+    ENDIF<a name='89'>
+<a name='90'>
+ end if<a name='91'>
+<a name='92'>
+ return<a name='93'>
+ END FUNCTION interp_0<a name='94'>
+<a name='95'>
+END MODULE module_init_utilities<a name='96'>
+<a name='97'>
+<a name='98'>
+</pre></body></html>

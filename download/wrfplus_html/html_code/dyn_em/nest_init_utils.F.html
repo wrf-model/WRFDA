@@ -1,0 +1,261 @@
+<HTML> <BODY BGCOLOR=#cceeee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<A NAME='INIT_DOMAIN_CONSTANTS_EM'><A href='../../html_code/dyn_em/nest_init_utils.F.html#INIT_DOMAIN_CONSTANTS_EM' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='2'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>init_domain_constants_em</font> ( parent , nest ) <A href='../../call_to/INIT_DOMAIN_CONSTANTS_EM.html' TARGET='index'>1</A>,<A href='../../call_from/INIT_DOMAIN_CONSTANTS_EM.html' TARGET='index'>3</A><a name='3'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#INIT_DOMAIN_CONSTANTS_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_13"><a name='4'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#INIT_DOMAIN_CONSTANTS_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_25"><a name='5'>
+   IMPLICIT NONE<a name='6'>
+   TYPE(domain)  :: parent , nest<a name='7'>
+<a name='8'>
+   INTEGER iswater , map_proj, julyr, julday<a name='9'>
+   REAL    cen_lat, cen_lon, truelat1 , truelat2 , gmt , moad_cen_lat , stand_lon<a name='10'>
+   CHARACTER (LEN=4) :: char_junk<a name='11'>
+<a name='12'>
+<font color=#447700>! single-value constants<a name='13'></font>
+<a name='14'>
+   nest%p_top   = parent%p_top<a name='15'>
+   nest%cfn     = parent%cfn<a name='16'>
+   nest%cfn1    = parent%cfn1<a name='17'>
+   nest%epsts   = parent%epsts<a name='18'>
+   nest%rdx     = 1./nest%dx<a name='19'>
+   nest%rdy     = 1./nest%dy<a name='20'>
+<font color=#447700>!  nest%dts     = nest%dt/float(nest%time_step_sound)<a name='21'></font>
+   nest%dtseps  = parent%dtseps  <font color=#447700>! used in height model only?<a name='22'></font>
+   nest%resm    = parent%resm    <font color=#447700>! used in height model only?<a name='23'></font>
+   nest%zetatop = parent%zetatop <font color=#447700>! used in height model only?<a name='24'></font>
+   nest%cf1     = parent%cf1<a name='25'>
+   nest%cf2     = parent%cf2<a name='26'>
+   nest%cf3     = parent%cf3<a name='27'>
+   nest%gmt     = parent%gmt<a name='28'>
+   nest%julyr   = parent%julyr<a name='29'>
+   nest%julday  = parent%julday<a name='30'>
+<a name='31'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#NL_GET_MMINLU'>nl_get_mminlu</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#INIT_DOMAIN_CONSTANTS_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="NL_GET_MMINLU_1"> ( 1,char_junk(1:4) )<a name='32'>
+   CALL nl_get_iswater (1, iswater )<a name='33'>
+   CALL nl_get_cen_lat ( 1 , cen_lat )<a name='34'>
+   CALL nl_get_cen_lon ( 1 , cen_lon )<a name='35'>
+   CALL nl_get_truelat1 ( 1 , truelat1 )<a name='36'>
+   CALL nl_get_truelat2 ( 1 , truelat2 )<a name='37'>
+   CALL nl_get_moad_cen_lat ( 1 , moad_cen_lat )<a name='38'>
+   CALL nl_get_stand_lon ( 1 , stand_lon )<a name='39'>
+   CALL nl_get_map_proj ( 1 , map_proj )<a name='40'>
+   CALL nl_get_gmt ( 1 , gmt)<a name='41'>
+   CALL nl_get_julyr ( 1 , julyr)<a name='42'>
+   CALL nl_get_julday ( 1 , julday)<a name='43'>
+   IF ( nest%id .NE. 1 ) THEN<a name='44'>
+     CALL nl_set_gmt (nest%id, gmt)<a name='45'>
+     CALL nl_set_julyr (nest%id, julyr)<a name='46'>
+     CALL nl_set_julday (nest%id, julday)<a name='47'>
+     CALL nl_set_iswater (nest%id, iswater )<a name='48'>
+     CALL nl_set_cen_lat ( nest%id , cen_lat )<a name='49'>
+     CALL nl_set_cen_lon ( nest%id , cen_lon )<a name='50'>
+     CALL nl_set_truelat1 ( nest%id , truelat1 )<a name='51'>
+     CALL nl_set_truelat2 ( nest%id , truelat2 )<a name='52'>
+     CALL nl_set_moad_cen_lat ( nest%id , moad_cen_lat )<a name='53'>
+     CALL nl_set_stand_lon ( nest%id , stand_lon )<a name='54'>
+     CALL nl_set_map_proj ( nest%id , map_proj )<a name='55'>
+   END IF<a name='56'>
+   nest%gmt     = gmt <a name='57'>
+   nest%julday  = julday<a name='58'>
+   nest%julyr   = julyr<a name='59'>
+   nest%iswater = iswater<a name='60'>
+   nest%cen_lat = cen_lat<a name='61'>
+   nest%cen_lon = cen_lon<a name='62'>
+   nest%truelat1= truelat1<a name='63'>
+   nest%truelat2= truelat2<a name='64'>
+   nest%moad_cen_lat= moad_cen_lat<a name='65'>
+   nest%stand_lon= stand_lon<a name='66'>
+   nest%map_proj= map_proj<a name='67'>
+<a name='68'>
+   nest%step_number  = parent%step_number<a name='69'>
+<a name='70'>
+<font color=#447700>! 1D constants (Z)<a name='71'></font>
+<a name='72'>
+   nest%em_fnm    = parent%em_fnm<a name='73'>
+   nest%em_fnp    = parent%em_fnp<a name='74'>
+   nest%em_rdnw   = parent%em_rdnw<a name='75'>
+   nest%em_rdn    = parent%em_rdn<a name='76'>
+   nest%em_dnw    = parent%em_dnw<a name='77'>
+   nest%em_dn     = parent%em_dn<a name='78'>
+   nest%em_znu    = parent%em_znu<a name='79'>
+   nest%em_znw    = parent%em_znw<a name='80'>
+   nest%em_t_base = parent%em_t_base<a name='81'>
+   nest%u_base    = parent%u_base<a name='82'>
+   nest%v_base    = parent%v_base<a name='83'>
+   nest%qv_base   = parent%qv_base<a name='84'>
+   nest%dzs       = parent%dzs<a name='85'>
+   nest%zs        = parent%zs<a name='86'>
+<a name='87'>
+END SUBROUTINE init_domain_constants_em<a name='88'>
+<a name='89'>
+<A NAME='BLEND_TERRAIN'><A href='../../html_code/dyn_em/nest_init_utils.F.html#BLEND_TERRAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='90'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>blend_terrain</font> ( ter_interpolated , ter_input , &amp; <A href='../../call_to/BLEND_TERRAIN.html' TARGET='index'>3</A>,<A href='../../call_from/BLEND_TERRAIN.html' TARGET='index'>1</A><a name='91'>
+                           ids , ide , jds , jde , kds , kde , &amp; <a name='92'>
+                           ims , ime , jms , jme , kms , kme , &amp; <a name='93'>
+                           ips , ipe , jps , jpe , kps , kpe )<a name='94'>
+<a name='95'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#BLEND_TERRAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_26"><a name='96'>
+   IMPLICIT NONE<a name='97'>
+<a name='98'>
+   INTEGER , INTENT(IN)                       :: ids , ide , jds , jde , kds , kde , &amp; <a name='99'>
+                                                 ims , ime , jms , jme , kms , kme , &amp; <a name='100'>
+                                                 ips , ipe , jps , jpe , kps , kpe<a name='101'>
+   REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(IN)    :: ter_interpolated<a name='102'>
+   REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(INOUT) :: ter_input<a name='103'>
+<a name='104'>
+   REAL , DIMENSION(ims:ime,kms:kme,jms:jme) :: ter_temp<a name='105'>
+   INTEGER :: i , j , k , spec_zone<a name='106'>
+<a name='107'>
+   <font color=#447700>!  The fine grid elevation comes from the horizontally intterpolated<a name='108'></font>
+   <font color=#447700>!  parent elevation for the first spec_zone row/columns, so we need<a name='109'></font>
+   <font color=#447700>!  to get that value.<a name='110'></font>
+<a name='111'>
+   CALL nl_get_spec_zone ( 1, spec_zone) <a name='112'>
+<a name='113'>
+   <font color=#447700>!  Initialize temp values to the nest ter elevation.  This fills in the values<a name='114'></font>
+   <font color=#447700>!  that will not be modified below.  <a name='115'></font>
+<a name='116'>
+   DO j = jps , MIN(jpe, jde-1)<a name='117'>
+      DO k = kps , kpe<a name='118'>
+         DO i = ips , MIN(ipe, ide-1)<a name='119'>
+            ter_temp(i,k,j) = ter_input(i,k,j)<a name='120'>
+         END DO <a name='121'>
+      END DO <a name='122'>
+   END DO <a name='123'>
+<a name='124'>
+   <font color=#447700>!  To avoid some tricky indexing, we fill in the values inside out.  This allows<a name='125'></font>
+   <font color=#447700>!  us to overwrite incorrect assignments.  There are replicated assignments, and<a name='126'></font>
+   <font color=#447700>!  there is much unnecessary "IF test inside of a loop" stuff.  For a large<a name='127'></font>
+   <font color=#447700>!  domain, this is only a patch; for a small domain, this is not a biggy.<a name='128'></font>
+<a name='129'>
+   DO j = jps , MIN(jpe, jde-1)<a name='130'>
+      DO k = kps , kpe<a name='131'>
+         DO i = ips , MIN(ipe, ide-1)<a name='132'>
+   <a name='133'>
+            <font color=#447700>!  3 points out of the spec zone, 25% parent, 75% nest<a name='134'></font>
+   <a name='135'>
+            IF      ( ( i .EQ.       spec_zone + 3 ) .OR.  ( j .EQ.       spec_zone + 3 ) .OR. &amp;<a name='136'>
+                      ( i .EQ. ide - spec_zone - 3 ) .OR.  ( j .EQ. jde - spec_zone - 3 ) ) THEN<a name='137'>
+               ter_temp(i,k,j) = (    ter_interpolated(i,k,j) + 3.*ter_input(i,k,j) ) *0.25<a name='138'>
+            END IF<a name='139'>
+   <a name='140'>
+            <font color=#447700>!  2 points out of the spec zone, 50% parent, 50% nest<a name='141'></font>
+   <a name='142'>
+            IF      ( ( i .EQ.       spec_zone + 2 ) .OR.  ( j .EQ.       spec_zone + 2 ) .OR. &amp;<a name='143'>
+                      ( i .EQ. ide - spec_zone - 2 ) .OR.  ( j .EQ. jde - spec_zone - 2 ) ) THEN<a name='144'>
+               ter_temp(i,k,j) = ( 2.*ter_interpolated(i,k,j) + 2.*ter_input(i,k,j) ) *0.25<a name='145'>
+            END IF<a name='146'>
+   <a name='147'>
+            <font color=#447700>!  1 point out of the spec zone, 75% parent, 25% nest<a name='148'></font>
+   <a name='149'>
+            IF      ( ( i .EQ.       spec_zone + 1 ) .OR.  ( j .EQ.       spec_zone + 1 ) .OR. &amp;<a name='150'>
+                      ( i .EQ. ide - spec_zone - 1 ) .OR.  ( j .EQ. jde - spec_zone - 1 ) ) THEN<a name='151'>
+               ter_temp(i,k,j) = ( 3.*ter_interpolated(i,k,j) +    ter_input(i,k,j) ) *0.25<a name='152'>
+            END IF<a name='153'>
+   <a name='154'>
+            <font color=#447700>!  In the spec_zone: 100% of the terrain interpolated from the parent<a name='155'></font>
+   <a name='156'>
+            IF      ( ( i .LE.       spec_zone     ) .OR.  ( j .LE.       spec_zone     ) .OR. &amp;<a name='157'>
+                      ( i .GE. ide - spec_zone     ) .OR.  ( j .GE. jde - spec_zone     ) ) THEN<a name='158'>
+               ter_temp(i,k,j) =      ter_interpolated(i,k,j)<a name='159'>
+            END IF<a name='160'>
+   <a name='161'>
+         END DO <a name='162'>
+      END DO <a name='163'>
+   END DO <a name='164'>
+<a name='165'>
+   <font color=#447700>!  Set nest elevation with temp values.  All values not overwritten in the above<a name='166'></font>
+   <font color=#447700>!  100%, 75%, 50%, 25% loops have been previously set in the initial assignment.<a name='167'></font>
+<a name='168'>
+   DO j = jps , MIN(jpe, jde-1)<a name='169'>
+      DO k = kps , kpe<a name='170'>
+         DO i = ips , MIN(ipe, ide-1)<a name='171'>
+            ter_input(i,k,j) = ter_temp(i,k,j)<a name='172'>
+         END DO <a name='173'>
+      END DO <a name='174'>
+   END DO <a name='175'>
+<a name='176'>
+END SUBROUTINE blend_terrain<a name='177'>
+<a name='178'>
+<A NAME='STORE_TERRAIN'><A href='../../html_code/dyn_em/nest_init_utils.F.html#STORE_TERRAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='179'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>store_terrain</font> ( ter_interpolated , ter_input , &amp; <A href='../../call_to/STORE_TERRAIN.html' TARGET='index'>3</A><a name='180'>
+                           ids , ide , jds , jde , kds , kde , &amp; <a name='181'>
+                           ims , ime , jms , jme , kms , kme , &amp; <a name='182'>
+                           ips , ipe , jps , jpe , kps , kpe )<a name='183'>
+<a name='184'>
+   IMPLICIT NONE<a name='185'>
+<a name='186'>
+   INTEGER , INTENT(IN)                       :: ids , ide , jds , jde , kds , kde , &amp; <a name='187'>
+                                                 ims , ime , jms , jme , kms , kme , &amp; <a name='188'>
+                                                 ips , ipe , jps , jpe , kps , kpe<a name='189'>
+   REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(OUT) :: ter_interpolated<a name='190'>
+   REAL , DIMENSION(ims:ime,kms:kme,jms:jme) , INTENT(IN)  :: ter_input<a name='191'>
+<a name='192'>
+   INTEGER :: i , j , k<a name='193'>
+<a name='194'>
+   DO j = jps , MIN(jpe, jde-1)<a name='195'>
+      DO k = kps , kpe<a name='196'>
+         DO i = ips , MIN(ipe, ide-1)<a name='197'>
+            ter_interpolated(i,k,j) = ter_input(i,k,j)<a name='198'>
+         END DO <a name='199'>
+      END DO <a name='200'>
+   END DO <a name='201'>
+<a name='202'>
+END SUBROUTINE store_terrain<a name='203'>
+<a name='204'>
+<a name='205'>
+<A NAME='INPUT_TERRAIN_RSMAS'><A href='../../html_code/dyn_em/nest_init_utils.F.html#INPUT_TERRAIN_RSMAS' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='206'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>input_terrain_rsmas</font> ( ter , xlat, xlon, dx , &amp; <A href='../../call_to/INPUT_TERRAIN_RSMAS.html' TARGET='index'>1</A>,<A href='../../call_from/INPUT_TERRAIN_RSMAS.html' TARGET='index'>3</A><a name='207'>
+                           ids , ide , jds , jde , kds , kde , &amp;<a name='208'>
+                           ims , ime , jms , jme , kms , kme , &amp;<a name='209'>
+                           ips , ipe , jps , jpe , kps , kpe )<a name='210'>
+<a name='211'>
+   IMPLICIT NONE<a name='212'>
+<a name='213'>
+   INTEGER , INTENT(IN)                       :: ids , ide , jds , jde , kds , kde , &amp;<a name='214'>
+                                                 ims , ime , jms , jme , kms , kme , &amp;<a name='215'>
+                                                 ips , ipe , jps , jpe , kps , kpe<a name='216'>
+   REAL , DIMENSION(ims:ime,jms:jme) , INTENT(INOUT)  :: ter<a name='217'>
+   REAL , DIMENSION(ims:ime,jms:jme) , INTENT(IN)     :: xlat, xlon<a name='218'>
+   REAL , INTENT(IN)                                  :: DX<a name='219'>
+   LOGICAL, EXTERNAL ::  wrf_dm_on_monitor<a name='220'>
+<a name='221'>
+   INTEGER :: i , j , k<a name='222'>
+<a name='223'>
+#if DM_PARALLEL<a name='224'>
+<font color=#447700>! Local globally sized arrays<a name='225'></font>
+   REAL , DIMENSION(ids:ide,jds:jde) :: ter_g, xlat_g, xlon_g<a name='226'>
+#endif<a name='227'>
+<a name='228'>
+#if ( defined( DM_PARALLEL ) &amp;&amp; ( <font color=#447700>! defined( STUBMPI ) ) )<a name='229'></font>
+<a name='230'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_PATCH_TO_GLOBAL_REAL'>wrf_patch_to_global_real</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#INPUT_TERRAIN_RSMAS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_PATCH_TO_GLOBAL_REAL_1"> ( xlat , xlat_g , 'z' , 'xy' ,       &amp;<a name='231'>
+                                   ids, ide-1 , jds , jde-1 , 1 , 1 , &amp;<a name='232'>
+                                   ims, ime   , jms , jme   , 1 , 1 , &amp;<a name='233'>
+                                   ips, ipe   , jps , jpe   , 1 , 1   ) <a name='234'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_PATCH_TO_GLOBAL_REAL'>wrf_patch_to_global_real</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#INPUT_TERRAIN_RSMAS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_PATCH_TO_GLOBAL_REAL_2"> ( xlon , xlon_g , 'z' , 'xy' ,       &amp;<a name='235'>
+                                   ids, ide-1 , jds , jde-1 , 1 , 1 , &amp;<a name='236'>
+                                   ims, ime   , jms , jme   , 1 , 1 , &amp;<a name='237'>
+                                   ips, ipe   , jps , jpe   , 1 , 1   ) <a name='238'>
+<a name='239'>
+   IF ( wrf_dm_on_monitor() ) THEN<a name='240'>
+     CALL get_terrain ( dx/1000., xlat_g(ids:ide,jds:jde), xlon_g(ids:ide,jds:jde), ter_g(ids:ide,jds:jde), &amp;<a name='241'>
+                        ide-ids+1,jde-jds+1,ide-ids+1,jde-jds+1 )<a name='242'>
+     WHERE ( ter(ids:ide,jds:jde) &lt; -1000. ) ter(ids:ide,jds:jde) = 0.<a name='243'>
+   ENDIF<a name='244'>
+<a name='245'>
+   CALL <A href='../../html_code/frame/module_dm_stubs.F.html#WRF_GLOBAL_TO_PATCH_REAL'>wrf_global_to_patch_real</A><A href='../../html_code/dyn_em/nest_init_utils.F.html#INPUT_TERRAIN_RSMAS' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_GLOBAL_TO_PATCH_REAL_1"> ( ter_g , ter , 'z' , 'xy' ,         &amp;<a name='246'>
+                                   ids, ide-1 , jds , jde-1 , 1 , 1 , &amp;<a name='247'>
+                                   ims, ime   , jms , jme   , 1 , 1 , &amp;<a name='248'>
+                                   ips, ipe   , jps , jpe   , 1 , 1   ) <a name='249'>
+<a name='250'>
+#else<a name='251'>
+<a name='252'>
+   CALL get_terrain ( dx/1000., xlat(ids:ide,jds:jde), xlon(ids:ide,jds:jde), ter(ids:ide,jds:jde), &amp;<a name='253'>
+                       ide-ids+1,jde-jds+1,ide-ids+1,jde-jds+1 )<a name='254'>
+   WHERE ( ter(ids:ide,jds:jde) &lt; -1000. ) ter(ids:ide,jds:jde) = 0.<a name='255'>
+<a name='256'>
+#endif<a name='257'>
+<a name='258'>
+END SUBROUTINE input_terrain_rsmas<a name='259'>
+<a name='260'>
+</pre></body></html>

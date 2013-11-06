@@ -1,0 +1,434 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:DRIVER_LAYER:TILING<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_TILES'><A href='../../html_code/frame/module_tiles.F.html#MODULE_TILES' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_tiles</font> <A href='../../call_to/MODULE_TILES.html' TARGET='index'>10</A><a name='6'>
+<a name='7'>
+  USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_tiles.F.html#module_tiles.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_87"><a name='8'>
+<a name='9'>
+<A NAME='SET_TILES'><A href='../../html_code/frame/module_tiles.F.html#SET_TILES' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='10'>
+  <font color=#993300>INTERFACE </font><font color=#cc0000>set_tiles</font> <A href='../../call_to/SET_TILES.html' TARGET='index'>6</A><a name='11'>
+    MODULE PROCEDURE <A href='../../html_code/frame/module_tiles.F.html#SET_TILES1'>set_tiles1</A><A NAME="SET_TILES1_1"><A href='../../html_code/frame/module_tiles.F.html#module_tiles.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a>, <A href='../../html_code/frame/module_tiles.F.html#SET_TILES2'>set_tiles2</A><A NAME="SET_TILES2_1"><A href='../../html_code/frame/module_tiles.F.html#module_tiles.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a>, <A href='../../html_code/frame/module_tiles.F.html#SET_TILES3'>set_tiles3</A><A NAME="SET_TILES3_1"><A href='../../html_code/frame/module_tiles.F.html#module_tiles.F' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='12'>
+  END INTERFACE<a name='13'>
+<a name='14'>
+CONTAINS<a name='15'>
+<a name='16'>
+<font color=#447700>! CPP macro for error checking<a name='17'></font>
+#define ERROR_TEST(A,O,B) IF( A O B )THEN;WRITE(mess,'(3A4)')'A','O','B';CALL WRF_ERROR_FATAL(mess);ENDIF<a name='18'>
+<a name='19'>
+<font color=#447700>! this version is used to compute only on a boundary of some width<a name='20'></font>
+<font color=#447700>! The ids, ide, jds, and jde arguments specify the edge of the boundary (a way of<a name='21'></font>
+<font color=#447700>! accounting for staggering, and the bdyw gives the number of cells<a name='22'></font>
+<font color=#447700>! (idea: if bdyw is negative, have it do the reverse and specify the <a name='23'></font>
+<font color=#447700>! interior, less the boundary.<a name='24'></font>
+<a name='25'>
+<A NAME='SET_TILES1'><A href='../../html_code/frame/module_tiles.F.html#SET_TILES1' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='26'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_tiles1</font> ( grid , ids , ide , jds , jde , bdyw ) <A href='../../call_to/SET_TILES1.html' TARGET='index'>1</A>,<A href='../../call_from/SET_TILES1.html' TARGET='index'>4</A><a name='27'>
+<a name='28'>
+     USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_74"><a name='29'>
+     USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_24"><a name='30'>
+     USE <A href='../../html_code/frame/module_machine.F.html#MODULE_MACHINE'>module_machine</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MACHINE_12"><a name='31'>
+     USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES1' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_16"><a name='32'>
+<a name='33'>
+     IMPLICIT NONE<a name='34'>
+  <a name='35'>
+     <font color=#447700>!  Input data.<a name='36'></font>
+  <a name='37'>
+     TYPE(domain)                   , INTENT(INOUT)  :: grid<a name='38'>
+     INTEGER                        , INTENT(IN)     :: ids , ide , jds , jde , bdyw<a name='39'>
+<a name='40'>
+     <font color=#447700>!  Local data<a name='41'></font>
+<a name='42'>
+     INTEGER                                :: spx, epx, spy, epy, t, tt, ts, te<a name='43'>
+     INTEGER                                :: smx, emx, smy, emy<a name='44'>
+     INTEGER                                :: ntiles , num_tiles<a name='45'>
+<a name='46'>
+     CHARACTER*80              :: mess<a name='47'>
+<a name='48'>
+     data_ordering : SELECT CASE ( model_data_order )<a name='49'>
+       CASE  ( DATA_ORDER_XYZ )<a name='50'>
+         spx = grid%sp31 ; epx = grid%ep31 ; spy = grid%sp32 ; epy = grid%ep32<a name='51'>
+       CASE  ( DATA_ORDER_YXZ )<a name='52'>
+         spx = grid%sp32 ; epx = grid%ep32 ; spy = grid%sp31 ; epy = grid%ep31<a name='53'>
+       CASE  ( DATA_ORDER_ZXY )<a name='54'>
+         spx = grid%sp32 ; epx = grid%ep32 ; spy = grid%sp33 ; epy = grid%ep33<a name='55'>
+       CASE  ( DATA_ORDER_ZYX )<a name='56'>
+         spx = grid%sp33 ; epx = grid%ep33 ; spy = grid%sp32 ; epy = grid%ep32<a name='57'>
+       CASE  ( DATA_ORDER_XZY )<a name='58'>
+         spx = grid%sp31 ; epx = grid%ep31 ; spy = grid%sp33 ; epy = grid%ep33<a name='59'>
+       CASE  ( DATA_ORDER_YZX )<a name='60'>
+         spx = grid%sp33 ; epx = grid%ep33 ; spy = grid%sp31 ; epy = grid%ep31<a name='61'>
+     END SELECT data_ordering<a name='62'>
+<a name='63'>
+     num_tiles = 4<a name='64'>
+<a name='65'>
+     IF ( num_tiles &gt; grid%max_tiles ) THEN<a name='66'>
+       IF ( ASSOCIATED(grid%i_start) ) THEN ; DEALLOCATE( grid%i_start ) ; NULLIFY( grid%i_start ) ; ENDIF<a name='67'>
+       IF ( ASSOCIATED(grid%i_end) )   THEN ; DEALLOCATE( grid%i_end   ) ; NULLIFY( grid%i_end   ) ; ENDIF<a name='68'>
+       IF ( ASSOCIATED(grid%j_start) ) THEN ; DEALLOCATE( grid%j_start ) ; NULLIFY( grid%j_start ) ; ENDIF<a name='69'>
+       IF ( ASSOCIATED(grid%j_end) )   THEN ; DEALLOCATE( grid%j_end   ) ; NULLIFY( grid%j_end   ) ; ENDIF<a name='70'>
+       ALLOCATE(grid%i_start(num_tiles))<a name='71'>
+       ALLOCATE(grid%i_end(num_tiles))<a name='72'>
+       ALLOCATE(grid%j_start(num_tiles))<a name='73'>
+       ALLOCATE(grid%j_end(num_tiles))<a name='74'>
+       grid%max_tiles = num_tiles<a name='75'>
+     ENDIF<a name='76'>
+<a name='77'>
+<font color=#447700>! XS boundary<a name='78'></font>
+     IF      ( ids .ge. spx .and. ids .le. epx ) THEN<a name='79'>
+        grid%i_start(1) = ids<a name='80'>
+        grid%i_end(1)   = min( ids+bdyw-1 , epx )<a name='81'>
+        grid%j_start(1) = max( spy , jds )<a name='82'>
+        grid%j_end(1)   = min( epy , jde )<a name='83'>
+     ELSEIF  ( (ids+bdyw-1) .ge. spx .and. (ids+bdyw-1) .le. epx ) THEN<a name='84'>
+        grid%i_start(1) = max( ids , spx )<a name='85'>
+        grid%i_end(1)   = ids+bdyw-1<a name='86'>
+        grid%j_start(1) = max( spy , jds )<a name='87'>
+        grid%j_end(1)   = min( epy , jde )<a name='88'>
+     ELSE<a name='89'>
+        grid%i_start(1) = 1<a name='90'>
+        grid%i_end(1)   = -1<a name='91'>
+        grid%j_start(1) = 1<a name='92'>
+        grid%j_end(1)   = -1<a name='93'>
+     ENDIF<a name='94'>
+<a name='95'>
+<font color=#447700>! XE boundary<a name='96'></font>
+     IF      ( ide .ge. spx .and. ide .le. epx ) THEN<a name='97'>
+        grid%i_start(2) = max( ide-bdyw+1 , spx )<a name='98'>
+        grid%i_end(2)   = ide<a name='99'>
+        grid%j_start(2) = max( spy , jds )<a name='100'>
+        grid%j_end(2)   = min( epy , jde )<a name='101'>
+     ELSEIF  ( (ide-bdyw+1) .ge. spx .and. (ide-bdyw+1) .le. epx ) THEN<a name='102'>
+        grid%i_start(2) = ide-bdyw+1<a name='103'>
+        grid%i_end(2)   = min( ide , epx )<a name='104'>
+        grid%j_start(2) = max( spy , jds )<a name='105'>
+        grid%j_end(2)   = min( epy , jde )<a name='106'>
+     ELSE<a name='107'>
+        grid%i_start(2) = 1<a name='108'>
+        grid%i_end(2)   = -1<a name='109'>
+        grid%j_start(2) = 1<a name='110'>
+        grid%j_end(2)   = -1<a name='111'>
+     ENDIF<a name='112'>
+<a name='113'>
+<font color=#447700>! YS boundary (note that the corners may already be done by XS and XE)<a name='114'></font>
+     IF      ( jds .ge. spy .and. jds .le. epy ) THEN<a name='115'>
+        grid%j_start(3) = jds<a name='116'>
+        grid%j_end(3)   = min( jds+bdyw-1 , epy )<a name='117'>
+        grid%i_start(3) = max( spx , ids+bdyw )<a name='118'>
+        grid%i_end(3)   = min( epx , ide-bdyw )<a name='119'>
+     ELSEIF  ( (jds+bdyw-1) .ge. spy .and. (jds+bdyw-1) .le. epy ) THEN<a name='120'>
+        grid%j_start(3) = max( jds , spy )<a name='121'>
+        grid%j_end(3)   = jds+bdyw-1<a name='122'>
+        grid%i_start(3) = max( spx , ids+bdyw )<a name='123'>
+        grid%i_end(3)   = min( epx , ide-bdyw )<a name='124'>
+     ELSE<a name='125'>
+        grid%j_start(3) = 1<a name='126'>
+        grid%j_end(3)   = -1<a name='127'>
+        grid%i_start(3) = 1<a name='128'>
+        grid%i_end(3)   = -1<a name='129'>
+     ENDIF<a name='130'>
+<a name='131'>
+<font color=#447700>! YE boundary (note that the corners may already be done by XS and XE)<a name='132'></font>
+     IF      ( jde .ge. spy .and. jde .le. epy ) THEN<a name='133'>
+        grid%j_start(4) = max( jde-bdyw+1 , spy )<a name='134'>
+        grid%j_end(4)   = jde<a name='135'>
+        grid%i_start(4) = max( spx , ids+bdyw )<a name='136'>
+        grid%i_end(4)   = min( epx , ide-bdyw )<a name='137'>
+     ELSEIF  ( (jde-bdyw+1) .ge. spy .and. (jde-bdyw+1) .le. epy ) THEN<a name='138'>
+        grid%j_start(4) = jde-bdyw+1<a name='139'>
+        grid%j_end(4)   = min( jde , epy )<a name='140'>
+        grid%i_start(4) = max( spx , ids+bdyw )<a name='141'>
+        grid%i_end(4)   = min( epx , ide-bdyw )<a name='142'>
+     ELSE<a name='143'>
+        grid%j_start(4) = 1<a name='144'>
+        grid%j_end(4)   = -1<a name='145'>
+        grid%i_start(4) = 1<a name='146'>
+        grid%i_end(4)   = -1<a name='147'>
+     ENDIF<a name='148'>
+<a name='149'>
+     grid%num_tiles = num_tiles<a name='150'>
+<a name='151'>
+     RETURN<a name='152'>
+  END SUBROUTINE set_tiles1<a name='153'>
+<a name='154'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='155'></font>
+<font color=#447700>! this version is used to limit the domain or compute onto halos<a name='156'></font>
+<A NAME='SET_TILES2'><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='157'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_tiles2</font> ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe ) <A href='../../call_to/SET_TILES2.html' TARGET='index'>1</A>,<A href='../../call_from/SET_TILES2.html' TARGET='index'>9</A><a name='158'>
+     USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_75"><a name='159'>
+     USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_25"><a name='160'>
+     USE <A href='../../html_code/frame/module_machine.F.html#MODULE_MACHINE'>module_machine</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MACHINE_13"><a name='161'>
+     USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_17"><a name='162'>
+<a name='163'>
+     IMPLICIT NONE<a name='164'>
+  <a name='165'>
+     <font color=#447700>!  Input data.<a name='166'></font>
+  <a name='167'>
+     TYPE(domain)                   , INTENT(INOUT)  :: grid<a name='168'>
+     INTEGER                        , INTENT(IN)     :: ids , ide , jds , jde<a name='169'>
+     INTEGER                        , INTENT(IN)     :: ips , ipe , jps , jpe<a name='170'>
+<a name='171'>
+     <font color=#447700>!  Output data.<a name='172'></font>
+<a name='173'>
+     <font color=#447700>!  Local data.<a name='174'></font>
+  <a name='175'>
+     INTEGER                                :: num_tiles_x, num_tiles_y, num_tiles<a name='176'>
+     INTEGER                                :: tile_sz_x, tile_sz_y<a name='177'>
+     INTEGER                                :: spx, epx, spy, epy, t, tt, ts, te<a name='178'>
+     INTEGER                                :: smx, emx, smy, emy<a name='179'>
+     INTEGER                                :: ntiles<a name='180'>
+     INTEGER                                :: one<a name='181'>
+#ifdef _OPENMP<a name='182'>
+     INTEGER , EXTERNAL        :: omp_get_max_threads<a name='183'>
+#endif<a name='184'>
+     CHARACTER*80              :: mess<a name='185'>
+<a name='186'>
+     data_ordering : SELECT CASE ( model_data_order )<a name='187'>
+       CASE  ( DATA_ORDER_XYZ )<a name='188'>
+         spx = grid%sp31 ; epx = grid%ep31 ; spy = grid%sp32 ; epy = grid%ep32<a name='189'>
+         smx = grid%sm31 ; emx = grid%em31 ; smy = grid%sm32 ; emy = grid%em32<a name='190'>
+       CASE  ( DATA_ORDER_YXZ )<a name='191'>
+         spx = grid%sp32 ; epx = grid%ep32 ; spy = grid%sp31 ; epy = grid%ep31<a name='192'>
+         smx = grid%sm32 ; emx = grid%em32 ; smy = grid%sm31 ; emy = grid%em31<a name='193'>
+       CASE  ( DATA_ORDER_ZXY )<a name='194'>
+         spx = grid%sp32 ; epx = grid%ep32 ; spy = grid%sp33 ; epy = grid%ep33<a name='195'>
+         smx = grid%sm32 ; emx = grid%em32 ; smy = grid%sm33 ; emy = grid%em33<a name='196'>
+       CASE  ( DATA_ORDER_ZYX )<a name='197'>
+         spx = grid%sp33 ; epx = grid%ep33 ; spy = grid%sp32 ; epy = grid%ep32<a name='198'>
+         smx = grid%sm33 ; emx = grid%em33 ; smy = grid%sm32 ; emy = grid%em32<a name='199'>
+       CASE  ( DATA_ORDER_XZY )<a name='200'>
+         spx = grid%sp31 ; epx = grid%ep31 ; spy = grid%sp33 ; epy = grid%ep33<a name='201'>
+         smx = grid%sm31 ; emx = grid%em31 ; smy = grid%sm33 ; emy = grid%em33<a name='202'>
+       CASE  ( DATA_ORDER_YZX )<a name='203'>
+         spx = grid%sp33 ; epx = grid%ep33 ; spy = grid%sp31 ; epy = grid%ep31<a name='204'>
+         smx = grid%sm33 ; emx = grid%em33 ; smy = grid%sm31 ; emy = grid%em31<a name='205'>
+     END SELECT data_ordering<a name='206'>
+<a name='207'>
+     ERROR_TEST(ips,&lt;,smx)<a name='208'>
+     ERROR_TEST(ipe,&gt;,emx)<a name='209'>
+     ERROR_TEST(jps,&lt;,smy)<a name='210'>
+     ERROR_TEST(jpe,&gt;,emy)<a name='211'>
+<a name='212'>
+     <font color=#447700>! Here's how the number of tiles is arrived at:<a name='213'></font>
+     <font color=#447700>!<a name='214'></font>
+     <font color=#447700>!          if tile sizes are specified use those otherwise<a name='215'></font>
+     <font color=#447700>!          if num_tiles is specified use that otherwise<a name='216'></font>
+     <font color=#447700>!          if omp provides a value use that otherwise<a name='217'></font>
+     <font color=#447700>!          use 1.<a name='218'></font>
+     <font color=#447700>!<a name='219'></font>
+<a name='220'>
+     IF ( grid%num_tiles_spec .EQ. 0 ) THEN<a name='221'>
+       CALL nl_get_numtiles( 1, num_tiles )<a name='222'>
+       IF ( num_tiles .EQ. 1 ) THEN<a name='223'>
+#ifdef _OPENMP<a name='224'>
+         num_tiles = omp_get_max_threads()<a name='225'>
+         WRITE(mess,'("WRF NUMBER OF TILES FROM OMP_GET_MAX_THREADS = ",I3)')num_tiles<a name='226'>
+         CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>WRF_MESSAGE</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_20"> ( mess )<a name='227'>
+#else<a name='228'>
+         num_tiles = 1<a name='229'>
+#endif<a name='230'>
+       ENDIF<a name='231'>
+<font color=#447700>! override num_tiles setting (however gotten) if tile sizes are specified<a name='232'></font>
+       CALL nl_get_tile_sz_x( 1, tile_sz_x )<a name='233'>
+       CALL nl_get_tile_sz_y( 1, tile_sz_y )<a name='234'>
+       IF ( tile_sz_x &gt;= 1 .and. tile_sz_y &gt;= 1 ) THEN<a name='235'>
+        <font color=#447700>! figure number of whole tiles and add 1 for any partials in each dim<a name='236'></font>
+          num_tiles_x = (epx-spx+1) / tile_sz_x<a name='237'>
+          if ( tile_sz_x*num_tiles_x &lt; epx-spx+1 ) num_tiles_x = num_tiles_x + 1<a name='238'>
+          num_tiles_y = (epy-spy+1) / tile_sz_y<a name='239'>
+          if ( tile_sz_y*num_tiles_y &lt; epy-spy+1 ) num_tiles_y = num_tiles_y + 1<a name='240'>
+          num_tiles = num_tiles_x * num_tiles_y<a name='241'>
+       ELSE<a name='242'>
+         IF      ( machine_info%tile_strategy == TILE_X ) THEN<a name='243'>
+           num_tiles_x = num_tiles<a name='244'>
+           num_tiles_y = 1<a name='245'>
+         ELSE IF ( machine_info%tile_strategy == TILE_Y ) THEN<a name='246'>
+           num_tiles_x = 1<a name='247'>
+           num_tiles_y = num_tiles<a name='248'>
+         ELSE <font color=#447700>! Default ( machine_info%tile_strategy == TILE_XY ) THEN<a name='249'></font>
+           one = 1<a name='250'>
+           call <A href='../../html_code/frame/module_machine.F.html#LEAST_ASPECT'>least_aspect</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="LEAST_ASPECT_1">( num_tiles, one, one, num_tiles_y, num_tiles_x )<a name='251'>
+         ENDIF<a name='252'>
+       ENDIF<a name='253'>
+       grid%num_tiles_spec = num_tiles<a name='254'>
+       grid%num_tiles_x = num_tiles_x<a name='255'>
+       grid%num_tiles_y = num_tiles_y<a name='256'>
+       WRITE(mess,'("WRF NUMBER OF TILES = ",I3)')num_tiles<a name='257'>
+       CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_MESSAGE'>WRF_MESSAGE</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_MESSAGE_21"> ( mess )<a name='258'>
+     ENDIF<a name='259'>
+<a name='260'>
+     num_tiles   = grid%num_tiles_spec<a name='261'>
+     num_tiles_x = grid%num_tiles_x<a name='262'>
+     num_tiles_y = grid%num_tiles_y<a name='263'>
+<a name='264'>
+     IF ( num_tiles &gt; grid%max_tiles ) THEN<a name='265'>
+       IF ( ASSOCIATED(grid%i_start) ) THEN ; DEALLOCATE( grid%i_start ) ; NULLIFY( grid%i_start ) ; ENDIF<a name='266'>
+       IF ( ASSOCIATED(grid%i_end) )   THEN ; DEALLOCATE( grid%i_end   ) ; NULLIFY( grid%i_end   ) ; ENDIF<a name='267'>
+       IF ( ASSOCIATED(grid%j_start) ) THEN ; DEALLOCATE( grid%j_start ) ; NULLIFY( grid%j_start ) ; ENDIF<a name='268'>
+       IF ( ASSOCIATED(grid%j_end) )   THEN ; DEALLOCATE( grid%j_end   ) ; NULLIFY( grid%j_end   ) ; ENDIF<a name='269'>
+       ALLOCATE(grid%i_start(num_tiles))<a name='270'>
+       ALLOCATE(grid%i_end(num_tiles))<a name='271'>
+       ALLOCATE(grid%j_start(num_tiles))<a name='272'>
+       ALLOCATE(grid%j_end(num_tiles))<a name='273'>
+       grid%max_tiles = num_tiles<a name='274'>
+     ENDIF<a name='275'>
+<a name='276'>
+     DO t = 0, num_tiles-1<a name='277'>
+        ntiles = mod(t,num_tiles_x)<a name='278'>
+        CALL <A href='../../html_code/frame/module_machine.F.html#REGION_BOUNDS'>region_bounds</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="REGION_BOUNDS_1">( spx, epx,                                  &amp;<a name='279'>
+                            num_tiles_x, ntiles,                       &amp;<a name='280'>
+                            ts, te )<a name='281'>
+<font color=#447700>!!!<a name='282'></font>
+<font color=#447700>! This bit allows the user to specify execution out onto the halo region<a name='283'></font>
+<font color=#447700>! in the call to set_tiles. If the low patch boundary specified by the arguments<a name='284'></font>
+<font color=#447700>! is less than what the model already knows to be the patch boundary and if<a name='285'></font>
+<font color=#447700>! the user hasn't erred by specifying something that would fall off memory<a name='286'></font>
+<font color=#447700>! (safety tests are higher up in this routine, outside the IF) then adjust<a name='287'></font>
+<font color=#447700>! the tile boundary of the low edge tiles accordingly. Likewise for high edges.<a name='288'></font>
+        IF ( ips .lt. spx .and. ts .eq. spx ) ts = ips ;<a name='289'>
+        IF ( ipe .gt. epx .and. te .eq. epx ) te = ipe ;<a name='290'>
+<font color=#447700>!!!<a name='291'></font>
+        grid%i_start(t+1) = max ( ts , ids )<a name='292'>
+        grid%i_end(t+1)   = min ( te , ide )<a name='293'>
+        ntiles = t / num_tiles_x<a name='294'>
+        CALL <A href='../../html_code/frame/module_machine.F.html#REGION_BOUNDS'>region_bounds</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES2' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="REGION_BOUNDS_2">( spy, epy,                                  &amp;<a name='295'>
+                            num_tiles_y, ntiles,                       &amp;<a name='296'>
+                            ts, te )<a name='297'>
+<font color=#447700>!<a name='298'></font>
+        IF ( jps .lt. spy .and. ts .eq. spy ) ts = jps ;<a name='299'>
+        IF ( jpe .gt. epy .and. te .eq. epy ) te = jpe ;<a name='300'>
+<font color=#447700>!<a name='301'></font>
+        grid%j_start(t+1) = max ( ts , jds )<a name='302'>
+        grid%j_end(t+1)   = min ( te , jde )<a name='303'>
+     END DO<a name='304'>
+     grid%num_tiles = num_tiles<a name='305'>
+<a name='306'>
+     RETURN<a name='307'>
+  END SUBROUTINE set_tiles2<a name='308'>
+  <a name='309'>
+<a name='310'>
+<font color=#447700>!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!<a name='311'></font>
+<font color=#447700>! this version sets the tiles based on a passed in integer mask<a name='312'></font>
+<font color=#447700>! the assumption here is that the mask is relatively straigthforward<a name='313'></font>
+<font color=#447700>! and coverable with 2 or three rectangles. No weird stuff...<a name='314'></font>
+<a name='315'>
+<A NAME='SET_TILES3'><A href='../../html_code/frame/module_tiles.F.html#SET_TILES3' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='316'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_tiles3</font> ( grid , imask, ims, ime, jms, jme, ips, ipe, jps, jpe ) <A href='../../call_to/SET_TILES3.html' TARGET='index'>1</A>,<A href='../../call_from/SET_TILES3.html' TARGET='index'>5</A><a name='317'>
+     USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_76"><a name='318'>
+     USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_26"><a name='319'>
+     USE <A href='../../html_code/frame/module_machine.F.html#MODULE_MACHINE'>module_machine</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_MACHINE_14"><a name='320'>
+     USE <A href='../../html_code/frame/module_wrf_error.F.html#MODULE_WRF_ERROR'>module_wrf_error</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_WRF_ERROR_18"><a name='321'>
+<a name='322'>
+     IMPLICIT NONE<a name='323'>
+  <a name='324'>
+     <font color=#447700>!  Input data.<a name='325'></font>
+  <a name='326'>
+     TYPE(domain)                   , INTENT(INOUT)  :: grid<a name='327'>
+     INTEGER                        , INTENT(IN)     :: ims , ime , jms , jme<a name='328'>
+     INTEGER                        , INTENT(IN)     :: ips , ipe , jps , jpe<a name='329'>
+     INTEGER, DIMENSION(ims:ime,jms:jme), INTENT(IN) :: imask<a name='330'>
+     INTEGER                :: num_tiles<a name='331'>
+     INTEGER, DIMENSION(50) :: i_start, i_end, j_start, j_end<a name='332'>
+<a name='333'>
+     <font color=#447700>!  Output data.<a name='334'></font>
+<a name='335'>
+     <font color=#447700>!  Local data.<a name='336'></font>
+  <a name='337'>
+     CHARACTER*80              :: mess<a name='338'>
+<a name='339'>
+     CALL <A href='../../html_code/frame/module_tiles.F.html#SET_TILES_MASKED'>set_tiles_masked</A><A href='../../html_code/frame/module_tiles.F.html#SET_TILES3' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TILES_MASKED_1"> ( imask, ims, ime, jms, jme, ips, ipe, jps, jpe, &amp;<a name='340'>
+                             num_tiles, i_start, i_end, j_start, j_end )<a name='341'>
+<a name='342'>
+     IF ( num_tiles &gt; grid%max_tiles ) THEN<a name='343'>
+       IF ( ASSOCIATED(grid%i_start) ) THEN ; DEALLOCATE( grid%i_start ) ; NULLIFY( grid%i_start ) ; ENDIF<a name='344'>
+       IF ( ASSOCIATED(grid%i_end) )   THEN ; DEALLOCATE( grid%i_end   ) ; NULLIFY( grid%i_end   ) ; ENDIF<a name='345'>
+       IF ( ASSOCIATED(grid%j_start) ) THEN ; DEALLOCATE( grid%j_start ) ; NULLIFY( grid%j_start ) ; ENDIF<a name='346'>
+       IF ( ASSOCIATED(grid%j_end) )   THEN ; DEALLOCATE( grid%j_end   ) ; NULLIFY( grid%j_end   ) ; ENDIF<a name='347'>
+       ALLOCATE(grid%i_start(num_tiles))<a name='348'>
+       ALLOCATE(grid%i_end(num_tiles))<a name='349'>
+       ALLOCATE(grid%j_start(num_tiles))<a name='350'>
+       ALLOCATE(grid%j_end(num_tiles))<a name='351'>
+       grid%max_tiles = num_tiles<a name='352'>
+     ENDIF<a name='353'>
+     grid%num_tiles = num_tiles<a name='354'>
+     grid%i_start(1:num_tiles) = i_start(1:num_tiles)<a name='355'>
+     grid%i_end(1:num_tiles)   = i_end(1:num_tiles)<a name='356'>
+     grid%j_start(1:num_tiles) = j_start(1:num_tiles)<a name='357'>
+     grid%j_end(1:num_tiles)   = j_end(1:num_tiles)<a name='358'>
+<a name='359'>
+     RETURN<a name='360'>
+  END SUBROUTINE set_tiles3<a name='361'>
+<a name='362'>
+<A NAME='SET_TILES_MASKED'><A href='../../html_code/frame/module_tiles.F.html#SET_TILES_MASKED' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='363'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>set_tiles_masked</font> ( imask, ims, ime, jms, jme, ips, ipe, jps, jpe, &amp; <A href='../../call_to/SET_TILES_MASKED.html' TARGET='index'>1</A><a name='364'>
+                                num_tiles, istarts, iends, jstarts, jends )<a name='365'>
+<a name='366'>
+      IMPLICIT NONE<a name='367'>
+<a name='368'>
+      <font color=#447700>!  Arguments<a name='369'></font>
+<a name='370'>
+      INTEGER                        , INTENT(IN)     :: ims , ime , jms , jme<a name='371'>
+      INTEGER, DIMENSION(ims:ime,jms:jme), INTENT(IN) :: imask<a name='372'>
+      INTEGER                        , INTENT(IN)     :: ips , ipe , jps , jpe<a name='373'>
+      INTEGER                        , INTENT(OUT)    :: num_tiles<a name='374'>
+      INTEGER, DIMENSION(*)          , INTENT(OUT)    :: istarts, iends<a name='375'>
+      INTEGER, DIMENSION(*)          , INTENT(OUT)    :: jstarts, jends<a name='376'>
+<a name='377'>
+      <font color=#447700>!  Output data.<a name='378'></font>
+<a name='379'>
+      <font color=#447700>!  Local data.<a name='380'></font>
+      CHARACTER*80              :: mess<a name='381'>
+      INTEGER :: i, j, ir, jr<a name='382'>
+      INTEGER :: imaskcopy(ips:ipe,jps:jpe)    <font color=#447700>! copy of imask to write on<a name='383'></font>
+<a name='384'>
+      imaskcopy = imask(ips:ipe,jps:jpe)<a name='385'>
+      num_tiles = 0<a name='386'>
+      <font color=#447700>! simple multi-pass scheme, optimize later...<a name='387'></font>
+      DO WHILE (ANY(imaskcopy == 1))<a name='388'>
+        DO j = jps,jpe<a name='389'>
+          DO i = ips,ipe<a name='390'>
+            <font color=#447700>! find first "1" and build a rectangle from it<a name='391'></font>
+            IF ( imaskcopy(i,j) == 1 ) THEN<a name='392'>
+              num_tiles = num_tiles + 1<a name='393'>
+              istarts(num_tiles) = i<a name='394'>
+              iends(num_tiles)   = i<a name='395'>
+              jstarts(num_tiles) = j<a name='396'>
+              jends(num_tiles)   = j<a name='397'>
+              <font color=#447700>! don't check this point again<a name='398'></font>
+              imaskcopy(i,j) = 0<a name='399'>
+              <font color=#447700>! find length of first row<a name='400'></font>
+              DO ir = istarts(num_tiles)+1,ipe<a name='401'>
+                IF ( imaskcopy(ir,j) == 1 ) THEN<a name='402'>
+                  iends(num_tiles) = ir<a name='403'>
+                  <font color=#447700>! don't check this point again<a name='404'></font>
+                  imaskcopy(ir,j) = 0<a name='405'>
+                ELSE<a name='406'>
+                  EXIT<a name='407'>
+                ENDIF<a name='408'>
+              ENDDO<a name='409'>
+              <font color=#447700>! find number of rows<a name='410'></font>
+              DO jr = jstarts(num_tiles)+1,jpe<a name='411'>
+                IF (ALL(imaskcopy(istarts(num_tiles):iends(num_tiles),jr) == 1)) THEN<a name='412'>
+                  jends(num_tiles) = jr<a name='413'>
+                  <font color=#447700>! don't check these points again<a name='414'></font>
+                  imaskcopy(istarts(num_tiles):iends(num_tiles),jr) = 0<a name='415'>
+                ELSE<a name='416'>
+                  EXIT<a name='417'>
+                ENDIF<a name='418'>
+              ENDDO<a name='419'>
+            ENDIF   <font color=#447700>! if ( imaskcopy(i,j) == 1 )<a name='420'></font>
+          ENDDO<a name='421'>
+        ENDDO<a name='422'>
+      ENDDO<a name='423'>
+      RETURN<a name='424'>
+  END SUBROUTINE set_tiles_masked<a name='425'>
+<a name='426'>
+  <a name='427'>
+<A NAME='INIT_MODULE_TILES'><A href='../../html_code/frame/module_tiles.F.html#INIT_MODULE_TILES' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='428'>
+  <font color=#993300>SUBROUTINE </font><font color=#cc0000>init_module_tiles</font> <A href='../../call_to/INIT_MODULE_TILES.html' TARGET='index'>2</A><a name='429'>
+  END SUBROUTINE init_module_tiles<a name='430'>
+<a name='431'>
+END MODULE module_tiles<a name='432'>
+<a name='433'>
+</pre></body></html>

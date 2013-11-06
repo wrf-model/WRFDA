@@ -1,0 +1,521 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!!!!!!!!!!!!! header manipulation routines !!!!!!!!!!!!!!!<a name='2'></font>
+<a name='3'>
+<A NAME='GET_HDR_TAG'><A href='../../html_code/frame/internal_header_util.F.html#GET_HDR_TAG' TARGET='top_target'><IMG SRC="../../gif/bar_green.gif" border=0></A><a name='4'>
+INTEGER <font color=#993300>FUNCTION </font><font color=#cc0000>get_hdr_tag</font>( hdrbuf )<a name='5'>
+  IMPLICIT NONE<a name='6'>
+  INTEGER, INTENT(IN) :: hdrbuf(*)<a name='7'>
+  get_hdr_tag = hdrbuf(2)<a name='8'>
+  RETURN<a name='9'>
+END FUNCTION get_hdr_tag<a name='10'>
+<a name='11'>
+<A NAME='INT_GEN_WRITE_FIELD_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='12'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_write_field_header</font> ( hdrbuf, hdrbufsize, itypesize, ftypesize, &amp; <A href='../../call_to/INT_GEN_WRITE_FIELD_HEADER.html' TARGET='index'>2</A>,<A href='../../call_from/INT_GEN_WRITE_FIELD_HEADER.html' TARGET='index'>14</A><a name='13'>
+                                        DataHandle , DateStr , VarName , Dummy , FieldType , Comm , IOComm,  &amp;<a name='14'>
+                                        DomainDesc , MemoryOrder , Stagger , DimNames ,              &amp;<a name='15'>
+                                        DomainStart , DomainEnd ,                                    &amp;<a name='16'>
+                                        MemoryStart , MemoryEnd ,                                    &amp;<a name='17'>
+                                        PatchStart , PatchEnd )<a name='18'>
+  IMPLICIT NONE<a name='19'>
+  INCLUDE 'intio_tags.h'<a name='20'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='21'>
+  INTEGER, INTENT(INOUT) ::  hdrbufsize<a name='22'>
+  INTEGER, INTENT(INOUT)   ::  itypesize, ftypesize<a name='23'>
+<a name='24'>
+  INTEGER ,       INTENT(IN)    :: DataHandle<a name='25'>
+  CHARACTER*(*) :: DateStr<a name='26'>
+  CHARACTER*(*) :: VarName<a name='27'>
+  integer                       :: dummy<a name='28'>
+  integer                       ,intent(in)    :: FieldType<a name='29'>
+  integer                       ,intent(inout) :: Comm<a name='30'>
+  integer                       ,intent(inout) :: IOComm<a name='31'>
+  integer                       ,intent(in)    :: DomainDesc<a name='32'>
+  character*(*)                 ,intent(in)    :: MemoryOrder<a name='33'>
+  character*(*)                 ,intent(in)    :: Stagger<a name='34'>
+  character*(*) , dimension (*) ,intent(in)    :: DimNames<a name='35'>
+  integer ,dimension(*)         ,intent(in)    :: DomainStart, DomainEnd<a name='36'>
+  integer ,dimension(*)         ,intent(in)    :: MemoryStart, MemoryEnd<a name='37'>
+  integer ,dimension(*)         ,intent(in)    :: PatchStart,  PatchEnd<a name='38'>
+<a name='39'>
+  INTEGER i, n<a name='40'>
+<a name='41'>
+  hdrbuf(1) = 0 <font color=#447700>! deferred -- this will be length of header<a name='42'></font>
+  hdrbuf(2) = int_field<a name='43'>
+  hdrbuf(3) = ftypesize<a name='44'>
+<a name='45'>
+  i = 4<a name='46'>
+  hdrbuf(i) = DataHandle      ; i = i+1<a name='47'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_1">( DateStr, hdrbuf(i), n ) ; i = i + n<a name='48'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_2">( VarName, hdrbuf(i), n ) ; i = i + n<a name='49'>
+  hdrbuf(i) = FieldType       ; i = i+1<a name='50'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_3">( MemoryOrder, hdrbuf(i), n ) ; i = i + n<a name='51'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_4">( Stagger,     hdrbuf(i), n ) ; i = i + n<a name='52'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_5">( DimNames(1), hdrbuf(i), n ) ; i = i + n<a name='53'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_6">( DimNames(2), hdrbuf(i), n ) ; i = i + n<a name='54'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_7">( DimNames(3), hdrbuf(i), n ) ; i = i + n<a name='55'>
+  hdrbuf(i) = DomainStart(1)     ; i = i+1<a name='56'>
+  hdrbuf(i) = DomainStart(2)     ; i = i+1<a name='57'>
+  hdrbuf(i) = DomainStart(3)     ; i = i+1<a name='58'>
+  hdrbuf(i) = DomainEnd(1)       ; i = i+1<a name='59'>
+  hdrbuf(i) = DomainEnd(2)       ; i = i+1<a name='60'>
+  hdrbuf(i) = DomainEnd(3)       ; i = i+1<a name='61'>
+  hdrbuf(i) = PatchStart(1)     ; i = i+1<a name='62'>
+  hdrbuf(i) = PatchStart(2)     ; i = i+1<a name='63'>
+  hdrbuf(i) = PatchStart(3)     ; i = i+1<a name='64'>
+  hdrbuf(i) = PatchEnd(1)       ; i = i+1<a name='65'>
+  hdrbuf(i) = PatchEnd(2)       ; i = i+1<a name='66'>
+  hdrbuf(i) = PatchEnd(3)       ; i = i+1<a name='67'>
+<a name='68'>
+  hdrbufsize = (i-1) * itypesize  <font color=#447700>! return the number in bytes<a name='69'></font>
+  hdrbuf(1) = hdrbufsize<a name='70'>
+<a name='71'>
+  RETURN<a name='72'>
+END SUBROUTINE int_gen_write_field_header<a name='73'>
+<a name='74'>
+<a name='75'>
+<A NAME='INT_GET_WRITE_FIELD_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='76'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_write_field_header</font> ( hdrbuf, hdrbufsize, itypesize, ftypesize, &amp; <A href='../../call_to/INT_GET_WRITE_FIELD_HEADER.html' TARGET='index'>3</A>,<A href='../../call_from/INT_GET_WRITE_FIELD_HEADER.html' TARGET='index'>16</A><a name='77'>
+                                        DataHandle , DateStr , VarName , Dummy , FieldType , Comm , IOComm,  &amp;<a name='78'>
+                                        DomainDesc , MemoryOrder , Stagger , DimNames ,              &amp;<a name='79'>
+                                        DomainStart , DomainEnd ,                                    &amp;<a name='80'>
+                                        MemoryStart , MemoryEnd ,                                    &amp;<a name='81'>
+                                        PatchStart , PatchEnd )<a name='82'>
+  IMPLICIT NONE<a name='83'>
+  INCLUDE 'intio_tags.h'<a name='84'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='85'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='86'>
+  INTEGER, INTENT(INOUT)   ::  itypesize, ftypesize<a name='87'>
+<a name='88'>
+  INTEGER ,       INTENT(OUT)    :: DataHandle<a name='89'>
+  CHARACTER*(*) :: DateStr<a name='90'>
+  CHARACTER*(*) :: VarName<a name='91'>
+  integer                       :: dummy<a name='92'>
+  integer                                       :: FieldType<a name='93'>
+  integer                                      :: Comm<a name='94'>
+  integer                                      :: IOComm<a name='95'>
+  integer                                       :: DomainDesc<a name='96'>
+  character*(*)                                 :: MemoryOrder<a name='97'>
+  character*(*)                                 :: Stagger<a name='98'>
+  character*(*) , dimension (*)                 :: DimNames<a name='99'>
+  integer ,dimension(*)                         :: DomainStart, DomainEnd<a name='100'>
+  integer ,dimension(*)                         :: MemoryStart, MemoryEnd<a name='101'>
+  integer ,dimension(*)                         :: PatchStart,  PatchEnd<a name='102'>
+  character*132 mess<a name='103'>
+<a name='104'>
+  INTEGER i, n<a name='105'>
+<a name='106'>
+  hdrbufsize = hdrbuf(1)<a name='107'>
+  IF ( hdrbuf(2) .NE. int_field ) THEN<a name='108'>
+    write(mess,*)'int_get_write_field_header: hdrbuf(2) ne int_field ',hdrbuf(2),int_field<a name='109'>
+    CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_74"> ( mess )<a name='110'>
+  ENDIF<a name='111'>
+  ftypesize = hdrbuf(3)<a name='112'>
+<a name='113'>
+   i = 4<a name='114'>
+   DataHandle = hdrbuf(i)     ; i = i+1<a name='115'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_1">( DateStr, hdrbuf(i), n )     ; i = i+n<a name='116'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_2">( VarName, hdrbuf(i), n )     ; i = i+n<a name='117'>
+   FieldType = hdrbuf(i)      ; i = i+1<a name='118'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_3">( MemoryOrder, hdrbuf(i), n ) ; i = i+n<a name='119'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_4">( Stagger, hdrbuf(i), n )     ; i = i+n<a name='120'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_5">( DimNames(1), hdrbuf(i), n ) ; i = i+n<a name='121'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_6">( DimNames(2), hdrbuf(i), n ) ; i = i+n<a name='122'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_WRITE_FIELD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_7">( DimNames(3), hdrbuf(i), n ) ; i = i+n<a name='123'>
+   DomainStart(1) = hdrbuf(i)    ; i = i+1<a name='124'>
+   DomainStart(2) = hdrbuf(i)    ; i = i+1<a name='125'>
+   DomainStart(3) = hdrbuf(i)    ; i = i+1<a name='126'>
+   DomainEnd(1) = hdrbuf(i)       ; i = i+1<a name='127'>
+   DomainEnd(2) = hdrbuf(i)       ; i = i+1<a name='128'>
+   DomainEnd(3) = hdrbuf(i)       ; i = i+1<a name='129'>
+   PatchStart(1) = hdrbuf(i)     ; i = i+1<a name='130'>
+   PatchStart(2) = hdrbuf(i)     ; i = i+1<a name='131'>
+   PatchStart(3) = hdrbuf(i)     ; i = i+1<a name='132'>
+   PatchEnd(1) = hdrbuf(i)       ; i = i+1<a name='133'>
+   PatchEnd(2) = hdrbuf(i)       ; i = i+1<a name='134'>
+   PatchEnd(3) = hdrbuf(i)       ; i = i+1<a name='135'>
+<a name='136'>
+  RETURN<a name='137'>
+END SUBROUTINE int_get_write_field_header<a name='138'>
+<a name='139'>
+<font color=#447700>!!!!!!!!<a name='140'></font>
+<a name='141'>
+<A NAME='INT_GEN_OFR_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_OFR_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='142'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_ofr_header</font>( hdrbuf, hdrbufsize, itypesize, &amp;,<A href='../../call_from/INT_GEN_OFR_HEADER.html' TARGET='index'>4</A><a name='143'>
+                                FileName, SysDepInfo, DataHandle )<a name='144'>
+  IMPLICIT NONE<a name='145'>
+  INCLUDE 'intio_tags.h'<a name='146'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='147'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='148'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='149'>
+<font color=#447700>!Local<a name='150'></font>
+  INTEGER ,       INTENT(IN)    :: DataHandle<a name='151'>
+  CHARACTER*(*) :: FileName<a name='152'>
+  CHARACTER*(*) :: SysDepInfo<a name='153'>
+  INTEGER i, n<a name='154'>
+<font color=#447700>!<a name='155'></font>
+  hdrbuf(1) = 0  <font color=#447700>!deferred<a name='156'></font>
+  hdrbuf(2) = int_open_for_read<a name='157'>
+  i = 3<a name='158'>
+  hdrbuf(i) = DataHandle     ; i = i+1<a name='159'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_OFR_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_8">( FileName, hdrbuf(i), n )   ; i = i + n<a name='160'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_OFR_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_9">( SysDepInfo, hdrbuf(i), n ) ; i = i + n<a name='161'>
+  hdrbufsize = (i-1) * itypesize  <font color=#447700>! return the number in bytes<a name='162'></font>
+  hdrbuf(1) = hdrbufsize<a name='163'>
+  RETURN<a name='164'>
+END SUBROUTINE int_gen_ofr_header<a name='165'>
+<a name='166'>
+<A NAME='INT_GET_OFR_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_OFR_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='167'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_ofr_header</font>( hdrbuf, hdrbufsize, itypesize, &amp;,<A href='../../call_from/INT_GET_OFR_HEADER.html' TARGET='index'>4</A><a name='168'>
+                                FileName, SysDepInfo, DataHandle )<a name='169'>
+  IMPLICIT NONE<a name='170'>
+  INCLUDE 'intio_tags.h'<a name='171'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='172'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='173'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='174'>
+<font color=#447700>!Local<a name='175'></font>
+  INTEGER ,       INTENT(OUT)    :: DataHandle<a name='176'>
+  CHARACTER*(*) :: FileName<a name='177'>
+  CHARACTER*(*) :: SysDepInfo<a name='178'>
+  INTEGER i, n<a name='179'>
+  integer ii<a name='180'>
+<font color=#447700>!<a name='181'></font>
+  hdrbufsize = hdrbuf(1)<a name='182'>
+<font color=#447700>!  IF ( hdrbuf(2) .NE. int_open_for_read ) THEN<a name='183'></font>
+<font color=#447700>!    CALL wrf_error_fatal ( "int_get_ofr_header: hdrbuf ne int_open_for_read")<a name='184'></font>
+<font color=#447700>!  ENDIF<a name='185'></font>
+  i = 3<a name='186'>
+  DataHandle = hdrbuf(i)    ; i = i+1<a name='187'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_OFR_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_8">( FileName, hdrbuf(i), n ) ; i = i+n<a name='188'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_OFR_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_9">( SysDepInfo, hdrbuf(i), n ) ; i = i+n<a name='189'>
+  RETURN<a name='190'>
+END SUBROUTINE int_get_ofr_header<a name='191'>
+<a name='192'>
+<font color=#447700>!!!!!!!!<a name='193'></font>
+<a name='194'>
+<A NAME='INT_GEN_OFWB_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_OFWB_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='195'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_ofwb_header</font>( hdrbuf, hdrbufsize, itypesize, &amp; <A href='../../call_to/INT_GEN_OFWB_HEADER.html' TARGET='index'>1</A>,<A href='../../call_from/INT_GEN_OFWB_HEADER.html' TARGET='index'>4</A><a name='196'>
+				FileName, SysDepInfo, io_form, DataHandle )<a name='197'>
+  IMPLICIT NONE<a name='198'>
+  INCLUDE 'intio_tags.h'<a name='199'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='200'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='201'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='202'>
+  INTEGER ,       INTENT(IN)    :: io_form<a name='203'>
+  INTEGER ,       INTENT(IN)    :: DataHandle<a name='204'>
+<font color=#447700>!Local<a name='205'></font>
+  CHARACTER*(*) :: FileName<a name='206'>
+  CHARACTER*(*) :: SysDepInfo<a name='207'>
+  INTEGER i, n<a name='208'>
+<font color=#447700>!<a name='209'></font>
+  hdrbuf(1) = 0  <font color=#447700>!deferred<a name='210'></font>
+  hdrbuf(2) = int_open_for_write_begin<a name='211'>
+  i = 3<a name='212'>
+  hdrbuf(i) = DataHandle     ; i = i+1<a name='213'>
+  hdrbuf(i) = io_form        ; i = i+1<a name='214'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_OFWB_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_10">( FileName, hdrbuf(i), n )   ; i = i + n<a name='215'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_OFWB_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_11">( SysDepInfo, hdrbuf(i), n ) ; i = i + n<a name='216'>
+  hdrbufsize = (i-1) * itypesize  <font color=#447700>! return the number in bytes<a name='217'></font>
+  hdrbuf(1) = hdrbufsize<a name='218'>
+  RETURN<a name='219'>
+END SUBROUTINE int_gen_ofwb_header<a name='220'>
+<a name='221'>
+<A NAME='INT_GET_OFWB_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_OFWB_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='222'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_ofwb_header</font>( hdrbuf, hdrbufsize, itypesize, &amp; <A href='../../call_to/INT_GET_OFWB_HEADER.html' TARGET='index'>1</A>,<A href='../../call_from/INT_GET_OFWB_HEADER.html' TARGET='index'>4</A><a name='223'>
+				FileName, SysDepInfo, io_form, DataHandle )<a name='224'>
+  IMPLICIT NONE<a name='225'>
+  INCLUDE 'intio_tags.h'<a name='226'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='227'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='228'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='229'>
+  INTEGER ,       INTENT(OUT)    :: DataHandle<a name='230'>
+  INTEGER ,       INTENT(OUT)    :: io_form<a name='231'>
+<font color=#447700>!Local<a name='232'></font>
+  CHARACTER*(*) :: FileName<a name='233'>
+  CHARACTER*(*) :: SysDepInfo<a name='234'>
+  INTEGER i, n<a name='235'>
+  integer ii<a name='236'>
+<font color=#447700>!<a name='237'></font>
+  hdrbufsize = hdrbuf(1)<a name='238'>
+<font color=#447700>!  IF ( hdrbuf(2) .NE. int_open_for_write_begin ) THEN<a name='239'></font>
+<font color=#447700>!    CALL wrf_error_fatal ( "int_get_ofwb_header: hdrbuf ne int_open_for_write_begin") <a name='240'></font>
+<font color=#447700>!  ENDIF<a name='241'></font>
+  i = 3<a name='242'>
+  DataHandle = hdrbuf(i)    ; i = i+1<a name='243'>
+  io_form    = hdrbuf(i)    ; i = i+1<a name='244'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_OFWB_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_10">( FileName, hdrbuf(i), n ) ; i = i+n<a name='245'>
+  call <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_OFWB_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_11">( SysDepInfo, hdrbuf(i), n ) ; i = i+n<a name='246'>
+  RETURN<a name='247'>
+END SUBROUTINE int_get_ofwb_header<a name='248'>
+<a name='249'>
+<font color=#447700>!!!!!!!!!!<a name='250'></font>
+<a name='251'>
+<A NAME='INT_GEN_HANDLE_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_HANDLE_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='252'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_handle_header</font>( hdrbuf, hdrbufsize, itypesize, &amp; <A href='../../call_to/INT_GEN_HANDLE_HEADER.html' TARGET='index'>3</A><a name='253'>
+                                DataHandle , code )<a name='254'>
+  IMPLICIT NONE<a name='255'>
+  INCLUDE 'intio_tags.h'<a name='256'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='257'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='258'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='259'>
+  INTEGER ,       INTENT(IN)    :: DataHandle, code<a name='260'>
+<font color=#447700>!Local<a name='261'></font>
+  INTEGER i<a name='262'>
+<font color=#447700>!<a name='263'></font>
+  hdrbuf(1) = 0  <font color=#447700>!deferred<a name='264'></font>
+  hdrbuf(2) = code<a name='265'>
+  i = 3<a name='266'>
+  hdrbuf(i) = DataHandle     ; i = i+1<a name='267'>
+  hdrbufsize = (i-1) * itypesize  <font color=#447700>! return the number in bytes<a name='268'></font>
+  hdrbuf(1) = hdrbufsize<a name='269'>
+  RETURN<a name='270'>
+END SUBROUTINE int_gen_handle_header<a name='271'>
+<a name='272'>
+<A NAME='INT_GET_HANDLE_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_HANDLE_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='273'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_handle_header</font>( hdrbuf, hdrbufsize, itypesize, &amp; <A href='../../call_to/INT_GET_HANDLE_HEADER.html' TARGET='index'>3</A><a name='274'>
+                                DataHandle , code )<a name='275'>
+  IMPLICIT NONE<a name='276'>
+  INCLUDE 'intio_tags.h'<a name='277'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='278'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='279'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='280'>
+  INTEGER ,       INTENT(OUT)    :: DataHandle, code<a name='281'>
+<font color=#447700>!Local<a name='282'></font>
+  INTEGER i<a name='283'>
+<font color=#447700>!<a name='284'></font>
+  hdrbufsize = hdrbuf(1)<a name='285'>
+  code       = hdrbuf(2)<a name='286'>
+  i = 3<a name='287'>
+  DataHandle = hdrbuf(i)    ; i = i+1<a name='288'>
+  RETURN<a name='289'>
+END SUBROUTINE int_get_handle_header<a name='290'>
+<a name='291'>
+<font color=#447700>!!!!!!!!!!!!<a name='292'></font>
+<a name='293'>
+<A NAME='INT_GEN_TI_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_TI_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='294'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_ti_header</font>( hdrbuf, hdrbufsize, itypesize, typesize, &amp; <A href='../../call_to/INT_GEN_TI_HEADER.html' TARGET='index'>2</A>,<A href='../../call_from/INT_GEN_TI_HEADER.html' TARGET='index'>1</A><a name='295'>
+                              DataHandle, Element, Data, Count, code )<a name='296'>
+  IMPLICIT NONE<a name='297'>
+  INCLUDE 'intio_tags.h'<a name='298'>
+  INTEGER, INTENT(INOUT)       ::  hdrbuf(*)<a name='299'>
+  INTEGER, INTENT(OUT)         ::  hdrbufsize<a name='300'>
+  INTEGER, INTENT(IN)          ::  itypesize, typesize<a name='301'>
+  CHARACTER*(*) ::  Element<a name='302'>
+  INTEGER, INTENT(IN)          ::  Data, Count<a name='303'>
+  INTEGER, INTENT(IN)          ::  DataHandle, code<a name='304'>
+<font color=#447700>!Local<a name='305'></font>
+  INTEGER i, n<a name='306'>
+<font color=#447700>!<a name='307'></font>
+  CALL int_gen_ti_header_c ( hdrbuf, hdrbufsize, itypesize, typesize, &amp;<a name='308'>
+                             DataHandle, Data, Count, code )<a name='309'>
+  i = hdrbufsize/itypesize + 1 ;<a name='310'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_TI_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_12"> ( Element, hdrbuf( i ), n ) ; i = i + n<a name='311'>
+  hdrbufsize = n * itypesize + hdrbufsize <font color=#447700>! return the number in bytes<a name='312'></font>
+  hdrbuf(1) = hdrbufsize<a name='313'>
+  RETURN<a name='314'>
+END SUBROUTINE int_gen_ti_header<a name='315'>
+<a name='316'>
+<A NAME='INT_GET_TI_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_TI_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='317'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_ti_header</font>( hdrbuf, hdrbufsize, itypesize, typesize, &amp; <A href='../../call_to/INT_GET_TI_HEADER.html' TARGET='index'>2</A>,<A href='../../call_from/INT_GET_TI_HEADER.html' TARGET='index'>1</A><a name='318'>
+                              DataHandle, Element, Data, Count, code )<a name='319'>
+  IMPLICIT NONE<a name='320'>
+  INCLUDE 'intio_tags.h'<a name='321'>
+  INTEGER, INTENT(INOUT)       ::  hdrbuf(*)<a name='322'>
+  INTEGER, INTENT(OUT)         ::  hdrbufsize<a name='323'>
+  INTEGER, INTENT(IN)          ::  itypesize, typesize<a name='324'>
+  CHARACTER*(*) ::  Element<a name='325'>
+  INTEGER, INTENT(OUT)         ::  Data, Count<a name='326'>
+  INTEGER, INTENT(OUT)         ::  DataHandle, code<a name='327'>
+<font color=#447700>!Local<a name='328'></font>
+  INTEGER i, n<a name='329'>
+<font color=#447700>!<a name='330'></font>
+<a name='331'>
+  CALL int_get_ti_header_c ( hdrbuf, hdrbufsize, n, itypesize, typesize, &amp;<a name='332'>
+                           DataHandle, Data, Count, code )<a name='333'>
+  i = 1 <a name='334'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_TI_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_12"> ( Element, hdrbuf( n/itypesize + 1 ), n ) ;<a name='335'>
+  hdrbufsize = hdrbuf(1)<a name='336'>
+  RETURN<a name='337'>
+END SUBROUTINE int_get_ti_header<a name='338'>
+<a name='339'>
+<font color=#447700>!!!!!!!!!!!!<a name='340'></font>
+<a name='341'>
+<A NAME='INT_GEN_TI_HEADER_CHAR'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_TI_HEADER_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='342'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_ti_header_char</font>( hdrbuf, hdrbufsize, itypesize, &amp; <A href='../../call_to/INT_GEN_TI_HEADER_CHAR.html' TARGET='index'>3</A>,<A href='../../call_from/INT_GEN_TI_HEADER_CHAR.html' TARGET='index'>6</A><a name='343'>
+                              DataHandle, Element, VarName, Data, code )<a name='344'>
+  IMPLICIT NONE<a name='345'>
+  INCLUDE 'intio_tags.h'<a name='346'>
+  INTEGER, INTENT(INOUT)       ::  hdrbuf(*)<a name='347'>
+  INTEGER, INTENT(OUT)         ::  hdrbufsize<a name='348'>
+  INTEGER, INTENT(IN)          ::  itypesize<a name='349'>
+  CHARACTER*(*) ::  Element, Data, VarName<a name='350'>
+  INTEGER, INTENT(IN)          ::  DataHandle, code<a name='351'>
+<font color=#447700>!Local<a name='352'></font>
+  INTEGER                      ::  DummyData<a name='353'>
+  INTEGER i, n, Count, DummyCount<a name='354'>
+<font color=#447700>!<a name='355'></font>
+  DummyCount = 0<a name='356'>
+  CALL int_gen_ti_header_c ( hdrbuf, hdrbufsize, itypesize, 1, &amp;<a name='357'>
+                             DataHandle, DummyData, DummyCount, code )<a name='358'>
+  i = hdrbufsize/itypesize+1 ;<a name='359'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_TI_HEADER_CHAR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_13"> ( Element, hdrbuf( i ), n ) ; i = i + n<a name='360'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_TI_HEADER_CHAR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_14"> ( Data   , hdrbuf( i ), n ) ; i = i + n<a name='361'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_TI_HEADER_CHAR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_15"> ( VarName   , hdrbuf( i ), n ) ; i = i + n<a name='362'>
+  hdrbufsize = (i-1) * itypesize + hdrbufsize <font color=#447700>! return the number in bytes<a name='363'></font>
+  hdrbuf(1) = hdrbufsize<a name='364'>
+  RETURN<a name='365'>
+END SUBROUTINE int_gen_ti_header_char<a name='366'>
+<a name='367'>
+<A NAME='INT_GET_TI_HEADER_CHAR'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_TI_HEADER_CHAR' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='368'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_ti_header_char</font>( hdrbuf, hdrbufsize, itypesize, &amp; <A href='../../call_to/INT_GET_TI_HEADER_CHAR.html' TARGET='index'>3</A>,<A href='../../call_from/INT_GET_TI_HEADER_CHAR.html' TARGET='index'>6</A><a name='369'>
+                              DataHandle, Element, VarName, Data, code )<a name='370'>
+  IMPLICIT NONE<a name='371'>
+  INCLUDE 'intio_tags.h'<a name='372'>
+  INTEGER, INTENT(INOUT)       ::  hdrbuf(*)<a name='373'>
+  INTEGER, INTENT(OUT)         ::  hdrbufsize<a name='374'>
+  INTEGER, INTENT(IN)          ::  itypesize<a name='375'>
+  CHARACTER*(*)                ::  Element, VarName<a name='376'>
+  CHARACTER*(*)                ::  Data<a name='377'>
+  INTEGER, INTENT(OUT)         ::  DataHandle, code<a name='378'>
+<font color=#447700>!Local<a name='379'></font>
+  INTEGER i, n, DummyCount, typesize<a name='380'>
+  CHARACTER * 132  dummyData<a name='381'>
+logical, external :: debug_foo<a name='382'>
+<font color=#447700>!<a name='383'></font>
+  CALL int_get_ti_header_c ( hdrbuf, hdrbufsize, n, itypesize, typesize, &amp;<a name='384'>
+                           DataHandle, dummyData, DummyCount, code )<a name='385'>
+  i = n/itypesize+1 ;<a name='386'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_TI_HEADER_CHAR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_13"> ( Element, hdrbuf( i ), n ) ; i = i + n<a name='387'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_TI_HEADER_CHAR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_14"> ( Data   , hdrbuf( i ), n ) ; i = i + n<a name='388'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_TI_HEADER_CHAR' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_15"> ( VarName  , hdrbuf( i ), n ) ; i = i + n<a name='389'>
+  hdrbufsize = hdrbuf(1)<a name='390'>
+<a name='391'>
+  RETURN<a name='392'>
+END SUBROUTINE int_get_ti_header_char<a name='393'>
+<a name='394'>
+<a name='395'>
+<font color=#447700>!!!!!!!!!!!!<a name='396'></font>
+<a name='397'>
+<A NAME='INT_GEN_TD_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_TD_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='398'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_td_header</font>( hdrbuf, hdrbufsize, itypesize, typesize, &amp;,<A href='../../call_from/INT_GEN_TD_HEADER.html' TARGET='index'>2</A><a name='399'>
+                              DataHandle, DateStr, Element, Data, Count, code )<a name='400'>
+  IMPLICIT NONE<a name='401'>
+  INCLUDE 'intio_tags.h'<a name='402'>
+  INTEGER, INTENT(INOUT)       ::  hdrbuf(*)<a name='403'>
+  INTEGER, INTENT(OUT)         ::  hdrbufsize<a name='404'>
+  INTEGER, INTENT(IN)          ::  itypesize, typesize<a name='405'>
+  CHARACTER*(*) ::  DateStr, Element<a name='406'>
+  INTEGER, INTENT(IN)          ::  Data, Count<a name='407'>
+  INTEGER, INTENT(IN)          ::  DataHandle, code<a name='408'>
+<font color=#447700>!Local<a name='409'></font>
+  INTEGER i, n<a name='410'>
+<font color=#447700>!<a name='411'></font>
+<a name='412'>
+  CALL int_gen_ti_header_c ( hdrbuf, hdrbufsize, itypesize, typesize, &amp;<a name='413'>
+                           DataHandle, Data, Count, code )<a name='414'>
+  i = hdrbufsize/itypesize + 1 ;<a name='415'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_TD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_16"> ( DateStr, hdrbuf( i ), n ) ; i = i + n<a name='416'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_PACK_STRING'>int_pack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GEN_TD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_PACK_STRING_17"> ( Element, hdrbuf( i ), n ) ; i = i + n<a name='417'>
+  hdrbufsize = (i-1) * itypesize + hdrbufsize <font color=#447700>! return the number in bytes<a name='418'></font>
+  hdrbuf(1) = hdrbufsize<a name='419'>
+  RETURN<a name='420'>
+END SUBROUTINE int_gen_td_header<a name='421'>
+<a name='422'>
+<A NAME='INT_GET_TD_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_TD_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='423'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_td_header</font>( hdrbuf, hdrbufsize, itypesize, typesize, &amp; <A href='../../call_to/INT_GET_TD_HEADER.html' TARGET='index'>2</A>,<A href='../../call_from/INT_GET_TD_HEADER.html' TARGET='index'>2</A><a name='424'>
+                              DataHandle, DateStr, Element, Data, Count, code )<a name='425'>
+  IMPLICIT NONE<a name='426'>
+  INCLUDE 'intio_tags.h'<a name='427'>
+  INTEGER, INTENT(INOUT)       ::  hdrbuf(*)<a name='428'>
+  INTEGER, INTENT(OUT)         ::  hdrbufsize<a name='429'>
+  INTEGER, INTENT(IN)          ::  itypesize, typesize<a name='430'>
+  CHARACTER*(*) ::  DateStr, Element<a name='431'>
+  INTEGER, INTENT(OUT)         ::  Data, Count<a name='432'>
+  INTEGER, INTENT(OUT)         ::  DataHandle, code<a name='433'>
+<font color=#447700>!Local<a name='434'></font>
+  INTEGER i, n<a name='435'>
+<font color=#447700>!<a name='436'></font>
+<a name='437'>
+  CALL int_get_ti_header_c ( hdrbuf, hdrbufsize, n, itypesize, typesize, &amp;<a name='438'>
+                           DataHandle, Data, Count, code )<a name='439'>
+  i = n/itypesize + 1 ;<a name='440'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_TD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_16"> ( DateStr, hdrbuf( i ), n ) ; i = i + n ;<a name='441'>
+  CALL <A href='../../html_code/frame/module_internal_header_util.F.html#INT_UNPACK_STRING'>int_unpack_string</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_TD_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INT_UNPACK_STRING_17"> ( Element, hdrbuf( i ), n ) ; i = i + n ;<a name='442'>
+  hdrbufsize = hdrbuf(1)<a name='443'>
+  RETURN<a name='444'>
+END SUBROUTINE int_get_td_header<a name='445'>
+<a name='446'>
+<font color=#447700>!!!!!!!!!!!!!!<a name='447'></font>
+<a name='448'>
+<A NAME='INT_GEN_NOOP_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GEN_NOOP_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='449'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_gen_noop_header</font> ( hdrbuf, hdrbufsize, itypesize ) <A href='../../call_to/INT_GEN_NOOP_HEADER.html' TARGET='index'>8</A><a name='450'>
+  IMPLICIT NONE<a name='451'>
+  INCLUDE 'intio_tags.h'<a name='452'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='453'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='454'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='455'>
+<font color=#447700>!Local<a name='456'></font>
+  INTEGER i<a name='457'>
+<font color=#447700>!<a name='458'></font>
+  hdrbuf(1) = 0  <font color=#447700>!deferred<a name='459'></font>
+  hdrbuf(2) = int_noop<a name='460'>
+  i = 3<a name='461'>
+  hdrbufsize = (i-1) * itypesize  <font color=#447700>! return the number in bytes<a name='462'></font>
+  hdrbuf(1) = hdrbufsize<a name='463'>
+  RETURN<a name='464'>
+END SUBROUTINE int_gen_noop_header<a name='465'>
+<a name='466'>
+<A NAME='INT_GET_NOOP_HEADER'><A href='../../html_code/frame/internal_header_util.F.html#INT_GET_NOOP_HEADER' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='467'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_get_noop_header</font>( hdrbuf, hdrbufsize, itypesize ) <A href='../../call_to/INT_GET_NOOP_HEADER.html' TARGET='index'>1</A>,<A href='../../call_from/INT_GET_NOOP_HEADER.html' TARGET='index'>2</A><a name='468'>
+  IMPLICIT NONE<a name='469'>
+  INCLUDE 'intio_tags.h'<a name='470'>
+  INTEGER, INTENT(INOUT) ::  hdrbuf(*)<a name='471'>
+  INTEGER, INTENT(OUT)   ::  hdrbufsize<a name='472'>
+  INTEGER, INTENT(INOUT)   ::  itypesize<a name='473'>
+<font color=#447700>!Local<a name='474'></font>
+  INTEGER i<a name='475'>
+<font color=#447700>!<a name='476'></font>
+  hdrbufsize = hdrbuf(1)<a name='477'>
+  IF ( hdrbuf(2) .NE. int_noop ) THEN<a name='478'>
+    CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_ERROR_FATAL'>wrf_error_fatal</A><A href='../../html_code/frame/module_internal_header_util.F.html#INT_GET_NOOP_HEADER' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_ERROR_FATAL_75"> ( "int_get_noop_header: hdrbuf ne int_noop")<a name='479'>
+  ENDIF<a name='480'>
+  i = 3<a name='481'>
+  RETURN<a name='482'>
+END SUBROUTINE int_get_noop_header<a name='483'>
+<a name='484'>
+<a name='485'>
+<font color=#447700>! first int is length of string to follow then string encodes as ints<a name='486'></font>
+<A NAME='INT_PACK_STRING'><A href='../../html_code/frame/internal_header_util.F.html#INT_PACK_STRING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='487'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_pack_string</font> ( str, buf, n ) <A href='../../call_to/INT_PACK_STRING.html' TARGET='index'>40</A><a name='488'>
+  IMPLICIT NONE<a name='489'>
+  CHARACTER*(*) :: str<a name='490'>
+  INTEGER, INTENT(OUT) :: n    <font color=#447700>! on return, N is the number of ints stored in buf<a name='491'></font>
+  INTEGER, INTENT(OUT), DIMENSION(*) :: buf<a name='492'>
+  INTEGER i<a name='493'>
+  n = 1<a name='494'>
+  buf(n) = LEN(TRIM(str))<a name='495'>
+  n = n+1<a name='496'>
+  DO i = 1, LEN(TRIM(str))<a name='497'>
+    buf(n) = ichar(str(i:i))<a name='498'>
+    n = n+1<a name='499'>
+  ENDDO<a name='500'>
+  n = n - 1<a name='501'>
+END SUBROUTINE int_pack_string<a name='502'>
+<a name='503'>
+<A NAME='INT_UNPACK_STRING'><A href='../../html_code/frame/internal_header_util.F.html#INT_UNPACK_STRING' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='504'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>int_unpack_string</font> ( str, buf, n ) <A href='../../call_to/INT_UNPACK_STRING.html' TARGET='index'>40</A><a name='505'>
+  IMPLICIT NONE<a name='506'>
+  CHARACTER*(*) :: str<a name='507'>
+  INTEGER, INTENT(OUT) :: n       <font color=#447700>! on return, N is the number of ints copied from buf<a name='508'></font>
+  INTEGER, INTENT(IN), DIMENSION(*) :: buf<a name='509'>
+  INTEGER i<a name='510'>
+  INTEGER strlen<a name='511'>
+  strlen = buf(1)<a name='512'>
+  str = ""<a name='513'>
+  DO i = 1, strlen<a name='514'>
+    str(i:i) = char(buf(i+1))<a name='515'>
+  ENDDO<a name='516'>
+  n = strlen + 1<a name='517'>
+END SUBROUTINE int_unpack_string<a name='518'>
+<a name='519'>
+<a name='520'>
+</pre></body></html>

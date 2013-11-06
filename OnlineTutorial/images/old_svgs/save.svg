@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="150px"
+	 height="150px" viewBox="0 0 150 150" enable-background="new 0 0 150 150" xml:space="preserve">
+<g id="Button">
+	<g>
+		
+			<image overflow="visible" opacity="0.75" width="500" height="500" xlink:href="D84D1711.png"  transform="matrix(0.24 0 0 0.24 22 22)">
+		</image>
+		<g>
+			<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="106.8193" y1="106.8193" x2="43.1804" y2="43.1804">
+				<stop  offset="0" style="stop-color:#000000"/>
+				<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.5"/>
+			</linearGradient>
+			<circle fill="url(#SVGID_1_)" cx="75" cy="75" r="45"/>
+		</g>
+	</g>
+</g>
+<g id="Layer_1">
+	<title  id="title9903">floppy disk</title>
+	
+		<sodipodi:namedview  id="base" inkscape:cy="27.224388" showgrid="true" inkscape:cx="-17.376581" bordercolor="#666666" inkscape:zoom="5.5" pagecolor="#ffffff" fit-margin-top="0" fit-margin-left="0" borderopacity="1.0" inkscape:window-maximized="1" inkscape:window-y="24" inkscape:window-x="0" inkscape:window-height="691" inkscape:window-width="1366" fit-margin-bottom="0" fit-margin-right="0" inkscape:current-layer="layer1" inkscape:pageopacity="0.0" inkscape:grid-bbox="true" inkscape:document-units="px" inkscape:pageshadow="2">
+		</sodipodi:namedview>
+	<g id="layer1" transform="translate(-7.3765814,-3.3318884)" inkscape:label="Layer 1" inkscape:groupmode="layer">
+		
+			<g id="g10374" transform="matrix(1.7783977,0,0,1.7783977,-26.92109,-108.20801)" inkscape:export-filename="/home/gaetano/Scrivania/salva progetto.png" inkscape:export-xdpi="22.906492" inkscape:export-ydpi="22.906492">
+			<rect id="rect10376" x="46.637" y="89.467" fill="#010101" width="29.643" height="31.429"/>
+			<rect id="rect10378" x="53.066" y="91.442" fill="#BCBEC0" width="16.072" height="11.239"/>
+			<rect id="rect10380" x="49.137" y="105.471" fill="#FFFFFF" width="24.286" height="12.211"/>
+			<rect id="rect10382" x="62.566" y="92.681" fill="#010101" width="3.928" height="8.928"/>
+		</g>
+	</g>
+</g>
+</svg>

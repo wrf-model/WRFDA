@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generator: Adobe Illustrator 16.0.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" width="150px"
+	 height="150px" viewBox="0 0 150 150" enable-background="new 0 0 150 150" xml:space="preserve">
+<g id="Button">
+	<linearGradient id="SVGID_1_" gradientUnits="userSpaceOnUse" x1="105.9141" y1="104.3203" x2="42.2738" y2="40.68">
+		<stop  offset="0" style="stop-color:#000000"/>
+		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.5"/>
+	</linearGradient>
+	<circle fill="url(#SVGID_1_)" cx="74.094" cy="72.5" r="45"/>
+	<radialGradient id="SVGID_2_" cx="78.0938" cy="77.5" r="55" gradientUnits="userSpaceOnUse">
+		<stop  offset="0.8" style="stop-color:#231F20"/>
+		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0"/>
+	</radialGradient>
+	
+		<circle opacity="0.5" fill="none" stroke="url(#SVGID_2_)" stroke-width="20" stroke-miterlimit="10" cx="78.094" cy="77.5" r="45"/>
+	<circle fill="#FFFFFF" cx="74.094" cy="72.5" r="45"/>
+	<linearGradient id="SVGID_3_" gradientUnits="userSpaceOnUse" x1="105.9141" y1="104.3203" x2="42.2738" y2="40.68">
+		<stop  offset="0" style="stop-color:#1A1A1A"/>
+		<stop  offset="1" style="stop-color:#FFFFFF;stop-opacity:0.5"/>
+	</linearGradient>
+	<circle fill="url(#SVGID_3_)" cx="74.094" cy="72.5" r="45"/>
+</g>
+<g id="Thumbup">
+	<g>
+		<title>Layer 1</title>
+		<g id="layer1">
+			<g id="g9726">
+				<g id="g5713">
+					<path id="rect9675" fill="#010101" d="M70.327,34.13c-2.769,0.239-5.149,2.707-5.609,6.017l-0.51,3.773
+						c-0.103,0.181-0.217,0.351-0.307,0.544L54.043,65.61c-0.399,0.855-0.633,1.751-0.714,2.618h-5.338
+						c-3.495,0-6.323,2.794-6.323,6.289v19.956c0,3.494,2.829,6.323,6.323,6.323h9.281c2.124,1.922,4.919,3.094,8.023,3.094h12.646
+						c6.641,0,11.967-5.327,11.967-11.967V71.355c0-6.64-5.326-11.967-11.967-11.967h-3.91l2.414-17.542
+						c0.525-3.783-1.642-7.204-4.895-7.683C71.144,34.104,70.723,34.095,70.327,34.13L70.327,34.13z"/>
+					<path id="rect9623-6" fill="#010101" d="M102.334,64.94v0.855c0,3.071-2.256,5.561-5.041,5.561H80.229
+						c-2.783,0-5.041-2.49-5.041-5.561V64.94c0-3.071,2.257-5.561,5.041-5.561h17.064C100.078,59.379,102.334,61.869,102.334,64.94z
+						"/>
+					<path id="rect9623-6-5" fill="#010101" d="M106.52,76.774L106.52,76.774c0,3.438-2.43,6.226-5.428,6.226H80.617
+						c-3,0-5.429-2.788-5.429-6.226l0,0c0-3.439,2.429-6.228,5.429-6.228h20.475C104.09,70.547,106.52,73.335,106.52,76.774z"/>
+					<path id="rect9671" fill="#010101" d="M103.053,87.857L103.053,87.857c0,3.393-2.432,6.143-5.43,6.143H80.617
+						c-3,0-5.429-2.75-5.429-6.143l0,0c0-3.392,2.429-6.142,5.429-6.142h17.006C100.621,81.716,103.053,84.466,103.053,87.857z"/>
+					<path id="rect9673" fill="#010101" d="M99.346,98.313L99.346,98.313c0,2.999-2.432,5.43-5.43,5.43H80.617
+						c-3,0-5.429-2.431-5.429-5.43l0,0c0-2.998,2.429-5.429,5.429-5.429h13.299C96.914,92.884,99.346,95.314,99.346,98.313z"/>
+				</g>
+			</g>
+		</g>
+	</g>
+</g>
+</svg>

@@ -1,0 +1,342 @@
+<HTML> <BODY BGCOLOR=#eeddee LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!WRF:DRIVER_LAYER:INTEGRATION<a name='2'></font>
+<font color=#447700>!<a name='3'></font>
+<a name='4'>
+<A NAME='MODULE_INTEGRATE_TST'><A href='../../html_code/frame/module_integrate_tst.F.html#MODULE_INTEGRATE_TST' TARGET='top_target'><IMG SRC="../../gif/bar_purple.gif" border=0></A><a name='5'>
+<font color=#993300>MODULE </font><font color=#cc0000>module_integrate_tst</font> <A href='../../call_to/MODULE_INTEGRATE_TST.html' TARGET='index'>1</A><a name='6'>
+<a name='7'>
+CONTAINS<a name='8'>
+<a name='9'>
+<A NAME='INTEGRATE_TST'><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='10'>
+RECURSIVE <font color=#993300>SUBROUTINE </font><font color=#cc0000>integrate_tst</font> ( grid ) <A href='../../call_to/INTEGRATE_TST.html' TARGET='index'>2</A>,<A href='../../call_from/INTEGRATE_TST.html' TARGET='index'>55</A><a name='11'>
+<a name='12'>
+<a name='13'>
+<a name='14'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_61"><a name='15'>
+   USE <A href='../../html_code/frame/module_driver_constants.F.html#MODULE_DRIVER_CONSTANTS'>module_driver_constants</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DRIVER_CONSTANTS_15"><a name='16'>
+   USE <A href='../../html_code/frame/module_nesting.F.html#MODULE_NESTING'>module_nesting</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_NESTING_5"><a name='17'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_71"><a name='18'>
+   USE <A href='../../html_code/frame/module_timing.F.html#MODULE_TIMING'>module_timing</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_TIMING_13"><a name='19'>
+   USE WRF_ESMF_MOD<a name='20'>
+<a name='21'>
+   IMPLICIT NONE<a name='22'>
+<a name='23'>
+   <font color=#447700>!  Input data.<a name='24'></font>
+<a name='25'>
+   TYPE(domain) , POINTER :: grid<a name='26'>
+<a name='27'>
+<font color=#447700>! module_integrate:integrate<a name='28'></font>
+<font color=#447700>! &lt;DESCRIPTION&gt; <a name='29'></font>
+<font color=#447700>! This is a driver-level routine that controls the integration of a<a name='30'></font>
+<font color=#447700>! domain and subdomains rooted at the domain. <a name='31'></font>
+<font color=#447700>! <a name='32'></font>
+<font color=#447700>! The integrate routine takes a domain pointed to by the argument<a name='33'></font>
+<font color=#447700>! &lt;em&gt;grid&lt;/em&gt; and advances the domain and its associated nests from the<a name='34'></font>
+<font color=#447700>! grid's current time, stored as grid%current_time, to a given time<a name='35'></font>
+<font color=#447700>! forward in the simulation, stored as grid%stop_subtime. The<a name='36'></font>
+<font color=#447700>! stop_subtime value is arbitrary and does not have to be the same as<a name='37'></font>
+<font color=#447700>! time that the domain finished integrating.  The simulation stop time<a name='38'></font>
+<font color=#447700>! for the grid is known to the grid's clock (grid%domain_clock) and that<a name='39'></font>
+<font color=#447700>! is checked with a call to ESMF_ClockIsStopTime prior to beginning the<a name='40'></font>
+<font color=#447700>! loop over time period that is specified by the<a name='41'></font>
+<font color=#447700>! current_time/stop_subtime interval.<a name='42'></font>
+<font color=#447700>! <a name='43'></font>
+<font color=#447700>! The clock, the simulation stop time for the domain, and other timing<a name='44'></font>
+<font color=#447700>! aspects for the grid are set up in the routine<a name='45'></font>
+<font color=#447700>! (&lt;a href="setup_timekeeping.html"&gt;setup_timekeeping&lt;/a&gt;) at the time<a name='46'></font>
+<font color=#447700>! that the domain is initialized.<a name='47'></font>
+<font color=#447700>! The lower-level time library and the type declarations for the times<a name='48'></font>
+<font color=#447700>! and time intervals used are defined in external/esmf_time_f90, or, if <a name='49'></font>
+<font color=#447700>! WRF_ESMF_MOD is defined during build, a site-specific installation of the <a name='50'></font>
+<font color=#447700>! ESMF library is used.  Note that arithmetic and comparison is performed <a name='51'></font>
+<font color=#447700>! on these data types using F90 operator overloading, also defined in that <a name='52'></font>
+<font color=#447700>! library.<a name='53'></font>
+<font color=#447700>! <a name='54'></font>
+<font color=#447700>! This routine is the lowest level of the WRF Driver Layer and for the most<a name='55'></font>
+<font color=#447700>! part the WRF routines that are called from here are in the topmost level<a name='56'></font>
+<font color=#447700>! of the Mediation Layer.  Mediation layer routines typically are not <a name='57'></font>
+<font color=#447700>! defined in modules. Therefore, the routines that this routine calls<a name='58'></font>
+<font color=#447700>! have explicit interfaces specified in an interface block in this routine.<a name='59'></font>
+<font color=#447700>!<a name='60'></font>
+<font color=#447700>! As part of the Driver Layer, this routine is intended to be non model-specific<a name='61'></font>
+<font color=#447700>! and so a minimum of WRF-specific logic is coded at this level. Rather, there<a name='62'></font>
+<font color=#447700>! are a number of calls to mediation layer routines that contain this logic, some<a name='63'></font>
+<font color=#447700>! of which are merely stubs in WRF Mediation Layer that sits below this routine<a name='64'></font>
+<font color=#447700>! in the call tree.  The routines that integrate calls in WRF are defined in<a name='65'></font>
+<font color=#447700>! share/mediation_integrate.F.<a name='66'></font>
+<font color=#447700>! <a name='67'></font>
+<font color=#447700>! Flow of control<a name='68'></font>
+<font color=#447700>! <a name='69'></font>
+<font color=#447700>! 1. Check to see that the domain is not finished <a name='70'></font>
+<font color=#447700>! by testing the value returned by ESMF_ClockIsStopTime for the<a name='71'></font>
+<font color=#447700>! domain.<a name='72'></font>
+<font color=#447700>! <a name='73'></font>
+<font color=#447700>! 2. &lt;a href=model_to_grid_config_rec.html&gt;Model_to_grid_config_rec&lt;/a&gt; is called to load the local config_flags<a name='74'></font>
+<font color=#447700>! structure with the configuration information for the grid stored<a name='75'></font>
+<font color=#447700>! in model_config_rec and indexed by the grid's unique integer id. These<a name='76'></font>
+<font color=#447700>! structures are defined in frame/module_configure.F.<a name='77'></font>
+<font color=#447700>! <a name='78'></font>
+<font color=#447700>! 3. The current time of the domain is retrieved from the domain's clock<a name='79'></font>
+<font color=#447700>! using ESMF_ClockGet.  There is another call to ESMF_ClockGet<a name='80'></font>
+<font color=#447700>! inside the WHILE loop that follows.<a name='81'></font>
+<font color=#447700>! <a name='82'></font>
+<font color=#447700>! 4. Iterate forward while the current time is less than the stop subtime.<a name='83'></font>
+<font color=#447700>! <a name='84'></font>
+<font color=#447700>! 4.a. Start timing for this iteration (only on node zero in distributed-memory runs)<a name='85'></font>
+<font color=#447700>! <a name='86'></font>
+<font color=#447700>! 4.b. Call &lt;a href=med_setup_step.html&gt;med_setup_step&lt;/a&gt; to allow the mediation layer to <a name='87'></font>
+<font color=#447700>! do anything that's needed to call the solver for this domain.  In WRF this means setting<a name='88'></font>
+<font color=#447700>! the indices into the 4D tracer arrays for the domain.<a name='89'></font>
+<font color=#447700>! <a name='90'></font>
+<font color=#447700>! 4.c. Check for any nests that need to be started up at this time.  This is done <a name='91'></font>
+<font color=#447700>! calling the logical function &lt;a href=nests_to_open.html&gt;nests_to_open&lt;/a&gt; (defined in <a name='92'></font>
+<font color=#447700>! frame/module_nesting.F) which returns true and the index into the current domain's list<a name='93'></font>
+<font color=#447700>! of children to use for the nest when one needs to be started.<a name='94'></font>
+<font color=#447700>! <a name='95'></font>
+<font color=#447700>! 4.c.1  Call &lt;a href=alloc_and_configure_domain.html&gt;alloc_and_configure_domain&lt;/a&gt; to allocate<a name='96'></font>
+<font color=#447700>! the new nest and link it as a child of this grid.<a name='97'></font>
+<font color=#447700>! <a name='98'></font>
+<font color=#447700>! 4.c.2  Call &lt;a href=setup_Timekeeping.html&gt;setup_Timekeeping&lt;/a&gt; for the nest.<a name='99'></font>
+<font color=#447700>! <a name='100'></font>
+<font color=#447700>! 4.c.3  Initialize the nest's arrays by calling &lt;a href=med_nest_initial.html&gt;med_nest_initial&lt;/a&gt;. This will<a name='101'></font>
+<font color=#447700>! either interpolate data from this grid onto the nest, read it in from a file, or both. In a restart run, this<a name='102'></font>
+<font color=#447700>! is also where the nest reads in its restart file.<a name='103'></font>
+<font color=#447700>! <a name='104'></font>
+<font color=#447700>! 4.d  If a nest was opened above, check for and resolve overlaps (this is not implemented in WRF 2.0, which<a name='105'></font>
+<font color=#447700>! supports multiple nests on the same level but does not support overlapping).<a name='106'></font>
+<font color=#447700>! <a name='107'></font>
+<font color=#447700>! 4.e  Give the mediation layer an opportunity to do something before the solver is called by<a name='108'></font>
+<font color=#447700>! calling &lt;a href=med_before_solve_io.html&gt;med_before_solve_io&lt;/a&gt;. In WRF this is the point at which history and<a name='109'></font>
+<font color=#447700>! restart data is output.<a name='110'></font>
+<font color=#447700>! <a name='111'></font>
+<font color=#447700>! 4.f  Call &lt;a href=solve_interface_tst.html&gt;solve_interface_tst&lt;/a&gt; which calls the solver that advance the domain <a name='112'></font>
+<font color=#447700>! one time step, then advance the domain's clock by calling ESMF_ClockAdvance.  Upon advancing the clock,<a name='113'></font>
+<font color=#447700>! the current time for the grid is updated by calling ESMF_ClockGet. The enclosing WHILE loop around<a name='114'></font>
+<font color=#447700>! this section is for handling other domains with which this domain may overlap.  It is not active in WRF 2.0 and<a name='115'></font>
+<font color=#447700>! only executes one trip.  <a name='116'></font>
+<font color=#447700>! <a name='117'></font>
+<font color=#447700>! 4.g Call med_calc_model_time and med_after_solve_io, which are stubs in WRF.<a name='118'></font>
+<font color=#447700>! <a name='119'></font>
+<font color=#447700>! 4.h Iterate over the children of this domain (&lt;tt&gt;DO kid = 1, max_nests&lt;/tt&gt;) and check each child pointer to see<a name='120'></font>
+<font color=#447700>! if it is associated (and therefore, active).<a name='121'></font>
+<font color=#447700>! <a name='122'></font>
+<font color=#447700>! 4.h.1  Force the nested domain boundaries from this domain by calling &lt;a href=med_nest_force.html&gt;med_nest_force&lt;/a&gt;.<a name='123'></font>
+<font color=#447700>! <a name='124'></font>
+<font color=#447700>! 4.h.2  Setup the time period over which the nest is to run. Sine the current grid has been advanced one time step<a name='125'></font>
+<font color=#447700>! and the nest has not, the start for the nest is this grid's current time minus one time step.  The nest's stop_subtime<a name='126'></font>
+<font color=#447700>! is the current time, bringing the nest up the same time level as this grid, its parent.<a name='127'></font>
+<font color=#447700>! <a name='128'></font>
+<font color=#447700>! 4.h.3  Recursively call this routine, integrate, to advance the nest's time.  Since it is recursive, this will<a name='129'></font>
+<font color=#447700>! also advance all the domains who are nests of this nest and so on.  In other words, when this call returns, all<a name='130'></font>
+<font color=#447700>! the domains rooted at the nest will be at the current time.<a name='131'></font>
+<font color=#447700>! <a name='132'></font>
+<font color=#447700>! 4.h.4  Feedback data from the nested domain back onto this domain by calling &lt;a href=med_nest_feedback.html&gt;med_nest_feedback&lt;/a&gt;.<a name='133'></font>
+<font color=#447700>! <a name='134'></font>
+<font color=#447700>! 4.i  Write the time to compute this grid and its subtree. This marks the end of the loop begun at step 4, above.<a name='135'></font>
+<font color=#447700>! <a name='136'></font>
+<font color=#447700>! 5. Give the mediation layer an opportunity to do I/O at the end of the sequence of steps that brought the<a name='137'></font>
+<font color=#447700>! grid up to stop_subtime with a call to &lt;a href=med_last_solve_io.html&gt;med_last_solve_io&lt;/a&gt;.  In WRF, this <a name='138'></font>
+<font color=#447700>! is used to generate the final history and/or restart output when the domain reaches the end of it's integration.<a name='139'></font>
+<font color=#447700>! There is logic here to make sure this occurs correctly on a nest, since the nest may finish before its parent.<a name='140'></font>
+<font color=#447700>! &lt;/DESCRIPTION&gt;<a name='141'></font>
+<a name='142'>
+   <font color=#447700>!  Local data.<a name='143'></font>
+<a name='144'>
+   CHARACTER*32                           :: outname, rstname<a name='145'>
+   TYPE(domain) , POINTER                 :: grid_ptr , new_nest<a name='146'>
+   TYPE(domain)                           :: intermediate_grid<a name='147'>
+   INTEGER                                :: step<a name='148'>
+   INTEGER                                :: nestid , kid<a name='149'>
+   LOGICAL                                :: a_nest_was_opened<a name='150'>
+   INTEGER                                :: fid , rid<a name='151'>
+   LOGICAL                                :: lbc_opened<a name='152'>
+   REAL                                   :: time, btime, bfrq<a name='153'>
+   CHARACTER*256                          :: message, message2<a name='154'>
+   TYPE (grid_config_rec_type)            :: config_flags<a name='155'>
+   LOGICAL , EXTERNAL                     :: wrf_dm_on_monitor<a name='156'>
+   INTEGER                                :: idum1 , idum2 , ierr , open_status<a name='157'>
+   INTEGER                                :: rc<a name='158'>
+<a name='159'>
+   <font color=#447700>! interface<a name='160'></font>
+   INTERFACE<a name='161'>
+       <font color=#447700>! mediation-supplied solver<a name='162'></font>
+     SUBROUTINE solve_interface_tst ( grid )<a name='163'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_62"><a name='164'>
+       TYPE (domain) grid<a name='165'>
+     END SUBROUTINE solve_interface_tst<a name='166'>
+       <font color=#447700>! mediation-supplied routine to allow driver to pass time information<a name='167'></font>
+       <font color=#447700>! down to mediation/model layer<a name='168'></font>
+     SUBROUTINE med_calc_model_time ( grid , config_flags )<a name='169'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_63"><a name='170'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_72"><a name='171'>
+       TYPE (domain) grid<a name='172'>
+       TYPE (grid_config_rec_type) config_flags<a name='173'>
+     END SUBROUTINE med_calc_model_time<a name='174'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='175'></font>
+       <font color=#447700>! perform I/O before the call to the solve routine<a name='176'></font>
+     SUBROUTINE med_before_solve_io ( grid , config_flags )<a name='177'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_64"><a name='178'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_73"><a name='179'>
+       TYPE (domain) grid<a name='180'>
+       TYPE (grid_config_rec_type) config_flags<a name='181'>
+     END SUBROUTINE med_before_solve_io<a name='182'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='183'></font>
+       <font color=#447700>! perform I/O after the call to the solve routine<a name='184'></font>
+     SUBROUTINE med_after_solve_io ( grid , config_flags )<a name='185'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_65"><a name='186'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_74"><a name='187'>
+       TYPE (domain) grid<a name='188'>
+       TYPE (grid_config_rec_type) config_flags<a name='189'>
+     END SUBROUTINE med_after_solve_io<a name='190'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='191'></font>
+       <font color=#447700>! perform I/O to initialize a new nest<a name='192'></font>
+     SUBROUTINE med_nest_initial ( parent , grid , config_flags )<a name='193'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_66"><a name='194'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_75"><a name='195'>
+       TYPE (domain), POINTER ::  grid , parent<a name='196'>
+       TYPE (grid_config_rec_type) config_flags<a name='197'>
+     END SUBROUTINE med_nest_initial<a name='198'>
+<a name='199'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='200'></font>
+       <font color=#447700>! provide parent-&gt;nest forcing<a name='201'></font>
+     SUBROUTINE med_nest_force ( parent , grid , config_flags )<a name='202'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_67"><a name='203'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_76"><a name='204'>
+       TYPE (domain), POINTER ::  grid , parent<a name='205'>
+       TYPE (grid_config_rec_type) config_flags<a name='206'>
+     END SUBROUTINE med_nest_force<a name='207'>
+<a name='208'>
+#ifdef MOVE_NESTS<a name='209'>
+     SUBROUTINE med_nest_move ( parent , grid )<a name='210'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_68"><a name='211'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_77"><a name='212'>
+       TYPE (domain), POINTER ::  grid , parent<a name='213'>
+     END SUBROUTINE med_nest_move<a name='214'>
+#endif<a name='215'>
+<a name='216'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='217'></font>
+       <font color=#447700>! provide parent-&gt;nest feedback<a name='218'></font>
+     SUBROUTINE med_nest_feedback ( parent , grid , config_flags )<a name='219'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_69"><a name='220'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_78"><a name='221'>
+       TYPE (domain), POINTER ::  grid , parent<a name='222'>
+       TYPE (grid_config_rec_type) config_flags<a name='223'>
+     END SUBROUTINE med_nest_feedback<a name='224'>
+<a name='225'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='226'></font>
+       <font color=#447700>! perform I/O prior to the close of this call to integrate<a name='227'></font>
+     SUBROUTINE med_last_solve_io ( grid , config_flags )<a name='228'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_70"><a name='229'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_79"><a name='230'>
+       TYPE (domain) grid<a name='231'>
+       TYPE (grid_config_rec_type) config_flags<a name='232'>
+     END SUBROUTINE med_last_solve_io<a name='233'>
+       <font color=#447700>! mediation-supplied routine that gives mediation layer opportunity to <a name='234'></font>
+       <font color=#447700>! perform setup before iteration over steps in this call to integrate<a name='235'></font>
+     SUBROUTINE med_setup_step ( grid , config_flags )<a name='236'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_71"><a name='237'>
+       USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_80"><a name='238'>
+       TYPE (domain) grid<a name='239'>
+       TYPE (grid_config_rec_type) config_flags<a name='240'>
+     END SUBROUTINE med_setup_step<a name='241'>
+       <font color=#447700>! mediation-supplied routine that intializes the nest from the grid<a name='242'></font>
+       <font color=#447700>! by interpolation<a name='243'></font>
+<a name='244'>
+     SUBROUTINE Setup_Timekeeping( grid )<a name='245'>
+       USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_72"><a name='246'>
+       TYPE(domain), POINTER :: grid<a name='247'>
+     END SUBROUTINE<a name='248'>
+<a name='249'>
+   END INTERFACE<a name='250'>
+<a name='251'>
+   IF ( .NOT. ESMF_ClockIsStopTime(grid%domain_clock ,rc=rc) ) THEN<a name='252'>
+      CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_14"> ( grid%id , model_config_rec , config_flags )<a name='253'>
+      CALL ESMF_ClockGet( grid%domain_clock, currTime=grid%current_time, rc=rc )<a name='254'>
+      CALL <A href='../../html_code/share/module_date_time.F.html#WRF_CLOCKPRINT'>wrf_clockprint</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CLOCKPRINT_14"> ( 150, grid%domain_clock, &amp;<a name='255'>
+                            'DEBUG:  top of integrate(),' )<a name='256'>
+      DO WHILE ( grid%current_time .LT. grid%stop_subtime )<a name='257'>
+         IF ( wrf_dm_on_monitor() ) THEN<a name='258'>
+           CALL <A href='../../html_code/frame/module_timing.F.html#START_TIMING'>start_timing</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="START_TIMING_8"><a name='259'>
+         END IF<a name='260'>
+         CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_SETUP_STEP'>med_setup_step</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_SETUP_STEP_4"> ( grid , config_flags )<a name='261'>
+         a_nest_was_opened = .false.<a name='262'>
+         <font color=#447700>! for each nest whose time has come...<a name='263'></font>
+         DO WHILE ( nests_to_open( grid , nestid , kid ) )<a name='264'>
+            <font color=#447700>! nestid is index into model_config_rec (module_configure) of the grid<a name='265'></font>
+            <font color=#447700>! to be opened; kid is index into an open slot in grid's list of children<a name='266'></font>
+            a_nest_was_opened = .true.<a name='267'>
+            CALL <A href='../../html_code/frame/module_domain.F.html#ALLOC_AND_CONFIGURE_DOMAIN'>alloc_and_configure_domain</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="ALLOC_AND_CONFIGURE_DOMAIN_4"> ( domain_id  = nestid ,                          &amp;<a name='268'>
+                                              grid       = new_nest ,                        &amp;<a name='269'>
+                                              parent     = grid ,                            &amp;<a name='270'>
+                                              kid        = kid                               )<a name='271'>
+            CALL <A href='../../html_code/share/set_timekeeping.F.html#SETUP_TIMEKEEPING'>Setup_Timekeeping</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SETUP_TIMEKEEPING_4"> (new_nest)<a name='272'>
+            CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_NEST_INITIAL'>med_nest_initial</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_NEST_INITIAL_4"> ( grid , new_nest , config_flags )<a name='273'>
+         END DO<a name='274'>
+         IF ( a_nest_was_opened ) THEN<a name='275'>
+            CALL <A href='../../html_code/frame/module_nesting.F.html#SET_OVERLAPS'>set_overlaps</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_OVERLAPS_4"> ( grid )   <font color=#447700>! find overlapping and set pointers<a name='276'></font>
+         END IF<a name='277'>
+         CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_BEFORE_SOLVE_IO'>med_before_solve_io</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_BEFORE_SOLVE_IO_3"> ( grid , config_flags )<a name='278'>
+         grid_ptr =&gt; grid<a name='279'>
+         DO WHILE ( ASSOCIATED( grid_ptr ) )<a name='280'>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_83">( 100 , 'module_integrate: calling solve interface ' )<a name='281'>
+            CALL <A href='../../html_code/share/solve_interface_tst.F.html#SOLVE_INTERFACE_TST'>solve_interface_tst</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SOLVE_INTERFACE_TST_1"> ( grid_ptr ) <a name='282'>
+            CALL <A href='../../html_code/share/module_date_time.F.html#WRF_CLOCKPRINT'>wrf_clockprint</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CLOCKPRINT_15"> ( 150, grid_ptr%domain_clock, &amp;<a name='283'>
+                                  'DEBUG integrate():  before ESMF_ClockAdvance,' )<a name='284'>
+            CALL ESMF_ClockAdvance( grid_ptr%domain_clock, rc=rc )<a name='285'>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_CHECK_ERROR'>wrf_check_error</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CHECK_ERROR_4">( ESMF_SUCCESS, rc, &amp;<a name='286'>
+                                  'ESMF_ClockAdvance() FAILED', &amp;<a name='287'>
+                                  __FILE__ , &amp;<a name='288'>
+                                  __LINE__  )<a name='289'>
+            CALL <A href='../../html_code/share/module_date_time.F.html#WRF_CLOCKPRINT'>wrf_clockprint</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_CLOCKPRINT_16"> ( 150, grid_ptr%domain_clock, &amp;<a name='290'>
+                                  'DEBUG integrate():  after ESMF_ClockAdvance,' )<a name='291'>
+            CALL ESMF_ClockGet( grid_ptr%domain_clock, currTime=grid_ptr%current_time, rc=rc )<a name='292'>
+            CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_84">( 100 , 'module_integrate: back from solve interface ' )<a name='293'>
+            grid_ptr =&gt; grid_ptr%sibling<a name='294'>
+         END DO<a name='295'>
+         CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_CALC_MODEL_TIME'>med_calc_model_time</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_CALC_MODEL_TIME_3"> ( grid , config_flags )<a name='296'>
+         CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_AFTER_SOLVE_IO'>med_after_solve_io</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_AFTER_SOLVE_IO_3"> ( grid , config_flags )<a name='297'>
+         grid_ptr =&gt; grid<a name='298'>
+         DO WHILE ( ASSOCIATED( grid_ptr ) )<a name='299'>
+            DO kid = 1, max_nests<a name='300'>
+              IF ( ASSOCIATED( grid_ptr%nests(kid)%ptr ) ) THEN<a name='301'>
+                <font color=#447700>! Recursive -- advance nests from previous time level to this time level.<a name='302'></font>
+                CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_85">( 100 , 'module_integrate: calling med_nest_force ' )<a name='303'>
+                CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_NEST_FORCE'>med_nest_force</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_NEST_FORCE_4"> ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )<a name='304'>
+                CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_86">( 100 , 'module_integrate: back from med_nest_force ' )<a name='305'>
+                grid_ptr%nests(kid)%ptr%start_subtime = grid%current_time - grid%step_time<a name='306'>
+                grid_ptr%nests(kid)%ptr%stop_subtime = grid%current_time<a name='307'>
+                CALL <A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST'>integrate_tst</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="INTEGRATE_TST_1"> ( grid_ptr%nests(kid)%ptr ) <a name='308'>
+                CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_87">( 100 , 'module_integrate: back from recursive call to integrate ' )<a name='309'>
+                CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_88">( 100 , 'module_integrate: calling med_nest_feedback ' )<a name='310'>
+                CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_NEST_FEEDBACK'>med_nest_feedback</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_NEST_FEEDBACK_4"> ( grid_ptr , grid_ptr%nests(kid)%ptr , config_flags )<a name='311'>
+                CALL <A href='../../html_code/frame/module_wrf_error.F.html#WRF_DEBUG'>wrf_debug</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_DEBUG_89">( 100 , 'module_integrate: back from med_nest_feedback ' )<a name='312'>
+#ifdef MOVE_NESTS<a name='313'>
+                CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_NEST_MOVE'>med_nest_move</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_NEST_MOVE_4"> ( grid_ptr , grid_ptr%nests(kid)%ptr )<a name='314'>
+#endif<a name='315'>
+              END IF<a name='316'>
+            END DO<a name='317'>
+            grid_ptr =&gt; grid_ptr%sibling<a name='318'>
+         END DO<a name='319'>
+         <font color=#447700>!  Report on the timing for a single time step.<a name='320'></font>
+         IF ( wrf_dm_on_monitor() ) THEN<a name='321'>
+           CALL <A href='../../html_code/share/module_date_time.F.html#WRF_TIMETOA'>wrf_timetoa</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="WRF_TIMETOA_9"> ( grid%current_time, message2 )<a name='322'>
+           WRITE ( message , FMT = '("main: time ",A," on domain ",I3)' ) TRIM(message2), grid%id<a name='323'>
+           CALL <A href='../../html_code/frame/module_timing.F.html#END_TIMING'>end_timing</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="END_TIMING_8"> ( TRIM(message) )<a name='324'>
+         END IF<a name='325'>
+      END DO<a name='326'>
+      <font color=#447700>! Avoid double writes on nests if this is not really the last time;<a name='327'></font>
+      <font color=#447700>! Do check for write if the parent domain is ending.<a name='328'></font>
+      IF ( grid%id .EQ. 1 ) THEN               <font color=#447700>! head_grid<a name='329'></font>
+        CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_LAST_SOLVE_IO'>med_last_solve_io</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_LAST_SOLVE_IO_5"> ( grid , config_flags )<a name='330'>
+      ELSE<a name='331'>
+        IF ( ESMF_ClockIsStopTime(grid%domain_clock , rc=rc) .OR. &amp;<a name='332'>
+             ESMF_ClockIsStopTime(grid%parents(1)%ptr%domain_clock , rc=rc ) ) THEN<a name='333'>
+           CALL <A href='../../html_code/share/mediation_integrate.F.html#MED_LAST_SOLVE_IO'>med_last_solve_io</A><A href='../../html_code/frame/module_integrate_tst.F.html#INTEGRATE_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MED_LAST_SOLVE_IO_6"> ( grid , config_flags )<a name='334'>
+        ENDIF<a name='335'>
+      ENDIF<a name='336'>
+   END IF<a name='337'>
+<a name='338'>
+END SUBROUTINE integrate_tst<a name='339'>
+<a name='340'>
+END MODULE module_integrate_tst<a name='341'>
+</pre></body></html>

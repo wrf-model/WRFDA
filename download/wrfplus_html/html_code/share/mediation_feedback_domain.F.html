@@ -1,0 +1,123 @@
+<HTML> <BODY BGCOLOR=#eedddd LINK=#0000aa VLINK=#0000ff ALINK=#ff0000 ><BASE TARGET="bottom_target"><PRE><a name='1'>
+<font color=#447700>!<a name='2'></font>
+<font color=#447700>!WRF:MEDIATION_LAYER:NESTING<a name='3'></font>
+<font color=#447700>!<a name='4'></font>
+<A NAME='MED_FEEDBACK_DOMAIN'><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='top_target'><IMG SRC="../../gif/bar_red.gif" border=0></A><a name='5'>
+<font color=#993300>SUBROUTINE </font><font color=#cc0000>med_feedback_domain</font> ( parent_grid , nested_grid ) <A href='../../call_to/MED_FEEDBACK_DOMAIN.html' TARGET='index'>1</A>,<A href='../../call_from/MED_FEEDBACK_DOMAIN.html' TARGET='index'>7</A><a name='6'>
+   USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_103"><a name='7'>
+   USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_127"><a name='8'>
+   IMPLICIT NONE<a name='9'>
+   TYPE(domain), POINTER :: parent_grid , nested_grid<a name='10'>
+   TYPE(domain), POINTER :: grid<a name='11'>
+   INTEGER nlev, msize<a name='12'>
+   TYPE (grid_config_rec_type)            :: config_flags<a name='13'>
+<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='14'></font>
+   INTEGER     :: sm31 , em31 , sm32 , em32 , sm33 , em33<a name='15'>
+   INTEGER     :: sm31x, em31x, sm32x, em32x, sm33x, em33x<a name='16'>
+   INTEGER     :: sm31y, em31y, sm32y, em32y, sm33y, em33y<a name='17'>
+<a name='18'>
+<font color=#447700>! ----------------------------------------------------------<a name='19'></font>
+<font color=#447700>! ------------------------------------------------------<a name='20'></font>
+<font color=#447700>! Interface blocks<a name='21'></font>
+<font color=#447700>! ------------------------------------------------------<a name='22'></font>
+   INTERFACE<a name='23'>
+<font color=#447700>! ------------------------------------------------------<a name='24'></font>
+<font color=#447700>!    Interface definitions for EM CORE<a name='25'></font>
+<font color=#447700>! ------------------------------------------------------<a name='26'></font>
+#if (EM_CORE == 1)<a name='27'>
+<font color=#447700>! ------------------------------------------------------<a name='28'></font>
+<font color=#447700>!    These routines are supplied by module_dm.F from the<a name='29'></font>
+<font color=#447700>!    external communication package (e.g. external/RSL)<a name='30'></font>
+<font color=#447700>! ------------------------------------------------------<a name='31'></font>
+      SUBROUTINE feedback_domain_em_part1 ( grid, nested_grid, config_flags ,  &amp;<a name='32'>
+<font color=#447700>!<a name='33'></font>
+#          include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_1"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='34'>
+<font color=#447700>!<a name='35'></font>
+                                          )<a name='36'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_104"><a name='37'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_128"><a name='38'>
+         TYPE(domain), POINTER :: grid          <font color=#447700>! name of the grid being dereferenced (must be "grid")<a name='39'></font>
+         TYPE(domain), POINTER :: nested_grid<a name='40'>
+         TYPE (grid_config_rec_type)            :: config_flags<a name='41'>
+#        include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_2"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='42'>
+      END SUBROUTINE feedback_domain_em_part1<a name='43'>
+      SUBROUTINE feedback_domain_em_part2 ( grid, intermediate_grid , nested_grid, config_flags ,  &amp;<a name='44'>
+<font color=#447700>!<a name='45'></font>
+#          include "<A href='../../html_code/include/em_dummy_args.inc.html'>em_dummy_args.inc</A>"<A NAME="em_dummy_args.inc_3"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='46'>
+<font color=#447700>!<a name='47'></font>
+                                          )<a name='48'>
+         USE <A href='../../html_code/frame/module_domain.F.html#MODULE_DOMAIN'>module_domain</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_DOMAIN_105"><a name='49'>
+         USE <A href='../../html_code/frame/module_configure.F.html#MODULE_CONFIGURE'>module_configure</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODULE_CONFIGURE_129"><a name='50'>
+         TYPE(domain), POINTER :: grid          <font color=#447700>! name of the grid being dereferenced (must be "grid")<a name='51'></font>
+         TYPE(domain), POINTER :: intermediate_grid<a name='52'>
+         TYPE(domain), POINTER :: nested_grid<a name='53'>
+         TYPE (grid_config_rec_type)            :: config_flags<a name='54'>
+#        include &lt;<A href='../../html_code/include/em_dummy_decl.inc.html'>em_dummy_decl.inc</A>&gt;<A NAME="em_dummy_decl.inc_4"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='55'>
+      END SUBROUTINE feedback_domain_em_part2<a name='56'>
+#endif<a name='57'>
+<font color=#447700>! ----------------------------------------------------------<a name='58'></font>
+<font color=#447700>!    Interface definitions for NMM (placeholder)<a name='59'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='60'></font>
+#if (NMM_CORE == 1 )<a name='61'>
+#endif<a name='62'>
+<font color=#447700>! ----------------------------------------------------------<a name='63'></font>
+<font color=#447700>!    Interface definitions for COAMPS (placeholder)<a name='64'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='65'></font>
+#if (COAMPS_CORE == 1 )<a name='66'>
+#endif<a name='67'>
+   END INTERFACE<a name='68'>
+<font color=#447700>! ----------------------------------------------------------<a name='69'></font>
+<font color=#447700>! End of Interface blocks<a name='70'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='71'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='72'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='73'></font>
+<font color=#447700>! Executable code<a name='74'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='75'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='76'></font>
+<font color=#447700>!    Feedback calls for EM CORE.<a name='77'></font>
+<font color=#447700>! ----------------------------------------------------------<a name='78'></font>
+#if (EM_CORE == 1 &amp;&amp; defined( DM_PARALLEL ))<a name='79'>
+   CALL <A href='../../html_code/frame/module_configure.F.html#MODEL_TO_GRID_CONFIG_REC'>model_to_grid_config_rec</A><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="MODEL_TO_GRID_CONFIG_REC_30"> ( nested_grid%id , model_config_rec , config_flags )<a name='80'>
+   IF ( config_flags%dyn_opt == DYN_EM ) THEN<a name='81'>
+     grid =&gt; nested_grid%intermediate_grid<a name='82'>
+#    include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_5"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='83'>
+     CALL feedback_domain_em_part1 ( grid, nested_grid, config_flags ,  &amp;<a name='84'>
+<font color=#447700>!<a name='85'></font>
+#      include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_6"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='86'>
+<font color=#447700>!<a name='87'></font>
+                                   )<a name='88'>
+     grid =&gt; parent_grid<a name='89'>
+#    include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_7"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='90'>
+     CALL feedback_domain_em_part2 ( grid , nested_grid%intermediate_grid, nested_grid , config_flags ,  &amp;<a name='91'>
+<font color=#447700>!<a name='92'></font>
+#      include "<A href='../../html_code/include/em_actual_args.inc.html'>em_actual_args.inc</A>"<A NAME="em_actual_args.inc_8"><A href='../../html_code/share/mediation_feedback_domain.F.html#MED_FEEDBACK_DOMAIN' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='93'>
+<font color=#447700>!<a name='94'></font>
+                                   )<a name='95'>
+   ENDIF<a name='96'>
+#endif<a name='97'>
+<font color=#447700>! ------------------------------------------------------<a name='98'></font>
+<font color=#447700>!    End of Feedback calls for EM CORE.<a name='99'></font>
+<font color=#447700>! ------------------------------------------------------<a name='100'></font>
+<font color=#447700>! ------------------------------------------------------<a name='101'></font>
+<font color=#447700>! ------------------------------------------------------<a name='102'></font>
+<font color=#447700>!    Feedback calls for NMM. (Placeholder)<a name='103'></font>
+<font color=#447700>! ------------------------------------------------------<a name='104'></font>
+#if (NMM_CORE == 1)<a name='105'>
+#endif<a name='106'>
+<font color=#447700>! ------------------------------------------------------<a name='107'></font>
+<font color=#447700>!    End of Feedback calls for NMM.<a name='108'></font>
+<font color=#447700>! ------------------------------------------------------<a name='109'></font>
+<font color=#447700>! ------------------------------------------------------<a name='110'></font>
+<font color=#447700>! ------------------------------------------------------<a name='111'></font>
+<font color=#447700>!    Feedback calls for COAMPS. (Placeholder)<a name='112'></font>
+<font color=#447700>! ------------------------------------------------------<a name='113'></font>
+#if (COAMPS_CORE == 1)<a name='114'>
+#endif<a name='115'>
+<font color=#447700>! ------------------------------------------------------<a name='116'></font>
+<font color=#447700>!    End of Feedback calls for COAMPS.<a name='117'></font>
+<font color=#447700>! ------------------------------------------------------<a name='118'></font>
+   RETURN<a name='119'>
+END SUBROUTINE med_feedback_domain<a name='120'>
+<a name='121'>
+<a name='122'>
+</pre></body></html>

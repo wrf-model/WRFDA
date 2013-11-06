@@ -1,0 +1,393 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="949.43">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 24.0px Times; background-color: #000000}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 18.0px Times; background-color: #000000}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; min-height: 14.0px}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 20.0px Times; background-color: #e6e6ff}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Times}
+    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Times; min-height: 18.0px}
+    p.p8 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0066cc}
+    p.p9 {margin: 0.0px 0.0px 0.0px 0.0px; font: 20.0px Times; background-color: #e6e6ff; min-height: 24.0px}
+    span.s1 {color: #0066cc}
+    span.s2 {color: #000000}
+    span.Apple-tab-span {white-space:pre}
+    ul.ul1 {list-style-type: disc}
+    ul.ul2 {list-style-type: circle}
+    ul.ul3 {list-style-type: square}
+  body {
+	background-color: #CBFFCD;
+}
+</style>
+</head>
+<body>
+<p class="p3"><br></p>
+<p class="p4">Version 0.0<span class="Apple-tab-span">	</span>Monika KRYSTA<span class="Apple-tab-span">	</span>NCAR/MMM<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>01-2009</p>
+<p class="p4">Version 0.1<span class="Apple-tab-span">	</span>Yann MICHEL<span class="Apple-tab-span">	</span>NCAR/MMM<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>02-2009</p>
+<p class="p4">Version 0.2<span class="Apple-tab-span">	</span>Yann MICHEL<span class="Apple-tab-span">	</span>NCAR/MMM<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>03-2009 – update of diagnostics</p>
+<p class="p3"><br></p>
+<p class="p5">Stage 0<span class="Apple-converted-space"> <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></span></p>
+<p class="p6"><i>gen_be_stage0_wrf.f90<span class="Apple-tab-span">	</span></i>build up "standard perturbation fields"</p>
+<p class="p3"><br></p>
+<p class="p4"><i>Purpose </i>: To convert WRF output to "standard perturbation fields" required by the WRF-Var BE covariance generation utility "gen_be".</p>
+<p class="p4"><i>Input</i><span class="Apple-converted-space">  </span>: WRF forecasts for a specified date (NETCDF format).<span class="Apple-converted-space"> </span></p>
+<p class="p4"><i>Output </i>: Binary files for use in gen_be_stage1.</p>
+<p class="p3"><i></i><br></p>
+<p class="p4">[1] Initialize information</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Reads arguments, initializes</li>
+</ul>
+<p class="p4">[2] Setup up ancillary fields using 1st member values</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Reads fields (lat, map factors). Initializes FFT.</li>
+</ul>
+<p class="p4">[3] Convert WRF forecast fields to standard fields and output</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over members</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over vertical dimension</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Reads u,v. Compute vorticity/divergence.<span class="Apple-converted-space"> </span></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate streamfunction and potential<span class="Apple-converted-space"> </span></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read mass fields, and convert to T and r<sub>h</sub>.</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Finally, extract surface pressure</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Write out ensemble forecasts for this member</li>
+    </ul>
+  </ul>
+</ul>
+<p class="p4">[4] Compute perturbations and output [NMC or Ensemble]</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Take forecast/ensemble difference</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Write out perturbations</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Write out mean/mean square fields</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"></li>
+</ul>
+<p class="p5">Stage 1<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_stage1.f90</i><span class="Apple-tab-span">	</span>Produces temporal perturbations</p>
+<p class="p3"><br></p>
+<p class="p4"><i>Purpose</i> : to remove the binned mean from the perturbation fields.</p>
+<p class="p4"><i>Input</i> <span class="Apple-converted-space">  </span>: binary files: "pert.ccyymmddhh.e"ce for ENS or "pert.ccyymmddhh.e001" for NMC.</p>
+<p class="p4"><i>Output</i> : binary files for use of the gen_be_stage2</p>
+<p class="p3"><br></p>
+<p class="p4"><span class="Apple-converted-space"> </span>[1] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Reads namelist 'gen_be_stage1_nl.nl' (data dir, bin method...)</li>
+</ul>
+<p class="p4">[2] Read fields from standard files, and calculate mean fields'</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read perturbation (psi_mean, chi_mean, t_mean, rh_mean, ps_mean...)</li>
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Create bin (if first loop)</li>
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate time/ensemble mean (psi_mean, chi_mean, t_mean, rh_mean, ps_mean)</li>
+  </ul>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates (second time =Read fields again, and remove time/ensemble/area)<span class="Apple-converted-space"> </span></li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Remove mean</li>
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Write necessary full-fields (ni, nj, nk, latitude, height)</li>
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Write fields to file for further processing</li>
+  </ul>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Write down bin info into 'bin.data'</li>
+</ul>
+<p class="p3"><br></p>
+<p class="p5">Stage 2<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_stage2.f90</i><span class="Apple-tab-span">	</span>Computes regression coefficients: 'covar/var'</p>
+<p class="p7"><br></p>
+<p class="p4"><i>Input: <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></i>Reads 'fullflds/yyymmddhh.fullflds.e+ce'</p>
+<p class="p4"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Reads 'bin.data'</p>
+<p class="p4"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Reads perturbation files 'varyyyymmddhh.var.e+ce'</p>
+<p class="p4"><i>Output</i>:<span class="Apple-tab-span">	</span>Write regression coefficients into 'gen_be_stage2.dat '</p>
+<p class="p3"><br></p>
+<p class="p4">[1] Initialize namelist variables and other scalars.'</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read namelist 'gen_be_stage2_nl.nl'</li>
+</ul>
+<p class="p4">[2] Read fields, and calculate correlations</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over members</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read Full-fields (latitude, height)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read bin info (if first time)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read perturbations (psi, chi...)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate psi/chi covariances <span class="Apple-tab-span">	</span>3D bins (binning in all three directions: i,j,k)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">(covar1=chi*psi and var1=psi*psi) - depends on b (bin number)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate psi/ps covariances<span class="Apple-tab-span">	</span>2D bins</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">(covar2=ps*psi) - depends on b and k (vertical level of psi)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate<span class="Apple-converted-space">  </span>psi/T covariances<span class="Apple-tab-span">	</span>2D bins</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">(covar3=T*psi) - depends on b and k,k2 (vertical levels of T and psi)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate<span class="Apple-converted-space">  </span>psi/rh covariances<span class="Apple-tab-span">	</span>2D bins</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">(covar4=rh*T) - depends on b and k,k2 (vertical levels of rh and psi)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate<span class="Apple-converted-space">  </span>psi/psi covariances<span class="Apple-tab-span">	</span>2D bins</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">(var2=psi*psi) - depends on b and k,k2 (vertical levels of psi and psi)</li>
+    </ul>
+  </ul>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"> Fill in psi/psi covariance by symmetry</li>
+</ul>
+<p class="p4">[3] Calculate eigenvectors, eigenvalues and inverse for psi/psi covariance</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over bins</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"> Call <i>da_eof_decomposition</i> = performs eigenvalue/eigenvector decomposition of var2 matrix.</li>
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Truncate eigenvalues to ensure inverse is not dominated by rounding error (eigenvectors are orthogonal) <span class="Apple-converted-space">      </span><span class="s1"><i>hard-coded threshold on variance to make it robust</i></span></li>
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Inverts 'truncated' var2<span class="Apple-converted-space">  </span>&lt;psi,psi&gt;<sup>-1</sup> = E . Lam<sup>-1</sup> . E<sup>T</sup>:</li>
+  </ul>
+</ul>
+<p class="p4">[4] Calculate regression coefficients</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">psi/chi<span class="Apple-tab-span">	</span>3D bins<span class="Apple-tab-span">	</span>regcoeff1(b) = covar1(b) / var1(b)</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">psi/ps<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>2D bins<span class="Apple-tab-span">	</span>regcoeff2(k,b) = sum[covar2(k2,b)*var2_inv(k2,k,b)]</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">psi/T<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>2D bins<span class="Apple-tab-span">	</span>regcoeff3(k,k2,b) =sum [covar3(k,k3,b)*var2_inv(k3,k2,b)]<span class="Apple-converted-space"> </span></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Output regression coefficients for use in 3/4D-Var into <i>gen_be_stage2.dat</i></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i></i></li>
+</ul>
+<p class="p5">Stage 2a<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_stage2a.f90</i><span class="Apple-tab-span">	</span>Builds unbalanced fields: chi_u, T_u, ps_u</p>
+<p class="p7"><br></p>
+<p class="p4"><i>Purpose</i></p>
+<p class="p4"><i><span class="Apple-tab-span">	</span></i>Calculates (for every time instant and every member) unbalanced fields (as perturbed <span class="Apple-tab-span">	</span>field- field explained by perturbed psi via a linear mapping):<span class="Apple-converted-space"> </span></p>
+<p class="p4"><span class="Apple-tab-span">	</span>perturbed field - regcoeff*psi (summation over k performed in case of each field)</p>
+<p class="p4"><i>Input</i></p>
+<p class="p4"><span class="Apple-tab-span">	</span>Reads gen_be stage2.dat [have not checked the filtering yet]</p>
+<p class="p4"><span class="Apple-tab-span">	</span>Reads bin.data</p>
+<p class="p4"><span class="Apple-tab-span">	</span>Reads perturbation files var/yyyymmddhh.var.e</p>
+<p class="p4"><i>Output</i></p>
+<p class="p3"><span class="Apple-tab-span">	</span></p>
+<p class="p4">[1] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Namelist <i>gen_be_stage2a_nl.nl</i></li>
+</ul>
+<p class="p4">[2] Read regression coefficients and bin information</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read regression coefficients from '<i>gen_be_stage2.dat</i>'</li>
+</ul>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read bin info '<i>bin.data</i>'</li>
+</ul>
+<p class="p4">[3] Apply ', num_passes, ' pass recursive filter to regression coefficients<span class="Apple-converted-space">  </span><span class="s1"><i>if ( num_passes &gt; 0 )</i></span></p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Call <i>da_filter_regcoeffs</i></li>
+</ul>
+<p class="p4">[4] Read standard fields, and compute control variable fields</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over members</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read psi predictor</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate/write unbalanced chi</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate/write unbalanced T</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate/write unbalanced ps</li>
+    </ul>
+  </ul>
+</ul>
+<p class="p4"><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Writes var_u/yyymmddhh.var_u.e+ce (.01 for ps_u)</p>
+<p class="p3"><br></p>
+<p class="p5">Stage 3<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_stage3.f90</i><span class="Apple-tab-span">	</span>Reorganise distribution in vertical direction</p>
+<p class="p3"><br></p>
+<p class="p4"><i>Input</i></p>
+<p class="p4"><span class="Apple-tab-span">	</span>Read read fullflds/yyyymmddhh.e+ce</p>
+<p class="p4"><span class="Apple-tab-span">	</span>Read var/yyyymmdd.var.e+ce (for all fields; take unbalanced if available; +.01 for ps)</p>
+<p class="p4"><i>Output</i></p>
+<p class="p4"><span class="Apple-tab-span">	</span>Write var/yyyymmddhh.var.e+ce.ck <span class="Apple-converted-space"> </span></p>
+<p class="p4"><span class="Apple-tab-span">	</span>(var=psi,chi_u,t_u,ps_u,rh and ck is vertical level number)</p>
+<p class="p3"><br></p>
+<p class="p3"><br></p>
+<p class="p3"><br></p>
+<p class="p4">[1] Initialize namelist variables and other scalars</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">namelist <i>gen_be_stage3_nl.nl</i></li>
+</ul>
+<p class="p8"><i><span class="Apple-converted-space"> </span>if ( .not. data_on_levels ) then</i></p>
+<p class="p4">[2] Process fields for variables - loop over variables is in script (gen_be.ksh)</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over members</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0066cc"><span class="s2">Create and sort into bins<span class="Apple-tab-span">	</span></span><i>Would be enough to read bin.dat?</i></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Compute mean field<span class="Apple-converted-space"> <span class="Apple-tab-span">	</span></span></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0066cc"><i>seems mean = average over grid points, not physical cosine weighted mean</i></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Build 2D perturbations - for each level subtract its spatial mean.</li>
+    </ul>
+  </ul>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Fill in upper-right part of BE matrix by symmetry</li>
+</ul>
+<p class="p4">[3] Calculate vertical eigenvectors and eigenvalues for all variables</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Latitudinally varying BE decomposition<span class="Apple-converted-space">  </span>= separately for each 2D bin (local)</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Call <i>da_eof_decomposition<span class="Apple-converted-space"> </span></i></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Domain-averaged BE decomposition =<span class="Apple-converted-space">  </span>mean over all horizontal bins</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Call <i>da_eof_decomposition<span class="Apple-converted-space"> </span></i></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Output eigenvectors, eigenvalues for use in WRF_Var</li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Decide on local or domain-averaged EOFs for horizontal correlations<span class="Apple-converted-space">  </span><i>use_global_eofs</i></li>
+</ul>
+<p class="p4"><span class="Apple-tab-span">	</span>Map binned eigenvectors to x, y grid</p>
+<p class="p4"><span class="Apple-tab-span">	</span>Take <i>sqrt </i>of eigenvalues</p>
+<p class="p8"><i>end (not. data_on_levels)</i></p>
+<p class="p4">[4] Transform perturbations (or not), and output.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over members</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Project fields onto vertical modes<span class="Apple-converted-space">  <span class="Apple-tab-span">	</span></span>call <i>da_transform_vptovv</i></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Output fields (split into 2D files to allow parallel horizontal treatment)</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"></li>
+    </ul>
+  </ul>
+</ul>
+<p class="p5">Stage 4<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Regional<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_stage4_regional.f90<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></i>Computes lengthscale for recursive filter</p>
+<p class="p3"><br></p>
+<p class="p4"><i>Input: </i><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Read rundir/varyyyymmddhh.var.e+ce.ck (ck is vertical level)</p>
+<p class="p4"><i>Output: </i><span class="Apple-tab-span">	</span>Writes ck, coeff, 1/coeff in dir.varck/sl_print.var<span class="Apple-converted-space"> </span></p>
+<p class="p3"><br></p>
+<p class="p4">[1] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">reads namelist <i>gen_be_stage4_regional_nl.nl</i></li>
+</ul>
+<p class="p4">[2] Input fields and calculate correlation as a function of distance between points.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over dates</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over members</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">if first time; build up new 1D grid<span class="Apple-tab-span">	</span></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0066cc"><span class="s2">call <i>get_grid_info <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></i></span><i>distance is in (i,j) space rather than on Earth</i></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate spatial correlation<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times; color: #0066cc"><span class="s2">call <i>get_covariance <span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></i></span><i>distance is in (i,j) space rather than on Earth</i></li>
+    </ul>
+  </ul>
+</ul>
+<p class="p4">[3] Compute fit of correlation to a straight line</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate fit of input covariance data to Gaussian correlation function</li>
+</ul>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"> takes <i>ln</i> and fits a straight line<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">call <i>make_scale_length</i></li>
+  </ul>
+</ul>
+<p class="p3"><br></p>
+<p class="p5">Stage Diagnostics<span class="Apple-tab-span">	</span>I<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_diags.f90<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Gather data into file 'be.dat'</i></p>
+<p class="p7"><br></p>
+<p class="p4"><i>Input: </i><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>'bin.dat', 'gen_be_stage2.dat', gen_be_stage3.'+var+'.dat', var/'sl_print.'+var</p>
+<p class="p4"><i>Output: </i><span class="Apple-tab-span">	</span>be.dat</p>
+<p class="p3"><br></p>
+<p class="p4">[0] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">reads namelist gen_be_diags_nl.nl'</li>
+</ul>
+<p class="p4">[1] Gather regression coefficients.'</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Times"><i></i></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i>call da_readwrite_be_stage2</i></li>
+</ul>
+<p class="p3"><br></p>
+<p class="p4">[2] Gather vertical error eigenvectors, eigenvalues</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Times"></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over unbalanced variables<span class="Apple-converted-space"> </span></li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i>call da_readwrite_be_stage3</i></li>
+  </ul>
+</ul>
+<p class="p4">[3] Gather horizontal scale length / horizontal error power spectra</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 15.0px Times"></li>
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over unbalanced variables<span class="Apple-converted-space"> </span></li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i>call da_readwrite_be_stage4 <span class="Apple-tab-span">	</span></i><span class="s1"><i>no bin2d info</i></span></li>
+  </ul>
+</ul>
+<p class="p3"><br></p>
+<p class="p5">Stage Diagnostics<span class="Apple-tab-span">	</span>II<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_diags_read.f90<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>Read file 'be.dat' and print out diagnostics</i></p>
+<p class="p7"><br></p>
+<p class="p4"><i>Input: </i><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>'be.dat'</p>
+<p class="p4"><i>Output: </i><span class="Apple-tab-span">	</span>Fortran units</p>
+<p class="p3"><br></p>
+<p class="p4">[0] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">read namelist gen_be_diags_nl.nl'</li>
+</ul>
+<p class="p4">[1] Gather regression coefficients.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">read regcoeff for balanced/physical transform</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i>call da_print_be_stats_p</i></li>
+  </ul>
+</ul>
+<p class="p4">[2] Gather vertical error eigenvectors, eigenvalues.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">read vertical eigenvectors/eigenvalues</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i>call da_print_be_stats_v</i></li>
+  </ul>
+</ul>
+<p class="p4">[3] Gather horizontal scale length / horizontal error power spectra</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">read total power (global) or scale_length (regional)</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"><i>call da_print_be_stats_h_global / da_print_be_stats_h_regional</i></li>
+  </ul>
+</ul>
+<p class="p3"><i></i><br>
+  <br>
+</p>
+<p class="p5">Stage Diagnostics<span class="Apple-tab-span">	</span>IIIa<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-converted-space"> </span></p>
+<p class="p6"><i>gen_be_cov3d.f90<span class="Apple-tab-span">	</span>Covariances between 3D balanced and unbalanced fields</i></p>
+<p class="p7"><br></p>
+<p class="p4"><i>Input: </i><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>var1/yyyymmddhh.var1.e+ce,<span class="Apple-converted-space">  </span>var2/yyyymmddhh.var2.e+ce<span class="Apple-converted-space"> </span></p>
+<p class="p4"><i>Output: <span class="Apple-tab-span">	</span>Fortran units</i></p>
+<p class="p3"><br></p>
+<p class="p4">[1] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read namelist gen_be_cov3d_nl.nl</li>
+</ul>
+<p class="p4">[2] Read fields, and calculate correlations</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over date</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over member</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate covariances</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"></li>
+    </ul>
+  </ul>
+</ul>
+<p class="p5">Stage Diagnostics<span class="Apple-tab-span">	</span>IIIb<span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span></p>
+<p class="p6"><i>gen_be_cov2d.f90<span class="Apple-tab-span">	</span>Covariances between 2D balanced and unbalanced fields</i></p>
+<p class="p7"><br></p>
+<p class="p4"><i>Input: </i><span class="Apple-tab-span">	</span><span class="Apple-tab-span">	</span>var1/yyyymmddhh.var1.e+ce,<span class="Apple-converted-space">  </span>var2/yyyymmddhh.var2.e+ce<span class="Apple-converted-space"> </span></p>
+<p class="p4"><i>Output: <span class="Apple-tab-span">	</span>Fortran units</i></p>
+<p class="p3"><br></p>
+<p class="p4">[1] Initialize namelist variables and other scalars.</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Read namelist gen_be_cov2d_nl.nl</li>
+</ul>
+<p class="p4">[2] Read fields, and calculate correlations</p>
+<ul class="ul1">
+  <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over date</li>
+  <ul class="ul2">
+    <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Loop over member</li>
+    <ul class="ul3">
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times">Calculate covariances</li>
+      <li style="margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Times"></li>
+    </ul>
+  </ul>
+</ul>
+</body>
+</html>
