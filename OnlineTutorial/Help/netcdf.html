@@ -186,9 +186,19 @@ body {
 
       <p class="bodytext"><strong id="Font14">Step 2: Configure and compile</strong> </p>
       <p class="bodytext">Now, navigate to the folder you just un-tarred. Now it is time to select your compilers (again, if you are unsure of which compilers to use, see the <a href="configuration.html">Configuration Help Page</a>). Set the environment variable "FC" to the name of the Fortran compiler you will be using, and set "CC" to the name of the C compiler you will be using. We recommend using Gnu, Intel, or PGI compilers if possible. </p>
-MAKE A NOTE HERE: IF "SETENV" DOESN'T WORK, YOU ARE LIKELY USING A DIFFERENT TERMINAL SHELL. SEE OUR TERMINAL SHELL HELP PAGE.
       <p class="code">> setenv FC gfortran</br>
                       > setenv CC gcc</p>
+
+      <table width="90%" border="0" cellpadding="3" cellspacing="7">
+        <tr>
+          <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td>
+          <td width="95%" bgcolor="#DDAA55" class="bodytext">
+            <span class="style5">When typing the "setenv" command, I receive a "not found" or similar error</span><br>
+            You are using a shell other than csh or tcsh. Please see the "<a href="../Help/shells.html">Shells Help Page</a>" for solutions.
+          </td>
+        </tr>
+      </table>
+
       <p class="bodytext">Finally, you should configure netCDF so it will install in the correct folder. Typically netCDF will install in the /usr/local directory by default, but if you do not have administrative privileges on your machine, you will need to set your own directory. Any directory that you can write to will suffice; for demonstration purposes, we will use <span class="style6" id="Font12">/user/home/jdoe/netcdf_4.1.3</span> as our installation directory. Ensure that you are in the netcdf source directory that you just unpacked, and enter the following:</p>
       <p class="code">> ./configure --prefix=/user/home/jdoe/netcdf_4.1.3 --disable-netcdf-4</p>
       <p class="bodytext">The "--disable-netcdf-4" option is very important, as omitting it introduces many complications which are beyond the scope of this tutorial. </p>

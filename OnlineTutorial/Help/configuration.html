@@ -1,0 +1,285 @@
+<html>
+
+<head>
+
+<title>WRFDA Online Tutorial</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation: Online Tutorial">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta name="author" content="Michael J. Kavulich, Jr.">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array_tutorial.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/popups.js" type=text/javascript></SCRIPT>
+
+
+
+
+<SCRIPT LANGUAGE="JavaScript">
+
+//  #########  popup text 
+descarray = new Array(
+//Name - 0
+"The variable name as it should appear in the namelist",
+//Type - 1
+"The type of data this variable stores. There are three possible options:<br><b>logical</b>: .true. or .false.<br><b>integer</b>: A whole number; positive, negative, or zero<br><b>real</b>: Any real number",
+//Size - 2
+"This is the expected size of the variable. A '1' indicates a single value is needed.<br> Any other number indicates that the variable is a vector, and requires multiple comma-delimited values.",
+//Default - 3
+"Default value of the variable",
+//Detailed description - 4
+"Detailed description of the namelist variable and its proper use",
+//Last
+""
+);
+</script>
+
+<SCRIPT language=JavaScript src="../scripts/hover.js" type=text/javascript></SCRIPT>
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<style type="text/css">
+<!--
+body {
+	background-image: url(../images/background.gif);
+}
+.style5 {color: #993333
+; font-weight: bold; }
+.style6 {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 12px;
+}
+.style7 {
+	color: #990000;
+	font-style: italic;
+}
+-->
+</style>
+
+</head>
+
+ <div id="object1" style="position:absolute; visibility:show; left:25px; top:-100px; z-index:+1" onMouseOver="overdiv=1;"  onmouseout="overdiv=0; setTimeout('hideLayer()',1000)"> </div>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#AADDAA"><div align="left"><img src="../tools/images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../tools/images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="22" bgcolor="#AADDAA">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../tools/images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+    <td width="5%" valign="top" background="../images/edgenew.fw.png">&nbsp;</td>
+
+    <td width="1%" valign="top">&nbsp;</td>
+    <td width="94%" valign="top"><p>&nbsp;</p>
+      <p class="headingtext" id="Font20">Configuration Help</p>
+      <blockquote>
+<a name="what"></a>
+      <p class="style5" id="Font16">What is "configuration" anyway?</p>
+      <p class="bodytext">WRFDA is designed to be compiled on a wide variety of systems for a wide variety of purposes. This flexibility comes at a cost: the user must specify the compilation that they wantBecause of this, WRFDA must be configured for the particular system you are using. This is achieved using the <span class="style6" id="Font12">configure</span> script. This script attempts to determine your system setup, and allows you to choose from several different options.</p>
+
+<a name="how"></a>
+      <p class="style5" id="Font16">How do I choose the best option for my purposes</p>
+      <p class="bodytext">Because the same configuration script is used for all WRF-related products, you must specify that you want to compile WRFDA by issuing the command <span class="style6" id="Font12">./configure wrfda</span>. As an example, this is what this step will look like on a Linux system:</p>
+
+      <p class="code">> ./configure wrfda<br>
+                      checking for perl5... no<br>
+                      checking for perl... found /usr/bin/perl (perl)<br>
+                      Will use NETCDF in dir: /usr/local/netcdf<br>
+                      PHDF5 not set in environment. Will configure WRF for use without.<br>
+                      $JASPERLIB or $JASPERINC not found in environment, configuring to build without grib2 I/O...<br>
+                      ------------------------------------------------------------------------<br>
+                      Please select from among the following supported platforms.<br>
+                      &nbsp;<br>
+                      &nbsp; &nbsp;1.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (serial)</br>
+                      &nbsp; &nbsp;2.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (smpar)</br>
+                      &nbsp; &nbsp;3.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (dmpar)</br>
+                      &nbsp; &nbsp;4.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (dm+sm)</br>
+                      &nbsp; &nbsp;5.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (serial)</br>
+                      &nbsp; &nbsp;6.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (smpar)</br>
+                      &nbsp; &nbsp;7.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (dmpar)</br>
+                      &nbsp; &nbsp;8.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (dm+sm)</br>
+                      &nbsp; &nbsp;9.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (serial)</br>
+                      &nbsp; 10.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (smpar)</br>
+                      &nbsp; 11.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (dmpar)</br>
+                      &nbsp; 12.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (dm+sm)</br>
+                      &nbsp; 13.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (serial)</br>
+                      &nbsp; 14.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (smpar)</br>
+                      &nbsp; 15.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (dmpar)</br>
+                      &nbsp; 16.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (dm+sm)</br>
+                      &nbsp; 17.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (serial)</br>
+                      &nbsp; 18.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (smpar)</br>
+                      &nbsp; 19.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (dmpar)</br>
+                      &nbsp; 20.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (dm+sm)</br>
+                      &nbsp; 21.&nbsp; Linux x86_64 i486 i586 i686, Xeon Phi (MIC architecture) ifort compiler with icc  (dm+sm)</br>
+                      &nbsp; 22.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (serial)</br>
+                      &nbsp; 23.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (smpar)</br>
+                      &nbsp; 24.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (dmpar)</br>
+                      &nbsp; 25.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (dm+sm)</br>
+                      &nbsp; 26.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (serial)</br>
+                      &nbsp; 27.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (smpar)</br>
+                      &nbsp; 28.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (dmpar)</br>
+                      &nbsp; 29.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (dm+sm)</br>
+                      &nbsp; 30.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (serial)</br>
+                      &nbsp; 31.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (smpar)</br>
+                      &nbsp; 32.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (dmpar)</br>
+                      &nbsp; 33.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (dm+sm)</br>
+                      &nbsp; 34.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (serial)</br>
+                      &nbsp; 35.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (smpar)</br>
+                      &nbsp; 36.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (dmpar)</br>
+                      &nbsp; 37.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (dm+sm)</br>
+                      &nbsp; 38.&nbsp; Linux i486 i586 i686 x86_64, PathScale compiler with pathcc  (serial)</br>
+                      &nbsp; 39.&nbsp; Linux i486 i586 i686 x86_64, PathScale compiler with pathcc  (dmpar)</br>
+                      &nbsp; 40.&nbsp; x86_64 Linux, gfortran compiler with gcc   (serial)</br>
+                      &nbsp; 41.&nbsp; x86_64 Linux, gfortran compiler with gcc   (smpar)</br>
+                      &nbsp; 42.&nbsp; x86_64 Linux, gfortran compiler with gcc   (dmpar)</br>
+                      &nbsp; 43.&nbsp; x86_64 Linux, gfortran compiler with gcc   (dm+sm)</br>
+                      &nbsp; 44.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (serial)</br>
+                      &nbsp; 45.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (smpar)</br>
+                      &nbsp; 46.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (dmpar)</br>
+                      &nbsp; 47.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (dm+sm)</br>
+                      &nbsp; 48.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (serial)</br>
+                      &nbsp; 49.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (smpar)</br>
+                      &nbsp; 50.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (dmpar)</br>
+                      &nbsp; 51.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (dm+sm)</br>
+                      &nbsp; 52.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (serial)</br>
+                      &nbsp; 53.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (smpar)</br>
+                      &nbsp; 54.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (dmpar)</br>
+                      &nbsp; 55.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (dm+sm)</br>
+                      </br>
+                      Enter selection [1-55] :</p>
+      <p class="bodytext">Each line contains several columns of data. All of these data are important, so be sure to pay attention:</p>
+      <ol><ol>
+        <li class="bodybullet"><b>Operating system and architecture</b><br>
+          The text before the first comma indicates the operating system and architecture (processor type). You can type "uname -a" on the command line in most systems to see your system's specifications. Possible values are the following:<br>
+            <ul><li>Linux. This is the most common operating system for modern supercomputers, and can also be used on PCs. Linux can be run on systems with several different architectures:
+                <ul><li>x86_64, a very common 64-bit architecture</li>
+                <li>i386&ndash;686, older (but still fairly common) 32-bit architectures</li>
+                <li>ppc64, a 64-bit architecture for PowerPC processors</li>
+                <li>SGI Altix, an architecture for Altix supercomputers</li>
+                <li>ia64, a rarely-seen 64-bit architecture for Itanium systems</li></ul></li>
+            <li>Darwin (MACOS). This is the operating system for Apple PCs.</li>
+            <li>AIX. This is an IBM-specific operating system for Unix-based supercomputers</li></ul>
+        </li>
+        <br>
+        <li class="bodybullet"><b>Fortran and C compilers</b><br>
+          The next bit of text indicates the compilers WRFDA should be built with. The configure script does not try to determine which compilers are actually present on your system, so you will have to determine which ones are available for yourself. The most common options are:<br>
+            <ul><li>GNU fortran compiler (gfortran) with GNU C compiler (gcc)</li>
+            <li>PGI fortran compiler (pgf90) with PGI C compiler (pgcc)</li>
+            <li>PGI fortran compiler (pgf90) with GNU C compiler (gcc)</li>
+            <li>Intel fortran compiler (ifort) with PGI C compiler (pgcc)</li>
+            <li>G95 fortran compiler (g95) with GNU C compiler (gcc)</li>
+            <li>XL Fortran compiler (xlf) XL C compiler (xlc)</li></ul><br>
+          If you are unsure whether you can use a certain compiler, you can issue the "which" command to see if that particular compiler exists in your path (for example: "which gfortran").<br>
+        </li>
+        <br>
+        <li class="bodybullet"><b>Parallelization option</b><br>
+          The parallelization option is the term in parenthesis at the end of each line. We recommend selecting a "dmpar" (<b>d</b>istributed-<b>m</b>emory <b>par</b>allel) option for several reasons:<br>
+        <ul><li class="bodybullet">Code compiled to run in serial restricts you to a single processor for running WRFDA, leading to slower execution and the potential for segmentation faults if you choose too large a domain or too many observations.</li>
+        <li class="bodybullet">Code compiled to run in parallel takes the same amount of compilation time.</li>
+        <li class="bodybullet">Code compiled to run in parallel can still be run in serial if the need arises.</li>
+        <li class="bodybullet">Shared-memory options (smpar and dm+sm) are not supported for WRFDA (they may work on some systems, but hidden errors and problems with irreproducability are likely due to the way most Fortran compilers handle shared memory). They will not provide a significant advantage over distributed-memory anyway.</li></ul></li>
+      </ol></ol>
+
+      <p class="bodytext">You should enter the number of the selection you choose, then hit [Enter]. Again, make sure that you choose the same compilers (both FORTRAN and C) that you used to compile your netCDF library!</p>
+
+
+
+      </blockquote>
+      <br>
+      <strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
+var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> so that we can address the problem. We appreciate your feedback!
+
+
+      </p>
+     <table width="100%"  border="0" align="right" cellspacing="0">
+        <tr>
+          <td><div align="right"><a href="../menu.html"><img src="../images/menu.svg" height="50" border="0"></a>&nbsp;&nbsp;&nbsp;</div></td>
+        </tr>
+
+      </table>      
+      <p align="right" class="bodytext">&nbsp;</p></td>
+  </tr>
+
+  <tr>
+    <td height="20" colspan="3" bgcolor="#AADDAA">
+		  
+<p align="right" class="detailtextRed"> <span class="calloutboxtitle"><strong>NOTE</strong>: These pages makes use of Java Script. Enable Java on your computer to make  use of all the functionality.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+              <script language="JavaScript">
+                <!--
+                document.write("updated " + document.lastModified);
+                // -->
+              </script>         
+    </p></td>
+  </tr>
+
+</table>
+
+</body>
+
+</html>
+

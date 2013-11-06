@@ -151,8 +151,7 @@ body {
 
       <table width="90%" border="0" cellpadding="3" cellspacing="7">
         <tr>
-          <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td
->
+          <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td>
           <td width="95%" bgcolor="#DDAA55" class="bodytext">
             <span class="style5">When typing the "setenv" command, I receive a "not found" or similar error</span><br>
             You are using a shell other than csh or tcsh. Please see the "<a href="../Help/shells.html">Shells Help Page</a>" for solutions.
@@ -202,10 +201,10 @@ are/netcdf/docs/faq.html#whatisit">Unidata FAQ</a></p>
         </tr>
       </table>
 
-      <p class="bodytext">It's recommended that you compile a few included external libraries as well:</p>
+      <p class="bodytext">At this point in the compilation process you need to make your first decision: which external libraries will you compile?</p>
         <blockquote>
         <p class="bodytext"><strong>BUFRLIB</strong></p>
-        <p class="bodytext">The BUFR library allows WRFDA to read observations in NCEP PREPBUFR format. Set the BUFR environment variable to compile this library:</p>
+        <p class="bodytext">The BUFR library allows WRFDA to read observations in NCEP PREPBUFR format. You will need this option if you have PREPBUFR-format conventional observations (for instance, the <a href=http://rda.ucar.edu/datasets/ds337.0/>NCEP ADP Global Upper Air and Surface Weather Observations database</a>) or if you wish to assimilate radiance observations in BUFR format. Set the BUFR environment variable to compile this library:</p>
         <p class="code">> setenv BUFR 1 <br></p>
         <p class="bodytext"><strong>CRTM</strong></p>
         <p class="bodytext">If you plan to assimilate radiance observations, you will need a radiative transfer model (RTM). The Community Radiative Transfer Model (CRTM) is included along with the WRFDA source code, and can be compiled by setting the CRTM environment variable:</p>
@@ -288,7 +287,15 @@ are/netcdf/docs/faq.html#whatisit">Unidata FAQ</a></p>
         <li class="bodybullet">Parallelization option</li>
       </ol></ol>
 
-      <p class="bodytext">You should enter the number of the selection you choose (for this simple tutorial, select a "serial" parallelization option), then hit [Enter]. Again, make sure that you choose the same compilers (both FORTRAN and C) that you used to compile your netCDF library. Notice that each compilation option comes with a term tacked on the end in parenthesis: This term represents the parallelization option for your code. For this simple tutorial, select the "serial" option. Compiling with a different parallelization option will be covered in the "Advanced 3DVAR" tutorial.</p>
+      <p class="bodytext">The parallelization option is the term in parenthesis at the end of each line. We recommend selecting a "dmpar" (<b>d</b>istributed-<b>m</b>emory <b>par</b>allel) option for several reasons:</p>
+      <ol><ol>
+        <li class="bodybullet">Code compiled to run in serial restricts you to a single processor for running WRFDA, leading to slower execution and the potential for segmentation faults if you choose too large a domain or too many observations.</li>
+        <li class="bodybullet">Code compiled to run in parallel takes the same amount of compilation time.</li>
+        <li class="bodybullet">Code compiled to run in parallel can still be run in serial if the need arises.</li>
+        <li class="bodybullet">Shared-memory options (smpar and dm+sm) are not supported for WRFDA (they may work on some systems, but hidden errors and problems with irreproducability are likely due to the way most Fortran compilers handle shared memory). They will not provide a significant advantage over distributed-memory anyway.</li>
+      </ol></ol>
+
+      <p class="bodytext">You should enter the number of the selection you choose, then hit [Enter]. Again, make sure that you choose the same compilers (both FORTRAN and C) that you used to compile your netCDF library!</p>
 
       <table width="90%" border="0" cellpadding="3" cellspacing="7">
         <tr>
