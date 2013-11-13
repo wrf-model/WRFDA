@@ -145,19 +145,34 @@ body {
 
       <p class="bodytext"><strong id="Font14">Step 2: Set up your data and namelist</strong> <br>
 
-      <p class="bodytext">Radiance data files in BUFR format must be linked according to a standard naming convention. You must also set a few namelist variables for each instrument. The following table details the necessary settings for each instrument; mouse over the column headings for a detailed description of each setting.</p>
+      <p class="bodytext">Radiance data files in BUFR format must be linked according to a standard naming convention. You must also set a few namelist variables for each instrument. The following table details the necessary settings for each instrument that WRFDA supports; mouse over the column headings for a detailed description of each setting.</p>
 
 
       <table width="100%" class="bottomBorder">
         <tr>
-          <th width="50%" scope="col"><a href="#" onMouseOver="popLayer(0)" onMouseOut="hideLayer()">Instrument</a></th>
+          <th width="30%" scope="col"><a href="#" onMouseOver="popLayer(0)" onMouseOut="hideLayer()">Instrument</a></th>
           <th width="10%" scope="col"><a href="#" onMouseOver="popLayer(1)" onMouseOut="hideLayer()">File name</a></th>
-          <th width="10%" scope="col"><a href="#" onMouseOver="popLayer(2)" onMouseOut="hideLayer()">Read obs</a></th>
-          <th width="10%" scope="col"><a href="#" onMouseOver="popLayer(3)" onMouseOut="hideLayer()">rtminit_platform</a></th>
-          <th width="10%" scope="col"><a href="#" onMouseOver="popLayer(4)" onMouseOut="hideLayer()">rtminit_satid</a></th>
-          <th width="10%" scope="col"><a href="#" onMouseOver="popLayer(4)" onMouseOut="hideLayer()">rtminit_sensor</a></th>
+          <th width="15%" scope="col"><a href="#" onMouseOver="popLayer(2)" onMouseOut="hideLayer()">Read obs</a></th>
+          <th width="15%" scope="col"><a href="#" onMouseOver="popLayer(3)" onMouseOut="hideLayer()">rtminit_platform</a></th>
+          <th width="15%" scope="col"><a href="#" onMouseOver="popLayer(4)" onMouseOut="hideLayer()">rtminit_satid</a></th>
+          <th width="15%" scope="col"><a href="#" onMouseOver="popLayer(4)" onMouseOut="hideLayer()">rtminit_sensor</a></th>
         </tr>
 
+        <tr>
+          <td class="bodytext"><a href="http://mirs.nesdis.noaa.gov/amsua.php">Advanced Microwave Sounding Unit-A (AMSU-A)</a>: A microwave observing instrument aboard several satellites:<br> NOAA-15&ndash;NOAA-18, Aqua, MetOp-A and MetOp-B</td>
+          <td class="tablecode">amsua.bufr</td>
+          <td class="tablecode">use_amsuaobs (NOAA, MetOp)<br>use_eos_amsuaobs (Aqua)</td>
+          <td class="tablecode">1 (NOAA)<br>9 (Aqua)<br>10 (MetOp)</td>
+          <td class="tablecode">15,16,17, and/or 18 (NOAA)<br>2 (Aqua, MetOp)</td>
+          <td class="tablecode">3</td>
+        </tr>
+          <td class="bodytext"><a href="http://mirs.nesdis.noaa.gov/amsub.php">Advanced Microwave Sounding Unit-B (AMSU-B)</a>: A microwave observing instrument, utilized mainly for humidity retrievals, carried aboard the NOAA-15, NOAA-16, and NOAA-17 satellites</td>
+          <td class="tablecode">amsub.bufr</td>
+          <td class="tablecode">use_amsubobs</td>
+          <td class="tablecode">1</td>
+          <td class="tablecode">15,16, and/or 17</td>
+          <td class="tablecode">4</td>
+        </tr>
         <tr>
           <td class="bodytext"><a href="http://npp.gsfc.nasa.gov/atms.html">Advanced Technology Microwave Sounder (ATMS)</a>: A microwave observing instrument aboard the NPP-Suomi satellite.</td>
           <td class="tablecode">atms.bufr</td>

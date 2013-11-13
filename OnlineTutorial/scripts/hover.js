@@ -11,7 +11,7 @@ if(!descarray[a]){descarray[a]="<font color=red>This popup (#"+a+") isn't setup 
 if (navigator.family == "gecko") {pad="0"; bord="1 bordercolor=black";}
 else {pad="1"; bord="0";}
 desc = 	  "<table cellspacing=0 cellpadding="+pad+" border="+bord+"  bgcolor=000000><tr><td>\n"
-	+"<table cellspacing=0 cellpadding=3 border=0 width=100%><tr><td bgcolor=#B4D3F4><font size=-1 face=arial>\n"
+	+"<table cellspacing=0 cellpadding=3 border=0 width=100%><tr><td bgcolor=#AADDAA><font size=-1 face=arial>\n"
 	+descarray[a]
 	+"\n</td></tr></table>\n"
 	+"</td></tr></table>";

@@ -65,6 +65,14 @@
 
 }
 
+.tablecode {
+        font-family: Courier, Courier New, sans-serif;
+        font-size: 90%;
+        line-height: 14pt;
+        color: #000000;
+        text-align: left;
+}
+
 .calloutbox {
 	font-family: Arial, Helvetica, sans-serif;
 	font-size: 8pt;
