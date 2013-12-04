@@ -446,8 +446,7 @@ PlainStyle2,
 ,"FSO","http://www.mmm.ucar.edu/wrf/users/wrfda/download/fso.html",,,1
 ,"MADIS2LITTLER","http://www.mmm.ucar.edu/wrf/users/wrfda/download/madis.html",,,1
 ,"TOOLS","http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,1
-,"Input Data from NCAR","http://www.mmm.ucar.edu/wrf/users/wrfda/download/free_data.html",,,1
-,"NCEP ftp","ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com",,,0
+,"Free Input Data","http://www.mmm.ucar.edu/wrf/users/wrfda/download/free_data.html",,,0
 ])
 
 

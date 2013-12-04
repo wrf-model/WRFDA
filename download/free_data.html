@@ -87,7 +87,7 @@
 
   <tr>
 
-    <td height="863" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+    <td height="863" valign="top" bgcolor="#CBFFCD"><table style=max-width:1000px; border="0" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
 
@@ -104,9 +104,7 @@
                 <p align="center"><a href="fso.html" class="leftnavlink">FSO</a></p>
                 <p align="center"><a href="madis.html" class="leftnavlink">MADIS2LITTLER</a></p>
                 <p align="center"><a href="tools.html" class="leftnavlink">TOOLS</a></p>
-                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">Free Met Data</p>
-                <p align="center"><a href="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com"
-                  class="leftnavlink">Real-time Data from NCEP</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">Free Input Data</p>
               </td>
             </tr>
 
@@ -115,73 +113,107 @@
           <p>&nbsp;</p>          <p>&nbsp;</p></td>
 
           <td><p>&nbsp;</p>
-            <p class="pagetitle">Free datasets from NCAR/RDA</p>
-            <p class="bodytext">A number of datasets which can be used to generate the input files of WRF-Var can now be download directly from the <a href="http://rda.ucar.edu/">NCAR/RDA</a> 
-              web site:</p>
-            <ul>
-              <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif">Only 
-                a limited number of datasets are available online</font></li>
-              <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif">The 
-                data is free to all users to download </font></li>
-            </ul>
-            <p class="bodytext"><strong>Available GRIB datasets:</strong> <em>(for 
-              input to WPS)</em></p>
-            <ul>
-              <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif">NCEP 
-                Final Analysis (FNL from GFS) (ds083.2): 1 degree resolution, 
-                every 6 hours</font> 
+            <p class="bodytext">A number of datasets which provide observation data and/or background atmospheric estimates for WRFDA can be downloaded directly from the <a href="http://rda.ucar.edu/">CISL Research Data Archive (RDA)</a> web site. This page lists several useful datasets from that archive, as well as some other useful data sources. All data sets listed on this page are free for users to download.</p>
+            <p class="pagetitle">Background datasets</p>
+            <p class="bodytext">These data sets can be used with the <a href="../../docs/user_guide_V3/users_guide_chap3.htm">WRF Pre-processing System</a> to generate first guess (background) files for use in WRFDA.<br><em>The details of each dataset (domain, timespan, etc.) may change</em>, click the links to see the most up-to-date descriptions of each dataset.</p>
+            <blockquote><ul class="bodytext">
+              <li><a href="http://rda.ucar.edu/datasets/ds083.2">NCEP Final Analysis (FNL from GFS) (ds083.2)</a>
                 <ul>
-                  <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><a href="http://rda.ucar.edu/datasets/ds083.2">http://rda.ucar.edu/datasets/ds083.2</a><br>
-                    </font></li>
+                  <li>1 degree resolution</li>
+                  <li>Global domain</li>
+                  <li>Output every 6 hours</li>
+                  <li>1999-07-30 to present</li>
                 </ul>
               </li>
-              <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif">NCEP/NCAR 
-                Reanalysis (ds090.0): 2.5 degree resolution, every 6 hours</font> 
+              <li><a href="http://rda.ucar.edu/datasets/ds090.0">NCEP/NCAR Reanalysis (ds090.0)</a>
                 <ul>
-                  <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><a href="http://rda.ucar.edu/datasets/ds090.0">http://rda.ucar.edu/datasets/ds090.0</a><br>
-                    </font></li>
+                  <li>2.5 degree resolution</li>
+                  <li>Global domain</li>
+                  <li>Output every 6 hours</li>
+                  <li>1948-01-01 to present</li>
                 </ul>
               </li>
-              <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
-                NCEP GRIB GDAS (ds083.0): 2.5 degree resolution, every 12 hours. 
-                - you may be able to use it if your entire domain stays in one 
-                hemisphere. </font> 
+              <li><a href="http://rda.ucar.edu/datasets/ds083.0">NCEP FNL Operational Model Global Tropospheric Analyses (ds083.0)</a>
                 <ul>
-                  <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><a href="http://rda.ucar.edu/datasets/ds083.0">http://rda.ucar.edu/datasets/ds083.0</a><br>
-                    </font></li>
+                  <li>2.5 degree resolution</li>
+                  <li><b>Northern hemisphere only</b></li>
+                  <li>Output every 12 hours</li>
+                  <li>1997-04-01 to 2007-06-30</li>
                 </ul>
               </li>
-              <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif"> 
-                NCEP Eta/NAM (ds609.2): 40 km resolution, every 6 hours. </font> 
+              <li><a href="http://rda.ucar.edu/datasets/ds609.2">NCEP Eta/NAM model output (ds609.2)</a>
                 <ul>
-                  <li><font size="2" face="Verdana, Arial, Helvetica, sans-serif"><a href="http://rda.ucar.edu/datasets/ds609.2">http://rda.ucar.edu/datasets/ds609.2</a></font></li>
+                  <li>40 km resolution</li>
+                  <li><b>Eta domain: Only a portion of North America</b></li>
+                  <li>Forecasts initialized every 6 hours</li>
+                  <li>1995-04-30 to 2012-12-31</li>
                 </ul>
-                <br>
+              </li>
+            </ul></blockquote>
+            <p class="pagetitle">CISL RDA Observation datasets</p>
+            <p class="bodytext">The following observation data sets can be directly assimilated with WRFDA:</p>
+            <blockquote><ul class="bodytext">
+              <li><a href="http://rda.ucar.edu/datasets/ds351.0">NCEP ADP Global Upper Air Observational Weather Data (ds351.0)</a>
+                <ul>
+                  <li>LITTLE_R format (assimilated through <a href="../../docs/user_guide_V3/users_guide_chap6.htm#_Running_Observation_Preprocessor_1">OBSPROC</a>)</li>
+                  <li>1999-09-30 to present</li>
+                </ul>
+              </li>
+              <li><a href="http://rda.ucar.edu/datasets/ds337.0">NCEP ADP Global Upper Air and Surface Weather Observations (ds337.0)</a>
+                <ul>
+                  <li>Surface (METAR, SHIPS, etc.) and Upper-Air (RAOB, ACARS, etc.) data</li>
+                  <li>PREPBUFR format (assimilated directly into WRFDA)</li>
+                  <li>1997-04-30 to present</li>
+                </ul>
+              </li>
+              <li><a href="http://rda.ucar.edu/datasets/ds735.0/">NCEP GDAS Satellite Radiance Data (ds735.0)</a>
+                <ul>
+                  <li>Raw radiance data from several instruments: 
+                    <ul><li>Atmospheric InfraRed Sounder (AIRS)</li>
+                      <li>Advanced Microwave Sounding Unit-A (AMSU-A) and Unit-B (AMSU-B)</li>
+                      <li>High resolution InfraRed Sounder-3 (HIRS-3) and 4 (HIRS-4)</li>
+                      <li>Microwave Humidity Sounder (MHS)</li>
+                    </ul>
+                  </li>
+                  <li>WMO BUFR format (assimilated directly into WRFDA <a href="../../docs/user_guide_V3/users_guide_chap6.htm#_Radiance_Data_Assimilations">utilizing a Radiative Transfer Model</a>)</li>
+                  <li>2004-04-17 to present</li>
+                </ul>
+              </li>
+            </ul></blockquote>
+            <p class="pagetitle">Other observation datasets</p>
+            <p class="bodytext">The following observation data sets require some additional processing before being assimilated with WRFDA:</p>
+            <blockquote><ul class="bodytext">
+              <li><a href="http://rda.ucar.edu/datasets/ds464.0">NCEP ADP Operational Global Surface Observations (ds351.0)</a> and <a href="http://rda.ucar.edu/datasets/ds353.4">Upper Air Observations (ds353.4)</a>
+                <ul>
+                  <li>ADP format (converted to LITTLE_R format using  <a href="#converting">a converter</a>)</li>
+                  <li>1999-09-30 to present</li>
+                </ul>
+              </li>
+              <li>MADIS data FTP sites: <a href="ftp://madis-data.noaa.gov/point/">real-time</a> and <a href="ftp://madis-data.noaa.gov/archive/">archived observations</a>
+                <ul>
+                  <li>Surface and upper-air data as described at the <a href="http://madis.noaa.gov/">MADIS website</a></li>
+                  <li>MADIS netCDF format (converted to LITTLE_R using the <a href="madis.html">MADIS2LITTLER converter</a>)</li>
+                  <li>2001-07-01 to present</li>
+                </ul>
+              </li>
+            </ul></blockquote>
+
+            <p class="pagetitle">Other datasets</p>
+            <p class="bodytext">The NCEP FTP site contains a large amount of realtime and near-realtime data for and output from their various operational models. However, the site is very difficult to navigate, and documentation is scant! There is some useful guidance available at <a href="http://www.nco.ncep.noaa.gov/pmb/docs/GRIB1_to_GRIB2.shtml">this page</a>.</p>
+            <blockquote><ul class="bodytext">
+              <li><a href="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com/">NCEP FTP SERVER</a></li>
+            </ul></blockquote>
+
+
+            <a name="converting">
+            <p class="pagetitle">Converting alternative observation formats to LITTLE_R:</p>
+            <blockquote><ul class="bodytext">
+            <li>Once you have ADP data on your machine, you can use the script adp_to_little-r.csh (inside the latest <a href="ftp://ftp.ucar.edu/mesouser/MM5V3/FETCH.TAR.gz">FETCH</a> TAR file - after Jan 21, 2004) to convert it to LITTLE_R input format.<br>
+              <b>This converter is NOT maintained by the WRFDA group, and is not guaranteed to work properly</b></li>
+            <li>For users with MADIS-formatted data, the WRF Data Assimilation group maintains the <a href="madis.html">MADIS2LITTLER</a> converter.<br>
             </li>
-            </ul>
-            <p class="bodytext"><strong>Available observational datasets:</strong></p>
-            <ul>
-              <li class="bodytext_no_indent">Surface and upper-air observational data (in ADP format) is also available to 
-                 users. See the next section for instructions on how to convert ADP format to LITTLE_R.<br>
-              </li>
-              <ul>
-                <li class="bodytext_no_indent">Surface and Ship data 
-                  (<a href="http://rda.ucar.edu/datasets/ds464.0">ds464.0</a>)<br></li>
-                <li class="bodytext_no_indent">Upper Air data
-                  (<a href="http://rda.ucar.edu/datasets/ds353.4">ds353.4</a>)</li>
-              </ul>
-            </ul>
-            <p class="bodytext"><strong>Converting alternative observation formats to LITTLE_R:</strong></p>
-            <ul>
-            <li class="bodytext_no_indent">Once you have ADP data on your machine, you can use the script 
-                adp_to_little-r.csh (inside the latest <a href="ftp://ftp.ucar.edu/mesouser/MM5V3/FETCH.TAR.gz">FETCH</a> 
-                TAR file - after Jan 21, 2004) to convert it to LITTLE_R input format.<br>
-                This converter is NOT maintained by the WRFDA group, and should be used with caution.
-            </li>
-            <li class="bodytext_no_indent">For users with MADIS-formatted data, the WRF Data Assimilation group maintains 
-                the <a href="madis.html">MADIS2LITTLER</a> converter.<br>
-            </li>
-            </ul>
+            </ul></blockquote>
+
           <img src="../images/transgif.gif" width="1" height="1"><img src="../images/shim112.gif" width="112" height="1"><img src="../images/shim162.gif" width="162" height="1">
             <p align="center" class="detailtextRed">
               <script language="JavaScript">
