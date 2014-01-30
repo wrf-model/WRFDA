@@ -158,6 +158,11 @@
                 <li><a href="#V3_0">Version 3.0</a></li></ul><br></blockquote></blockquote>
             <a name="V3_5"></a><p class="pagetitle">WRFDA Version 3.5 : Known Problems and Fixes</p>
             <blockquote>
+            <h2> WRFPLUS fails to compile when serial option is selected (posted 1/30/2014) </h2>
+            <p class="bodytext"><strong>Problem: </strong><br>
+             Compilation of WRFPLUS fails at main/module_wrf_top.f90 with message "error #6404: This name does not have a type, and must have an explicit type." (or similar error message)</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+             Replace the file "main/module_wrf_top.F" with this copy: (<a href="fixes/v35/module_wrf_top.F">module_wrf_top.F</a>). Then run "<code>./clean -a</code>" and recompile WRFPLUS.
             <h2> WRFDA compilation problem with some older compilers (posted 4/29/2013) </h2>
             <p class="bodytext"><strong>Problem: </strong><br>
              Compilation fails with the message "Error: Too many digits in STOP code at (1)"</p>
