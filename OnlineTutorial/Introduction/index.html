@@ -122,7 +122,7 @@ body {
     <td width="1%" valign="top">&nbsp;</td>
     <td width="94%" valign="top"><p>&nbsp;</p>
       <p class="headingtext" id="Font20">Introduction</p>
-      <p class="bodytext">The WRF Data Assimilation system (WRFDA) is a community data assimilation system for the Weather Research and Forecasting model. It is a community system in the sense that the model is kept open-source and released in the public domain. WRFDA currently has support for 3DVAR, FGAT, 4DVAR, and EnKF methods of data assimilation, and is undergoing constant improvements and additions. The system is maintained by the WRFDA Group of the Mesoscale and Microscale Meteorology (MMM; pronounced "em cubed") division of the NCAR Earth System Laboratory (NESL). However, we are constantly incorporating improvements proposed and designed by community users as well.</p>
+      <p class="bodytext">The WRF Data Assimilation system (WRFDA) is a community data assimilation system for the Weather Research and Forecasting model. It is a community system in the sense that the model is kept open-source and released in the public domain. WRFDA currently has support for 3DVAR, 4DVAR, ETKF, and Hybrid ensemble/variational methods of data assimilation, and is undergoing constant improvements and additions. The system is maintained by the WRFDA Group of the Mesoscale and Microscale Meteorology (MMM; pronounced "em cubed") division of the NCAR Earth System Laboratory (NESL). However, we are constantly incorporating improvements proposed and designed by community users as well.</p>
       <p class="bodytext">In addition to being open-source and public domain, WRFDA is designed and maintained to be as flexible as possible, keeping within the goals of the WRF model to be flexible for a wide range of uses (e.g. research, theory, modeling, and operational) and run on a wide range of platforms (e.g. several supported compilers, on single or multiple processors, on systems ranging from Mac/Linux PCs to the largest supercomputers, including NCAR's own <a href="https://www2.cisl.ucar.edu/resources/yellowstone">Yellowstone</a>).</p><!-- 
 This part should probably be converted into a bulleted list. Damn 3am making me type in run-on sentences
 -->
@@ -145,7 +145,7 @@ This part should probably be converted into a bulleted list. Damn 3am making me 
       </ul>
       <p class="bodytext">We will gladly offer help for problems with other Unix- and Linux-based systems (and WRFDA has been shown to work on dozens of different platforms), but cannot guarantee WRFDA's functionality outside of the above-listed platforms. WRFDA will not work on Windows-based systems.</p>
       <p class="headingtext" id="Font16"><em>Compilers</em></p>
-      <p class="bodytext">WRFDA requires both Fortran and C compilers. Fortran90 or higher support is necessary. The following compiler combinations are fully tested and supported:</p>
+      <p class="bodytext">WRFDA requires both Fortran and C compilers. Fortran90 or higher support is necessary, and some Fortran2003 features are needed as well. The following compiler combinations are fully tested and supported:</p>
       <ul>
         <li class="bodybullet">GNU Fortran (gfortran; version 3.4 or later) and C Compilers (gcc)</li>
         <li class="bodybullet">Portland Group Fortran 90 (pgf90) and C (pgcc) Compilers, as well as pgf90 with gcc</li>
@@ -186,7 +186,7 @@ This part should probably be converted into a bulleted list. Damn 3am making me 
       <br>
       <p class="bodytext"><strong>Note:</strong>  This website is currently under construction.  If you notice any problems with the website, including but not limited to broken links, formatting errors, or incorrect information, please submit an email to the <em><script type='text/javascript'><!--
 var v2="RFWEUIN2IYRNJ8ZQI";var v7=unescape("9%27%2109%20-Z%09%2C1/8%16%3F5%3C");var v5=v2.length;var v1="";for(var v4=0;v4<v5;v4++){v1+=String.fromCharCode(v2.charCodeAt(v4)^v7.charCodeAt(v4));}document.write('<a href="javascript:void(0)" onclick="window.location=\'mail\u0074o\u003a'+v1+'?subject=WRFDA%20Tutorial%20webmaster%3A'+'\'">'+'WRFDA Tutorial webmaster<\/a>');
-//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> so that we can address the problem. We appreciate your feedback!
+//--></script><noscript><a href='http://w2.syronex.com/jmr/safemailto/#noscript'>WRFDA Tutorial webmaster (with anti-spam)</a></noscript></em> or wrfhelp@ucar.edu so that we can address the problem. We appreciate your feedback!
 
 
       </p>
