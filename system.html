@@ -126,8 +126,11 @@
           <img src="images/shim112.gif" width="112" height="1"></td>
         <td bgcolor="#CBFFCD"><p>&nbsp;</p>
             <p class="pagetitle">WRFDA System Overview</p>
+          <p class="bodytext">The WRF Data Assimilation system (WRFDA, formerly known as WRF-VAR) is a unified (global/regional, multi-model, 3/4D-Var) model-space data assimilation system (WRFDA) for use by the NCAR staff and collaborators, and is also freely available to the general community, together with further documentation, test results, plans, etc.</p>
           <p class="bodytext">Data assimilation is the technique by which <b>observations</b> are combined with an NWP product (the <b>first guess</b> or background forecast) and their respective error statistics to provide an improved estimate (the <b>analysis</b>) of the atmospheric (or oceanic, Jovian, etc.) state. Variational (Var) data assimilation achieves this through the iterative minimization of a prescribed cost (or penalty) function. Differences between the analysis and observations/first guess are penalized (damped) according to their perceived error. The difference between three-dimensional (3D-Var) and four-dimensional (4D-Var) data assimilation is the use of a numerical forecast model in the latter.</p>
-          <p class="bodytext">The MMM Division of NCAR supports a unified (global/regional, multi-model, 3/4D-Var) model-space data assimilation system (WRFDA) for use by the NCAR staff and collaborators, and is also freely available to the general community, together with further documentation, test results, plans etc.</p>
+          <blockquote>
+            <p><strong>WRFDA System Components</strong></p>
+          </blockquote>
           <p class="bodytext">Various components of the WRFDA system are shown in blue in the sketch below, together with their relationship with the rest of the WRF system.</p>
           <table width="586" border="0" align="center" cellpadding="0" cellspacing="0">
               <tr>
@@ -135,7 +138,6 @@
               </tr>
             </table>
           <blockquote>
-            <p><strong>System overview</strong></p>
             <blockquote>
               <p><i><b>x<sup>b</sup></b></i>	first guess, either from a previous WRF forecast or from WPS/REAL output</p>
               <p><i><b>x<sup>lbc</sup></b></i>	lateral boundary from WPS/REAL output</p>
@@ -155,10 +157,42 @@
             <p class="citetext">Barker, D., X.-Y. Huang, Z. Liu, T. Aulign&eacute;, X. Zhang, S. Rugg, R. Ajjaji, A. Bourgeois, J. Bray, Y. Chen, M. Demirtas, Y.-R. Guo, T. Henderson, W. Huang, H.-C. Lin, J. Michalakes, S. Rizvi, and X. Zhang, 2012: <a href="http://journals.ametsoc.org/doi/abs/10.1175/BAMS-D-11-00167.1">The Weather Research and Forecasting Model's Community Variational/Ensemble Data Assimilation System: WRFDA</a>. <i>Bull. Amer. Meteor. Soc.</i>, <b>93</b>, 831&ndash;843.</p>
 </blockquote>
             <p class="bodytext">You can find additional publications on specific portions of the WRFDA system at our <a href="pub-doc.html">Publications Page</a>.</p>
-</blockquote>
+            <p><strong>WRFDA assimilation methods and observation types</strong></p>
+          <p class="bodytext">WRFDA is an assimilation system which contains several different methods of data assimilation:</p>
+             <ul class="bodytext"><li>3DVAR</li>
+               <li>4DVAR</li>
+               <li>Ensemble DA</li>
+               <li>Hybrid 3DVAR/Ensemble</li></ul>
+          <p class="bodytext">Using these assimilation methods, WRFDA is capable of ingesting a wide variety of observation types. Most data types can be assimilated in LITTLE_R (ASCII text) or PREPBUFR (binary) format, but satellite radiances are assimilated in BUFR format.</p>
+             <ul class="bodytext"><li><b>In-situ</b>
+                 <ul class="bodytext"><li>Surface (SYNOP, METAR, SHIP, BUOY)</li>
+                 <li>Upper air (TEMP, PIBAL, AIREP, ACARS, TAMDAR)</li></ul></ul>
+             <ul class="bodytext"><li><b>Remote sensing (derived products)</b>
+                 <ul class="bodytext"><li>Atmospheric Motion Vectors (GOES, Polar)</li>
+                 <li>GPS Refractivity (COSMIC)</li>
+                 <li>GPS Precipitable Water (PW) and Zenith Total Delay (ZTD)</li>
+                 <li>GPS Zenith Total Delay (ZTD)</li>
+                 <li>Radar reflectivity and velocity</li>
+                 <li>QUIKSCAT oceanic surface winds</li>
+                 <li>SSM/I oceanic surface wind speed</li>
+                 <li>SSM/I Total Precipitable Water (TPW)</li>
+                 <li>Stage IV precipitation/rain rate data <em>(4DVAR only)</em></li>
+                 <li>SATEM Thickness</li></ul></ul>
+             <ul class="bodytext"><li><b>Satellite radiance</b>
+                 <ul class="bodytext"><li>HIRS (NOAA 16&endash;19, METOP A)</li>
+                 <li>AMSU-A (NOAA 15&endash;19, EOS-Aqua, METOP A)</li>
+                 <li>AMSU-B (NOAA 15&endash;17)</li>
+                 <li>MHS (NOAA 18&endash;19, METOP A)</li>
+                 <li>AIRS (EOS-Aqua)</li>
+                 <li>SSMIS (DMSP 16&endash;18)</li>
+                 <li>IASI (METOP A)</li>
+                 <li>ATMS (Suomi-NPP)</li>
+                 <li>MWTS (FY-3)</li>
+                 <li>MWHS (FY-3)</li></ul></ul>
+          <p class="bodytext">Satellite radiance assimilation requires the use of a radiative transfer model. WRFDA supports the use of CRTM (included) and RTTOV (must be downloaded separately).</p>
             <p><br></p>
-</blockquote>
-            <p class="bodytext"><big>A more complete introduction to WRFDA, along with instructions on how to compile and run the various components, can be found in the <a href="./Docs/user_guide_V3.4/users_guide_chap6.htm">WRFDA User Guide</a>.</big></p>
+            </blockquote>
+             <p class="bodytext"><big>A more complete introduction to WRFDA, along with instructions on how to compile and run the various components, can be found in the <a href="usersguide.html">WRFDA User Guide</a>.</big></p>
           <p class="bodytext">
 <p class="bodytext">&nbsp;</p>
             <p align="center" class="detailtextRed">
