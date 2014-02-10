@@ -257,7 +257,8 @@ $row = $result->fetch_array();
 
   $goto_url = "http://www.mmm.ucar.edu/wrf/users/download/get_sources.html";
   print '<p class="bodytext"><b>User registration verified.</b></p>';
-  print '<p class="bodytext">Please <a href="' . $goto_url . '">click here</a> to proceed to the download page; the madis code can be found by clicking the "Utilities" link at the top right of the page.</p>';
+  print '<p class="bodytext">Please <a href="' . $goto_url . '">click here</a> to proceed to the download page. </p>';
+  print '<p class="bodytext"><b>NOTE:</b> The MADIS code can be found by clicking the "Utilities" link at the top right of the page, or scrolling down to the appropriate section.</p>';
 
 #  db_connect("box.mmm.ucar.edu", "wrfweb", "wtwrf");
  } else {
