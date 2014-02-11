@@ -9,10 +9,10 @@ include_once("../../../../libphp/connect_db.php");
 ?>
 <html>
 <head>
-<title>WRF Data Assimilation System Download: Returning Users</title>
+<title>MADIS2LITTLER Download: Returning Users</title>
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 <meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
-<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+<meta name="DESCRIPTION" content="Download page for the MADIS2LITTLER converter">
 <meta name="ROBOTS" content="INDEX,FOLLOW">
 <meta name="resource-type" content="document">
 <meta http-equiv="expires" content="0">
@@ -101,7 +101,7 @@ $(document).ready(function() {
     </td>
   </tr>
   <tr valign="top">
-    <td height="10" bgcolor="#FFFFFF"><img src="../images/header.jpg" width="566" height="56"></td>
+    <td height="10" bgcolor="#DDFFDD"><img src="../images/header_new_cropped.png" height="56" border="0"></td>
   </tr>
   <tr bgcolor="#FFCC33">
     <td height="6" background="../images/goldrule.jpg"><img src="../images/goldrule.jpg" width="1" height="1"></td>
@@ -117,19 +117,28 @@ $(document).ready(function() {
   <tr>
     <td height="865" valign="top" bgcolor="#CBFFCD"><table width="780" height="868" border="0" cellpadding="0" cellspacing="0">
       <tr valign="top">
-        <td width="117" height="868" bgcolor="#009933"><p>&nbsp;</p>
-          <table width="100" border="0" align="center" cellpadding="0" cellspacing="0">
-            <tr>
-              <td><p align="right"><a href="get_source.html" class="leftnavlink">WRFDA</a></p>
-                  <p align="right"><a href="free_data.html" class="leftnavlink">Free 
-                    Met Data from NCAR</a></p>
-                  <p align="right"><a href="ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com" class="leftnavlink">Real-time 
-                    Data from NCEP</a></p></td>
-            </tr>
+        <td width="117" height="900" bgcolor="#009933"><p>&nbsp;</p>
+
+
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+                <p align="center"><a href="../downloads.html" class="leftnavlink">Overview</a></p>
+                <p align="center"><a href="get_source.html" class="leftnavlink">WRFDA</a></p>
+                <p align="center"><a href="testdata.html" class="leftnavlink">Test data</a></p>
+                <p align="center"><a href="wrfnl.html" class="leftnavlink">WRFNL</a></p>
+                <p align="center"><a href="wrfplus.html" class="leftnavlink">WRFPLUS</a></p>
+                <p align="center"><a href="fso.html" class="leftnavlink">FSO</a></p>
+                <p align="center"><a href="madis.html" class="leftnavlink">MADIS2LITTLER</a></p>
+                <p align="center"><a href="tools.html" class="leftnavlink">Tools</a></p>
+                <p align="center"><a href="free_data.html" class="leftnavlink">Free Input Data</a></p>
+              </td>
+
           </table>          
+
+
           <p>&nbsp;</p>          <p>&nbsp;</p></td>
           <td><p>&nbsp;</p>
-            <p class="pagetitle">WRFDA Source Code Download: Returning Users</p>
+            <p class="pagetitle">MADIS Source Code Download: Returning Users</p>
             <p class="bodytext">
 	    <!-- ################################################################ -->
 <form method="post">
