@@ -158,7 +158,7 @@ addmenu(menu=[
 "Mainmenu",
 72,								//  top position of menu
 ,
-98,							// width of buttons
+100,							// width of buttons
 ,
 "left",							// left, center, right postition
 PlainStyle,
@@ -176,14 +176,13 @@ PlainStyle,
 ,
 0,
 ,
-,"Home","show-menu=Home",,,1
-,"System","show-menu=Analysis",,,1
-,"User Support","show-menu=Support",,,1
-,"Download","show-menu=Download",,,1
-,"Doc / Pub","show-menu=Pub",,,1
-,"Links","show-menu=Links",,,1
-,"Internal","http://www.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
-,"Users Forum","http://forum.wrfforum.com/",,,1
+,"<div style='margin-top:6px'>Home</div>","show-menu=Home",,,1
+,"<div style='margin-top:6px'>System</div>","show-menu=Analysis",,,1
+,"<div style='margin-top:6px'>User Support</div>","show-menu=Support",,,1
+,"<div style='margin-top:6px'>Download</div>","show-menu=Download",,,1
+,"Publications & Documentation","show-menu=Pub",,,1
+,"<div style='margin-top:6px'>Links</div>","show-menu=Links",,,1
+,"<div style='margin-top:6px'>Internal</div>","http://www.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
 ])
 
 
@@ -248,7 +247,7 @@ PlainStyle2,
 ,"WRFDA V3.3","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.3.html",,,0
 ,"WRFDA V3.2.1","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.2.1.html",,,0
 ,"WRFDA V3.2","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.2.html",,,0
-,"Older versions","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-older.html",,,0
+,"Older versions","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-older.html",,,1
 ,"WRFDA Tutorials","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,1
 ,"WRFDA Tools","http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,0
 ])
@@ -275,9 +274,8 @@ PlainStyle2,
 ,
 0,
 ,
-//,"User Support Overview","http://www.mmm.ucar.edu/wrf/users/support.html",,,0
 ,"General Information","http://www.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
-,"Users' Guide","http://www.mmm.ucar.edu/wrf/users/wrfda/usersguide.html",,,0
+,"WRFDA User's Guide","show-menu=userguide",,,0
 ,"Known problems","http://www.mmm.ucar.edu/wrf/users/wrfda/known-prob.html",,,0
 ,"wrfhelp","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
 ,"wrf-news","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfnews.html",,,0
@@ -293,7 +291,7 @@ PlainStyle2,
 
 addmenu(menu=[
 "Pub",
-,
+100,
 ,
 190,
 1,
@@ -313,11 +311,13 @@ PlainStyle2,
 ,
 0,
 ,
-,"Pubs & Docs Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/pub-doc.html",,,1
-,"Tech Notes","http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,0
+,"WRFDA Publications","http://www.mmm.ucar.edu/wrf/users/wrfda/pub-doc.html",,,1
+,"Technical Notes","http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,1
 ,"WRFDA User's Guide","show-menu=userguide",,,0
+,"WRFDA Online Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/index.html",,,1
+,"WRFDA on Yellowstone","http://www.mmm.ucar.edu/wrf/users/wrfda/yellowstone.html",,,1
+,"Reading BUFR files","http://www.mmm.ucar.edu/wrf/users/wrfda/readBUFR.html",,,1
 //,"Tutorial Presentation","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
-//,"WRF-Var Online Tutorial","",,,1
 //,"NCAR Tech Notes","http://www.mmm.ucar.edu/wrf/users/doc1.html",,,0
 
 ])
@@ -360,7 +360,7 @@ addmenu(menu=[
 "Links",
 ,
 ,
-210,
+200,
 1,
 ,
 PlainStyle2,
@@ -380,41 +380,13 @@ PlainStyle2,
 ,
 ,"WRFDA Links Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/links.html",,,1
 ,"NCAR Graphics","http://ngwww.ucar.edu/",,,0
-,"NCL page","http://www.ncl.ucar.edu/",,,1
-,"Unidata (for netCDF)","http://www.unidata.ucar.edu/",,,1
-,"NCAR SCD","show-menu=SCD",,,1
-,"MMM Web Site","http://www.mmm.ucar.edu/",,,0
-,"NCAR Web Site","http://www.ncar.ucar.edu/ncar/",,,0
-,"UCAR Web Site","http://www.ucar.edu/ucar/",,,0
+,"NCAR Command Language (NCL)","http://www.ncl.ucar.edu/",,,1
+,"Unidata (netCDF)","http://www.unidata.ucar.edu/",,,1
+,"CISL NCAR Computing Support","http://www2.cisl.ucar.edu/cisl-support",,,1
+,"MMM website","http://www.mmm.ucar.edu/",,,0
+,"NCAR website","http://www.ncar.ucar.edu/ncar/",,,0
+,"UCAR website","http://www.ucar.edu/ucar/",,,0
 ])
-
-addmenu(menu=[
-"SCD",
-,
-,
-120,
-1,
-,
-PlainStyle2,
-0,
-,
-"Fade(duration=0.5);Shadow(color=777777, Direction=135, Strength=5)",
-0,
-0,
-0,
-,
-,
-0,
-0,
-,
-,
-0,
-,
-,"Account","http://www.scd.ucar.edu/resources/apply.html",,,0
-,"Data Support","http://www.scd.ucar.edu/dss/",,,0
-,"Documents","http://www.scd.ucar.edu/docs/catalog/",,,0
-])
-
 
 addmenu(menu=[
 "Download",
