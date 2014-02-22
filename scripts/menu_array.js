@@ -212,7 +212,7 @@ PlainStyle2,
 ,"WRFDA Users Home Page","http://www.mmm.ucar.edu/wrf/users/wrfda/index.html",,,0
 ,"WRFDA News","http://www.mmm.ucar.edu/wrf/users/wrfda/news.html",,,0
 ,"Public Domain Notice","http://www.mmm.ucar.edu/wrf/users/wrfda/public.html",,,0
-,"Contact WRF Support","http://www.mmm.ucar.edu/wrf/users/wrfda/contact.html",,,0
+,"Contact Us!","http://www.mmm.ucar.edu/wrf/users/wrfda/contact.html",,,0
 ])
 
 
@@ -274,15 +274,15 @@ PlainStyle2,
 ,
 0,
 ,
-,"General Information","http://www.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
-,"WRFDA User's Guide","show-menu=userguide",,,0
+,"WRFDA community support","http://www.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
 ,"Known problems","http://www.mmm.ucar.edu/wrf/users/wrfda/known-prob.html",,,0
 ,"wrfhelp","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
 ,"wrf-news","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfnews.html",,,0
 ,"wrf-users","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfusers.html",,,0
 ,"Become a registered user","http://www.mmm.ucar.edu/wrf/users/wrfda/regist.html",,,1
 ,"Workshop","http://www.mmm.ucar.edu/wrf/users/wrfda/workshop.html",,,0
-,"Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
+,"Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,1
+,"WRFDA User's Guide","show-menu=userguide",,,0
 //,"Tutorial","show-menu=Tutorials",,,0
 //,"On-Line tutorial","http://www.mmm.ucar.edu/mm5/mm5v3/tutorial/teachyourself.html target=new",,,1
 //,"Users information","http://www.mmm.ucar.edu/mm5/institutes.html",,,0
@@ -315,6 +315,7 @@ PlainStyle2,
 ,"Technical Notes","http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,1
 ,"WRFDA User's Guide","show-menu=userguide",,,0
 ,"WRFDA Online Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/index.html",,,1
+,"How to compile WRFDA","http://www.mmm.ucar.edu/wrf/users/wrfda/how_to_compile.html",,,1
 ,"WRFDA on Yellowstone","http://www.mmm.ucar.edu/wrf/users/wrfda/yellowstone.html",,,1
 ,"Reading BUFR files","http://www.mmm.ucar.edu/wrf/users/wrfda/readBUFR.html",,,1
 //,"Tutorial Presentation","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0

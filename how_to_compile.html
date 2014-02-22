@@ -2,13 +2,13 @@
 
 <head>
 
-<title>WRF Var Updates</title>
+<title>Compiling WRFDA</title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
 <meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
 
-<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+<meta name="DESCRIPTION" content="WRF Data assimilation Users homepage">
 
 <meta name="ROBOTS" content="INDEX,FOLLOW">
 
@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+<meta name="copyright" content="Copyright (c) 2014 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -75,7 +75,7 @@
 
   <tr valign="top">
 
-    <td height="10"><div align="left"><img src="images/header.jpg" width="566" height="56" border="0"></div></td>
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
 
   </tr>
 
@@ -106,237 +106,43 @@
     <td valign="top" bgcolor="#CBFFCD"><table width="994" border="0" align="left" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
-        <td width="116" height="790" valign="top" bgcolor="#009933"><p align="center">&nbsp;</p>
-          <p align="center">&nbsp;</p>
-          <p align="center"><a href="../docs/user_guide_V3/users_guide_chap6.htm#_Installing_WRF-Var" class="leftnavlink">How 
-            
-            to Compile?</a></p>
-          <p align="center"><a href="../docs/user_guide_V3/users_guide_chap6.htm#_Running_WRF-Var_1" class="leftnavlink">How 
-              
-              to Run?</a></p>
-          <p align="center" class="leftnavlink"><a href="updates.html" class="leftnavlink">WRF Var
-            Updates</a></p>
-          <p align="center"><a href="known-prob.html" class="leftnavlink">Known 
-          Problems and Fixes</a></p></td>
 
-        <td width="878" height="790" colspan="2" align="left" bgcolor="#CBFFCD"><p align="center">&nbsp;</p>
-          <p align="left" class="pagetitle">Required Libraries: </p>
-          <blockquote>
-            <p>Before compiling the WRFDA code, it is necessary to have installed following mandatory libraries:</p>
-            <ol>
-              <li><a href="http://www.unidata.ucar.edu/downloads/netcdf/netcdf-3_6_1/index.jsp">NETCDF-3.6.1</a>, http://www.unidata.ucar.edu/downloads/netcdf/netcdf-3_6_1/index.jsp</li>
-              <li><a href="http://netlib.org/blas/">BLAS</a>, http://netlib.org/blas/blas.tgz</li>
-              <li><a href="http://netlib.org/lapack/">LAPACK-3.1.1</a> http://netlib.org/lapack/lapack-3.1.1.tgz</li>
-            </ol>
-            <p>If any of the NETCDF, BLAS, LAPACK  libraries are not available on the computer, they needs to be installed first. Assuming, for example, that these libraries have been installed in subdirectories of /usr/local, the necessary environment variables might be set with, for example:</p>
-            <p>setenv BLAS   /usr/local/blas<br>
-              setenv LAPACK /usr/local/lapack<br>
-              setenv NETCDF   /usr/local/netcdf</p>
-            <p>If you intend to use some advanced functions provided by WRFDA, you have to install additional libraries:</p>
-            <ol>
-              <li>If Prebufr observational data will be used as input, you have to install <a href="http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB/BUFRLIB.tar">BUFR</a> library from http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB/</li>
-              <li>If MADIS observational data will be used as input, you have to install <a href="http://madis.noaa.gov/">MADIS</a> library from http://madis.noaa.gov/</li>
-              <li>If radiance observations will be used with Radiative Trnasfer model from NCEP, in addition to <a href="http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB/BUFRLIB.tar">BUFR</a> library, you have to install <a href="ftp://ftp.emc.ncep.noaa.gov/jcsda/CRTM/">CRTM</a> from ftp://ftp.emc.ncep.noaa.gov/jcsda/CRTM/</li>
-              </ol>
-            <blockquote>
-              <p class="style1">Note: You have to make following changes to use the CRTM_REL1.2</p>
-              <p>Index: da_transform_xtoy_crtm_adj.inc<br>
-                ===================================================================<br>
-                --- da_transform_xtoy_crtm_adj.inc      (revision 3543)<br>
-                +++ da_transform_xtoy_crtm_adj.inc      (working copy)<br>
-                @@ -310,7 +310,7 @@<br>
-!Surface(1)%Ice_Roughness=0.0               ! NO Table offered, single example is ZERO<br>
-end if<br>
-Surface(1)%SensorData%n_channels = nchanl<br>
--     Surface(1)%SensorData%Sensor_ID  = wmo_sensor_id<br>
-+     Surface(1)%SensorData%Select_WMO_Sensor_Id  = wmo_sensor_id<br>
-Surface(1)%SensorData%Tb(1:nchanl) = iv%instid(inst)%tb_inv(1:nchanl,n) + &amp;<br>
-iv%instid(inst)%tb_xb(1:nchanl,n)</p>
-              <p>Index: da_transform_xtoy_crtm.inc<br>
-                ===================================================================<br>
-                --- da_transform_xtoy_crtm.inc  (revision 3543)<br>
-                +++ da_transform_xtoy_crtm.inc  (working copy)<br>
-                @@ -328,7 +328,7 @@<br>
-                !Surface(1)%Ice_Roughness=0.0               ! NO Table offered, single egrid%xample is ZERO<br>
-                end if<br>
-                Surface(1)%SensorData%n_channels = nchanl<br>
-                -     Surface(1)%SensorData%Sensor_ID  = wmo_sensor_id<br>
-                +     Surface(1)%SensorData%Select_WMO_Sensor_Id  = wmo_sensor_id<br>
-                Surface(1)%SensorData%Tb(1:nchanl) = iv%instid(inst)%tb_inv(1:nchanl,n) + &amp;<br>
-                iv%instid(inst)%tb_xb(1:nchanl,n)<br>
-              </p>
-              <p>Index: da_get_innov_vector_crtm.inc<br>
-                ===================================================================<br>
-                --- da_get_innov_vector_crtm.inc        (revision 3543)<br>
-                +++ da_get_innov_vector_crtm.inc        (working copy)<br>
-                @@ -408,7 +408,7 @@<br>
-                end if<br>
-                if (nchanl &gt; 0) then<br>
-                Surface(1)%SensorData%n_channels = nchanl<br>
-                -            Surface(1)%SensorData%Sensor_ID  = wmo_sensor_id<br>
-                +            Surface(1)%SensorData%Select_WMO_Sensor_Id  = wmo_sensor_id<br>
-                Surface(1)%SensorData%Tb(1:nchanl) = ob%instid(inst)%tb(1:nchanl,n)<br>
-                end if</p>
-            </blockquote>
-            <ol start="4">
-              <li>If radiance observations will be used with Radiative Trnasfer model from UK Met Office, in addition to <a href="http://www.nco.ncep.noaa.gov/sib/decoders/BUFRLIB/BUFRLIB.tar">BUFR</a> library, you have to install <a href="http://www.metoffice.gov.uk/research/interproj/specialist_nwpsaf/rtm/rtm_rttov8.html">RTTOV</a> from http://www.metoffice.gov.uk/research/interproj/specialist_nwpsaf/rtm/rtm_rttov8.html (Users need to register first through a link at the top right of the page http://www.metoffice.gov.uk/science/creating/working_together/nwpsaf_public.html)</li>
-            </ol>
-            <p>Again, the necessary environment variables might be set with, for example:</p>
-            <p>setenv BUFR   /usr/local/bufr<br>
-              setenv MADIS /usr/local/madis<br>
-              setenv CRTM /usr/local/crtm<br>
-              setenv RTTOV   /usr/local/rttov</p>
-            <p><span class="style2"><strong>Important :</strong><span class="style3"> If PGI, INTEL ,g95 or GFORTRAN compiler are available on a Linux/Mac computer, make sure all libraries are compiled/installed using the same compiler with the one to compile WRF-Var.</span></span></p>
-            <p><span class="style5">Note: </span>These external libraries can be compiled by using the scripts under WRFDA/var/scripts/compile_external. </p>
-          </blockquote>
-          <blockquote>
-            <p align="left"></p>
-            <p align="left">The table below gives the details of the compilers and platforms on which each library was tested before release. </p>
-            <div align="center">
-              <table width="100%" border="1" align="center" cellpadding="1" cellspacing="1">
-                <tr>
-                  <th width="122" scope="col">&nbsp;</th>
-                    <th width="76" align="center" scope="col">xlf</th>
-                    <th width="104" scope="col"><div align="center">pgi</div></th>
-                    <th width="141" scope="col"><div align="center">g95 (gcc version 4.0.3 (g95 0.91!) </div></th>
-                    <th width="126" scope="col"><div align="center">
-                        <p><a href="http://gcc.gnu.org/wiki/GFortran">gfortran(v4.3 above)</a></p>
-                    </div></th>
-                    <th width="102" scope="col"><div align="center">intel</div></th>
-                  </tr>
-                <tr>
-                  <th scope="row"><span class="style2">* </span>NETCDF-3.6.1</th>
-                    <td align="center"><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center">
-                      <p><strong>&radic;</strong></p>
-                    </div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                  </tr>
-                <tr>
-                  <th scope="row"><span class="style2">* </span>BLAS</th>
-                    <td align="center"><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                  </tr>
-                <tr>
-                  <th scope="row"><span class="style2">* </span>LAPACK-3.1.1</th>
-                    <td align="center"><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                  </tr>
-                <tr>
-                  <th scope="row">BUFR</th>
-                    <td align="center"><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                  </tr>
-                <tr>
-                  <th scope="row">CRTM</th>
-                    <td align="center"><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                  </tr>
-                <tr>
-                  <th scope="row">RTTOV</th>
-                    <td align="center"><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                    <td><div align="center"><strong>&radic;</strong></div></td>
-                  </tr>
-                <tr>
-                  <th scope="row">MADIS</th>
-                    <td align="center"><div align="center"></div></td>
-                    <td><div align="center"></div></td>
-                    <td><div align="center"></div></td>
-                    <td><div align="center"></div></td>
-                    <td><div align="center"></div></td>
-                  </tr>
-                </table>
-              </div>
-            <p align="left" class="style1">* The mandatory libraries for WRFDA</p>
-          </blockquote>
-          <p align="left">&nbsp;</p>
-          <p align="left" class="pagetitle">WRF Var Version 3.1: </p>
-            
-            
-            <blockquote><h2 align="left">&nbsp;</h2>
-              <h2 align="left">Supported and tested platforms:</h2>
-              <div align="center">
-                <table width="100%" border="1" align="center" cellpadding="1" cellspacing="1">
-                  <tr>
-                    <th width="171" scope="col">&nbsp;</th>
-                    <th width="99" align="center" scope="col">xlf</th>
-                    <th width="83" scope="col"><div align="center">pgi</div></th>
-                    <th width="144" scope="col"><div align="center">g95 (gcc version 4.0.3 (g95 0.91!) </div></th>
-                    <th width="141" scope="col"><div align="center">
-                      <p>gfortran(v4.3 above)</p>
-                      </div></th>
-                    <th width="126" scope="col"><div align="center">intel</div></th>
-                  </tr>
-                  <tr>
-                    <th scope="row">IBM</th>
-                    <td align="center"><div align="center">Yes</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Linux</th>
-                    <td align="center"><div align="center">-</div></td>
-                    <td><div align="center">Yes</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">Yes</div></td>
-                    <td><div align="center">Yes</div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Mac Intel</th>
-                    <td align="center"><div align="center">-</div></td>
-                    <td><div align="center">Yes</div></td>
-                    <td><div align="center">Yes</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">Pending</div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">Mac PowerPC</th>
-                    <td align="center"><div align="center">Yes</div></td>
-                    <td><div align="center">N/A</div></td>
-                    <td><div align="center">Yes</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                  </tr>
-                  <tr>
-                    <th scope="row">SGI Altix</th>
-                    <td align="center"><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">-</div></td>
-                    <td><div align="center">Yes</div></td>
-                  </tr>
-                              </table>
-              </div>
-              <p align="left">&nbsp;</p>
-              <p align="left"> &gt; ./configure wrfda<br>
-                serial means single processor<br>
-              dmpar means Distributed Memory Parallel</p>
-              <p align="left"><br>
-                &gt; ./compile all_wrfvar<br>
-                ls -ls var/da/*.exe<br>
-                If the compilation was successful, da_wrfvar.exe, da_update_bc.exe, and other executables should be found in the var/da directory.</p>
-              <h2 align="left">&nbsp;</h2>
-            </blockquote>
-            <p align="left" class="detailtextRed"> 
+        <td width="117" height="880" bgcolor="#009933"><p>&nbsp;</p>
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><p align="center"><a href="pub-doc.html" class="leftnavlink">WRFDA Publications</a></p>
+                <p align="center"><a href="technotes.html" class="leftnavlink">Technical Notes</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.5.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.5/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.4.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.4/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.3/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.3</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.2.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.2/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.1.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1</a></p>
+                <p align="center"><a href="OnlineTutorial/index.html" class="leftnavlink">WRFDA Online Tutorial</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt; font-size: 10pt; font-weight: bold;">How to compile WRFDA</p>
+                <p align="center"><a href="yellowstone.html" class="leftnavlink">WRFDA on Yellowstone</a></p>
+                <p align="center"><a href="readBUFR.html" class="leftnavlink">Reading BUFR files</a></p>
+              </td>
+
+            </tr>
+
+          </table>
+
+          <p>&nbsp;</p>          <p>&nbsp;</p>          <img src="images/shim112.gif" width="112" height="1"></td>
+
+          <td bgcolor="#CBFFCD"><p>&nbsp;</p>
+
+            <p class="pagetitle">A quick guide to compiling WRFDA:</p>
+
+            <p class="bodytext">This page is coming soon. For detailed compiling instructions see the <a href="usersguide.html">User's Guide</a>.</p>
+
+
+            <p align="center" class="detailtextRed">
+
               <script language="JavaScript">
 
 <!--
@@ -346,15 +152,13 @@ document.write("updated " + document.lastModified);
 // -->
 
                         </script>
-              <br>
-              <br>
-          </p></td>
+</p>
+
+            <p class="bodytext">&nbsp;            </p>            <br>
+
+            <br>        <img src="images/transgif.gif" width="1" height="1"><img src="images/shim162.gif" width="162" height="1"></td>
         </tr>
 
-      <tr valign="top">
-
-          <td height="2" colspan="3" bgcolor="#FFCC66"><img src="images/transgif.gif" width="1" height="1"></td>
-        </tr>
 
     </table></td>
   </tr>

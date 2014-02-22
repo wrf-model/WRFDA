@@ -2,7 +2,7 @@
 
 <head>
 
-<title>TRANSITION TO YELLOWSTONE</title>
+<title>Using WRFDA on Yellowstone</title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
@@ -94,22 +94,28 @@
 
         <td width="117" height="865" bgcolor="#009933"><p>&nbsp;</p>
 
-            <table width="100" border="0" align="center" cellpadding="0" cellspacing="0">
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><p align="center"><a href="pub-doc.html" class="leftnavlink">WRFDA Publications</a></p>
+                <p align="center"><a href="technotes.html" class="leftnavlink">Technical Notes</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.5.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.5/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.4.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.4/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.3/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.3</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.2.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.2/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.1.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1</a></p>
+                <p align="center"><a href="OnlineTutorial/index.html" class="leftnavlink">WRFDA Online Tutorial</a></p>
+                <p align="center"><a href="how_to_compile.html" class="leftnavlink">How to compile WRFDA</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFDA on Yellowstone</p>
+                <p align="center"><a href="readBUFR.html" class="leftnavlink">Reading BUFR files</a></p>
+              </td>
 
-              <tr> 
-           <p align="center"><a href="support.html" class="leftnavlink">General info</a></p>
-           <p align="center"><a href="usersguide.html" class="leftnavlink">Users' Guide</a></p>
-           <p align="center"><a href="known-prob.html" class="leftnavlink">Known problems</a></p>
-           <p align="center"><a href="wrfhelp.html" class="leftnavlink">About wrfhelp</a></p>
-           <p align="center"><a href="wrfnews.html" class="leftnavlink">wrf-news list</a></p>
-           <p align="center"><a href="wrfusers.html" class="leftnavlink">wrf-users list</a></p>
-           <p align="center"><a href="regist.html" class="leftnavlink">Becoming a registered user</a></p>
-           <p align="center"><a href="workshop.html" class="leftnavlink">WRF Workshop</a></p>
-           <p align="center"><a href="tutorial.html" class="leftnavlink">WRFDA Tutorials</a></p>
-           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFDA on Yellowstone</p>
-           <p align="center"><a href="readBUFR.html" class="leftnavlink">Reading BUFR files</a></p>
-              </tr>
-            </table>
+            </tr>
+
+          </table>
 
             <p>&nbsp;</p>          <p>&nbsp;</p>            <img src="images/shim112.gif" width="112" height="1"></td>
 
@@ -117,9 +123,9 @@
 
             <p class="pagetitle">Transition to Yellowstone</p>
 
-            <p class="bodytext">As you may know, NCAR has officially brought the new supercomputer "Yellowstone" online, and it is now accepting jobs for all users who had accounts on the Bluefire machine. If you have not yet done so, it is a very good idea to read the <a href="https://www2.cisl.ucar.edu/resources/yellowstone/quick_start">CISL Quick-Start Guide for Yellowstone</a> to get comfortable with the new environment; many aspects of running on Yellowstone are quite different from running on Bluefire!
+            <p class="bodytext">In November 2012, NCAR officially brought the new supercomputer "Yellowstone" online, replacing the old <a href="https://www.cisl.ucar.edu/computers/gallery/ibm/bluefire.jsp">Bluefire machine</a>. If you have not yet done so, it is a very good idea to read the <a href="https://www2.cisl.ucar.edu/resources/yellowstone/quick_start">CISL Quick-Start Guide for Yellowstone</a> to get comfortable with the new environment; many aspects of running on Yellowstone are quite different from running on Bluefire!
 
-            <p class="bodytext">We are currently in the process of testing all supported versions of WRFDA on Yellowstone, and we do anticipate that there may be problems transitioning from Bluefire (an AIX architecture with xl compilers) to Yellowstone (a Linux architecture with Intel, PGI, GNU, and Pathscale compilers). This page details the WRFDA versions that should work as-is, in addition to providing fixes for some known problems.</p>
+            <p class="bodytext">Due to the architecture differences between Yellowstone (a Linux architecture with Intel, PGI, GNU, and Pathscale compilers) and Bluefire (an AIX architecture with xl compilers), there are some older versions of WRFDA that do not work as anticipated on Yellowstone. This page details the various WRFDA versions that are known to work on Yellowstone, and the compilers with which they can be used, in addition to providing fixes for some known problems.</p>
 
             <p class="bodytext">Testing is ongoing, so if you encounter a problem running a version of WRFDA which is not listed here as a known problem, please contact <a href="wrfhelp.html">wrfhelp</a>.</p>
 
@@ -129,7 +135,7 @@
               <tr>
                 <th colspan="2" style="text-align: center;">Intel (ifort, icc)</th></tr>
               <tr>
-                <td>WRFDA V3.5<br>(April 2013)</td>
+                <td>WRFDA V3.5<br>&nbsp;and V3.5.1</td>
                 <td>Compiles<br>Runs basic test case<br>Runs CRTM radiance test case</td></tr>
               <tr>
                 <td>WRFDA V3.4.1</td>
@@ -149,20 +155,23 @@
               <tr>
                 <th colspan="2" style="text-align: center;">GNU (gfortran, gcc)</th></tr>
               <tr>
-                <td>WRFDA V3.5<br>(April 2013)</td>
+                <td>WRFDA V3.5.1</td>
+                <td>Compiles<br>Runs basic test case<br>Runs CRTM radiance test case</td></tr>
+              <tr>
+                <td>WRFDA V3.5</td>
                 <td>Compiles<br>Runs basic test case<br>Runs CRTM radiance test case (see "Known problems with solutions" below)</td></tr>
             </table></p>
 
             <p class="pagetitle">Known problems with solutions</p>
-            <p class="bodytext">Some problems with the latest version of WRFDA can not be fixed without some effort by the user. These problems and their solutions are offered below:</p>
+            <p class="bodytext">Some problems with recent versions of WRFDA can not be fixed without some effort by the user. These problems and their solutions are offered below:</p>
 
             <p style="padding-left: 45px"><table width="100%" border="1" class="bodytable">
               <tr>
                 <th colspan="2" style="text-align: center;">GNU (gfortran, gcc)</th></tr>
               <tr>
-                <td rowspan="2";>WRFDA (all versions)</td>
+                <td rowspan="2";>WRFDA V3.3.1&ndash;3.5</td>
                 <td><b>Problem: </b> When reading BUFR/PREPBUFR files, WRFDA fails or hangs.</td></tr>
-                <td><b>Solution: </b> Follow the instructions on <a href="Docs/readBufr.htm">this page</a>.</td></tr>
+                <td><b>Solution: </b> Follow the instructions on <a href="readBufr.htm">this page</a>.</td></tr>
               <tr>
                 <td rowspan="2";>WRFDA V3.3.1&ndash;3.4.1</td>
                 <td><b>Problem: </b> Compilation fails with error "Graphite loop optimizations cannot be used"</td></tr>
@@ -171,7 +180,7 @@
               <tr>
                 <th colspan="2" style="text-align: center;">Intel (ifort, icc)</th></tr>
               <tr>
-                <td rowspan="2";>WRFDA (all versions)</td>
+                <td rowspan="2";>WRFDA V3.2&ndash;3.5</td>
                 <td><b>Problem: </b> When reading BUFR/PREPBUFR files, WRFDA fails or hangs.</td></tr>
                 <td><b>Solution: </b> Follow the instructions on <a href="Docs/readBufr.htm">this page</a>.</td></tr>
             </table></p>
@@ -214,7 +223,7 @@
                 <th colspan="2" style="text-align: center;">PathScale (pathf90, pathcc)</th></tr>
               <tr>
                 <td>WRFDA (All versions)</td>
-                <td>Compilation error: All sorts of issues. Will not support in the near future.</td></tr>
+                <td>Compilation error: PathScale is terrible. Will not support in the near future.</td></tr>
             </table></p>
 
             <p class="pagetitle">Planned tests</p>

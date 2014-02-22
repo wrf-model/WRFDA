@@ -46,7 +46,7 @@ PlainStyle=[                  // PlainStyle is an array of properties. You can h
 "bold",                       // Font Weight (bold or normal)
 "ARIAL,helvetica",            // Font Name
 3,                            // Menu Item Padding or spacing
-"/wrf/users/images/arrow.gif",                  // Sub Menu Image (Leave this blank if not needed)
+"images/arrow.gif",                  // Sub Menu Image (Leave this blank if not needed)
 0,                            // 3D Border & Separator bar
 "ffff00",                     // 3D High Color
 "ccffff",                     // 3D Low Color
@@ -69,7 +69,7 @@ PlainStyle2=[                 // PlainStyle is an array of properties. You can h
 "bold",                       // Font Weight (bold or normal)
 "arial,helvetica",          // Font Name
 3,                            // Menu Item Padding or spacing
-"http://www.mmm.ucar.edu/wrf/OnlineTutorial/images/arrow.gif",                  // Sub Menu Image (Leave this blank if not needed)
+"images/arrow.gif",                  // Sub Menu Image (Leave this blank if not needed)
 0,                            // 3D Border & Separator bar
 "ffff00",                     // 3D High Color
 "ccffff",                     // 3D Low Color
