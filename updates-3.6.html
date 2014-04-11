@@ -1,0 +1,215 @@
+<html>
+
+<head>
+
+<title>WRFDA Updates for 3.6</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2014 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="./scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="./scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="./images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="./images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="./images/goldrule.jpg"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td width="100%" height="838" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+        <td height="842" bgcolor="#009933"><p align="right">&nbsp;</p>
+           <p align="center"><a href="system.html" class="leftnavlink">System Overview</a></p>
+           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFDA V3.6</p>
+           <p align="center"><a href="updates-3.5.1.html" class="leftnavlink">WRFDA V3.5.1</a></p>
+           <p align="center"><a href="updates-3.5.0.1.html" class="leftnavlink">WRFDA V3.5.0.1</a></p>
+           <p align="center"><a href="updates-3.5.html" class="leftnavlink">WRFDA V3.5</a></p>
+           <p align="center"><a href="updates-3.4.1.html" class="leftnavlink">WRFDA V3.4.1</a></p>
+           <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
+           <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
+           <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
+           <p align="center"><a href="updates-3.2.1.html" class="leftnavlink">WRFDA V3.2.1</a></p>
+           <p align="center"><a href="updates-3.2.html" class="leftnavlink">WRFDA V3.2</a></p>
+           <p align="center"><a href="updates-older.html" class="leftnavlink">Older versions</a></p>
+           <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
+           <p align="center"><a href="download/tools.html" class="leftnavlink">Tools</a></p>
+           <p align="center"><a href="known-prob.html" class="leftnavlink">Known Problems and Fixes</a></p></td>
+        <td width="663" bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle">WRFDA Version 3.6 update summary</p>
+            <blockquote>
+              <h2>WRFDA Version 3.6 was released on April 15, 2014. </h2>
+              <h3><big>New features:</big></h3>
+              <ul class="bodytext"><li><a href="#dual_res">Dual-resolution hybrid assimilation</a> has been implemented.</li>
+                <li>New observations can be assimilated:</li>
+                <ul class="bodytext"><li><a href="#seviri">Meteosat SEVIRI</a></li>
+                  <li><a href="#metop-b">Metop-B instruments</a></li>
+                  <li><a href="#airep">AIREP humidity observations</a></li></ul>
+                <li><a href="#thinning">Observation thinning for conventional observations in ASCII format</a></li></ul>
+
+              <h3><big>Updated features:</big></h3>
+              <ul class="bodytext"></li>GPS Radio Occultation data <a href="#gpsro">can now be read separately from other conventional data types</a></li>
+                <li>Wind speed/direction assimilation has been updated, and namelist options have changed. See <a href="Docs/user_guide_V3.6/users_guide_chap6.htm#_Hybrid_Data_Assimilation">the relevant section of the User's Guide</a> for more information.</li>
+                <li>Updated libraries:</li>
+                <ul class="bodytext"><li>CRTM Version 2.1.3</li>
+                  <li>BUFR Version 10.2.3</li>
+                  <li>RTTOV interface is now for RTTOV Version 11.1</li></ul>
+                <li>Bug fixes and performance improvements</li>
+                <li><a href="download/wrfplus.html">WRFPLUS</a> (WRF adjoint and tangent linear model) has been upgraded to V3.6 and is consistent with the released WRF version 3.6.</li></ul>
+              <p class="bodytext">For instructions on compiling and running the latest version of WRFDA, please refer to the updated <a href="Docs/user_guide_V3.6/WRFDA_Users_Guide.html">User's Guide</a></p>
+
+            </blockquote>
+            <p class="pagetitle">Version 3.6 update details</p>
+            <blockquote>
+              <a name="dual_res"></a>
+              <h1>Dual-resolution hybrid assimilation</h1>
+              <p class="bodytext">WRFDA now has an option for dual-resolution hybrid data assimilation where a high-resolution background is combined with a low-resolution ensemble to produce a high-resolution analysis.  The procedure for hybrid assimilation (as described in <a href="Docs/user_guide_V3.6/users_guide_chap6.htm#_Hybrid_Data_Assimilation_2">the relevant section of the User's Guide</a>) is not changed, but there is an additional namelist option for the dual-resolution capability:</p>
+              <p class="bodytext">&wrfvar16<br>
+                &nbsp; hybrid_dual_res: &nbsp; (logical) Switch for using dual-resolution hybrid<br>
+                &nbsp; &nbsp; true:  use dual-resolution hybrid assimilation<br>
+                &nbsp; &nbsp; false: ensemble members and analysis will be the same resolution (default)</p>
+              <p class="bodytext">In addition, the user will need to provide a first guess file for the ensemble domain (named "fg_ens"); this is only needed to extract mapping info, so the exact file does not matter.</p>
+
+              <a name="seviri"></a>
+              <h1>Meteosat SEVIRI assimilation</h1>
+              <p class="bodytext">Metosat 8, 9, and 10 (AKA MSG 1, 2, and 3) carry the Spinning Enhanced Visible and InfraRed Imager (SEVIRI). WRFDA can now assimilate radiance observations from this instrument, which are available in BUFR format from EUMETSAT. This is a limited implementation for now, only covering the 8 infrared channels. The relevant namelist options are as follows:</p>
+              <p class="bodytext">&wrfvar4<br>
+                &nbsp; use_seviriobs: &nbsp; (logical) Switch for reading SEVIRI observations.<br>
+                &nbsp; &nbsp; true:  WRFDA will look for the "seviri.bufr" file and read it if it exists<br>
+                &nbsp; &nbsp; false: no SEVIRI data will be read (default)</p>
+              <p class="bodytext">&wrfvar14<br>
+                &nbsp; rtminit_platform = 12, ("MSG" (Meteosat Second Generation)<br>
+                &nbsp; rtminit_satid = 1,2,3 (for MSG 1, 2, and 3 respectively)<br>
+                &nbsp; rtminit_sensor = 21, ("seviri")</p>
+
+              <a name="metop-b"></a>
+              <h1>Metop-B instruments</h1>
+              <p class="bodytext">Metop-B (AKA Metop 1) is a polar-orbiting satellite run by EUMETSAT, and is the sister satellite for Metop-A. Data from the IASI, AMSU-A, and MHS instruments from Metop-A could already be assimilated in WRFDA; starting with 3.6 this data can also be assimilated from Metop-B.</p>
+              <p class="bodytext"><em>Beware of the strange numbering system for Metop!</em> Use namelist setting "rtminit_platform = 10" for all Metop satellites. Metop-A, officially named "Metop 2", was the first operational Metop satellite. However, because "Metop-A" is officially named "Metop 2", you should set "rtminit_satid = 2" for Metop-A, and "rtminit_satid = 1" for Metop-B. These conventions are set by EUMETSAT: don't blame us.</p>
+
+              <a name="airep"></a>
+              <h1>AIREP humidity observations</h1>
+              <p class="bodytext">AIREP (short for “aircraft report”) is an automated weather observation from an airplane. WRFDA has had the ability to assimilate AIREP observations of temperature and wind for many years, but not moisture. These moisture observations can now be read and assimilated by WRFDA. Users will not need to change any settings to assimilate these observations: if they are present in your observation files they will be read and assimilated.</p>
+
+              <a name="thinning"></a>
+              <h1>Observation thinning for conventional observations in ASCII format</h1>
+              <p class="bodytext">WRFDA now allows for the thinning of conventional observations assimilated in ASCII format; previously this options was only available for assimilating PREPBUFR-format observations. The relevant namelist options are as follows:</p>
+              <p class="bodytext">&wrfvar4<br>
+                &nbsp; thin_conv_ascii: &nbsp; (logical) Switch for thinning conventional obs for ob_format=2 (ASCII).<br>
+                &nbsp; &nbsp; true:  conventional observations will be thinned<br>
+                &nbsp; &nbsp; false: all observations with good quality will be assimilated (default)<br>
+                &nbsp; thin_conv_mesh: &nbsp; (real) The size of the thinning mesh boxes, in km (default: 20.).</p>
+              <p class="bodytext"><em>Note for users performing radar assimilation</em>: Thining routines have been implemented for radar observations, but the code has not been well tested. We recommend not using thinning with radar observations at this time.</p>
+
+              <a name="gpsro"></a>
+              <h1>GPSRO</h1>
+              <p class="bodytext">Users now have more flexibility when assimilating GPS Radio Occulation (GPSRO) observations. These observations can be read in ASCII text format (from file "ob.ascii", potentially along with other conventional observation types) or in NCEP PREPBUFR format (from file "gpsro.bufr"). Previously, users reading conventional observations from "ob.ascii" could not read GPSRO observations from "gpsro.bufr" at the same time, but now that is possible with the namelist option "ob_format_gpsro" under record &wrfvar3. For "ob_format_gpsro = 1", WRFDA will read GSPRO observations from "gpsro.bufr". For "ob_format_gpsro = 2", WRFDA will read GSPRO observations from "ob.ascii".</p>
+
+              <p>&nbsp;</p>
+
+            </blockquote>
+            <p class="pagetitle">Helpful links</p>
+            <blockquote>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.6/users_guide_chap6.htm#_Installing_WRF-Var">Compiling WRFDA</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.6/users_guide_chap6.htm#_Running_WRF-Var_1">Running WRFDA</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.6/users_guide_chap6.htm#_Description_of_Namelist_1">List and description of namelist variables</a></big></li>
+
+              <p class="bodytext"><br></p>
+              <p align="center" class="detailtextRed"><br>
+                <script language="JavaScript"><!--  ;;;;;;;;;;;-->
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script><br><br>&nbsp;
+              </p>
+              <p>&nbsp;</p>
+          </blockquote>            </td>
+        </tr>
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

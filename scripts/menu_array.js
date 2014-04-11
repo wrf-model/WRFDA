@@ -239,6 +239,7 @@ PlainStyle2,
 0,
 , 
 ,"System Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/system.html",,,1
+,"WRFDA V3.6","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.6.html",,,0
 ,"WRFDA V3.5.1","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.5.1.html",,,0
 ,"WRFDA V3.5","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.5.html",,,0
 ,"WRFDA V3.4.1","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.4.1.html",,,0
@@ -345,6 +346,7 @@ PlainStyle2,
 ,
 0,
 ,
+,"WRFDA V3.6","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.6/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.5.1","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.5.1/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.5","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.5/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.4.1","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.4.1/users_guide_chap6.htm",,,0
