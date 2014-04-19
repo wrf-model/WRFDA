@@ -121,17 +121,42 @@
 
         <td bgcolor="#CBFFCD"><p>&nbsp;</p>
 
-            <p class="pagetitle">Transition to Yellowstone</p>
+            <p class="pagetitle">WRFDA on Yellowstone</p>
 
-            <p class="bodytext">In November 2012, NCAR officially brought the new supercomputer "Yellowstone" online, replacing the old <a href="https://www.cisl.ucar.edu/computers/gallery/ibm/bluefire.jsp">Bluefire machine</a>. If you have not yet done so, it is a very good idea to read the <a href="https://www2.cisl.ucar.edu/resources/yellowstone/quick_start">CISL Quick-Start Guide for Yellowstone</a> to get comfortable with the new environment; many aspects of running on Yellowstone are quite different from running on Bluefire!
+            <p class="bodytext">Yellowstone is NCAR's high-performance supercomputer, used for research by NCAR, UCAR, and university users. The latest version of WRFDA (version 3.6) can be compiled and run using Yellowstone's default configuration, but some users may want to use different compilers. Here is a list of tested compilers, as well as the configurations which are known not to work:</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Compiler</b></td>
+                <td style="text-align:center"><b>Version</b></td>
+                <td><b>Status</b></td></tr>
+              <tr>
+                <td>Intel (ifort)</td>
+                <td style="text-align:center">12.1.5<br>13.0.1</td>
+                <td>All tests pass!</td></tr>
+              <tr>
+                <td>Gnu (gfortran)</td>
+                <td style="text-align:center">4.7.2<br>4.8.2</td>
+                <td>All tests pass!</td></tr>
+              <tr style="background-color:#DDAAAA;">
+                <td>PGI (pgf90)</td>
+                <td style="text-align:center">13.3<br>13.9</td>
+                <td><b>Compilation fails</b><br>Due to bugs in the PGI Fortran compiler, WRFDA cannot be compiled with the PGI versions currently on Yellowstone.</td></tr>
+              <tr style="background-color:#DDAAAA;">
+                <td>Pathscale (pathf90)</td>
+                <td style="text-align:center">all</td>
+                <td><b>Compilation fails</b><br>PathScale can not be used with WRF or WRFDA.</td></tr>
+            </table></p>
 
-            <p class="bodytext">Due to the architecture differences between Yellowstone (a Linux architecture with Intel, PGI, GNU, and Pathscale compilers) and Bluefire (an AIX architecture with xl compilers), there are some older versions of WRFDA that do not work as anticipated on Yellowstone. This page details the various WRFDA versions that are known to work on Yellowstone, and the compilers with which they can be used, in addition to providing fixes for some known problems.</p>
 
-            <p class="bodytext">Testing is ongoing, so if you encounter a problem running a version of WRFDA which is not listed here as a known problem, please contact <a href="wrfhelp.html">wrfhelp</a>.</p>
+            <p class="pagetitle">Older versions</p>
+
+            <p class="bodytext">In November 2012, NCAR officially brought the new supercomputer "Yellowstone" online, replacing the old <a href="https://www.cisl.ucar.edu/computers/gallery/ibm/bluefire.jsp">Bluefire machine</a>. Due to the architecture differences between Yellowstone (a Linux architecture with Intel, PGI, GNU, and Pathscale compilers) and Bluefire (an AIX architecture with xl compilers), there are some older versions of WRFDA that do not work as anticipated on Yellowstone. This page details the various older WRFDA versions that are known to work on Yellowstone, and the compilers with which they can be used, in addition to providing fixes for some known problems.</p>
+
+            <p class="bodytext">Not all configurations have been tested, so if you encounter a problem running a version of WRFDA which is not listed here as a known problem, please contact <a href="wrfhelp.html">wrfhelp</a>.</p>
 
             <p class="pagetitle">Working configurations</p>
             <p class="bodytext">The following configurations have been tested and should run normally. All are dmpar (distributed-memory parallel) builds unless otherwise noted:</p>
-            <p style="padding-left: 45px"><table width="100%" border="1" class="bodytable">
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
                 <th colspan="2" style="text-align: center;">Intel (ifort, icc)</th></tr>
               <tr>
@@ -165,7 +190,7 @@
             <p class="pagetitle">Known problems with solutions</p>
             <p class="bodytext">Some problems with recent versions of WRFDA can not be fixed without some effort by the user. These problems and their solutions are offered below:</p>
 
-            <p style="padding-left: 45px"><table width="100%" border="1" class="bodytable">
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
                 <th colspan="2" style="text-align: center;">GNU (gfortran, gcc)</th></tr>
               <tr>
@@ -188,7 +213,7 @@
 
             <p class="pagetitle">Older versions with major problems</p>
 <!--            <p class="bodytext"><b>NOTE: We <em>HIGHLY</em> recommend using the latest version of WRFDA on Yellowstone. However, if you must use an older version, you can try the fixes below.</b></p>-->
-            <p style="padding-left: 45px"><table width="100%" border="1" class="bodytable">
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
                 <th colspan="2" style="text-align: center;">Intel (ifort, icc)</th></tr>
               <tr>
@@ -200,7 +225,7 @@
 
             <p class="pagetitle">Non-working configurations</p>
             <p class="bodytext">The following configurations have known problems which are being investigated:</p>
-            <p style="padding-left: 45px"><table width="100%" border="1" class="bodytable">
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
                 <th colspan="2" style="text-align: center;">Intel (ifort, icc)</th></tr>
               <tr>
@@ -215,7 +240,7 @@
                 <th colspan="2" style="text-align: center;">PGI (pgf90, pgcc)</th></tr>
               <tr>
                 <td>WRFDA V3.4&ndash;current</td>
-                <td>Compilation fails when compiled with CRTM/BUFR libraries. This is a <a href="http://www.pgroup.com/userforum/viewtopic.php?t=3339&sid=7cb4c190d7933ce2849989c0e6c9d7b0">known bug in PGI version 12.5</a>; we are currently seeking a solution. Compilation is successful when using PGI 12.10, but WRFDA segfaults. We are researching a solution.</td></tr>
+                <td>Compilation fails when compiled with CRTM/BUFR libraries. This is a <a href="http://www.pgroup.com/userforum/viewtopic.php?t=3339&sid=7cb4c190d7933ce2849989c0e6c9d7b0">known bug in PGI version 12.5</a>; we are currently seeking a solution. Compilation is successful when using PGI 12.10, but WRFDA segfaults.</td></tr>
               <tr>
                 <td>WRFDA V3.3.1</td>
                 <td>Configuration problem: likely netCDF-related</td></tr>
