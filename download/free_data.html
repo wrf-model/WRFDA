@@ -6,7 +6,7 @@
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
-<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, National Center for Atmospheric Research">
 
 <meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
 
@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2004 by UCAR">
+<meta name="copyright" content="Copyright (c) 2014 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -182,7 +182,16 @@
             </ul></blockquote>
             <p class="pagetitle">Other observation datasets</p>
             <p class="bodytext">The following observation data sets require some additional processing before being assimilated with WRFDA:</p>
-            <blockquote><ul class="bodytext">
+            <blockquote><ul class="bodytext"><a name="precipitation">
+              <li><a href="http://data.eol.ucar.edu/codiac/dss/id=21.093">Precipitation NCEP/EMC 4KM Gridded Data (GRIB) Stage IV Data</a>
+                <ul>
+                  <li>4 km resolution</li>
+                  <li><b>Contiguous United States only</b></li>
+                  <li>GRIB format (converted to a WRFDA-readable ASCII format using <a href="precip_converter.tar.gz">a converter</a>)</li>
+                  <li>2002-01-01 to present</li>
+                  <li>See <a href="../Docs/user_guide_V3.6/users_guide_chap6.htm#Precipitation">relevant section in the User's Guide</a> for instructions on how to assimilate</li>
+                </ul>
+              </li>
               <li><a href="http://rda.ucar.edu/datasets/ds464.0">NCEP ADP Operational Global Surface Observations (ds351.0)</a> and <a href="http://rda.ucar.edu/datasets/ds353.4">Upper Air Observations (ds353.4)</a>
                 <ul>
                   <li>ADP format (converted to LITTLE_R format using  <a href="#converting">a converter</a>)</li>
