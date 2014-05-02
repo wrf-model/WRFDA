@@ -129,17 +129,17 @@
             <p class="bodytext"><b>NOTE: if you are running WRFDA on the Yellowstone machine, <a href="yellowstone.html">click here</a>.</b><br><br></p>
             <blockquote>
               <h2>Compile-time errors</h2>
-              <p class="bodytext"><strong>Problem <em>(Posted 04/09/09)</em>: </strong><br>
+              <p class="bodytext"><strong>Problem <em>(Posted 2009-04-09)</em>: </strong><br>
                 WRFDA doesn't compile with gfortran below version 4.3.0 on Linux OS.</p>
               <p class="bodytext"><strong>Solution:</strong><br>
               WRFDA is incompatible with this and some other old compiler versions. 
               Upgrade gfortran to version 4.3.0 or above, or use another compiler.</p>
-              <p class="bodytext"><strong>Problem <em>(Posted 07/26/12)</em>: </strong><br>
+              <p class="bodytext"><strong>Problem <em>(Posted 2012-07-26)</em>: </strong><br>
                 PGI compiler returns message "<code>PGF90-F-0007-Subprogram too large to compile at this optimization level</code>".</p>
               <p class="bodytext"><strong>Solution:</strong><br>
                 After running "<code>./configure</code>", edit "FCOPTIM" in <code>configure.wrf</code> to a lower optimization level ("-O2 -fast" --> "-O1").</p>
               <h2>Run-time errors</h2>
-              <p class="bodytext"><strong>Problem <em>(Posted 04/09/09)</em>: </strong><br>
+              <p class="bodytext"><strong>Problem <em>(Posted 2009-04-09)</em>: </strong><br>
               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:</br></br>
               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
@@ -148,19 +148,31 @@
               <p class="bodytext"><strong>Solution:</strong><br>
                 See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
               <h2>For version-specific bugs and fixes, see below:</h2>
-              <blockquote><ul class="bodytext"><li><a href="#V3_5">Version 3.5</a></li>
-                <li><a href="#V3_3">Version 3.4</a></li>
+              <blockquote><ul class="bodytext"><li><a href="#V3_6">Version 3.6</a></li>
+                <li><a href="#V3_5">Version 3.5</a></li>
+                <li><a href="#V3_4">Version 3.4</a></li>
                 <li><a href="#V3_3">Version 3.3</a></li>
                 <li><a href="#V3_1">Version 3.1</a></li>
                 <li><a href="#V3_0">Version 3.0</a></li></ul><br></blockquote></blockquote>
+            <a name="V3_6"></a><p class="pagetitle">WRFDA Version 3.6 : Known Problems and Fixes</p>
+            <blockquote>
+            <h2> Problems compiling with PGI fortran (posted 2014-05-02) </h2>
+            <p class="bodytext"><strong>Problem: </strong><br>
+             Compilation with version 13.3 fails with the message "PGF90-S-0155-Kind type parameter component does not have a corresponding type parameter specifier - n_layers (NLTECoeff_Define.f90: 125)"</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+             Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.
+            <p class="bodytext"><strong>Problem: </strong><br>
+             Compilation with version 12.5 fails with internal compiler error<br>Compilation with version 13.9 fails with assembler error</p>
+            <p class="bodytext"><b>These are problems with the pgf90 compiler itself; we do not have a fix at this time.</b>
+            </blockquote>
             <a name="V3_5"></a><p class="pagetitle">WRFDA Version 3.5 : Known Problems and Fixes</p>
             <blockquote>
-            <h2> WRFPLUS fails to compile when serial option is selected (posted 1/30/2014) </h2>
+            <h2> WRFPLUS fails to compile when serial option is selected (posted 2014-01-30) </h2>
             <p class="bodytext"><strong>Problem: </strong><br>
              Compilation of WRFPLUS fails at main/module_wrf_top.f90 with message "error #6404: This name does not have a type, and must have an explicit type." (or similar error message)</p>
             <p class="bodytext"><strong>Solution:</strong><br>
              Replace the file "main/module_wrf_top.F" with this copy: (<a href="fixes/v35/module_wrf_top.F">module_wrf_top.F</a>). Then run "<code>./clean -a</code>" and recompile WRFPLUS.
-            <h2> WRFDA compilation problem with some older compilers (posted 4/29/2013) </h2>
+            <h2> WRFDA compilation problem with some older compilers (posted 2013-04-29) </h2>
             <p class="bodytext"><strong>Problem: </strong><br>
              Compilation fails with the message "Error: Too many digits in STOP code at (1)"</p>
             <p class="bodytext"><strong>Solution:</strong><br>
