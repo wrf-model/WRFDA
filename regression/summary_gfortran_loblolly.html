@@ -2,16 +2,16 @@
 <body>
 <p>Regression Test Summary:</p>
 <ul>
-<li>Begin : 12:28:31-2013/09/23
+<li>Begin : 14:30:59-2014/05/14
 </li>
 <li>Source : SVN</li>
-<li>Revision : 6864</li>
+<li>Revision : 7456</li>
 <li>Tester : kavulich</li>
-<li>Machine name : yslogin2</li>
+<li>Machine name : loblolly</li>
 <li>Operating system : Linux</li>
-<li>Compiler : ifort</li>
-<li>Baseline : /glade/p/work/kavulich/REGRESSION/BASELINE.NEW</li>
-<li>End   : 13:35:52-2013/09/23
+<li>Compiler : gfortran</li>
+<li>Baseline : /loblolly2/kavulich/REGTEST/BASELINE.NEW</li>
+<li>End   : 16:42:36-2014/05/14
 </li>
 </ul>
 <table border="1">
@@ -26,411 +26,477 @@
 <th>COMPARE</th>
 </tr>
 <tr>
+<tr style="background-color:red;color:white">
+<td>ASR_airs</td>
+<td>3DVAR</td>
+<td>dmpar</td>
+<td>6</td>
+<td>16</td>
+<td>error</td>
+<td>  593</td>
+<td>Baseline missing</td>
+</tr>
+<tr>
 <tr>
 <td>ASR_prepbufr</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   79.0</td>
-<td>match</td>
+<td>  179</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>ASR_prepbufr</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>  161.0</td>
-<td>match</td>
+<td>  334</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>afwa_t7_ssmi</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>8</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   24.0</td>
-<td>match</td>
+<td>   38</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>afwa_t7_ssmi</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>8</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   54.0</td>
-<td>match</td>
+<td>   94</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>afwa_t7_ssmi_32</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>8</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   24.0</td>
-<td>match</td>
+<td>   41</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>afwa_t7_ssmi_32</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>8</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   57.0</td>
-<td>match</td>
+<td>   98</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cv3_guo</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   26.0</td>
-<td>match</td>
+<td>   45</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cv3_guo</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   73.0</td>
-<td>match</td>
+<td>  146</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cv3_guo_32</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   42.0</td>
-<td>match</td>
+<td>   44</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cv3_guo_32</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   71.0</td>
-<td>match</td>
+<td>  143</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cwb_ascii</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   15.0</td>
-<td>match</td>
+<td>   21</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cwb_ascii</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   23.0</td>
-<td>match</td>
+<td>   48</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cwb_ascii_outerloop_rizvi</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   61.0</td>
-<td>match</td>
+<td>   62</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>cwb_ascii_outerloop_rizvi</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   69.0</td>
-<td>match</td>
+<td>  152</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr style="background-color:red;color:white">
-<td>iasi_dmxu</td>
+<td>cwb_ascii_thinning</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>error</td>
-<td>  192.0</td>
-<td>Output missing</td>
+<td>   29</td>
+<td>Baseline missing</td>
 </tr>
 <tr>
 <tr style="background-color:red;color:white">
-<td>iasi_dmxu</td>
+<td>cwb_ascii_thinning</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>error</td>
-<td>  469.0</td>
-<td>Output missing</td>
+<td>   62</td>
+<td>Baseline missing</td>
+</tr>
+<tr>
+<tr style="background-color:red;color:white">
+<td>iasi_kavulich</td>
+<td>3DVAR</td>
+<td>dmpar</td>
+<td>6</td>
+<td>16</td>
+<td>error</td>
+<td>  654</td>
+<td>Baseline missing</td>
+</tr>
+<tr>
+<tr style="background-color:red;color:white">
+<td>lat_lon</td>
+<td>3DVAR</td>
+<td>dmpar</td>
+<td>6</td>
+<td>16</td>
+<td>error</td>
+<td>   16</td>
+<td>Baseline missing</td>
+</tr>
+<tr>
+<tr style="background-color:red;color:white">
+<td>lat_lon</td>
+<td>3DVAR</td>
+<td>serial</td>
+<td>6</td>
+<td>16</td>
+<td>error</td>
+<td>   34</td>
+<td>Baseline missing</td>
 </tr>
 <tr>
 <tr>
 <td>outerloop_bench_guo</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   38.0</td>
-<td>match</td>
+<td>   40</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>outerloop_bench_guo</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   46.0</td>
-<td>match</td>
+<td>   90</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>outerloop_ztd_bench_guo</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>1</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   11.0</td>
-<td>match</td>
+<td>    2</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>outerloop_ztd_bench_guo</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>1</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>    5.0</td>
-<td>match</td>
+<td>    9</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>radar_meixu</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>4</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   25.0</td>
-<td>match</td>
+<td>   32</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>radar_meixu</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>4</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   26.0</td>
-<td>match</td>
+<td>   53</td>
+<td>ok</td>
+</tr>
+<tr>
+<tr style="background-color:red;color:white">
+<td>radar_meixu_thinning</td>
+<td>3DVAR</td>
+<td>dmpar</td>
+<td>6</td>
+<td>16</td>
+<td>error</td>
+<td>   11</td>
+<td>Baseline missing</td>
+</tr>
+<tr>
+<tr style="background-color:red;color:white">
+<td>radar_meixu_thinning</td>
+<td>3DVAR</td>
+<td>serial</td>
+<td>6</td>
+<td>16</td>
+<td>error</td>
+<td>   17</td>
+<td>Baseline missing</td>
 </tr>
 <tr>
 <tr>
 <td>sfc_assi_2_outerloop_guo</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   53.0</td>
-<td>match</td>
+<td>   73</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>sfc_assi_2_outerloop_guo</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>  115.0</td>
-<td>match</td>
+<td>  244</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>t44_liuz</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>1</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   21.0</td>
-<td>match</td>
+<td>    8</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>t44_liuz</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>1</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   14.0</td>
-<td>match</td>
+<td>   21</td>
+<td>ok</td>
 </tr>
 <tr>
-<tr>
+<tr style="background-color:yellow">
 <td>t44_prepbufr</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>4</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   21.0</td>
-<td>match</td>
+<td>   85</td>
+<td>diff</td>
 </tr>
 <tr>
-<tr>
+<tr style="background-color:yellow">
 <td>t44_prepbufr</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>4</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   17.0</td>
-<td>match</td>
+<td>  104</td>
+<td>diff</td>
 </tr>
 <tr>
 <tr>
 <td>tutorial_4dvar</td>
 <td>4DVAR</td>
 <td>dmpar</td>
-<td>32</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>  236.0</td>
-<td>match</td>
+<td> 1151</td>
+<td>ok</td>
 </tr>
 <tr>
-<tr>
+<tr style="background-color:yellow">
 <td>tutorial_xinzhang</td>
-<td>3DVAR</td>
+<td>OBSPROC|3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   86.0</td>
-<td>match</td>
+<td>  204</td>
+<td>diff</td>
 </tr>
 <tr>
-<tr>
-<td>tutorial_xinzhang_32</td>
-<td>3DVAR</td>
-<td>dmpar</td>
-<td>16</td>
+<tr style="background-color:yellow">
+<td>tutorial_xinzhang</td>
+<td>OBSPROC|3DVAR</td>
+<td>serial</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>  125.0</td>
-<td>match</td>
+<td>  222</td>
+<td>diff</td>
 </tr>
 <tr>
 <tr>
 <td>tutorial_xinzhang_kmatrix</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>3</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   46.0</td>
-<td>match</td>
+<td>   93</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>tutorial_xinzhang_kmatrix</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>3</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   44.0</td>
-<td>match</td>
+<td>  113</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>tutorial_xinzhang_rttov</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   63.0</td>
-<td>match</td>
+<td>  111</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>tutorial_xinzhang_rttov</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   90.0</td>
-<td>match</td>
+<td>  224</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>wind_sd</td>
 <td>3DVAR</td>
 <td>dmpar</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>   45.0</td>
-<td>match</td>
+<td>  124</td>
+<td>ok</td>
 </tr>
 <tr>
 <tr>
 <td>wind_sd</td>
 <td>3DVAR</td>
 <td>serial</td>
-<td>16</td>
+<td>6</td>
 <td>16</td>
 <td>done</td>
-<td>  213.0</td>
-<td>match</td>
+<td>  345</td>
+<td>ok</td>
 </tr>
 </table>
 </body>
