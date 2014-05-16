@@ -99,7 +99,7 @@
 
   <tr>
 
-    <td height="1739" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+    <td height="1739" valign="top" bgcolor="#CBFFCD"><table width="900" border="0" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
 
@@ -124,11 +124,11 @@
           <p>&nbsp;</p></td>
 
           <td width="660" height="1739" colspan="2" bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle">Known bugs and solutions (if available)</p>
+            <p class="bodytext"><b>NOTE: if you are running WRFDA on the Yellowstone machine and your problem is not listed on this page, <a href="yellowstone.html">click here</a>.</b><br><br></p>
             <p class="bodytext">If your issue is not found on this page, please contact <a href="wrfhelp.html">wrfhelp</a> for assistance.<br><br></p>
-            <p class="pagetitle">WRFDA Common Issues</p>
-            <p class="bodytext"><b>NOTE: if you are running WRFDA on the Yellowstone machine, <a href="yellowstone.html">click here</a>.</b><br><br></p>
             <blockquote>
-              <h2>Compile-time errors</h2>
+<!--              <h1>Compile-time errors</h1>
               <p class="bodytext"><strong>Problem <em>(Posted 2009-04-09)</em>: </strong><br>
                 WRFDA doesn't compile with gfortran below version 4.3.0 on Linux OS.</p>
               <p class="bodytext"><strong>Solution:</strong><br>
@@ -137,100 +137,157 @@
               <p class="bodytext"><strong>Problem <em>(Posted 2012-07-26)</em>: </strong><br>
                 PGI compiler returns message "<code>PGF90-F-0007-Subprogram too large to compile at this optimization level</code>".</p>
               <p class="bodytext"><strong>Solution:</strong><br>
-                After running "<code>./configure</code>", edit "FCOPTIM" in <code>configure.wrf</code> to a lower optimization level ("-O2 -fast" --> "-O1").</p>
-              <h2>Run-time errors</h2>
-              <p class="bodytext"><strong>Problem <em>(Posted 2009-04-09)</em>: </strong><br>
-              WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:</br></br>
-              **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
-              BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
-              WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
-              **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
-              <p class="bodytext"><strong>Solution:</strong><br>
-                See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
-              <h2>For version-specific bugs and fixes, see below:</h2>
+                After running "<code>./configure</code>", edit "FCOPTIM" in <code>configure.wrf</code> to a lower optimization level ("-O2 -fast" -> "-O1").</p>-->
               <blockquote><ul class="bodytext"><li><a href="#V3_6">Version 3.6</a></li>
                 <li><a href="#V3_5">Version 3.5</a></li>
                 <li><a href="#V3_4">Version 3.4</a></li>
                 <li><a href="#V3_3">Version 3.3</a></li>
+                <li><a href="#V3_2">Version 3.2</a></li>
                 <li><a href="#V3_1">Version 3.1</a></li>
                 <li><a href="#V3_0">Version 3.0</a></li></ul><br></blockquote></blockquote>
             <a name="V3_6"></a><p class="pagetitle">WRFDA Version 3.6 : Known Problems and Fixes</p>
             <blockquote>
-            <h2> Problems compiling with PGI fortran (posted 2014-05-02) </h2>
+<!--            <h1> Problems with radiance assimilation using VARBC (posted 2014-05-16) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             Compilation with version 13.3 fails with the message "PGF90-S-0155-Kind type parameter component does not have a corresponding type parameter specifier - n_layers (NLTECoeff_Define.f90: 125)"</p>
+             Assimilation fails during the VARBC step. May either fail with an error such as a segmentation fault or hang indefinitely. Last message printed to the rsl.out files is usually "Calculate innovation vector(iv)"</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.
+             Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.</p>-->
+            <h1> Problems with SEVIRI radiance assimilation (posted 2014-05-16) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             Compilation with version 12.5 fails with internal compiler error<br>Compilation with version 13.9 fails with assembler error</p>
+               WRFDA fails when SEVIRI data is assimilated. May either fail with an error such as a segmentation fault or hang indefinitely.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the following two files: </p>
+               <blockquote><ul class="bodytext"><li>"WRFDA/var/da/da_obs_io/da_read_y_unit.inc" with this copy: (<a href="fixes/v36/da_read_y_unit.inc">da_read_y_unit.inc</a>).</li>
+               <li>"WRFDA/var/da/da_radiance/da_read_obs_bufrseviri.inc" with this copy: (<a href="fixes/v36/da_read_obs_bufrseviri.inc">da_read_obs_bufrseviri.inc</a>).</li></ul></blockquote>
+            <p class="bodytext">Then run "<code>./clean -a</code>" and recompile.</p>
+            <h1> Problems compiling with PGI fortran (posted 2014-05-02) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Compilation with version 13.3 fails with the message "PGF90-S-0155-Kind type parameter component does not have a corresponding type parameter specifier - n_layers (NLTECoeff_Define.f90: 125)"</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.</p>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Compilation with version 12.5 fails with internal compiler error<br>Compilation with version 13.9 fails with assembler error</p>
             <p class="bodytext"><b>These are problems with the pgf90 compiler itself; we do not have a fix at this time.</b>
             </blockquote>
             <a name="V3_5"></a><p class="pagetitle">WRFDA Version 3.5 : Known Problems and Fixes</p>
             <blockquote>
-            <h2> WRFPLUS fails to compile when serial option is selected (posted 2014-01-30) </h2>
+            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             Compilation of WRFPLUS fails at main/module_wrf_top.f90 with message "error #6404: This name does not have a type, and must have an explicit type." (or similar error message)</p>
+               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
+               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             Replace the file "main/module_wrf_top.F" with this copy: (<a href="fixes/v35/module_wrf_top.F">module_wrf_top.F</a>). Then run "<code>./clean -a</code>" and recompile WRFPLUS.
-            <h2> WRFDA compilation problem with some older compilers (posted 2013-04-29) </h2>
+               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
+            <h1> WRFPLUS fails to compile with serial option is selected (posted 2014-01-30) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             Compilation fails with the message "Error: Too many digits in STOP code at (1)"</p>
+               Compilation of WRFPLUS fails at main/module_wrf_top.f90 with message "error #6404: This name does not have a type, and must have an explicit type." (or similar error message)</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             Replace the file "var/da/da_radiance/da_read_obs_bufratms.inc" with this copy: (<a href="fixes/v35/da_read_obs_bufratms.inc">da_read_obs_bufratms.inc</a>). Then run "<code>./clean -a</code>" and recompile.
+               Replace the file "main/module_wrf_top.F" with this copy: (<a href="fixes/v35/module_wrf_top.F">module_wrf_top.F</a>). Then run "<code>./clean -a</code>" and recompile WRFPLUS.
+            <h1> WRFDA compilation problem with some older compilers (posted 2013-04-29) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Compilation fails with the message "Error: Too many digits in STOP code at (1)"</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the file "var/da/da_radiance/da_read_obs_bufratms.inc" with this copy: (<a href="fixes/v35/da_read_obs_bufratms.inc">da_read_obs_bufratms.inc</a>). Then run "<code>./clean -a</code>" and recompile.
             </blockquote>
             <a name="V3_4"></a><p class="pagetitle">WRFDA Version 3.4 : Known Problems and Fixes</p>
             <blockquote>
-            <h2> Problem with WRFPLUS under certain "mp_physics" settings (posted 7/24/12) </h2>
+            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             WRFPlus adjoint model fails with a segmentation fault or a fatal error message "<code>subscript out of range for array head_grid%g_moist (mediation_pertmod_io.f90: 428)</code>" when <code>mp_physics =</code> any of the following: 9,10,13,14,16,17, or 18.</p>
+               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
+               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             Download and unpack <a href="fixes/v34/Registry.EM_COMMON.tar.gz">Registry.EM_COMMON.tar.gz</a>, and use this file to overwrite the <kbd>WRFPLUS/Registry/Registry.EM_COMMON</kbd> file. Then run "<code>./clean -a</code>" and recompile.
+               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
+            <h1> Problem with WRFPLUS under certain "mp_physics" settings (posted 2012-07-24) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFPlus adjoint model fails with a segmentation fault or a fatal error message "<code>subscript out of range for array head_grid%g_moist (mediation_pertmod_io.f90: 428)</code>" when <code>mp_physics =</code> any of the following: 9,10,13,14,16,17, or 18.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Download and unpack <a href="fixes/v34/Registry.EM_COMMON.tar.gz">Registry.EM_COMMON.tar.gz</a>, and use this file to overwrite the <kbd>WRFPLUS/Registry/Registry.EM_COMMON</kbd> file. Then run "<code>./clean -a</code>" and recompile.
             </blockquote>
             <a name="V3_3"></a><p class="pagetitle">WRFDA Version 3.3 : Known Problems and Fixes</p>
             <blockquote>
-            <h2> Problem with WRFPLUS, especially when compiled with PGI compiler (posted 6/24/11) </h2>
+            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             The adjoint model integration fails with either a segmentation fault or the error message: <code>0: ALLOCATE: 18446744072053605056 bytes requested; not enough memory</code>.</p>
+               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
+               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             Download <a href="fixes/v33/module_em_tl.F">module_em_tl.F</a>, <a href="fixes/v33/module_em_ad.F">module_em_ad.F</a>, <a href="fixes/v33/module_advect_em_tl.F">module_advect_em_tl.F</a> and <a href="fixes/v33/module_advect_em_ad.F">module_advect_em_ad.F</a> and place them in the <kbd>WRFPLUS/dyn_em</kbd> directory.
-             Then download <a href="fixes/configure_new.defaults">configure_new.defaults</a> and place it in the <kbd>WRFPLUS/arch</kbd> directory.</p>
-            <h2> WRFPLUS compilation problem with g95 compiler for Mac OS (posted 6/24/11) </h2>
+               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
+            <h1> Problem with WRFPLUS, especially with PGI compiler (posted 2011-06-24) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             WRFPLUS fails to compile when using g95 compiler for Mac OS. </p>
+               The adjoint model integration fails with either a segmentation fault or the error message: <code>0: ALLOCATE: 18446744072053605056 bytes requested; not enough memory</code>.</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             Download <code><a href="fixes/v33/adStack.c">adStack.c</a></code> and place it in the <kbd>WRFPLUS/frame</kbd> directory.</p>
-            <h2> Problem with New Configure Script (posted 4/8/11) </h2>
+               Download <a href="fixes/v33/module_em_tl.F">module_em_tl.F</a>, <a href="fixes/v33/module_em_ad.F">module_em_ad.F</a>, <a href="fixes/v33/module_advect_em_tl.F">module_advect_em_tl.F</a> and <a href="fixes/v33/module_advect_em_ad.F">module_advect_em_ad.F</a> and place them in the <kbd>WRFPLUS/dyn_em</kbd> directory.
+               Then download <a href="fixes/configure_new.defaults">configure_new.defaults</a> and place it in the <kbd>WRFPLUS/arch</kbd> directory.</p>
+            <h1> WRFPLUS compilation problem with g95 compiler for Mac OS (posted 2011-06-24) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-             There is a problem with the new configure script on Opensuse and Ubuntu Linux. It will fail on creating configure.wrf file, and may result in file removal in the top WRFV3/ directory. If configure.wrf is successfully created, then this fix doesn't affect you. </p>
+               WRFPLUS fails to compile when using g95 compiler for Mac OS. </p>
             <p class="bodytext"><strong>Solution:</strong><br>
-             If files are removed from WRFV3 directory, you will have to redownload the V3.3 tar file, or re-untar the file. Then download the <a href=http://www.mmm.ucar.edu/wrf/src/fix/configure_fix.tar>configure_fix.tar</a> file in the WRFV3 directory. This file contains a new configure script, and a new arch/configure_new.default file.</p> 
-            <h2> Problem with New compile Script (posted 4/8/11) </h2>
+               Download <code><a href="fixes/v33/adStack.c">adStack.c</a></code> and place it in the <kbd>WRFPLUS/frame</kbd> directory.</p>
+            <h1> Problem with New Configure Script (posted 2011-04-08) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
-There is a problem with the new compile script on IBM AIX OS. It will complain about invalid parameters for grep if compiled with CRTM lib. </p>
+               There is a problem with the new configure script on Opensuse and Ubuntu Linux. It will fail on creating configure.wrf file, and may result in file removal in the top WRFV3/ directory. If configure.wrf is successfully created, then this fix doesn't affect you. </p>
             <p class="bodytext"><strong>Solution:</strong><br>
-            Download the <a href=fixes/v33/compile_fix.tar>compile_fix.tar</a> file in the WRFDA directory, untar it and overwrite the old file. <br><br></p></blockquote>
-            <a name="V3_1"></a><p class="pagetitle">WRF Var Version 3.1 : Known Problems and Fixes</p>
+               If files are removed from WRFV3 directory, you will have to redownload the V3.3 tar file, or re-untar the file. Then download the <a href=http://www.mmm.ucar.edu/wrf/src/fix/configure_fix.tar>configure_fix.tar</a> file in the WRFV3 directory. This file contains a new configure script, and a new arch/configure_new.default file.</p> 
+            <h1> Problem with New compile Script (posted 2011-04-08) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               There is a problem with the new compile script on IBM AIX OS. It will complain about invalid parameters for grep if compiled with CRTM lib. </p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Download the <a href=fixes/v33/compile_fix.tar>compile_fix.tar</a> file in the WRFDA directory, untar it and overwrite the old file. <br></p>
+            </blockquote>
+            <a name="V3_2"></a><p class="pagetitle">WRF Var Version 3.2 : Known Problems and Fixes</p>
             <blockquote>
-              <h2>Parallel WRF-Var run with PREPBUFR observational data (Posted 4/9/09)</h2>
-              <p class="bodytext"><strong>Problem: </strong><br>
-                Parallel running WRFDA with PREPBUFR observational data (ob_format=1) might get hung up with no error message being printed.</p>
-              <p class="bodytext"><strong>Solution:</strong><br>
-              Click <a href="fixes/v31/V3_1_prepbufr_fix.tar">here</a> to download the patch</p>
-              <h2>Unblock and reblock radiance BUFR data with gfortran (Posted 4/9/09)</h2>
-              <p class="bodytext"><strong>Problem: </strong><br>
-                In some Linux operating systems using the gfortran compiler, the radiance BUFR data unblocked and reblocked by cwordsh might be unable to be read by WRFDA.</p>
-              <p class="bodytext"><strong>Solution:</strong><br>
-              Upgrade to the latest version of WRFDA</p>
-              <h2>4D-Var (Posted 4/9/09)</h2>
-              <p class="bodytext"><strong>Problem: </strong><br>
-              4D-Var results are unstable on some platforms.</p>
-              <p class="bodytext"><strong>Solution:</strong><br>
-              Upgrade to the latest version of WRFDA</p>
-              <p class="bodytext">&nbsp;<br><br></p>
+            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
+               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
+            </blockquote>
+            <a name="V3_1"></a><p class="pagetitle">WRF Var Version 3.1 : Known Problems and Fixes</p>
+<!--            <p style="padding-right: 45px;padding-left: 60px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="text-align:center;background-color:#DDAAAA;"><b>NOTE:</b> These older versions (3.1 and earlier) are no longer supported. If you are unable to solve your problem with the solutions listed here, upgrade to a newer version of WRFDA.</td></tr></table></p>
+-->
+            <blockquote>
+            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
+               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
+               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
+               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
+            <h1>Parallel WRF-Var run with PREPBUFR observational data (Posted 2009-04-09)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Parallel running WRFDA with PREPBUFR observational data (ob_format=1) might get hung up with no error message being printed.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Click <a href="fixes/v31/V3_1_prepbufr_fix.tar">here</a> to download the patch</p>
+            <h1>Unblock and reblock radiance BUFR data with gfortran (Posted 2009-04-09)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               In some Linux operating systems using the gfortran compiler, the radiance BUFR data unblocked and reblocked by cwordsh might be unable to be read by WRFDA.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Upgrade to the latest version of WRFDA</p>
+            <h1>4D-Var (Posted 2009-04-09)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               4D-Var results are unstable on some platforms.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Upgrade to the latest version of WRFDA</p>
+            <p class="bodytext">&nbsp;<br><br></p>
             </blockquote>
             <a name="V3_0"></a><p class="pagetitle">WRFDA Version 3.0 : Known Problems and Fixes</p>
+<!--            <p style="padding-right: 45px;padding-left: 60px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="text-align:center;background-color:#DDAAAA;"><b>NOTE:</b> These older versions (3.1 and earlier) are no longer supported. If you are unable to solve your problem with the solutions listed here, upgrade to a newer version of WRFDA.</td></tr></table></p>
+-->
             <blockquote>
-              <h2>Minor bug fixes for version 3.0.1.1 (Posted 1/9/09)</h2>
+              <h1>Minor bug fixes for version 3.0.1.1 (Posted 2009-01-09)</h1>
               <p class="bodytext"><strong>Bug fix related to check_rh=2</strong><br>
                 To fix this problem a second RH check has been added after the moisture adjustment to 
                 ensure the RH is within a reasonable range.<br>
@@ -256,16 +313,16 @@ There is a problem with the new compile script on IBM AIX OS. It will complain a
                 var/da/da_minimisation/da_jo_and_grady.inc</p>
               <p class="bodytext"><strong>Solution:</strong>
               <p class="bodytext">Upgrade to a newer version of WRFDA (fixed in version 3.1)</p>
-              <h2></h2>
-              <h2>Known Problems for version 3.0.1.1 (Posted 1/9/09)</h2>
+              <h1></h1>
+              <h1>Known Problems for version 3.0.1.1 (Posted 2009-01-09)</h1>
               <p class="bodytext">WRF-Var does not work properly with NCEP PREPBUFR observations, because of the following known problems:</p>
               <p class="bodytext"> (1) pressure fields are used twice and observation numbers are double-counted because mass and wind reports are separated in NCEP PREPBUFR files.</p>
               <p class="bodytext"> (2) time-duplicate observations from fixed stations are over-used. For example, if there is more than one synop report from a surface station contained in a 6-hour time-windowed PREPBUFR file, only one report should be used. </p>
               <p class="bodytext"><em>Fixes will be available in the next release.</em><br>
               &nbsp;</p>
-              <h2>
-              <hr>Known Problems in Version 3.0.1 </h2>
-              <h2>Compile Error using PGI 7.1+  (posted 6/10/08) </h2>
+              <h1>
+              <hr>Known Problems in Version 3.0.1 </h1>
+              <h1>Compile Error using PGI 7.1+  (posted 2008-06-10) </h1>
               <p class="bodytext"><strong>Problem</strong>: Compile errors like this one occur when using PGI 7.1 or later: &quot;<kbd>PGF90-S-0000-Internal compiler error. string_expr_length: ast not string op</kbd>&quot;. </p>
               <p class="bodytext"><strong>Solution</strong>: Changes have been made to the latest WRF Var tar file to fix the problem. The problem affects the following files:<br>
                 WRFDA/var/da/da_main/da_med_initialdata_input.inc<br>
@@ -282,12 +339,12 @@ There is a problem with the new compile script on IBM AIX OS. It will complain a
                 WRFDA/var/da/da_tracing/da_trace_exit.inc<br>
               WRFDA/var/da/da_vtox_transforms/da_vertical_transform.inc </p>
             </blockquote>
-            <h2 class="bodytext style2">Compile Problem for Program obsproc (Posted 6/10/08) </h2>
+            <h2 class="bodytext style2">Compile Problem for Program obsproc (Posted 2008-06-10) </h1>
             <blockquote>
               <p class="bodytext"><strong>Problem</strong>: Compile fails on program obsproc. </p>
               <p class="bodytext"><strong>Solution</strong>: Upgrade to a newer version of WRFDA (fixed in Version 3.0.1.1 and later)</p>i
             </blockquote>
-            <h2 class="bodytext style2">Compile Problem On IBMs (Posted 6/10/08) </h2>
+            <h2 class="bodytext style2">Compile Problem On IBMs (Posted 2008-06-10) </h1>
             <blockquote>
               <p class="bodytext"><strong>Problem</strong>: Compile time very long on IBMs using xlf. </p>
               <p class="bodytext"><strong>Solution</strong>: Check your configure.var file and reduce optimization level from O3 to O2. This has also been included in the updated tar file. </p>

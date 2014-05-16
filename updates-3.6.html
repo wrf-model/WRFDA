@@ -142,13 +142,14 @@
 
               <a name="seviri"></a>
               <h1>Meteosat SEVIRI assimilation</h1>
+              <p style="padding-right: 45px;padding-left: 45px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="padding-right: 45px;padding-left: 45px;"><b>Note:</b> There is a known bug in the original release version: <a href="known-prob.html#V3_6">see this page</a> for a solution.</td></tr></table></p>
               <p class="bodytext">Metosat 8, 9, and 10 (AKA MSG 1, 2, and 3) carry the Spinning Enhanced Visible and InfraRed Imager (SEVIRI). WRFDA can now assimilate radiance observations from this instrument, which are available in BUFR format from EUMETSAT. This is a limited implementation for now, only covering the 8 infrared channels. The relevant namelist options are as follows:</p>
               <p class="bodytext">&wrfvar4<br>
                 &nbsp; use_seviriobs: &nbsp; (logical) Switch for reading SEVIRI observations.<br>
                 &nbsp; &nbsp; true:  WRFDA will look for the "seviri.bufr" file and read it if it exists<br>
                 &nbsp; &nbsp; false: no SEVIRI data will be read (default)</p>
               <p class="bodytext">&wrfvar14<br>
-                &nbsp; rtminit_platform = 12, ("MSG" (Meteosat Second Generation)<br>
+                &nbsp; rtminit_platform = 12, ("MSG", Meteosat Second Generation)<br>
                 &nbsp; rtminit_satid = 1,2,3 (for MSG 1, 2, and 3 respectively)<br>
                 &nbsp; rtminit_sensor = 21, ("seviri")</p>
 
@@ -159,7 +160,7 @@
 
               <a name="airep"></a>
               <h1>AIREP humidity observations</h1>
-              <p class="bodytext">AIREP (short for “aircraft report”) is an automated weather observation from an airplane. WRFDA has had the ability to assimilate AIREP observations of temperature and wind for many years, but not moisture. These moisture observations can now be read and assimilated by WRFDA. Users will not need to change any settings to assimilate these observations: if they are present in your observation files they will be read and assimilated.</p>
+              <p class="bodytext">AIREP (short for "aircraft report") is an automated weather observation from an airplane. WRFDA has had the ability to assimilate AIREP observations of temperature and wind for many years, but not moisture. These moisture observations can now be read and assimilated by WRFDA. Users will not need to change any settings to assimilate these observations: if they are present in your observation files they will be read and assimilated.</p>
 
               <a name="thinning"></a>
               <h1>Observation thinning for conventional observations in ASCII format</h1>
