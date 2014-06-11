@@ -276,6 +276,7 @@ PlainStyle2,
 0,
 ,
 ,"WRFDA community support","http://www.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
+,"System requirements","http://www.mmm.ucar.edu/wrf/users/wrfda/requirements.html",,,0
 ,"Known problems","http://www.mmm.ucar.edu/wrf/users/wrfda/known-prob.html",,,0
 ,"wrfhelp","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
 ,"wrf-news","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfnews.html",,,0
