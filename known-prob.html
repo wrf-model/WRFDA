@@ -150,6 +150,14 @@
              Assimilation fails during the VARBC step. May either fail with an error such as a segmentation fault or hang indefinitely. Last message printed to the rsl.out files is usually "Calculate innovation vector(iv)"</p>
             <p class="bodytext"><strong>Solution:</strong><br>
              Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.</p>-->
+            <h1> Problems reading LITTLE_R files in OBSPROC (posted 2014-06-23) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               OBSPROC fails to read LITTLE_R files, with one of the following (or similar) error messages:<br><br>
+               <code>forrtl: severe (64): input conversion error, unit -5, file Internal Formatted Read<br>
+               Fortran runtime error: Bad value during integer read<br>
+               PGFIO-F-231/formatted read/internal file/error on data conversion.</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Download and untar the following tar file (<a href="fixes/v36/obsproc.tar">obsproc.tar</a>), which contains a directory named "obsproc". Delete the directory "WRFDA/var/obsproc" and replace it with the new "obsproc" directory. Then run "<code>./clean -a</code>" and recompile.</p>
             <h1> Problems compiling on Mac OS X 10.9 (Mavericks) and potentially other systems (posted 2014-05-27) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFDA fails to compile, returning the following message at or near the end of the compilation log:<br><br>
