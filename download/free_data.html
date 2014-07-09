@@ -177,6 +177,13 @@
                   </li>
                   <li>WMO BUFR format (assimilated directly into WRFDA <a href="../../docs/user_guide_V3/users_guide_chap6.htm#_Radiance_Data_Assimilations">utilizing a Radiative Transfer Model</a>)</li>
                   <li>2004-04-17 to present</li>
+                  <li><b>Note:</b> This data repository is only a partial set of all data available through GDAS. For more instruments (though for a shorter time period), see the next section.</li>
+                </ul>
+              </li>
+              <li><a href="http://rda.ucar.edu/datasets/ds464.0">NCEP ADP Operational Global Surface Observations (ds351.0)</a> and <a href="http://rda.ucar.edu/datasets/ds353.4">Upper Air Observations (ds353.4)</a>
+                <ul>
+                  <li>ADP format (converted to LITTLE_R format using  <a href="#converting">a converter</a>)</li>
+                  <li>1999-09-30 to present</li>
                 </ul>
               </li>
             </ul></blockquote>
@@ -192,10 +199,18 @@
                   <li>See <a href="../Docs/user_guide_V3.6/users_guide_chap6.htm#Precipitation">relevant section in the User's Guide</a> for instructions on how to assimilate</li>
                 </ul>
               </li>
-              <li><a href="http://rda.ucar.edu/datasets/ds464.0">NCEP ADP Operational Global Surface Observations (ds351.0)</a> and <a href="http://rda.ucar.edu/datasets/ds353.4">Upper Air Observations (ds353.4)</a>
+              <li>NCEP GDAS <a href="http://nomads.ncdc.noaa.gov/data/gdas/">HTTP</a> or <a href="ftp://nomads.ncdc.noaa.gov/GDAS/">FTP</a>
                 <ul>
-                  <li>ADP format (converted to LITTLE_R format using  <a href="#converting">a converter</a>)</li>
-                  <li>1999-09-30 to present</li>
+                  <li>Raw radiance data from several instruments:
+                    <ul><li>Atmospheric InfraRed Sounder (AIRS)</li>
+                      <li>Advanced Microwave Sounding Unit-A (AMSU-A) and Unit-B (AMSU-B)</li>
+                      <li>High resolution InfraRed Sounder-3 (HIRS-3) and 4 (HIRS-4)</li>
+                      <li>Infrared Atmospheric Sounding Interferometer (IASI)</li>
+                      <li>Microwave Humidity Sounder (MHS)</li>
+                      <li>Spinning Enhanced Visible and Infrared Imager (SEVIRI)</li>
+                    </ul>
+                  <li>WMO BUFR format (assimilated directly into WRFDA <a href="../../docs/user_guide_V3/users_guide_chap6.htm#_Radiance_Data_Assimilations">utilizing a Radiative Transfer Model</a>)</li>
+                  <li>Available for one year prior to current date, though some data (METOP-B instruments, SEVIRI data) were only included <a href="http://www.nws.noaa.gov/os/notification/tin13-18addobservations_gdas.htm">starting August 20, 2013</a>.</li>
                 </ul>
               </li>
               <li>MADIS data FTP sites: <a href="ftp://madis-data.noaa.gov/point/">real-time</a> and <a href="ftp://madis-data.noaa.gov/archive/">archived observations</a>
