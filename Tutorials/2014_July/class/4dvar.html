@@ -1,0 +1,216 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practical</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <p><span class="pagetitle">Running 4D-VAR</span></p>
+            <p><span class="body">Reference: <a href="../docs/WRFDA_4dvar.pdf">Download the tutorial presentation</a></span>
+            </p>
+            <p><span class="bodyh1">source code</span>
+            </p>
+            <blockquote>
+              <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so.</p>
+              <p><em>WRFDA/var/build/da_wrfvar.exe_4dvar</em> (this is renamed from da_wrfvar.exe)<br>
+                is the executable that will be used in the 4D-VAR session.              </p>
+</blockquote>
+            <span class="bodyh1">Choice of your working directory</span>
+            <blockquote>
+              <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
+              <p>We recommend you create<em> /data1/${USER}/DA/4dvar</em> and cd there to be your working directory for this session.</p>
+              <p><span class="stylecode">mkdir /data1/${USER}/DA/4dvar</span><br>
+                <span class="stylecode">cd /data1/${USER}/DA/4dvar</span> (or other your choice of working directory)</p>
+            </blockquote>
+            <span class="bodyh1">Input data</span>
+            <blockquote>
+              <p>For running 3D-VAR, the 3 major input files are observations (ob.ascii), background error statistics (be.dat) and first guess (fg). For 4D-VAR, the similar concept holds except that now the observations need to be processed into multiple time-slot files. </p>
+              <p>Test data for this 4D-VAR tutorial case are in /wrfhelp/DATA/WRFDA/4dvar.</p>
+            </blockquote>
+            <ul>
+              <li>Observations
+                <blockquote>
+                  <p>/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/ob.ascii+<br>
+                    /wrfhelp/DATA/WRFDA/4dvar/ob/2005071601/ob.ascii<br>
+                    /wrfhelp/DATA/WRFDA/4dvar/ob/2005071602/ob.ascii<br>
+                    /wrfhelp/DATA/WRFDA/4dvar/ob/2005071603/ob.ascii            <br>
+                    /wrfhelp/DATA/WRFDA/4dvar/ob/2005071604/ob.ascii<br>
+                    /wrfhelp/DATA/WRFDA/4dvar/ob/2005071605/ob.ascii<br>
+                    /wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/ob.ascii-</p>
+                </blockquote>
+              </li>
+              <li>First guess
+                <blockquote>
+                  <p>/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfinput_d01<br>
+                    /wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfbdy_d01</p>
+                </blockquote>
+              </li>
+              <li>Background error statistics
+                <blockquote>
+                  <p>/wrfhelp/DATA/WRFDA/4dvar/be/be.dat            </p>
+                </blockquote>
+              </li>
+            </ul>
+            <span class="bodyh1">Linking files</span>
+            <blockquote>
+              <p class="stylecode">cd /data1/${USER}/DA/4dvar</p>
+              <p>A few additional contant files are needed for 4D-VAR runs.</p>
+              <blockquote>
+                
+                <p> <span class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span> <span style="color:red"> # be sure to link the double-precision one for 4dvar runs and rename it</span></p>
+                <p> <span class="stylecode">ln -fs  /data1/${USER}/DA/WRFDA/run/*.TBL .</span></p>
+              </blockquote>
+              <p>link first guess and boundary files.</p>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfinput_d01 ./fg</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfavn_d01 ./fg02</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfinput_d01 .</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfbdy_d01 .</span></p>
+                <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
+              </blockquote>
+              <p>link observation files</p>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/ob.ascii+ ./ob01.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071601/ob.ascii ./ob02.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071602/ob.ascii ./ob03.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071603/ob.ascii ./ob04.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071604/ob.ascii ./ob05.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071605/ob.ascii ./ob06.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/ob.ascii ./ob07.ascii</span></p>
+              </blockquote>
+              <p>link background error file</p>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/4dvar/be/be.dat .</span></p>
+              </blockquote>
+            </blockquote>
+<span class="bodyh1">Edit namelists</span>
+            <blockquote>
+                <p>A very basic namelist.input for running the 4D-VAR tutorial case is available at <em>/wrfhelp/DATA/WRFDA/4dvar/namelist.input</em></p>
+                <p><span class="stylecode">cp /wrfhelp/DATA/WRFDA/4dvar/namelist.input .</span></p>
+                <p class="stylecode">vi namelist.input</p>
+              <p>Pay special attention to the following namelist variables.</p>
+                <p><span class="stylecode">&amp;wrfvar1<br>
+                  var4d=true,<br>
+                  var4d_lbc=true,<br>
+                  var4d_bin=3600,<br>
+                  /<br>
+                  &amp;wrfvar6<br>
+                </span>
+                  ntmax=5</span><span style="color:red"> # for testing purpose only, reduce the maximum iteration number for quick test, as for each iteration, 4D-VAR takes a lot longer to run than 3D-VAR</span><br>
+                  /
+              <br>
+                  &amp;wrfvar18<br>
+                  analysis_date='2005-07-16_00:00:00&quot;,<br>
+                  /<br>
+                  &amp;wrfvar21<br>
+                  time_window_min=&quot;2005-07-16_00:00:00&quot;,<br>
+                  /<br>
+                  &amp;wrfvar22</span><br>
+                  <span class="stylecode">time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
+                /<br>
+                &amp;time_control<br>
+                run_hours=6,<br>
+                start_year=2005,<br>
+                start_month=07,<br>
+                start_day=16,<br>
+                start_hour=00,<br>
+                end_year=2005,<br>
+                end_month=07,<br>
+                end_day=16,<br>
+                end_hour=06,<br>
+                interval_seconds=21600,<br>
+                debug_level=-300,<br>
+                /<br>
+                &amp;domains<br>
+                time_step=600,<br>
+                e_we=31,<br>
+                e_sn=25,<br>
+                e_vert=17,<br>
+                dx=135000,<br>
+                dy=135000,<br>
+                smooth_option=0,<br>
+                nproc_x=0,<br>
+                /<br>
+                &amp;physics </span>(make sure the physics options here are consistent with those in the first guess file, fg. Use <span class="stylecode">ncdump -h fg</span> to look for the options listed in the global attributes.)<span class="stylecode"><br>
+                ......<br>
+                mp_physics=3<br>
+                sf_surface_physics=2<br>
+                  num_soil_layers=4<br>
+                  ......
+                  <br>
+                /<br>
+                &amp;perturbation<br>
+                trajectory_io=true,<br>
+                enable_identity=false,<br>
+                jcdfi_use=true,<br>
+                jcdfi_diag=1,<br>
+                jcdfi_penalty=1000.0,<br>
+                /                </span>            </p>
+            </blockquote>
+            <span class="bodyh1">Running 4D-VAR</span>
+            <blockquote>
+              <p><span class="stylecode">mpirun -np 4 /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_4dvar &gt;&amp;! var4d.log </span></p>
+<p class="stylecode">&nbsp; </p>
+            </blockquote>
+            <p class="bodyh2"><a name="advance">Advanced</a></p>
+            <blockquote>
+              <p>Try setting up a different 4D-VAR run using CONUS60 case (/wrfhelp/DATA/WRFDA/CONUS60) and compare the results with the 3D-VAR run. A sample namelist.input is provided in the WRFDA source tar file as WRFDA/var/test/4dvar/namelist.input for the CONUS60 case.<br>
+                <br>
+                The CONUS60 case is not used as the default 4D-VAR practical case
+                because of its relatively large domain dimensions for 4D-VAR tutorial purpose.</p>
+              <p>&nbsp;</p>
+</blockquote>
+          <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practical_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

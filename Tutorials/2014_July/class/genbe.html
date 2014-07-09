@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practical</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Running gen_be utility</span>
+            <blockquote>
+              <p>The goal of this session is to generate the background error statistics file (i.e. the B<sub>0</sub> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.</p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_be.pdf">Download the tutorial presentation</a></span></p>
+              <span class="bodyh1">Source code</span>
+              <blockquote>
+                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
+                <p><strong><em>WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh</em></strong> is the main script that will be used in this practice.</p>
+                <p>GEN_BE consists of several stages. Quite a few executables and scripts are used for the process. They are listed below for reference. These executables and scripts will be called subsequently by <em>gen_be_wrapper.ksh</em>:</p>
+                <blockquote>
+                  <p class="stylecode">WRFDA/var/scripts/gen_be/gen_be.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_stage0_wrf.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_stage4_regional.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_cov2d.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_cov3d.ksh<br>
+                  WRFDA/var/build/gen_be_stage0_wrf.exe<br>
+                  WRFDA/var/build/gen_be_stage1.exe<br>
+                  WRFDA/var/build/gen_be_stage2.exe<br>
+                  WRFDA/var/build/gen_be_stage2a.exe<br>
+                  WRFDA/var/build/gen_be_stage3.exe<br>
+                  WRFDA/var/build/gen_be_stage4_regional.exe<br>
+                  WRFDA/var/build/gen_be_diags_read.exe<br>
+                  WRFDA/var/build/gen_be_diags.exe<br>
+                  WRFDA/var/build/gen_be_cov2d.exe<br>
+                  WRFDA/var/build/gen_be_cov3d.exe</p>
+              </blockquote></blockquote>
+              <p><span class="bodyh1">Choice of your working directory </span> </p>
+              <blockquote>
+                <p>For this exercise you should create<em> /data1/${USER}/DA/gen_be</em> and use this as your working directory for this session.<br>
+                <blockquote>
+                  <p class="stylecode">mkdir /data1/${USER}/DA/gen_be<br>
+                                       cd /data1/${USER}/DA/gen_be</p>
+              </blockquote></blockquote>
+              <p><span class="bodyh1">Edit gen_be_wrapper.ksh</span>
+              </p>
+              <blockquote>
+                <p>Copy gen_be_wrapper.ksh to your working directory</p>
+                <blockquote><p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh .</p></blockquote>
+                <p>Pay special attention to the following settings and make necessary modifications for your case and directories:</p>
+                <blockquote>
+                  <p class="stylecode">......<br>
+                    export WRFVAR_DIR=/data1/${USER}/DA/WRFDA<br>
+                    ......<br>
+                    export START_DATE = 2008020612 &nbsp; # the first perturbation valid date<br>
+                    export END_DATE = 2008020700 # the last perturbation valid date<br>
+                    export NUM_LEVELS = 40 # e_vert -1<br>
+                    export BIN_TYPE = 5<br>
+                    export FC_DIR = /wrfhelp/DATA/WRFDA/CONUS60/fc<br>
+                    export RUN_DIR =/data1/${USER}/DA/gen_be<br>
+                    export DOMAIN = 01<br>
+                    export FCST_RANGE = 24<br>
+                    export FCST_RANGE = 12<br>
+                    export INTERVAL = 12<br>
+                  export STRIDE = 1</p>
+                </blockquote>
+                <p>FC_DIR specifies the directory where the WRF forecast files (wrfout*) reside. Observe the directory structure and how the wrfout files are stored. To generate your own BE file for your own case and domain in the future, you will need to prepare and arrange your wrfout files in the same way (for example, 2008020512/wrfout_d01_2008-02-06_12:00:00; 2008020512 is the initial time, wrfout_d01_2008-02-06_12:00:00 is the 24-hour forecast valid at 2008020612).</p>
+              </blockquote>
+              <p><span class="bodyh1">Run gen_be_wrapper.ksh</span></p>
+              <blockquote>
+                <p class="stylecode">./gen_be_wrapper.ksh &gt;&amp;! gen_be.log</p>
+              </blockquote>
+              <p><span class="bodyh1">Check output</span>
+              </p>
+              <blockquote>
+                <p>View the log file (gen_be.log) to ensure that all stages (stage0_wrf, stage1, stage2, stage2a, stage3, stage4, gen_be_cov2d) have been run successfully.</p>
+                <table width="85%" border="1" cellpadding="10">
+                  <tr>
+                    <td><p class="stylecode">Thu Jul 22 15:18:13 MDT 2010 Start<br>
+                      WRFVAR_DIR is /wrfhelp/SOURCE_CODE/WRFDA exported<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 0: Calculate ensemble perturbations from model forecasts.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 22 15:18:13 MDT 2010<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020612<br>
+                      2008020512 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_12:00:00 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-06_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020700<br>
+                      2008020600 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-07_00:00:00 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_00:00:00<br>
+                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 1: Read standard fields, and remove time/ensemble/area mean.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 2: Calculate regression coefficients.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 2a: Calculate control variable fields.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 3: Read 3D control variable fields, and calculate vertical covariances.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
+                      Ending CPU time: Thu Jul 22 15:18:18 MDT 2010<br>
+                      Beginning CPU time: Thu Jul 22 15:18:18 MDT 2010<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 4: Calculate horizontal covariances (regional lengthscales).<br>
+                      ---------------------------------------------------------------<br>
+                      Ending CPU time: Thu Jul 22 15:18:32 MDT 2010<br>
+                      Ending CPU time: Thu Jul 22 15:18:32 MDT 2010<br>
+                      ---------------------------------------------------------------<br>
+                      Run gen_be_cov2d.<br>
+                      ---------------------------------------------------------------</p>
+                    <p class="stylecode">Thu Jul 22 15:18:32 MDT 2010 Finished</p></td>
+                  </tr>
+                </table>
+                <p>&nbsp;</p>
+                <p>Look for <strong><em>be.dat</em></strong> in the ${RUN_DIR} you specified in your gen_be_wrapper.ksh. <em><strong>be.dat</strong></em> is the background error file which can now be used to run WRFDA.</p>
+                <p>If <em>be.dat</em> has not been created, check the log files for each gen_be stage (found in ${RUN_DIR}) to find the error.</p>
+                <p>The <em>fort.*</em> files under the directory <em>$RUN_DIR/working</em> are the files to be read by the graphics tools mentioned below.</p>
+              </blockquote>
+              <p><span class="bodyh1">Graphics</span>
+              </p>
+              <blockquote>
+                <p><em>WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh</em> is the main plotting script which calls other NCL scripts located in WRFDA/var/graphics/ncl/gen_be.</p>
+                <blockquote>
+                  <p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh .</p>
+                </blockquote>
+                <p>Edit gen_be_plot_wrapper.ksh to provide proper settings.</p>
+                <blockquote>
+                  <p class="stylecode">......<br>
+                export NCARG_ROOT=/usr/local/ncl<br>
+                ......<br>
+                export WRFVAR_DIR=/wrfhelp/SOURCE_CODE/WRFDA<br>
+                export GEN_BE_PLOT=${WRFVAR_DIR}/var/graphics/ncl/gen_be<br>
+                export GRAPHIC_WORKS=pdf</p>
+                <p>export NUM_WE=89 # 1 point less than stagger points  90<br>
+                  export NUM_SN=59 # 1 point less than stagger points  60<br>
+                  export NUM_LEVELS=40 # 1 point less than stagger points 41<br>
+                  export RESOLUTION=60.0  # km<br>
+                  export REGION=tutorial     # only for naming output purpose<br>
+                  export BE_DIR=/data1/${USER}/DA/gen_be/working<br>
+                  export BE_NROW=$NUM_LEVELS</p>
+                <p class="stylecode">./gen_be_plot_wrapper.ksh </p>
+                <p>Look for gen_be_*.pdf and display each of them.</p>
+              </blockquote>
+              <span class="bodyh1">Other practice</span>
+              <blockquote>
+                <p>If this was successful, continue to try more <a href="psot.html#advanced_psot">single ob tests</a> using the be.dat you have created.</p>
+                <p>&nbsp;</p>
+              </blockquote>
+            </blockquote>
+<!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practical_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>
