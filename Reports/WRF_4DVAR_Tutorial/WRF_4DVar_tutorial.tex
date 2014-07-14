@@ -22,10 +22,10 @@
 \newcommand{\fst}[2]{\subsection{#1}\frame{\frametitle{#1} #2}}
 
 % Standard LaTeX stuff - note the optional abbreviated title being provided
-\title[WRF 4D-Var V3.5, WRFDA Tutorial]{\small{WRF Four-dimensional variational data assimilation system\\Tutorial for V3.5}}
-\author[Zhang and Huang, Boulder, July 2013]{Xin Zhang \and Xiang-Yu Huang}
+\title[WRF 4D-Var V3.6, WRFDA Tutorial]{\small{WRF Four-dimensional variational data assimilation system\\Tutorial for V3.6}}
+\author[Zhang and Huang, Boulder, July 2014]{Xin Zhang \and Xiang-Yu Huang}
 
-\date{\tiny{Presented in July 2013, WRFDA Tutorial} \\
+\date{\tiny{Presented in July 2014, WRFDA Tutorial} \\
   ~\\
   ~\\
   ~\\
@@ -261,10 +261,10 @@ To investigate the impact of including boundary condition control in data assimi
 		{\tiny\url{http://www.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html}}\pause
 	\item download the WRFPLUSV3 codes  and the patch from :\\
 		{\tiny\url{http://www.mmm.ucar.edu/wrf/users/wrfda/download/wrfplus.html}}
-		{\tiny\url{http://www.mmm.ucar.edu/wrf/users/wrfda/known-prob_V3_5.html}}\pause
+		{\tiny\url{http://www2.mmm.ucar.edu/wrf/users/wrfda/known-prob.html\#V3_6}}\pause
 	\item enter into WRFDA/var/test/4dvar \pause
 	\item get the test dataset from :\\
-		{\tiny\url{ftp://ftp.ucar.edu/pub/mmm/xinzhang/WRF4DVar_V3.5_Tutorial/2008020521}}\pause
+		{\tiny\url{ftp://ftp.ucar.edu/pub/mmm/xinzhang/WRF4DVar_V3.6_Tutorial/2008020521}}\pause
 	\item $ln$ $-fs$ $wrfinput\_d01$ $fg$ \pause
 	\item $ln$ $-fs$ $../../build/da\_wrfvar.exe$ $.$
 	\item $ln$ $-fs$ $../../run/be.dat.cv3$ $be.dat$
@@ -272,7 +272,7 @@ To investigate the impact of including boundary condition control in data assimi
 }
 \fst{Installation}{
 \begin{itemize}
-   \item Install WRFPLUS V3.5
+   \item Install WRFPLUS V3.6
    	\begin{itemize}
    	 	\item $./configure$  $(-d)$  $wrfplus$
    	     	\item $./compile$  $em\_real$
@@ -280,7 +280,7 @@ To investigate the impact of including boundary condition control in data assimi
    	 \end{itemize}\pause
     \item for csh, tcsh : {\small{$setenv$  $WRFPLUS\_DIR$  $path\_of\_wrfplusv3$}}
     \item for bash, ksh : {\small{$export$  $WRFPLUS\_DIR=path\_of\_wrfplusv3$}}\pause
-    \item Install WRFDA V3.5
+    \item Install WRFDA V3.6
         \begin{itemize}
     	\item $./configure$  $(-d)$  $4dvar$
 	\item $./compile$  $all\_wrfvar$
@@ -299,9 +299,10 @@ To investigate the impact of including boundary condition control in data assimi
 \end{itemize}
 }
 
+\begin{comment}
 \frame{
 \frametitle{Portability}
-We have tested the WRF 4D-Var V3.5 on following systems:
+We have tested the WRF 4D-Var V3.6 on following systems:
 \begin{itemize}
    	\item IBM with XLF compiler V12.1 \pause
    	\item Linux with PGI compiler V8.0-4 64-bit \pause
@@ -311,6 +312,7 @@ We have tested the WRF 4D-Var V3.5 on following systems:
 	\item Mac with G95 compiler V4.0.3 (please download the patch on WRFDA home page)
 \end{itemize}
 }
+\end{comment}
 
 %\frame{
 %\frametitle{Common problems in compilation}
@@ -406,6 +408,7 @@ adjoint identity:
 \end{itemize}
 }
 
+\begin{comment}
 \frame{
 \frametitle{Tips for using prepbufr and bufr data on non-IBM platforms}
  On non-IBM platforms,the prepbufr and bufr formats observation downloaded from NCEP ftp server or NCAR achives should be converted. This conversion was conducted using the C code ssrc.c located in the $utils$ directory of the GSI distribution. \\
@@ -420,6 +423,7 @@ More detail information and GSI codes download, please refer to \\ {\tiny\url{ht
 		ssrc.exe $<$ gdas.1bamua.t00z.20080206.bufr $>$ amusa.bufr}}
 \end{itemize}
 }
+\end{comment}
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{WRF 4D-Var Run}
 
@@ -541,7 +545,7 @@ da_check_xtoy_adjoint: Test Finished:
 \frame[containsverbatim]{
 \frametitle{Assimilate satellite radiance data}
 refer to WRFDA Users' guide Chapter 6: \\
-\tiny{\url{http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.5/users_guide_chap6.htm#_Radiance_Data_Assimilations}} \\
+\tiny{\url{http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.6/users_guide_chap6.htm#_Radiance_Data_Assimilations}} \\
 ~\\
 Modify namelist.input for radiance data :
 \tiny
@@ -588,6 +592,8 @@ Modify namelist.input for radiance data :
 \end{itemize}
 }
 
+\begin{comment}
+
 \subsection{Common problems in WRF 4D-Var run}
 
 \frame[containsverbatim]{
@@ -619,7 +625,6 @@ Modify namelist.input for radiance data :
 
 }
 
-\begin{comment}
 \section{Future Developments}
 
 \frame{
