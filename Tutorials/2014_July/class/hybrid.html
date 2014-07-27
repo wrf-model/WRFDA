@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -57,9 +56,9 @@ a:active {
               </p>
               <blockquote>
                 <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
-                <p>We recommend you create<em> /data1/${USER}/DA/hybrid</em> and cd there to be your main working directory for this session.</p>
-                <p><span class="stylecode">mkdir /data1/${USER}/DA/hybrid</span><br>
-                  <span class="stylecode">cd /data1/${USER}/DA/hybrid</span></p>
+                <p>We recommend you create<em> /kumquat/users/${USER}/DA/hybrid</em> and cd there to be your main working directory for this session.</p>
+                <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA/hybrid</span><br>
+                  <span class="stylecode">cd /kumquat/users/${USER}/DA/hybrid</span></p>
               </blockquote>
               <p><span class="bodyh1">Input data</span> </p>
               <blockquote>
@@ -71,7 +70,7 @@ a:active {
                 <li>ensemble mean
                   <blockquote>
                     <p>Usually, the first step of hybrid data assimilation is to prepare a set of ensembles.<br>
-                      For this practice, a set of 10-member ensemble forecasts is provided under /wrfhelp/DATA/WRFDA/Hybrid/fc directory.</p>
+                      For this practice, a set of 10-member ensemble forecasts is provided under /kumquat/wrfhelp/DATA/WRFDA/Hybrid/fc directory.</p>
                     <p>Hybrid/fc/2006102712/<br>
                       -rw-r--r-- 1 wrfhelp cbet 30091104 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e001<br>
                       -rw-r--r-- 1 wrfhelp cbet 36580804 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e002<br>
@@ -92,11 +91,11 @@ a:active {
                     <li> Copy  ensemble forecasts and template files to your working directory.</li>
                   </ul>
                   <blockquote>
-                    <p> <span class="stylecode">cp -r /wrfhelp/DATA/WRFDA/Hybrid/fc/2006102712 . </span># copy a directory</p>
+                    <p> <span class="stylecode">cp -r /kumquat/wrfhelp/DATA/WRFDA/Hybrid/fc/2006102712 . </span># copy a directory</p>
                   </blockquote>
                   
                   <ul>
-                    <li>Edit gen_be_ensmean_nl.nl (or copy it from /wrfhelp/DATA/WRFDA/Hybrid/gen_be_ensmean_nl.nl)</li>
+                    <li>Edit gen_be_ensmean_nl.nl (or copy it from /kumquat/wrfhelp/DATA/WRFDA/Hybrid/gen_be_ensmean_nl.nl)</li>
                   </ul>
                   <blockquote>
                     <p class="stylecode">vi gen_be_ensmean_nl.nl</p>
@@ -112,7 +111,7 @@ a:active {
                     <li>Run gen_be_ensmean.exe</li>
                   </ul>
                   <blockquote>
-                    <p class="stylecode">/data1/${USER}/DA/WRFDA/var/build/gen_be_ensmean.exe</p>
+                    <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/gen_be_ensmean.exe</p>
                   </blockquote>
                   <ul>
                     <li>Check output</li>
@@ -125,14 +124,14 @@ a:active {
               <blockquote>
                 <blockquote>
                   <p><em>2006102712/wrfout_d01_2006-10-28_00:00:00.vari</em> is the ensemble variance</p>
-                  <p>You may use the NCL script <em>/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_mean_std_dev.ncl</em> to make some plots.</p>
+                  <p>You may use the NCL script <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_mean_std_dev.ncl</em> to make some plots.</p>
                   <blockquote>
-                    <p><span class="stylecode">cp <em>/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_mean_std_dev.ncl</em> .<br>
+                    <p><span class="stylecode">cp <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_mean_std_dev.ncl</em> .<br>
                       cp 
-                      <em>/wrfhelp/DATA/WRFDA/Hybrid/ncl/</em>WRF_contributed.ncl.test .<br>
+                      <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/</em>WRF_contributed.ncl.test .<br>
                       </span>Edit <em>ens_mean_std_dev.ncl</em> to set the proper date and path path<span class="stylecode"><br>
                       </span>...<span>...<br>
-                      </span>dir = &quot;/data1/classxx/DA/hybrid/&quot; + date + &quot;/&quot;<br>
+                      </span>dir = &quot;/kumquat/users/classxx/DA/hybrid/&quot; + date + &quot;/&quot;<br>
                     ......
                     <br>
                     <span class="stylecode">ncl ens_mean_std_dev.ncl</span><br>
@@ -148,7 +147,7 @@ a:active {
                   <li>Create another sub-directory where you will be working for ensemble perturbations.</li>
                 </ul>
                 <blockquote>
-                  <p class="stylecode">cd /data1/${USER}/DA/hybrid</p>
+                  <p class="stylecode">cd /kumquat/users/${USER}/DA/hybrid</p>
                   <p class="stylecode">mkdir -p 2006102800/ep</p>
                   <p class="stylecode">cd 2006102800/ep                </p>
                 </blockquote>
@@ -160,21 +159,21 @@ a:active {
                 </ul>
                 <blockquote>
                   <p>gen_be_ep2.exe requires 4 command arguments (DATE, NUM_MEMBER, DIRECTORY, FILENAME) as defined below:</p>
-                  <p class="stylecodesmall">/data1/${USER}/DA/WRFDA/var/build/gen_be_ep2.exe 2006102800 10 ../../2006102712 wrfout_d01_2006-10-28_00:00:00</p>
+                  <p class="stylecodesmall">/kumquat/users/${USER}/DA/WRFDA/var/build/gen_be_ep2.exe 2006102800 10 ../../2006102712 wrfout_d01_2006-10-28_00:00:00</p>
                 </blockquote>
                 <ul>
                   <li>Check the output files generated by gen_be_ep2.exe</li>
                 </ul>
                 <blockquote>
                   <p>A list of binary files will be created under 2006102800/ep directory. Among them, tmp.e* are temporary scratch files that can be removed.</p>
-                  <p>You may use the NCL script <em>/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_perturbations.ncl</em> to make some plots.</p>
+                  <p>You may use the NCL script <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_perturbations.ncl</em> to make some plots.</p>
                   <blockquote>
-                    <p><span class="stylecode">cp /wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_perturbations.ncl .</span><br>
-                      <span class="stylecode">cp <em>/wrfhelp/DATA/WRFDA/Hybrid/ncl/</em>WRF_contributed.ncl.test .</span>                      <br>
+                    <p><span class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_perturbations.ncl .</span><br>
+                      <span class="stylecode">cp <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/</em>WRF_contributed.ncl.test .</span>                      <br>
                       Edit 
                         <em>ens_perturbations.ncl</em> to set the proper date and path.<br>
                     ......<br>
-                    directory = &quot;/data1/classxx/DA/hybrid/&quot; + date<br>
+                    directory = &quot;/kumquat/users/classxx/DA/hybrid/&quot; + date<br>
                     ......<br>
                     <span class="stylecode">ncl 
                     ens_perturbations.ncl</span><br>
@@ -185,14 +184,14 @@ a:active {
               </blockquote>
               <span class="bodyh1">Run WRFDA in hybrid mode</span>
               <blockquote>
-                <p class="stylecode">cd /data1/${USER}/DA/hybrid</p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/hybrid</p>
                 <p> <span class="stylecode">ln -fs 2006102800/ep ./ep </span> <span style="color:red"># ensemble perturbation files should be under the ep subdirectory</span></p>
                 <p> <span class="stylecode">ln -fs 2006102712/wrfout_d01_2006-10-28_00:00:00.mean ./fg </span> <span style="color:red"># first guess is an ensemble forecast mean</span></p>
-                <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/run/LANDUSE.TBL .<br>
-                  ln -fs /wrfhelp/DATA/WRFDA/Hybrid/ob/2006102800/ob.ascii ./ob.ascii<br>
-                  ln -fs /wrfhelp/DATA/WRFDA/Hybrid/be/be.dat ./be.dat
+                <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL .<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Hybrid/ob/2006102800/ob.ascii ./ob.ascii<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Hybrid/be/be.dat ./be.dat
                 </p>
-                <p>Edit namelist.input (a sample file is provided as /wrfhelp/DATA/WRFDA/Hybrid/namelist.input)</p>
+                <p>Edit namelist.input (a sample file is provided as /kumquat/wrfhelp/DATA/WRFDA/Hybrid/namelist.input)</p>
                 <p>Pay special attention to the following hybrid-related settings:</p>
                 <p> <span class="stylecode">&amp;wrfvar7<br>
                   je_factor = 2.0<br>
@@ -203,7 +202,7 @@ a:active {
                   alpha_corr_scale = 1500.0<br>
                   /</span>
                 </p>
-                <p class="stylecode">mpirun -np 4 /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
+                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
               </blockquote>
               <span class="bodyh1">Other practice</span>
               <blockquote>

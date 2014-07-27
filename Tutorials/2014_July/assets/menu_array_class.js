@@ -159,7 +159,7 @@ PlainStyle,
 ,"Helpful links","show-menu=helpful",,,0
 ,"Exercises","show-menu=Exercises",,,0
 ,"Data&Code","show-menu=Data&Code",,,0
-,"Feedback ","survey.html",,,0
+,"Feedback ","../survey.html",,,0
 ,"WRF Basic","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/index.html",,,0
 ])
 

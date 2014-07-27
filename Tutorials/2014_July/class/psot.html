@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -52,18 +51,18 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Choose your working directory</span> </p>
               <blockquote>
-                <p>For this exercise you should create<em> /data1/${USER}/DA/singleob</em> and use this as your working directory for this session.</p>
+                <p>For this exercise you should create<em> /kumquat/users/${USER}/DA/singleob</em> and use this as your working directory for this session.</p>
                 <blockquote>
-                <p class="stylecode">mkdir /data1/${USER}/DA/singleob<br>
-                                     cd /data1/${USER}/DA/singleob</p>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/singleob<br>
+                                     cd /kumquat/users/${USER}/DA/singleob</p>
               </blockquote></blockquote>
               <span class="bodyh1">Input files</span>
               <blockquote>
                 <p>The procedure is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
                 <blockquote>
-                  <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL <br>
-                  ln -fs /wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat <br>
-                  ln -fs /wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg <br>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg <br>
                 </blockquote>
               </blockquote>
               <span class="bodyh1">Edit namelist.input</span>
@@ -89,7 +88,7 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Run WRFDA (da_wrfvar.exe)</span> </p>
               <blockquote>
-                <p class="stylecode">mpirun -np 4 /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
+                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span>          </p>
               <blockquote>

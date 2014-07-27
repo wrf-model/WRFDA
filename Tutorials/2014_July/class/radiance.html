@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -53,21 +52,21 @@ a:active {
               <p><span class="bodyh1">Choice of your working directory </span> </p>
               <blockquote>
                 <p>You should run each lesson in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
-                <p>We recommend you create <em>/data1/${USER}/DA/radiance</em> to be your working directory for this session.</p>
+                <p>We recommend you create <em>/kumquat/users/${USER}/DA/radiance</em> to be your working directory for this session.</p>
                 <blockquote>
-                  <p class="stylecode">mkdir /data1/${USER}/DA/radiance<br>
-                                       cd /data1/${USER}/DA/radiance</p>
+                  <p class="stylecode">mkdir /kumquat/users/${USER}/DA/radiance<br>
+                                       cd /kumquat/users/${USER}/DA/radiance</p>
               </blockquote></blockquote>
               <p><span class="bodyh1">Input files</span> </p>
               <blockquote>
                 <p>The radiance case is the same CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. Keep in mind that when <a href="compile.html">compiling WRFDA yourself</a>, additional settings must be specified at compile time to utilize radiance data. This has been done for you in the pre-compiled code.</p>
                 <p>Radiance assimilation for 3DVAR is much the same procedure as <a href="3dvar.html">Running WRFDA-3DVAR with conventional observations</a>. To begin this exercise, link/copy the basic input files above that you should have been familiar with by now:</p>
                 <blockquote>
-                  <p class="stylecode">ln -sf /data1/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL<br>
-                                       ln -sf /data1/${USER}/DA/obsproc/obs_gts_2008-02-05_12:00:00.3DVAR ./ob.ascii<br>
-                                       ln -sf /data1/${USER}/DA/gen_be/be.dat ./be.dat<br>
-                                       <span style="color:red">(use /wrfhelp/DATA/WRFDA/CONUS60/be/be.dat if you have not done the GEN_BE exercise)</span><br>
-                                       cp -p /wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg</p>
+                  <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL<br>
+                                       ln -sf /kumquat/users/${USER}/DA/obsproc/obs_gts_2008-02-05_12:00:00.3DVAR ./ob.ascii<br>
+                                       ln -sf /kumquat/users/${USER}/DA/gen_be/be.dat ./be.dat<br>
+                                       <span style="color:red">(use /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat if you have not done the GEN_BE exercise)</span><br>
+                                       cp -p /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg</p>
                 </blockquote>
                 <p>In addition, the following extra files are required for radiance assimilation:</p>
               </blockquote>
@@ -76,8 +75,8 @@ a:active {
               </ul>
               <blockquote>
                 <blockquote>
-                  <p class="stylecodesmall">ln -fs /wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.1bamua.tm00.bufr_d.linux ./amsua.bufr<br>
-                    ln -fs /wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.1bamub.tm00.bufr_d.linux ./amsub.bufr</p>
+                  <p class="stylecodesmall">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.1bamua.tm00.bufr_d.linux ./amsua.bufr<br>
+                    ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.1bamub.tm00.bufr_d.linux ./amsub.bufr</p>
                 </blockquote>
               </blockquote>
               <ul>
@@ -85,7 +84,7 @@ a:active {
               </ul>
               <blockquote>
                 <blockquote> 
-                  <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/var/run/radiance_info ./radiance_info</p>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/radiance_info ./radiance_info</p>
                 </blockquote>
               </blockquote>
               <ul>
@@ -93,7 +92,7 @@ a:active {
               </ul>
               <blockquote>
                 <blockquote>
-                  <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/var/run/VARBC.in ./VARBC.in</p>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/VARBC.in ./VARBC.in</p>
                 </blockquote>
               </blockquote>
               <ul>
@@ -101,14 +100,14 @@ a:active {
               </ul>
               <blockquote>
                 <blockquote>
-                  <p>(CRTM only)<span class="stylecode"> ln -fs /data1/${USER}/DA/WRFDA/var/run/crtm_coeffs ./crtm_coeffs</span></p>
-                  <p>(RTTOV only) <span class="stylecode">ln -fs /wrfhelp/WRFDA/external/rttov10/rtcoef_rttov10/rttov7pred51L ./rttov_coeffs </span></p>
+                  <p>(CRTM only)<span class="stylecode"> ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/crtm_coeffs ./crtm_coeffs</span></p>
+                  <p>(RTTOV only) <span class="stylecode">ln -fs /kumquat/wrfhelp/WRFDA/external/rttov10/rtcoef_rttov10/rttov7pred51L ./rttov_coeffs </span></p>
                 </blockquote>
               </blockquote>
               <p><span class="bodyh1">Edit namelist.input</span> </p>
               <blockquote>
                 <p>A sample namelist.input is provided in the WRFDA package as WRFDA/var/test/radiance/namelist.input</p>
-                <p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/test/radiance/namelist.input ./namelist.input</p>
+                <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/radiance/namelist.input ./namelist.input</p>
                 <p><span class="stylecode">vi namelist.input </span>(pay special attention to the following radiance-related settings)</p>
                 <p class="stylecode">&amp;wrfvar4<br>
                   use_amsuaobs = .true.<br>
@@ -141,7 +140,7 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Run WRFDA</span> </p>
               <blockquote>
-                <p class="stylecode">mpirun -np 4 /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
+                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span> </p>
               <blockquote>
@@ -154,13 +153,13 @@ a:active {
               </blockquote>
               <span class="bodyh1">Graphics</span>
               <blockquote>
-                <p><strong><em>/wrfhelp/SOURCE_CODE/WRFDA_SOURCE/TOOLS/scripts/da_rad_diags.ksh</em></strong><br>
+                <p><strong><em>/kumquat/wrfhelp/SOURCE_CODE/WRFDA_SOURCE/TOOLS/scripts/da_rad_diags.ksh</em></strong><br>
                   Note: This version of <em><strong>da_rad_diag.ksh </strong></em> is customized to work for the directory structures for this tutorial. For your own applications, you should read through the default <em><strong>da_rad_diags.ksh</strong></em> and make proper changes.</p>
-                <p>The diagnostics netCDF files will be created in the /data1/$USER/DA/radiance/diags directory.</p>
+                <p>The diagnostics netCDF files will be created in the /kumquat/users/$USER/DA/radiance/diags directory.</p>
               </blockquote>
 <p><span class="bodyh1">Other practice</span> </p>
               <ul>
-                <li>Try linking<em> /wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.1bamua.tm00.bufr_d</em> as <em>amsua.bufr</em> in your working directory and run WRFDA to see what log messages you will get.                </li>
+                <li>Try linking<em> /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.1bamua.tm00.bufr_d</em> as <em>amsua.bufr</em> in your working directory and run WRFDA to see what log messages you will get.                </li>
               </ul>
               <p class="bodyh2"><a name="advance">Advanced </a></p>
               <ul>

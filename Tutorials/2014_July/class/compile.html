@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -47,10 +46,10 @@ a:active {
             </blockquote>-->
 <p class="pagetitle"><a name="compile_3dvar"></a>Compiling WRFDA for 3DVAR</p>
             <blockquote>
-              <p>Get the WRFDA zipped tar file from /wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
-                <p class="stylecode">cd /data1/${USER}/DA</p>
-                <p class="stylecode">cp /wrfhelp/SOURCE_CODE/WRFDA_V3.5.tar.gz .</p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.5.tar.gz .</p>
               </blockquote>
               <p>Unzip and untar the file:</p>
               <blockquote>
@@ -62,12 +61,12 @@ a:active {
               </blockquote>
               <p>Configure and compile</p>
               <blockquote>
-                <p><span class="stylecode">cd /data1/${USER}/DA/WRFDA</span></p>
+                <p><span class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</span></p>
                 <p class="stylecode">./clean -a</p>
                 <p class="stylecode">setenv BUFR 1</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
                 <p class="stylecode">setenv CRTM 1<br>
-                  setenv RTTOV /wrfhelp/WRFDA/external/rttov10/pgi</p>
+                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov10/pgi</p>
                 <p class="stylecode">./configure wrfda</p>
                 <p><i>Choose<span class="stylecode"><strong> 17 </strong></span>for pgf90/pgcc, dmpar</i></p>
                 <p class="stylecode">./compile all_wrfvar &gt;&amp;! compile_3dvar.log &amp;</p>
@@ -76,10 +75,10 @@ a:active {
             <p class="pagetitle"><a name="compile_wrfplus"></a>Compiling WRFPLUS</p>
             <blockquote>
               <p>WRFPLUS contains both the non-linear and the tangent-linear/adjoint WRF code. It is needed for 4DVAR and Forecast Sensitivity to Observations (FSO).</p>
-              <p>Get the WRFPLUS zipped tar file from /wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFPLUS zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
-                <p class="stylecode">cd /data1/$USER/DA</p>
-                <p class="stylecode">cp /wrfhelp/SOURCE_CODE/WRFPLUS_V3.5.tar.gz .</p>
+                <p class="stylecode">cd /kumquat/users/$USER/DA</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFPLUS_V3.5.tar.gz .</p>
               </blockquote>
               <p>Set "J" to compile in parallel</p>
               <blockquote>
@@ -91,7 +90,7 @@ a:active {
               </blockquote>
               <p>Configure</p>
               <blockquote>
-                <p class="stylecode">cd  /data1/$USER/DA/WRFPLUS </p>
+                <p class="stylecode">cd  /kumquat/users/$USER/DA/WRFPLUS </p>
                 <p class="stylecode"> ./configure wrfplus</p>
                 <p><i>Choose<strong class="stylecode"> 10 </strong>for pgf90/pgcc, dmpar</i></p>
               </blockquote>
@@ -114,10 +113,10 @@ a:active {
             <p class="pagetitle"><a name="compile_4dvar"></a>Compiling WRFDA for 4DVAR</p>
             <blockquote>
               <p>To compile WRFDA for 4DVAR, you should have already compiled WRFPLUS (see <a href=#compile_wrfplus>above</a>).</p>
-              <p>Get the WRFDA zipped tar file from /wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
-                <p class="stylecode">cd /data1/$USER/DA</p>
-                <p class="stylecode">cp /wrfhelp/SOURCE_CODE/WRFDA_V3.5.tar.gz .</p>
+                <p class="stylecode">cd /kumquat/users/$USER/DA</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.5.tar.gz .</p>
               </blockquote>
               <p>Unzip and untar the file</p>
               <blockquote>
@@ -125,14 +124,14 @@ a:active {
               </blockquote>
               <p>Configure and Compile</p>
               <blockquote>
-                <p><span class="stylecode">cd /data1/${USER}/DA/WRFDA</span></p>
+                <p><span class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</span></p>
                 <p class="stylecode">./clean -a</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
                 <p class="stylecode">setenv BUFR 1<br>
                   setenv CRTM 1<br>
-                  setenv RTTOV /wrfhelp/WRFDA/external/rttov10/pgi</span></p>
+                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov10/pgi</span></p>
                 <p><i>Set the environment variable WRFPLUS_DIR to point to the WRFPLUS build you just installed</i></p>
-                <p class="stylecode">setenv WRFPLUS_DIR /data1/$USER/DA/WRFPLUS</p>
+                <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/WRFPLUS</p>
                 <p class="stylecode">./configure 4dvar</p>
                 <p>Choose <span class="stylecode"><strong>8</strong></span> for PGI/gcc, dmpar</p>
                 <p class="stylecode">./compile all_wrfvar &gt;&amp;! make.log &amp;</p>

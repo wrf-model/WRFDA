@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -70,27 +69,27 @@ a:active {
               </blockquote></blockquote>
               <p><span class="bodyh1">Choice of your working directory </span> </p>
               <blockquote>
-                <p>For this exercise you should create<em> /data1/${USER}/DA/gen_be</em> and use this as your working directory for this session.<br>
+                <p>For this exercise you should create<em> /kumquat/users/${USER}/DA/gen_be</em> and use this as your working directory for this session.<br>
                 <blockquote>
-                  <p class="stylecode">mkdir /data1/${USER}/DA/gen_be<br>
-                                       cd /data1/${USER}/DA/gen_be</p>
+                  <p class="stylecode">mkdir /kumquat/users/${USER}/DA/gen_be<br>
+                                       cd /kumquat/users/${USER}/DA/gen_be</p>
               </blockquote></blockquote>
               <p><span class="bodyh1">Edit gen_be_wrapper.ksh</span>
               </p>
               <blockquote>
                 <p>Copy gen_be_wrapper.ksh to your working directory</p>
-                <blockquote><p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh .</p></blockquote>
+                <blockquote><p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh .</p></blockquote>
                 <p>Pay special attention to the following settings and make necessary modifications for your case and directories:</p>
                 <blockquote>
                   <p class="stylecode">......<br>
-                    export WRFVAR_DIR=/data1/${USER}/DA/WRFDA<br>
+                    export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
                     ......<br>
                     export START_DATE = 2008020612 &nbsp; # the first perturbation valid date<br>
                     export END_DATE = 2008020700 # the last perturbation valid date<br>
                     export NUM_LEVELS = 40 # e_vert -1<br>
                     export BIN_TYPE = 5<br>
-                    export FC_DIR = /wrfhelp/DATA/WRFDA/CONUS60/fc<br>
-                    export RUN_DIR =/data1/${USER}/DA/gen_be<br>
+                    export FC_DIR = /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc<br>
+                    export RUN_DIR =/kumquat/users/${USER}/DA/gen_be<br>
                     export DOMAIN = 01<br>
                     export FCST_RANGE = 24<br>
                     export FCST_RANGE = 12<br>
@@ -110,15 +109,15 @@ a:active {
                 <table width="85%" border="1" cellpadding="10">
                   <tr>
                     <td><p class="stylecode">Thu Jul 22 15:18:13 MDT 2010 Start<br>
-                      WRFVAR_DIR is /wrfhelp/SOURCE_CODE/WRFDA exported<br>
+                      WRFVAR_DIR is /kumquat/wrfhelp/SOURCE_CODE/WRFDA exported<br>
                       ---------------------------------------------------------------<br>
                       Run Stage 0: Calculate ensemble perturbations from model forecasts.<br>
                       ---------------------------------------------------------------<br>
                       Beginning CPU time: Thu Jul 22 15:18:13 MDT 2010<br>
                       gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020612<br>
-                      2008020512 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_12:00:00 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-06_12:00:00<br>
+                      2008020512 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-06_12:00:00<br>
                       gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020700<br>
-                      2008020600 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-07_00:00:00 /wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_00:00:00<br>
+                      2008020600 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-07_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_00:00:00<br>
                       Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
                       ---------------------------------------------------------------<br>
                       Run Stage 1: Read standard fields, and remove time/ensemble/area mean.<br>
@@ -162,14 +161,14 @@ a:active {
               <blockquote>
                 <p><em>WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh</em> is the main plotting script which calls other NCL scripts located in WRFDA/var/graphics/ncl/gen_be.</p>
                 <blockquote>
-                  <p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh .</p>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh .</p>
                 </blockquote>
                 <p>Edit gen_be_plot_wrapper.ksh to provide proper settings.</p>
                 <blockquote>
                   <p class="stylecode">......<br>
                 export NCARG_ROOT=/usr/local/ncl<br>
                 ......<br>
-                export WRFVAR_DIR=/wrfhelp/SOURCE_CODE/WRFDA<br>
+                export WRFVAR_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA<br>
                 export GEN_BE_PLOT=${WRFVAR_DIR}/var/graphics/ncl/gen_be<br>
                 export GRAPHIC_WORKS=pdf</p>
                 <p>export NUM_WE=89 # 1 point less than stagger points  90<br>
@@ -177,7 +176,7 @@ a:active {
                   export NUM_LEVELS=40 # 1 point less than stagger points 41<br>
                   export RESOLUTION=60.0  # km<br>
                   export REGION=tutorial     # only for naming output purpose<br>
-                  export BE_DIR=/data1/${USER}/DA/gen_be/working<br>
+                  export BE_DIR=/kumquat/users/${USER}/DA/gen_be/working<br>
                   export BE_NROW=$NUM_LEVELS</p>
                 <p class="stylecode">./gen_be_plot_wrapper.ksh </p>
                 <p>Look for gen_be_*.pdf and display each of them.</p>

@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -53,30 +52,30 @@ a:active {
             <p><span class="bodyh1">Working directory</span></p>
               <blockquote>
                 <p>We recommend you create a new working directory for this exercise:</p>
-                <p class="stylecode">mkdir /data1/$USER/DA/rainfall<br>
-                cd /data1/$USER/DA/rainfall</p>
+                <p class="stylecode">mkdir /kumquat/users/$USER/DA/rainfall<br>
+                cd /kumquat/users/$USER/DA/rainfall</p>
               </blockquote>
             <p><span class="bodyh1">Input data</span></p>
               <blockquote>
-                <p>The test data for this rainfall tutorial case can be found in <em>/wrfhelp/DATA/WRFDA/Rainfall</em></p>
+                <p>The test data for this rainfall tutorial case can be found in <em>/kumquat/wrfhelp/DATA/WRFDA/Rainfall</em></p>
                 <blockquote>
-                  <p class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/Rainfall/ob/ob.rain.2008020518.06h ob07.rain <br>
-                  ln -fs /wrfhelp/DATA/WRFDA/Rainfall/rc/wrfinput_d01 ./fg <br>
-                  ln -fs /wrfhelp/DATA/WRFDA/Rainfall/rc/wrfinput_d01 . <br>
-                  ln -fs /wrfhelp/DATA/WRFDA/Rainfall/rc/wrfbdy_d01 . <br>
-                  ln -fs /wrfhelp/DATA/WRFDA/Rainfall/be/be.dat . </p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Rainfall/ob/ob.rain.2008020518.06h ob07.rain <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Rainfall/rc/wrfinput_d01 ./fg <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Rainfall/rc/wrfinput_d01 . <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Rainfall/rc/wrfbdy_d01 . <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Rainfall/be/be.dat . </p>
                 </blockquote>
                 <p>These are the observation, first guess, boundary, and background error files, respectively. It is necessary to link a few more files for a 4D-VAR precipitation run</p>
                 <blockquote>
-                  <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA<br>
-                  ln -fs /data1/${USER}/DA/WRFDA/run/*.TBL .</p>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA<br>
+                  ln -fs /kumquat/users/${USER}/DA/WRFDA/run/*.TBL .</p>
                 </blockquote>
               </blockquote>
               <p><span class="bodyh1">Edit namelists </span></p>
               <blockquote>
-                <p>A very basic namelist.input file for running this tutorial case is available at <em>/wrfhelp/DATA/WRFDA/Rainfall/namelist.input</em>.
+                <p>A very basic namelist.input file for running this tutorial case is available at <em>/kumquat/wrfhelp/DATA/WRFDA/Rainfall/namelist.input</em>.
                 <blockquote>
-                  <p class="stylecode">cp /wrfhelp/DATA/WRFDA/Rainfall/namelist.input . <br>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Rainfall/namelist.input . <br>
                   vi namelist.input</p>
                 </blockquote>
                 <p>Pay special attention to the following namelist variables, making sure they are set to these values:</p>
@@ -95,7 +94,7 @@ a:active {
                 </blockquote>
                 <p><span class="bodyh1">Run 4D-VAR with Accumulated Rainfall Observations</span></p> 
                 <blockquote>
-                  <p class="stylecode">mpirun -np 4 /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_4dvar >&! rainfall.log </p>
+                  <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_4dvar >&! rainfall.log </p>
                 </blockquote>
               </blockquote>
 <!-- InstanceEndEditable --><br>

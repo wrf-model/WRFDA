@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -54,7 +53,7 @@ a:active {
               </p>
               <blockquote>
                 <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run. </p>
-                <p>We recommend you create <em>/data1/${USER}/DA/radar</em> and cd there to be your working directory for this session. <br>
+                <p>We recommend you create <em>/kumquat/users/${USER}/DA/radar</em> and cd there to be your working directory for this session. <br>
                 </p>
               </blockquote>
               <p><span class="bodyh1">Input files</span>
@@ -63,18 +62,18 @@ a:active {
                 <p>The <a href="wrfda_testdata.html#testdata_radar">radar case</a> is different from the CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. It is a toy case and contains only 12 data points (<a href="../cases/radar_obsloc.png">view observation locations</a>).</p>
                 <p>The procedure is the same as <a href="3dvar.html">Running WRFDA-3DVAR</a> except for an extra radar input file and adding and changing some namelist.input settings.</p>
                 <p><strong><em>ob.radar</em></strong> is in plain text format. Edit it to see the content. Its format is simple, but the radar data preprocessing is not trivial and it is user's responsibility. </p>
-                <p class="stylecode">cd /data1/${USER}/DA/radar</p>
-                <p class="stylecode">cp /wrfhelp/DATA/WRFDA/Radar/ob.radar ./ob.radar</p>
-                <p class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/Radar/ob.ascii ./ob.ascii<br>
-                ln -fs /wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./fg<br>
-                ln -fs /wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat<br>
-                ln -fs /data1/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/radar</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.radar ./ob.radar</p>
+                <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.ascii ./ob.ascii<br>
+                ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./fg<br>
+                ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat<br>
+                ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
 </blockquote>
               <p><span class="bodyh1">Edit namelist.input</span>
               </p>
               <blockquote>
-                <p>A sample file for this test case is provided in <em>/wrfhelp/DATA/WRFDA/Radar/namelist.input</em></p>
-                <p class="stylecode">cp /wrfhelp/DATA/WRFDA/Radar/namelist.input ./namelist.input</p>
+                <p>A sample file for this test case is provided in <em>/kumquat/wrfhelp/DATA/WRFDA/Radar/namelist.input</em></p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/namelist.input ./namelist.input</p>
                 <p class="stylecode">vi namelist.input</p>
                 <p class="stylecode">&amp;wrfvar2<br>
                   calc_w_increment = .true.<br>
@@ -88,7 +87,7 @@ a:active {
               <p><span class="bodyh1">Run WRFDA</span>
               </p>Note that, as with other cases in this tutorial, the executable has been renamed (when building your own code it will be named <em>da_wrfvar.exe</em>
               <blockquote>
-                <p class="stylecode">mpirun -np 4 /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
+                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span>
               </p>

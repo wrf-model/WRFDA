@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -49,10 +48,10 @@ a:active {
             <blockquote>
                 <p>WRFDA and WRFPLUS are needed for this practice.</p>
                 <p>The pre-compiled WRFDA and WRFPLUS can be accessed from</p>
-                <p>/wrfhelp/SOURCE_CODE/WRFDA and</p>
-                <p>/wrfhelp/SOURCE_CODE/WRFPLUSV3</p>
+                <p>/kumquat/wrfhelp/SOURCE_CODE/WRFDA and</p>
+                <p>/kumquat/wrfhelp/SOURCE_CODE/WRFPLUSV3</p>
                 <p><strong><em>wrapper_run_fso_v3.4.ksh</em></strong> is the main script that will be used in this practice.</p>
-<p>The <strong><em>wrapper_run_fso_v3.4.ksh</em></strong> calls other several scripts that are in the /wrfhelp/SOURCE_CODE/WRFDA/var/scripts and /wrfhelp/SOURCE_CODE/WRFDA/var/graphics/ncl directories.</p>
+<p>The <strong><em>wrapper_run_fso_v3.4.ksh</em></strong> calls other several scripts that are in the /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/scripts and /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/graphics/ncl directories.</p>
 <p>For example,<br>
 &nbsp;&nbsp;var/scripts/da_run_sensitivity.ksh<br>
 &nbsp;&nbsp;var/scripts/da_run_wrf.ksh<br>
@@ -68,10 +67,10 @@ are some of the scripts involved in the FSO procedures.
                 <p>You will need to download and unpack the FSO tar package for this exercise</p>
                 <p class="stylecode">
                 <p>Create a working directory for this practice.</p>
-                <p class="stylecode">mkdir /data1/$USER/DA/FSO<br>
-                cd /data1/$USER/DA/FSO</p>
+                <p class="stylecode">mkdir /kumquat/users/$USER/DA/FSO<br>
+                cd /kumquat/users/$USER/DA/FSO</p>
                 <p>You will need to download and unpack the FSO tar package for this exercise</p>
-                <p class="stylecode">/wrfhelp/DATA/WRFDA/FSO/fso_tutorial_v3.4.tar . <br><br>
+                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/FSO/fso_tutorial_v3.4.tar . <br><br>
                 tar -xvf fso_tutorial_v3.4.tar</p>
                 <p>Edit wrapper_run_fso_v3.4.ksh to set up the options for a regular WRFDA run.                </p>
                 <p>......<br>
@@ -86,8 +85,8 @@ are some of the scripts involved in the FSO procedures.
                 <p>                ......<br>
                 export NUM_PROCS=4</p>
                 <p>                ......<br>
-                export REL_DIR=/wrfhelp/SOURCE_CODE/WRFDA_SOURCE<br>
-                export DAT_DIR=/data1/$USER/DA/FSO<br>
+                export REL_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA_SOURCE<br>
+                export DAT_DIR=/kumquat/users/$USER/DA/FSO<br>
                 export WRFPLUS_DIR=$REL_DIR/WRFPLUSV3<br>
                 export WRFVAR_DIR=$REL_DIR/WRFDA<br>
                 export WRFNL_DIR=$WRFPLUS_DIR<br>
@@ -99,7 +98,7 @@ are some of the scripts involved in the FSO procedures.
                 <p>export FC_DIR=${RUN_DIR}/fc</p>
                 <p>Execute the script </p>
                 <p class="stylecode">./wrapper_run_fso_v3.4.ksh</p>
-<p>After the script finishes, a file in your working directory (<em>/data1/$USER/DA/FSO/run</em>) will indicate whether the run was successful or not (a blank file will exist, either named "FAIL" or "SUCCESS"). If the run was successful, edit wrapper_run_fso_v3.4.ksh again, and change the following settings to do sensitivity and observation impact runs:</p>
+<p>After the script finishes, a file in your working directory (<em>/kumquat/users/$USER/DA/FSO/run</em>) will indicate whether the run was successful or not (a blank file will exist, either named "FAIL" or "SUCCESS"). If the run was successful, edit wrapper_run_fso_v3.4.ksh again, and change the following settings to do sensitivity and observation impact runs:</p>
 <p>......<br>
   export RUN_WRFVAR=<strong><span style="color:blue">false</span></strong><br>
 export RUN_UPDATE_BC=<strong><span style="color:blue">false</span></strong><br>
@@ -116,9 +115,9 @@ export RUN_OBS_IMPACT=<span style="color:red">true</span></p>
               <p>  <br>
                 <span class="bodyh1">Check Output </span></p>
               <blockquote>
-                <p>/data1/$USER/DA/FSO/run/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. var/graphics/ncl/plot_adj_sensitivity.ncl can be used to make some plots.</p>
-                <p>/data1/$USER/DA/FSO/run/2007010100/sensitivity/index.html contains the text output from running var/graphics/ncl/adj_diagnostics.ncl to get the <strong>diagnostics of error reduction in the forecasts from Xb (background) to Xa (analysis)</strong>.</p>
-                <p>/data1/$USER/DA/FSO/run/2007010100/obsimpact/rsl.out.0000 contains the <strong>cumulated impact of each observation type on the forecast errors</strong>.</p>
+                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. var/graphics/ncl/plot_adj_sensitivity.ncl can be used to make some plots.</p>
+                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/index.html contains the text output from running var/graphics/ncl/adj_diagnostics.ncl to get the <strong>diagnostics of error reduction in the forecasts from Xb (background) to Xa (analysis)</strong>.</p>
+                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/obsimpact/rsl.out.0000 contains the <strong>cumulated impact of each observation type on the forecast errors</strong>.</p>
               </blockquote>
 <!-- InstanceEndEditable --><br>
             

@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -47,18 +46,18 @@ a:active {
               <p><span class="bodyh1">Source code</span></p>
                 <p>Get the <a href="wrfda_code.html">WRFDA pre-compiled code</a> and <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/source_code.php">WRF pre-compiled code</a>, if you have not done so. <span class="stylecode">WRFDA/var/build/da_wrfvar.exe_3dvar</span>, <span class="stylecode">WRFDA/var/build/da_update_bc.exe</span>, and <span class="stylecode">WRFV3/main/wrf.exe</span> are the three executables that will be used in this session.</p>
                 <p>Three scripts for running the cycling system are also provided for this practical session:</p>
-                <p class="stylecode">/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrf_from_real_csh.html">run_wrf_from_real.csh</a></strong><br>
-                  /wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrfda_csh.html">run_wrfda.csh</a></strong><br>
-                  /wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrf_from_wrfda_csh.html">run_wrf_from_wrfda.csh</a></strong></p>
+                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrf_from_real_csh.html">run_wrf_from_real.csh</a></strong><br>
+                  /kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrfda_csh.html">run_wrfda.csh</a></strong><br>
+                  /kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrf_from_wrfda_csh.html">run_wrf_from_wrfda.csh</a></strong></p>
               <p><span class="bodyh1">Input data</span></p>
-                <p>wrfbdy, wrfinput and observations for 4 initial times are provided in <span class="stylecode">/wrfhelp/DATA/WRFDA/ASR180</span></p>
-                <p><span class="stylecode">/wrfhelp/DATA/WRFDA/ASR180/<strong>rc</strong></span> contains wrfbdy and wfrinput from WPS/real program.</p>
-                <p> <span class="stylecode">/wrfhelp/DATA/WRFDA/ASR180/<strong>ob</strong></span> contains observations (including radiance data, NCEP PREPBUFR file, ob.ascii processed by OBSPROC). You can set up your WRFDA runs with the observations you are interested in.</p>
-                <p><span class="stylecode">/wrfhelp/DATA/WRFDA/ASR180/<strong>be</strong></span> contains the background error statistics file for cv_options=5.</p>
+                <p>wrfbdy, wrfinput and observations for 4 initial times are provided in <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180</span></p>
+                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong>rc</strong></span> contains wrfbdy and wfrinput from WPS/real program.</p>
+                <p> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong>ob</strong></span> contains observations (including radiance data, NCEP PREPBUFR file, ob.ascii processed by OBSPROC). You can set up your WRFDA runs with the observations you are interested in.</p>
+                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong>be</strong></span> contains the background error statistics file for cv_options=5.</p>
               <span class="bodyh1">Procedures</span>
               <p>&nbsp;</p>
               <blockquote>
-                <p class="stylecode">cp /wrfhelp/DATA/WRFDA/ASR180/run_*.csh ${your_script_dir}</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/ASR180/run_*.csh ${your_script_dir}</p>
               </blockquote>
               <p>Edit the run*csh files to set the proper paths.</p>
               <p>It is recommended that you read through all the scripts to understand what files are created and used for cycling runs.</p>

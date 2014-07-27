@@ -30,7 +30,6 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="190" align="left" bgcolor="#FFFFFF"><a href="../index.html"><img src="../images/hands_on.jpg" width="190" height="125" border="0" align="right"></a></td>
     <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
@@ -53,10 +52,10 @@ a:active {
               </blockquote>
               <span class="bodyh1">Create your working directory</span>
               <blockquote>
-                <p>You should create <em>/data1/${USER}/DA/3dvar</em> and use this as your working directory for this lesson.</p>
+                <p>You should create <em>/kumquat/users/${USER}/DA/3dvar</em> and use this as your working directory for this lesson.</p>
                 <blockquote>
-                  <p class="stylecode">mkdir /data1/${USER}/DA/3dvar<br>
-                                       cd /data1/${USER}/DA/3dvar</p>
+                  <p class="stylecode">mkdir /kumquat/users/${USER}/DA/3dvar<br>
+                                       cd /kumquat/users/${USER}/DA/3dvar</p>
                 </blockquote>
               </blockquote>
               <p><span class="bodyh1">Input data</span>
@@ -64,28 +63,28 @@ a:active {
               <blockquote>
                 <p>A very basic namelist file for running the tutorial case is available at <em>WRFDA/var/test/tutorial/namelist.input</em></p>
                 <blockquote>
-                  <p><span class="stylecode">cp /data1/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</span></p>
+                  <p><span class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</span></p>
                 </blockquote>
                 <p>A land-use table is needed as well (provided in the WRFDA package)</p>
                 <blockquote>
-                  <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
                 </blockquote>
                  <p>Besides namelist.input and LANDUSE.TBL, the other three major input files to WRFDA-3DVAR are observations (ob.ascii), background error statistics (be.dat), and first guess (fg).</p>
               </blockquote>
               <ul>
                 <li><strong>ob.ascii</strong> is in plain-text format and is the output from OBSPROC that you created in the previous lesson.
                 <blockquote>
-                  <p class="stylecode">ln -fs /data1/${USER}/DA/obsproc/obs_gts_2008-02-05_12:00:00.3DVAR ./ob.ascii</p>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/obsproc/obs_gts_2008-02-05_12:00:00.3DVAR ./ob.ascii</p>
                 </blockquote>
                 </li>
                 <li><strong>be.dat</strong> is in binary format and is the output from gen_be utility. Generating your own be.dat will be discussed in the day-2 class; for today's lesson, just use the supplied pre-generated be.dat
                 <blockquote>
-                  <p class="stylecode">ln -fs /wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat</p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat</p>
                 </blockquote>
                 </li>
                 <li><strong>fg</strong> is the first guess (background) in netCDF format and can be either from WPS/real.exe or from a WRF forecast.
                 <blockquote>
-                  <p class="stylecode">cp -p /wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg</p>
+                  <p class="stylecode">cp -p /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg</p>
                 </blockquote>
                 </li>
               </ul>
@@ -123,7 +122,7 @@ a:active {
               <blockquote>
                 <p>For convenience, link the executable to your current working directory. Then run the executable</p>
                 <blockquote>
-                  <p class="stylecode">ln -sf /data1/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar ./da_wrfvar.exe</p>
+                  <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe_3dvar ./da_wrfvar.exe</p>
                   <p class="stylecode">mpirun -np 4 ./da_wrfvar.exe</p>
                 </blockquote>
               </blockquote>
@@ -147,8 +146,8 @@ a:active {
                 </blockquote>
                 <p>To create plots rather than a raw difference file, <em>WRFDA/var/graphics/ncl/WRF-Var_plot.ncl</em> and <em>WRFDA/var/graphics/ncl/WRF_contributed.ncl.test</em> can be used:<br>
                 <blockquote>
-                  <p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/graphics/ncl/WRF-Var_plot.ncl .<br>
-                  cp /data1/${USER}/DA/WRFDA/var/graphics/ncl/WRF_contributed.ncl.test .</p>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/graphics/ncl/WRF-Var_plot.ncl .<br>
+                  cp /kumquat/users/${USER}/DA/WRFDA/var/graphics/ncl/WRF_contributed.ncl.test .</p>
                 </blockquote>
                 <p>Edit <em>WRF-Var_plot.ncl </em>to provide the filenames, level index, field name, and what plot_data to plot for your case.</p>
                 <blockquote>
@@ -176,16 +175,16 @@ a:active {
               <blockquote>
                 <p>After creating an analysis, we have changed the initial conditions for the model. Therefore, the tendencies in the "wrfbdy" file should be adjusted based on these new initial conditions. This is done with da_update_bc.exe</p>
                 <p><strong>Important:</strong> Make a copy of wrfbdy_d01 from this folder, do not simply link it. The wrf_bdy_file will be overwritten by da_update_bc.exe.</p>
-                <p class="stylecode">cp /wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfbdy_d01 ./wrfbdy_d01</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfbdy_d01 ./wrfbdy_d01</p>
                 <p>Also, copy the sample da_update_bc namelist (parame.in) and make sure all the variables are set correctly for this experiment:</p>
                 <blockquote>
-                  <p class="stylecode">cp /data1/${USER}/DA/WRFDA/var/test/update_bc/parame.in .<br>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/update_bc/parame.in .<br>
                   vi parame.in <br><br>
                   &amp;control_param<br>
                   da_file            = './wrfvar_output'<br>
                   da_file_02         = './ana02' <br>
                   wrf_bdy_file       = './wrfbdy_d01' <br>
-                  wrf_input          = '/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01' <br>
+                  wrf_input          = '/kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01' <br>
                   domain_id          = 1 <br>
                   cycling            = .false. <br>
                   debug   = .true. <br>
@@ -196,7 +195,7 @@ a:active {
                 </blockquote>
                 <p>Run da_update_bc.exe</p>
                 <blockquote>
-                  <p class="stylecode">/data1/${USER}/DA/WRFDA/var/build/da_update_bc.exe</p>
+                  <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/da_update_bc.exe</p>
                 </blockquote>
                 <p>Finally, check the output. Use <em><strong><a href="http://www.mmm.ucar.edu/wrf/users/utilities/diffwrf.html">diffwrf</a></strong></em> (available in compiled WRFV3 code at WRFV3/external/io_netcdf/diffwrf), <strong><em>ncdiff</em></strong>, <em><strong>ncview</strong></em><strong></strong>, or other <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF NCL graphic tools</a> to check what fields have been updated.</p>
                 <p>The <em><strong>wrfvar_output</strong></em> and <em><strong>wrfbdy_d01</strong></em> are the data-assimilated initial condition and tendency-updated boundary condition for your subsequent WRF model run.</p>
@@ -217,9 +216,9 @@ a:active {
                   </p>
                 </li>
               
-                <li>                  Try running WRFDA using NCEP PREPBUFR data (<span class="stylecode">/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr.linux</span>) as the observation input.                
+                <li>                  Try running WRFDA using NCEP PREPBUFR data (<span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr.linux</span>) as the observation input.                
                   <blockquote>
-                    <p class="stylecode">ln -fs  /wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr.linux ob.bufr</p>
+                    <p class="stylecode">ln -fs  /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr.linux ob.bufr</p>
                     <p class="stylecode">vi namelist.input</p>
                     <blockquote>
                       <p class="stylecode">&amp;wrfvar3<br>
@@ -232,7 +231,7 @@ a:active {
                 
                 <li>Try running WRFDA with a different BE option (cv_options=3) using a pre-supplied be.dat available in the WRFDA package <em>WRFDA/var/run/be.dat.cv3</em>. Compare the results with previous cv_options=5 runs.
                   <blockquote>
-                    <p class="stylecode">ln -fs /data1/${USER}/DA/WRFDA/var/run/be.dat.cv3 ./be.dat</p>
+                    <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/be.dat.cv3 ./be.dat</p>
                     <p class="stylecode">vi namelist</p>
                     <blockquote>
                       <p class="stylecode">&amp;wrfvar7<br>
