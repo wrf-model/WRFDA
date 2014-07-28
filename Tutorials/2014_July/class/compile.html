@@ -41,58 +41,59 @@ a:active {
     <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
-<!--            <blockquote>
-              <p class="body">Practice compiling the code after you have done all other practice</p>
-            </blockquote>-->
+            <blockquote>
+              <p class="body">Compiling takes a long time on classroom computers; you should only compile the code yourself after you have finished the basic lessons.</p>
+              <p>&nbsp;</p>
+            </blockquote>
 <p class="pagetitle"><a name="compile_3dvar"></a>Compiling WRFDA for 3DVAR</p>
             <blockquote>
-              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
-                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.5.tar.gz .</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_V3.6.tar.gz .</p>
               </blockquote>
               <p>Unzip and untar the file:</p>
               <blockquote>
-                <p class="stylecode">tar -zxvf WRFDA_V3.5.tar.gz </p>
+                <p class="stylecode">tar -zxf WRFDA_V3.6.tar.gz </p>
               </blockquote>
+              <p>You should now see the directory <span class="stylecode">WRFDA</span>, which contains the WRFDA source code.</p>
               <p>To reduce compilation time you can compile in parallel (this is a separate process from deciding to <em>run</em> WRFDA in serial or parallel mode). You can do this by setting the environment variable J="-j #", where "#" is the number of processors.</p>
               <blockquote>
-                <p class="stylecode">setenv J "-j 6"</p>
+                <p class="stylecode">setenv J "-j 3"</p>
               </blockquote>
               <p>Configure and compile</p>
               <blockquote>
                 <p><span class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</span></p>
-                <p class="stylecode">./clean -a</p>
                 <p class="stylecode">setenv BUFR 1</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
                 <p class="stylecode">setenv CRTM 1<br>
-                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov10/pgi</p>
+                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov11</p>
                 <p class="stylecode">./configure wrfda</p>
-                <p><i>Choose<span class="stylecode"><strong> 17 </strong></span>for pgf90/pgcc, dmpar</i></p>
-                <p class="stylecode">./compile all_wrfvar &gt;&amp;! compile_3dvar.log &amp;</p>
+                <p><i>Choose<span class="stylecode"><strong> 50 </strong></span>for pgf90/pgcc, dmpar</i></p>
+                <p class="stylecode">./compile all_wrfvar &gt;&amp; compile_3dvar.log &amp;</p>
               </blockquote>
             </blockquote>
             <p class="pagetitle"><a name="compile_wrfplus"></a>Compiling WRFPLUS</p>
             <blockquote>
               <p>WRFPLUS contains both the non-linear and the tangent-linear/adjoint WRF code. It is needed for 4DVAR and Forecast Sensitivity to Observations (FSO).</p>
-              <p>Get the WRFPLUS zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFPLUS zipped tar file from /kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/$USER/DA</p>
-                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFPLUS_V3.5.tar.gz .</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFPLUS_V3.6_r7153.tar.gz .</p>
               </blockquote>
               <p>Set "J" to compile in parallel</p>
               <blockquote>
-                <p class="stylecode">setenv J "-j 6"</p>
+                <p class="stylecode">setenv J "-j 3"</p>
               </blockquote>
               <p>Unzip and untar the file</p>
               <blockquote>
-                <p class="stylecode">tar -zxvf WRFPLUS_V3.5.tar.gz</p>
+                <p class="stylecode">tar -zxf WRFPLUS_V3.6_r7153.tar.gz</p>
               </blockquote>
               <p>Configure</p>
               <blockquote>
-                <p class="stylecode">cd  /kumquat/users/$USER/DA/WRFPLUS </p>
+                <p class="stylecode">cd  /kumquat/users/$USER/DA/WRFPLUSV3 </p>
                 <p class="stylecode"> ./configure wrfplus</p>
-                <p><i>Choose<strong class="stylecode"> 10 </strong>for pgf90/pgcc, dmpar</i></p>
+                <p><i>Choose<strong class="stylecode"> 26 </strong>for pgf90/pgcc, dmpar</i></p>
               </blockquote>
               <p><b>IMPORTANT NOTE FOR TUTORIAL ATTENDEES:</b> On the classrooom computers, the PGI compiler has a bug which can cause problems with WRFPLUS compilation. The following steps will ensure successful compilation of WRFPLUS:</p>
               <blockquote>
@@ -107,34 +108,36 @@ a:active {
               </blockquote>
               <p>Compile WRFPLUS</p>
               <blockquote>
-                <p class="stylecode"> ./compile em_real &gt;&amp;! compile_wrfplus.log &amp;</p>
+                <p class="stylecode"> ./compile em_real &gt;&amp; compile_wrfplus.log &amp;</p>
               </blockquote>
             </blockquote>
             <p class="pagetitle"><a name="compile_4dvar"></a>Compiling WRFDA for 4DVAR</p>
             <blockquote>
               <p>To compile WRFDA for 4DVAR, you should have already compiled WRFPLUS (see <a href=#compile_wrfplus>above</a>).</p>
-              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/$USER/DA</p>
-                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.5.tar.gz .</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_V3.6.tar.gz .</p>
+                <p><i>If you have already built WRFDA in this directory for 3DVAR, be sure to rename that directory first.</i></p>
+                <p class="stylecode">mv /kumquat/users/$USER/DA/WRFDA /kumquat/users/$USER/DA/WRFDA_3DVAR</p>
               </blockquote>
               <p>Unzip and untar the file</p>
               <blockquote>
-                <p class="stylecode">tar -zxvf WRFDA_V3.5.tar.gz </p>
+                <p class="stylecode">tar -zxf WRFDA_V3.6.tar.gz </p>
               </blockquote>
               <p>Configure and Compile</p>
               <blockquote>
-                <p><span class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</span></p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</p>
                 <p class="stylecode">./clean -a</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
                 <p class="stylecode">setenv BUFR 1<br>
                   setenv CRTM 1<br>
-                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov10/pgi</span></p>
+                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov11</span></p>
                 <p><i>Set the environment variable WRFPLUS_DIR to point to the WRFPLUS build you just installed</i></p>
-                <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/WRFPLUS</p>
+                <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/WRFPLUSV3</p>
                 <p class="stylecode">./configure 4dvar</p>
-                <p>Choose <span class="stylecode"><strong>8</strong></span> for PGI/gcc, dmpar</p>
-                <p class="stylecode">./compile all_wrfvar &gt;&amp;! make.log &amp;</p>
+                <p>Choose <span class="stylecode"><strong>26</strong></span> for PGI/gcc, dmpar</p>
+                <p class="stylecode">./compile all_wrfvar &gt;&amp; compile_4dvar.log &amp;</p>
               </blockquote>
               <p class="stylecode">&nbsp;</p>
             </blockquote>

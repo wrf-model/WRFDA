@@ -43,12 +43,12 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <p><span class="pagetitle">Observation Preprocessing</span><br>
               <br>
-            The goal of this session is to generate the observation input (i.e. the <em>y</em><sup>0</sup> and R shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.<p class="body">Reference: <a href="../docs/WRFDA_observations.pptx">Download the tutorial presentation</a><p><br>
+            The goal of this session is to generate the observation input (i.e. the <em>y</em><sup>0</sup> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.<p class="body">Reference: <a href="../docs/WRFDA_obsproc.pdf">Download the tutorial presentation</a><p><br>
               <span class="bodyh1">Source code</span>
             <blockquote>
               <p>
                 Copy the <a href="wrfda_code.html">pre-compiled code</a> to your main working directory (<em>/kumquat/users/${USER}/DA</em>), if you have not done so. </p>
-              <p><em>WRFDA/var/obsproc/obsproc.exe</em> is the executable that will be used in this session.</p>
+              <p><span class="stylecode">WRFDA/var/obsproc/obsproc.exe</span> is the executable that will be used in this session.</p>
             </blockquote>
             <span class="bodyh1">Create your working directory </span>
             <blockquote>
@@ -67,13 +67,12 @@ a:active {
               <li>observations in little_r format
                 <blockquote>
                   <p>The first step of observation preprocessing is to prepare observations in little_r format.<br>
-                    For this tutorial, an observation file in little_r format is provided.<br>
-                    <strong>For your other applications, you will have to prepare your own observations.</strong></p>
-                  <p><em>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/obs.2008020512</em> is the observation file in little_r format.</p>
-                  <p>It is a text file; you can use <em>less</em> to see its contents.</p>
+                    For this tutorial, an observation file in little_r format is provided.</p>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/obs.2008020512 .</p>
+                  <p><span class="stylecode">obs.2008020512</span> is the observation file for this exercise in little_r format. It is a text file; you can use <em>less</em>, <em>vi</em>, or another text editor to see its contents. <strong>For your other applications, you will have to prepare your own observations.</strong></p>
                 </blockquote>
               </li>
-              <li>external observation error table
+              <li>observation error table
                 <blockquote>
                   <p>The observation error file (<em>obserr.txt</em>) is provided with the WRFDA package under the var/obsproc directory.<br>
                   Make sure it is present in your obsproc working directory.</p>
@@ -86,10 +85,11 @@ a:active {
                   <p>For your reference, an example namelist (namelist.obsproc.3dvar.wrfvar-tut) has been included in the WRFDA package under var/obsproc directory.<br>
                   Copy and rename the namelist to "namelist.obsproc" under your working directory.</p>
                   <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/obsproc/namelist.obsproc.3dvar.wrfvar-tut ./namelist.obsproc</p>
-                  <p><em>namelist.obsproc</em> contains options to configure the little_r observation file location, domain, time window, etc.<br>
-                  For this tutorial case, the only namelist variable you need to change is the full path and name of the little_r observation file.</p>
+                  <p><span class="stylecode">namelist.obsproc</span> contains options to configure the little_r observation file location, domain, time window, etc.<br>
+                  For this tutorial case, the only namelist variable you need to change is the name of the little_r observation file.</p>
                   <p class="stylecode">vi namelist.obsproc</p>
-                  <p class="stylecode">obs_gts_filename = '/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/obs.2008020512'</p>
+                  <p class="stylecode">&nbsp; obs_gts_filename = 'obs.2008020512'</p>
+                  <p>Alternatively, rather than copying the observation file to your working directory, you can set <span class="stylecode">obs_gts_filename</span> to the full path of the file's location.</p>
                 </blockquote>
               </li>
             </ul>
@@ -98,7 +98,7 @@ a:active {
               <p>It is convenient to link the executable to your current working directory.</p>
               <blockquote>
                 <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/var/obsproc/obsproc.exe .</p>
-                <p class="stylecode">./obsproc.exe &gt;&amp;! obsproc.log</p>
+                <p class="stylecode">./obsproc.exe &gt;&amp; obsproc.log</p>
             </blockquote></blockquote>
             <span class="bodyh1">Check output</span>
             <blockquote>
@@ -115,8 +115,8 @@ No SSMI observations available.</p>
                 </tr>
               </table>
               <p><br>If you see a line similar to "Warning: ieee_inexact is signaling", this is normal and can be safely ignored.</p>
-              <p>Look for<strong><em> obs_gts_2008-02-05_12:00:00.3DVAR</em></strong> in your working directory. That is the main output from obsproc. You can open it using the <em>less</em> to check its content.</p>
-              <p>*.diag are diagnostic files.</p>
+              <p>Look for<strong><em> obs_gts_2008-02-05_12:00:00.3DVAR</em></strong> in your working directory. That is the main output from obsproc. You can open it using a text editor to check its content.</p>
+              <p><span  class="stylecode">*.diag</span> are diagnostic files.</p>
               <p>HEIGHT.txt, PRES.txt, RH.txt, TEMP.txt, and WIND.txt are observation errors in plain-text format for easy reference.
               </p>
             </blockquote>

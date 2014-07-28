@@ -44,24 +44,20 @@ a:active {
             <p><span class="pagetitle">Get pre-compiled code</span><br>
               <br>
               Compilation of WRFDA can take up to 30 minutes, and compilation of WRFPLUS can take more than an hour. To save the limited time available for these practice sessions, <strong>we recommend running practice cases with pre-compiled code</strong>.<br>
-              If you are interested in compiling the code youreself, you can do that as a <a href="wrfda_sessions.html#session_compile">separate exercise</a>.
+              If you are interested in compiling the code youreself, you can do that as a <a href="compile.html">separate exercise</a>.
               <br>
             </p>
 <span class="bodyh1">Pre-compiled code for 3DVAR and 4DVAR</span>
             <blockquote>
-              <p>The pre-compiled WRFDA  can be accessed from<strong>/kumquat/wrfhelp/SOURCE_CODE/WRFDA</strong>.</p>
-              <p>If you would like to have a copy of the code in your local working directory, follow the steps below.</p>
+              <p>The pre-compiled WRFDA  can be accessed from <span class="stylecode">/kumquat/wrfhelp/SOURCE_CODE/WRFDA</span>.</p>
+              <p>You should copy the pre-compiled code into your local working directory. Follow the steps below:</p>
               <p><span class="stylecode">cd /kumquat/users/${USER}/DA</span>&nbsp;&nbsp;&nbsp; (your main working directory)<br>
-                <span class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_compiled.tar.gz . </span><br>
+                <span class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_compiled.tar.gz . </span><br>
                 <span class="stylecode">tar -xzf WRFDA_compiled.tar.gz</span></p>
-              <p>This will generate the directory</p>
-              <blockquote>
-                <p><strong>WRFDA</strong></p>
-              </blockquote>
-              <p><em>The WRFDA code is pre-compiled to run in parallel (dmpar) mode using the PGI compiler.</em></p>
+              <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA package. The WRFDA code is pre-compiled to run in parallel (dmpar) mode using the PGI compiler.</p>
               <p>The command for running a dmpar job on the classroom machine is<br>
               <span class="stylecode">mpirun -np 4 ${your_exe_file}</span></p>
-              <p>Note: In the pre-compiled tar file, the code was compiled for 3D-VAR and 4D-VAR separately, but the executables are placed under the same WRFDA/var/build directory with the 3DVAR and 4DVAR executables renamed as da_wrfvar.exe_3dvar and da_wrfvar.exe_4dvar respectively.
+              <p>Note: In the pre-compiled tar file, the code was compiled for 3D-VAR and 4D-VAR separately, but the executables are placed under the same WRFDA/var/build directory with the 3DVAR and 4DVAR executables renamed as da_wrfvar_3dvar.exe and da_wrfvar_4dvar.exe respectively.
               </p>
               <p>Note: In the pre-compiled tar file, the un-supported scripts (can be downloaded separately from <a href="http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html" target="_blank">http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html</a>) are already included.<br>
               </p>
