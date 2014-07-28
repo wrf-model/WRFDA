@@ -187,6 +187,7 @@ PlainStyle2,
 0,
 ,
 ,"Home","../index.html",,,0
+,"Lectures","../lectures.html",,,0
 ,"WRFDA Home Page","../../..",,,0
 ,"WRFDA User's Guide","../../../usersguide.html",,,0
 ,"Tutorial schedule","../Tutorial_Agenda.html",,,1
