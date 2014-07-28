@@ -43,22 +43,22 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <span class="pagetitle">Running WRFDA - pseudo single ob test</span>
             <blockquote>
-              <p>The pseudo single ob test is usually the first step to try out WRFDA after you have generated your own be.dat.</p>
+              <p>The pseudo single ob test is usually the first step to try out WRFDA after you have generated your own be.dat. It is a very useful tool, which can be used to investigate your choice of background error and its impact on your analysis. See <a href="../docs/WRFDA_BE.pdf#23">the Background Error presentation</a> for more information (starting on slide 23).</p>
               <span class="bodyh1">Source code</span>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
-                <p><em>WRFDA/var/build/da_wrfvar_3dvar.exe</em> is the executable that will be used in this session.</p>
+                <p><span class="stylecode">WRFDA/var/build/da_wrfvar_3dvar.exe</span> is the executable that will be used in this session.</p>
               </blockquote>
               <p><span class="bodyh1">Choose your working directory</span> </p>
               <blockquote>
-                <p>For this exercise you should create<em> /kumquat/users/${USER}/DA/singleob</em> and use this as your working directory for this session.</p>
+                <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/singleob</span> and use this as your working directory for this session.</p>
                 <blockquote>
                 <p class="stylecode">mkdir /kumquat/users/${USER}/DA/singleob<br>
                                      cd /kumquat/users/${USER}/DA/singleob</p>
               </blockquote></blockquote>
               <span class="bodyh1">Input files</span>
               <blockquote>
-                <p>The procedure is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
+                <p>The setup for a pseduo-observation test is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
                 <blockquote>
                   <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL <br>
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat <br>
@@ -67,7 +67,7 @@ a:active {
               </blockquote>
               <span class="bodyh1">Edit namelist.input</span>
               <blockquote>
-                <p>Change and add the following <em>namelist.input</em> settings to activate the pseudo single ob test. You can do so by modifying the namelist.input used in the previous WRFDA-3DVAR tutorial case:</p>
+                <p>Change and add the following <span class="stylecode">namelist.input</span> settings to activate the pseudo single ob test. You can do so by modifying the namelist.input used in the previous WRFDA-3DVAR tutorial case:</p>
                 <blockquote>
                   <p class="stylecode">cp ../3dvar/namelist.input namelist.input</p>
                   <p class="stylecode">vi namelist.input</p>
@@ -77,13 +77,13 @@ a:active {
                     pseudo_y = 23.0, <br>
                     pseudo_z = 14.0, <br>
                     pseudo_err = 1.0,<br>
-                    pseudo_val = 1.0<br>
+                    pseudo_val = 1.0,<br>
                     /<br>
                     &amp;wrfvar19<br>
                     pseudo_var = 'u'<br>
                     /</p>
                 </blockquote>
-                <p>Note: pseudo_var can be u, v, t, p, q. If pseudo_var is q, then the reasonable values of pseudo_err and pseudo_val are 0.001 in order to be able to view the analysis increments.</p>
+                <p>Note: pseudo_var can be u, v, t, p, q. If pseudo_var is q, then the reasonable values of pseudo_err and pseudo_val are 0.001 in order to have reasonable analysis increments.</p>
                 <p>By setting <span class="stylecode">num_pseudo = 1</span>, WRFDA will ignore real data and simply assimilate the pseudo-observation</p>
               </blockquote>
               <p><span class="bodyh1">Run WRFDA (da_wrfvar.exe)</span> </p>
@@ -92,15 +92,16 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Check output</span>          </p>
               <blockquote>
-                <p>Check the <em>statistics</em> file to view diagnostics related to your pseudo-obs run.</p>
-                <p>Use <em>ncdiff</em> and <em>ncview</em> to generate and view the analysis increment file.</p>
+                <p>As with every run of WRFDA, you should first make sure that the <span class="stylecode">rsl.out.0000</span> file ends with "<span class="stylecode">***&nbsp;WRF-Var&nbsp;completed&nbsp;successfully&nbsp;***</span>".</p>
+                <p>Check the <span class="stylecode">statistics</span> file to view diagnostics related to your pseudo-obs run.</p>
+                <p>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.</p>
                 <blockquote>
                   <p class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
                                        ncview increment.nc</p>
               </blockquote></blockquote>
               <span class="bodyh1">Graphics</span>
               <blockquote>
-                <p>Other useful NCL scripts for this exercise:<br>
+                <p>Some useful NCL scripts for this exercise are:<br>
                   <br>
                   WRFDA/var/graphics/ncl/WRF-Var_plot.ncl<br>
                   WRFDA/var/graphics/ncl/WRF_contributed.ncl.test<br>

@@ -44,12 +44,12 @@ a:active {
             <span class="pagetitle">Running gen_be utility</span>
             <blockquote>
               <p>The goal of this session is to generate the background error statistics file (i.e. the B<sub>0</sub> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.</p>
-              <p><span class="body">Reference: <a href="../docs/WRFDA_be.pdf">Download the tutorial presentation</a></span></p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_BE.pdf">Download the tutorial presentation</a></span></p>
               <span class="bodyh1">Source code</span>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
-                <p><strong><em>WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh</em></strong> is the main script that will be used in this practice.</p>
-                <p>GEN_BE consists of several stages. Quite a few executables and scripts are used for the process. They are listed below for reference. These executables and scripts will be called subsequently by <em>gen_be_wrapper.ksh</em>:</p>
+                <p><strong><span class="stylecode">WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh</span></strong> is the main script that will be used in this practice.</p>
+                <p>GEN_BE consists of several stages. Quite a few executables and scripts are used for the process. They are listed below for reference. These executables and scripts will be called subsequently by <span class="stylecode">gen_be_wrapper.ksh</span>:</p>
                 <blockquote>
                   <p class="stylecode">WRFDA/var/scripts/gen_be/gen_be.ksh<br>
                   WRFDA/var/scripts/gen_be/gen_be_stage0_wrf.ksh<br>
@@ -69,7 +69,7 @@ a:active {
               </blockquote></blockquote>
               <p><span class="bodyh1">Choice of your working directory </span> </p>
               <blockquote>
-                <p>For this exercise you should create<em> /kumquat/users/${USER}/DA/gen_be</em> and use this as your working directory for this session.<br>
+                <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/gen_be</span> and use this as your working directory for this session.<br>
                 <blockquote>
                   <p class="stylecode">mkdir /kumquat/users/${USER}/DA/gen_be<br>
                                        cd /kumquat/users/${USER}/DA/gen_be</p>
@@ -81,6 +81,7 @@ a:active {
                 <blockquote><p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh .</p></blockquote>
                 <p>Pay special attention to the following settings and make necessary modifications for your case and directories:</p>
                 <blockquote>
+                  <p class="stylecode">vi gen_be_wrapper.ksh</p>
                   <p class="stylecode">......<br>
                     export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
                     ......<br>
@@ -100,7 +101,7 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Run gen_be_wrapper.ksh</span></p>
               <blockquote>
-                <p class="stylecode">./gen_be_wrapper.ksh &gt;&amp;! gen_be.log</p>
+                <p class="stylecode">./gen_be_wrapper.ksh &gt;&amp; gen_be.log</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span>
               </p>
@@ -108,67 +109,68 @@ a:active {
                 <p>View the log file (gen_be.log) to ensure that all stages (stage0_wrf, stage1, stage2, stage2a, stage3, stage4, gen_be_cov2d) have been run successfully.</p>
                 <table width="85%" border="1" cellpadding="10">
                   <tr>
-                    <td><p class="stylecode">Thu Jul 22 15:18:13 MDT 2010 Start<br>
-                      WRFVAR_DIR is /kumquat/wrfhelp/SOURCE_CODE/WRFDA exported<br>
-                      ---------------------------------------------------------------<br>
-                      Run Stage 0: Calculate ensemble perturbations from model forecasts.<br>
-                      ---------------------------------------------------------------<br>
-                      Beginning CPU time: Thu Jul 22 15:18:13 MDT 2010<br>
-                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020612<br>
-                      2008020512 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-06_12:00:00<br>
-                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020700<br>
-                      2008020600 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-07_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_00:00:00<br>
-                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      ---------------------------------------------------------------<br>
-                      Run Stage 1: Read standard fields, and remove time/ensemble/area mean.<br>
-                      ---------------------------------------------------------------<br>
-                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      ---------------------------------------------------------------<br>
-                      Run Stage 2: Calculate regression coefficients.<br>
-                      ---------------------------------------------------------------<br>
-                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      ---------------------------------------------------------------<br>
-                      Run Stage 2a: Calculate control variable fields.<br>
-                      ---------------------------------------------------------------<br>
-                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      Ending CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      ---------------------------------------------------------------<br>
-                      Run Stage 3: Read 3D control variable fields, and calculate vertical covariances.<br>
-                      ---------------------------------------------------------------<br>
-                      Beginning CPU time: Thu Jul 22 15:18:17 MDT 2010<br>
-                      Ending CPU time: Thu Jul 22 15:18:18 MDT 2010<br>
-                      Beginning CPU time: Thu Jul 22 15:18:18 MDT 2010<br>
-                      ---------------------------------------------------------------<br>
-                      Run Stage 4: Calculate horizontal covariances (regional lengthscales).<br>
-                      ---------------------------------------------------------------<br>
-                      Ending CPU time: Thu Jul 22 15:18:32 MDT 2010<br>
-                      Ending CPU time: Thu Jul 22 15:18:32 MDT 2010<br>
-                      ---------------------------------------------------------------<br>
-                      Run gen_be_cov2d.<br>
-                      ---------------------------------------------------------------</p>
-                    <p class="stylecode">Thu Jul 22 15:18:32 MDT 2010 Finished</p></td>
+                    <td><p class="stylecode">Sun Jul 27 20:49:50 MDT 2014 Start<br>
+                    WRFVAR_DIR is /kumquat/users/class01/DA/WRFDA exported<br>
+                    RUN_DIR is /kumquat/users/class01/DA/gen_be<br>
+                    ---------------------------------------------------------------<br>
+                    Run Stage 0: Calculate ensemble perturbations from model forecasts.<br>
+                    ---------------------------------------------------------------<br>
+                    Beginning CPU time: Sun Jul 27 20:49:50 MDT 2014<br>
+                    gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020612<br>
+                    2008020512 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-06_12:00:00<br>
+                    gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020700<br>
+                    2008020600 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-07_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_00:00:00<br>
+                    Ending CPU time: Sun Jul 27 20:49:53 MDT 2014<br>
+                    ---------------------------------------------------------------<br>
+                    Run Stage 1: Read standard fields, and remove time/ensemble/area mean.<br>
+                    ---------------------------------------------------------------<br>
+                    Beginning CPU time: Sun Jul 27 20:49:53 MDT 2014<br>
+                    Ending CPU time: Sun Jul 27 20:49:54 MDT 2014<br>
+                    ---------------------------------------------------------------<br>
+                    Run Stage 2: Calculate regression coefficients.<br>
+                    ---------------------------------------------------------------<br>
+                    Beginning CPU time: Sun Jul 27 20:49:54 MDT 2014<br>
+                    Ending CPU time: Sun Jul 27 20:49:54 MDT 2014<br>
+                    ---------------------------------------------------------------<br>
+                    Run Stage 2a: Calculate control variable fields.<br>
+                    ---------------------------------------------------------------<br>
+                    Beginning CPU time: Sun Jul 27 20:49:54 MDT 2014<br>
+                    Ending CPU time: Sun Jul 27 20:49:54 MDT 2014<br>
+                    ---------------------------------------------------------------<br>
+                    Run Stage 3: Read 3D control variable fields, and calculate vertical covariances.<br>
+                    ---------------------------------------------------------------<br>
+                    Beginning CPU time: Sun Jul 27 20:49:54 MDT 2014<br>
+                    Ending CPU time: Sun Jul 27 20:49:57 MDT 2014<br>
+                    ---------------------------------------------------------------<br>
+                    Run Stage 4: Calculate horizontal covariances (regional lengthscales).<br>
+                    ---------------------------------------------------------------<br>
+                    Beginning CPU time: Sun Jul 27 20:49:57 MDT 2014<br>
+                    Ending CPU time: Sun Jul 27 20:50:11 MDT 2014<br>
+                    Ending CPU time: Sun Jul 27 20:50:11 MDT 2014<br>
+                    ---------------------------------------------------------------<br>
+                    Run gen_be_cov2d.<br>
+                    ---------------------------------------------------------------<br>
+                    <br>
+                    <p class="stylecode">Sun Jul 27 20:50:12 MDT 2014 Finished</p></td>
                   </tr>
                 </table>
                 <p>&nbsp;</p>
-                <p>Look for <strong><em>be.dat</em></strong> in the ${RUN_DIR} you specified in your gen_be_wrapper.ksh. <em><strong>be.dat</strong></em> is the background error file which can now be used to run WRFDA.</p>
-                <p>If <em>be.dat</em> has not been created, check the log files for each gen_be stage (found in ${RUN_DIR}) to find the error.</p>
-                <p>The <em>fort.*</em> files under the directory <em>$RUN_DIR/working</em> are the files to be read by the graphics tools mentioned below.</p>
+                <p>Look for <strong><span class="stylecode">be.dat</span></strong> in the ${RUN_DIR} you specified in your gen_be_wrapper.ksh. <span class="stylecode"><strong>be.dat</strong></span> is the background error file which can now be used to run WRFDA.</p>
+                <p>If <span class="stylecode">be.dat</span> has not been created, check the log files for each gen_be stage (found in ${RUN_DIR}) to find the error.</p>
+                <p>The <span class="stylecode">fort.*</span> files under the directory <span class="stylecode">$RUN_DIR/working</span> are the files to be read by the graphics tools mentioned below.</p>
               </blockquote>
               <p><span class="bodyh1">Graphics</span>
               </p>
               <blockquote>
-                <p><em>WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh</em> is the main plotting script which calls other NCL scripts located in WRFDA/var/graphics/ncl/gen_be.</p>
+                <p><span class="stylecode">WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh</span> is the main plotting script which calls other NCL scripts located in WRFDA/var/graphics/ncl/gen_be.</p>
                 <blockquote>
                   <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh .</p>
                 </blockquote>
                 <p>Edit gen_be_plot_wrapper.ksh to provide proper settings.</p>
                 <blockquote>
+                  <p class="stylecode">vi gen_be_plot_wrapper.ksh</p>
                   <p class="stylecode">......<br>
-                export NCARG_ROOT=/usr/local/ncl<br>
-                ......<br>
-                export WRFVAR_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA<br>
+                export WRFVAR_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA<br>
                 export GEN_BE_PLOT=${WRFVAR_DIR}/var/graphics/ncl/gen_be<br>
                 export GRAPHIC_WORKS=pdf</p>
                 <p>export NUM_WE=89 # 1 point less than stagger points  90<br>

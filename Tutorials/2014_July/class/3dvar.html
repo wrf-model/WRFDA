@@ -41,18 +41,18 @@ a:active {
     <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
-            <span class="pagetitle">Running WRFDA-3Dvar - real data case</span>
+            <span class="pagetitle">Running WRFDA-3DVAR - real data case</span>
             <blockquote>
-              <p>The goal of this session is to generate a data-assimilated updated WRF analysis and boundary conditions.</p>
-              <p><span class="body">Reference: <a href="../docs/WRFDA_setrundiag.pdf">Download the tutorial presentation</a></span></p>
+              <p>The goal of this session is to generate an updated WRF analysis and boundary conditions using WRFDA 3DVAR data assimilation.</p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_setuprundiag.pdf">Download the tutorial presentation</a></span></p>
               <p><span class="bodyh1">Source code</span> </p>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not yet done so. </p>
-                <p><em>WRFDA/var/build/da_wrfvar_3dvar.exe</em> and <em>WRFDA/var/build/da_update_bc.exe</em> are the executables that will be used in this session.</p>
+                <p><span class="stylecode">WRFDA/var/build/da_wrfvar_3dvar.exe</span> and <span class="stylecode">WRFDA/var/build/da_update_bc.exe</em> are the executables that will be used in this session.</p>
               </blockquote>
               <span class="bodyh1">Create your working directory</span>
               <blockquote>
-                <p>You should create <em>/kumquat/users/${USER}/DA/3dvar</em> and use this as your working directory for this lesson.</p>
+                <p>You should create <span class="stylecode">/kumquat/users/${USER}/DA/3dvar</span> and use this as your working directory for this lesson.</p>
                 <blockquote>
                   <p class="stylecode">mkdir /kumquat/users/${USER}/DA/3dvar<br>
                                        cd /kumquat/users/${USER}/DA/3dvar</p>
@@ -61,9 +61,9 @@ a:active {
               <p><span class="bodyh1">Input data</span>
               </p>
               <blockquote>
-                <p>A very basic namelist file for running the tutorial case is available at <em>WRFDA/var/test/tutorial/namelist.input</em></p>
+                <p>A very basic namelist file for running the tutorial case is available at <span class="stylecode">WRFDA/var/test/tutorial/namelist.input</span></p>
                 <blockquote>
-                  <p><span class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</span></p>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</p>
                 </blockquote>
                 <p>A land-use table is needed as well (provided in the WRFDA package)</p>
                 <blockquote>
@@ -77,12 +77,12 @@ a:active {
                   <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/obsproc/obs_gts_2008-02-05_12:00:00.3DVAR ./ob.ascii</p>
                 </blockquote>
                 </li>
-                <li><strong>be.dat</strong> is in binary format and is the output from gen_be utility. Generating your own be.dat will be discussed in the day-2 class; for today's lesson, just use the supplied pre-generated be.dat
+                <li><strong>be.dat</strong> is in binary format and is the output from gen_be utility. For this lesson, just use the supplied pre-generated be.dat
                 <blockquote>
                   <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat</p>
                 </blockquote>
                 </li>
-                <li><strong>fg</strong> is the first guess (background) in netCDF format and can be either from WPS/real.exe or from a WRF forecast.
+                <li><strong>fg</strong> is the first guess (background) in netCDF format and can be either a "wrfinput" file from WPS/real.exe or a "wrfout" file from a WRF forecast.
                 <blockquote>
                   <p class="stylecode">cp -p /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg</p>
                 </blockquote>
@@ -90,10 +90,10 @@ a:active {
               </ul>
               <p><span class="bodyh1">Edit namelist.input</span></p>
               <blockquote>
-                <p>You should edit <em>namelist.input</em> to ensure the following namelist variables are consistent with the time and domain of your analysis target.</p>
+                <p>You should edit <em>namelist.input</em> to ensure the following namelist variables are consistent with the time and domain of your analysis target. For the tutorial case, these values should be correct, but it is always good practice to make sure.</p>
                 <p><span class="stylecode">vi namelist.input<br><br>
                   &amp;wrfvar18<br>
-                  analysis_date='2008-02-05_12:00:00&quot;,<br>
+                  analysis_date=&quot;2008-02-05_12:00:00&quot;,<br>
                   /<br>
                   &amp;wrfvar21<br>
                   time_window_min=&quot;2008-02-05_11:00:00&quot;,<br>
@@ -108,14 +108,6 @@ a:active {
                 dx=60000,<br>
                 dy=60000,<br>
                 /<br>
-                &amp;physics </span>(make sure the physics options here are consistent with those in the first guess file, fg. Use <span class="stylecode">ncdump -h fg</span> to look for the options listed in the global attributes.)<span class="stylecode"><br>
-                ......<br>
-                mp_physics=3<br>
-                sf_surface_physics=1<br>
-                  num_soil_layers=5 <br>
-                  ......
-                  <br>
-                  /
                 </span> </p>
 </blockquote>
               <p class="bodyh1">Run WRFDA-3DVAR (da_wrfvar.exe)</p>
@@ -125,15 +117,16 @@ a:active {
                   <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_3dvar.exe ./da_wrfvar.exe</p>
                   <p class="stylecode">mpirun -np 4 ./da_wrfvar.exe</p>
                 </blockquote>
+                <p>Running this case should take less than a minute on the classroom computers.</p>
               </blockquote>
               <span class="bodyh1">Check output</span>
               <blockquote>
                 <p>Does your rsl.out.0000 (log file) end with *** WRF-Var completed successfully ***?</p>
-                <p>Look for <em><strong>wrfvar_output</strong></em> in your working directory. This is the analysis file generated by WRFDA. It is in WRF netCDF format.</p>
-                <p><em><strong>rsl.out.0000</strong></em> and <em><strong>statistics</strong></em> are the two most important diagnostic files that should be checked after each WRFDA run to make sure that the task was done correctly and successfully.</p>
-                <p><strong><em>gts_omb_oma_01</em></strong>, <strong><em>qcstat_conv_01</em></strong>, and <em><strong>rej_obs_conv_01</strong></em> are other useful diagnostic files.<br>
-                <em>WRFDA/var/graphics/ncl/plot_gts_omb_oma.ncl</em> can be used to plot the contents of gts_omb_oma_01. </p>
-                <p><em>WRFDA/var/graphics/ncl/plot_cost_grad_fn.ncl</em> can be used to plot cost function evolution.</p>
+                <p>Look for the file <span class="stylecode">wrfvar_output</span> in your working directory. This is the analysis file generated by WRFDA. It is in WRF netCDF format.</p>
+                <p><span class="stylecode">rsl.out.0000</span> and <span class="stylecode">statistics</span> are the two most important diagnostic files that should be checked after each WRFDA run to make sure that the task was done correctly and successfully.</p>
+                <p><span class="stylecode">gts_omb_oma_01</span> (contains information about observations and <em>innovation</em>), <span class="stylecode">qcstat_conv_01</span> (contains information about quality control), and <span class="stylecode">rej_obs_conv_01</span> (lists all conventional observations that were rejected) are other useful diagnostic files.<br>
+                <span class="stylecode">WRFDA/var/graphics/ncl/plot_gts_omb_oma.ncl</span> can be used to plot the contents of <span class="stylecode">gts_omb_oma_01.</span> </p>
+                <p><span class="stylecode">WRFDA/var/graphics/ncl/plot_cost_grad_fn.ncl</span> can be used to plot cost function evolution.</p>
                 <p>There are several tools available for viewing the analysis increments. A netCDF file containing the analysis increment fields can be created with either <strong>ncdiff</strong> or <strong>ncbo</strong>.</p>
                 <blockquote>
                   <p class="stylecode">ncdiff fg wrfvar_output increment.nc</p>
@@ -144,13 +137,14 @@ a:active {
                 <blockquote>
                   <p class="stylecode">ncview increment.nc</p>
                 </blockquote>
-                <p>To create plots rather than a raw difference file, <em>WRFDA/var/graphics/ncl/WRF-Var_plot.ncl</em> and <em>WRFDA/var/graphics/ncl/WRF_contributed.ncl.test</em> can be used:<br>
+                <p>To create plots rather than a raw difference file, <span class="stylecode">WRFDA/var/graphics/ncl/WRF-Var_plot.ncl</span> and <span class="stylecode">WRFDA/var/graphics/ncl/WRF_contributed.ncl.test</span> can be used:<br>
                 <blockquote>
                   <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/graphics/ncl/WRF-Var_plot.ncl .<br>
                   cp /kumquat/users/${USER}/DA/WRFDA/var/graphics/ncl/WRF_contributed.ncl.test .</p>
                 </blockquote>
-                <p>Edit <em>WRF-Var_plot.ncl </em>to provide the filenames, level index, field name, and what plot_data to plot for your case.</p>
+                <p>Edit <span class="stylecode">WRF-Var_plot.ncl</span> to provide the filenames, level index, field name, and what plot_data to plot for your case.</p>
                 <blockquote>
+                  <p class="stylecode">vi WRF-Var_plot.ncl</p>
                   <p class="stylecode">......<br>
                   first_guess = addfile(&quot;fg&quot;+&quot;.nc&quot;, &quot;r&quot;)<br>
                   analysis = addfile(&quot;wrfvar_output&quot;+&quot;.nc&quot;, &quot;r&quot;)                <br>
@@ -168,10 +162,9 @@ a:active {
                   display WRF-VAR_U_level_18.pdf</p>
                 </blockquote>
                 <p>Other <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF graphic tools</a> can be used as well.</p>
-                <p>The full list of namelist options, including those not specified by the user (and so were assigned default values), can be found in the <em>namelist.output</em> file.</p>
+                <p>The full list of namelist options, including those not specified by the user (and so were assigned default values), can be found in the <span class="stylecode">namelist.output.da</span> file.</p>
               </blockquote>
-              <p><span class="bodyh1">Update WRF lateral boundary conditions</span>
-              </p>
+              <p><span class="bodyh1">Update WRF lateral boundary conditions</span></p>
               <blockquote>
                 <p>After creating an analysis, we have changed the initial conditions for the model. Therefore, the tendencies in the "wrfbdy" file should be adjusted based on these new initial conditions. This is done with da_update_bc.exe</p>
                 <p><strong>Important:</strong> Make a copy of wrfbdy_d01 from this folder, do not simply link it. The wrf_bdy_file will be overwritten by da_update_bc.exe.</p>
@@ -197,8 +190,8 @@ a:active {
                 <blockquote>
                   <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/da_update_bc.exe</p>
                 </blockquote>
-                <p>Finally, check the output. Use <em><strong><a href="http://www.mmm.ucar.edu/wrf/users/utilities/diffwrf.html">diffwrf</a></strong></em> (available in compiled WRFV3 code at WRFV3/external/io_netcdf/diffwrf), <strong><em>ncdiff</em></strong>, <em><strong>ncview</strong></em><strong></strong>, or other <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF NCL graphic tools</a> to check what fields have been updated.</p>
-                <p>The <em><strong>wrfvar_output</strong></em> and <em><strong>wrfbdy_d01</strong></em> are the data-assimilated initial condition and tendency-updated boundary condition for your subsequent WRF model run.</p>
+                <p>Finally, check the output. Use <em><strong><a href="http://www.mmm.ucar.edu/wrf/users/utilities/diffwrf.htm">diffwrf</a></strong></em> (available in compiled WRFV3 code at WRFV3/external/io_netcdf/diffwrf), <strong><em>ncdiff</em></strong>, <em><strong>ncview</strong></em><strong></strong>, or other <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF NCL graphic tools</a> to check what fields have been updated.</p>
+                <p>The <span class="stylecode"><strong>wrfvar_output</strong></span> and <span class="stylecode"><strong>wrfbdy_d01</strong></span> are the data-assimilated initial condition and tendency-updated boundary condition for your subsequent WRF model run.</p>
                 <p>If this was successful, you can <a href="wrfda_sessions.html#session_runvar_psot">continue to the next practice case</a>.</p>
                 <p>Come back here later (or during Advanced Practice Session) for other advanced practices on running WRFDA-3DVAR with real data.<br>
                 </p>
