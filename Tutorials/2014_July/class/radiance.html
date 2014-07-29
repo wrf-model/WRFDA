@@ -154,9 +154,25 @@ a:active {
               </blockquote>
               <span class="bodyh1">Graphics</span>
               <blockquote>
-                <p><strong><em>/kumquat/wrfhelp/SOURCE_CODE/WRFDA_SOURCE/TOOLS/scripts/da_rad_diags.ksh</em></strong><br>
-                  Note: This version of <em><strong>da_rad_diag.ksh </strong></em> is customized to work for the directory structures for this tutorial. For your own applications, you should read through the default <em><strong>da_rad_diags.ksh</strong></em> and make proper changes.</p>
-                <p>The diagnostics netCDF files will be created in the /kumquat/users/$USER/DA/radiance/diags directory.</p>
+                <p class="stylecode">WRFDA/var/scripts/da_rad_diags.ksh<br>
+                  export START_DATE=2008020512<br>
+                  export END_DATE=2008020512<br>
+                  export CYCLE_PERIOD=12<br>
+                  #<br>
+                  export NUM_PROCS=4  # number of processors used in running WRF-Var<br>
+                  export WRFVAR_DIR=WRFVAR_DIR=/kumquat/users/($USER)/DA/WRFDA<br>
+                  export BUILD_DIR=${WRFVAR_DIR}/var/build<br>
+                  export EXP_DIR=/kumquat/users/$USER/DA/radiance<br>
+                  export VAR_RUN_DIR1=$EXP_DIR<br>
+                  export VAR_RUN_DIR2=none<br>
+                  <br>
+                  ...<br>
+                  export FGFILE=$VAR_RUN_DIR1/fg<br>
+                  ...<br>
+                  export FILE_PREFIX=01_oma</p>
+                <p>Also change the following line (around line 150):
+                  ln -sf $VAR_RUN_DIR1/$DATE/$FILE_PREFIX* .  -->  ln -sf $VAR_RUN_DIR1/$FILE_PREFIX* .
+                <p>The .ncgm plots will be created in your working directory. Use the command "idt" to view these .ncgm files.</p>
               </blockquote>
 <p><span class="bodyh1">Other practice</span> </p>
               <ul>

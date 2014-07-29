@@ -95,17 +95,6 @@ a:active {
                 <p class="stylecode"> ./configure wrfplus</p>
                 <p><i>Choose<strong class="stylecode"> 26 </strong>for pgf90/pgcc, dmpar</i></p>
               </blockquote>
-              <p><b>IMPORTANT NOTE FOR TUTORIAL ATTENDEES:</b> On the classrooom computers, the PGI compiler has a bug which can cause problems with WRFPLUS compilation. The following steps will ensure successful compilation of WRFPLUS:</p>
-              <blockquote>
-                <p>1.  Manually set the machine to use PGI version 13.6 with the following environment variables:</p>
-                <p class="stylecode">setenv PGI /usr/local/pgi-13.6</p>
-                <p class="stylecode">setenv PATH $PGI/bin:/usr/local/mpich-3.0.4-pgi13.6/bin:$PATH</p>
-                <p>2.  Manually edit the "configure.wrf" file, changing the following line:</p>
-                <p class="stylecode">FCOPTIM &nbsp; &nbsp; &nbsp; = &nbsp; &nbsp; <b><em>-O3</em></b> #-fastsse ...</p>
-                <p>&nbsp; to</p>
-                <p class="stylecode">FCOPTIM &nbsp; &nbsp; &nbsp; = &nbsp; &nbsp; <b><em>-O1</em></b> #-fastsse ...</p>
-                <p>&nbsp; Note that this is the letter "O", not a zero, following the dash</p>
-              </blockquote>
               <p>Compile WRFPLUS</p>
               <blockquote>
                 <p class="stylecode"> ./compile em_real &gt;&amp; compile_wrfplus.log &amp;</p>
@@ -136,7 +125,7 @@ a:active {
                 <p><i>Set the environment variable WRFPLUS_DIR to point to the WRFPLUS build you just installed</i></p>
                 <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/WRFPLUSV3</p>
                 <p class="stylecode">./configure 4dvar</p>
-                <p>Choose <span class="stylecode"><strong>26</strong></span> for PGI/gcc, dmpar</p>
+                <p><i>Choose <span class="stylecode"><strong>26</strong></span> for pgf90/pgcc, dmpar</i></p>
                 <p class="stylecode">./compile all_wrfvar &gt;&amp; compile_4dvar.log &amp;</p>
               </blockquote>
               <p class="stylecode">&nbsp;</p>

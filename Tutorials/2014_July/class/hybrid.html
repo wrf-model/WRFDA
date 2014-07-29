@@ -43,7 +43,7 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <span class="pagetitle">Hybrid data assimilation</span>
             <blockquote>
-              <p><span class="body">Reference: <a href="../docs/WRFDA_tutorial_hybrid_201307.ppt">Download the tutorial presentation</a></span></p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_hybrid.pdf">Download the tutorial presentation</a></span></p>
 <p><span class="bodyh1">Source code</span></p>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
@@ -56,7 +56,6 @@ a:active {
               </p>
               <blockquote>
                 <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
-                <p>We recommend you create<em> /kumquat/users/${USER}/DA/hybrid</em> and cd there to be your main working directory for this session.</p>
                 <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA/hybrid</span><br>
                   <span class="stylecode">cd /kumquat/users/${USER}/DA/hybrid</span></p>
               </blockquote>
@@ -91,7 +90,7 @@ a:active {
                     <li> Copy  ensemble forecasts and template files to your working directory.</li>
                   </ul>
                   <blockquote>
-                    <p> <span class="stylecode">cp -r /kumquat/wrfhelp/DATA/WRFDA/Hybrid/fc/2006102712 . </span># copy a directory</p>
+                    <p class="stylecode">cp -r /kumquat/wrfhelp/DATA/WRFDA/Hybrid/fc/2006102712 . </p>
                   </blockquote>
                   
                   <ul>
@@ -131,7 +130,7 @@ a:active {
                       <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/</em>WRF_contributed.ncl.test .<br>
                       </span>Edit <em>ens_mean_std_dev.ncl</em> to set the proper date and path path<span class="stylecode"><br>
                       </span>...<span>...<br>
-                      </span>dir = &quot;/kumquat/users/classxx/DA/hybrid/&quot; + date + &quot;/&quot;<br>
+                      </span>dir = &quot;/kumquat/users/$USER/DA/hybrid/&quot; + date + &quot;/&quot;<br>
                     ......
                     <br>
                     <span class="stylecode">ncl ens_mean_std_dev.ncl</span><br>
@@ -173,7 +172,7 @@ a:active {
                       Edit 
                         <em>ens_perturbations.ncl</em> to set the proper date and path.<br>
                     ......<br>
-                    directory = &quot;/kumquat/users/classxx/DA/hybrid/&quot; + date<br>
+                    directory = &quot;/kumquat/users/$USER/DA/hybrid/&quot; + date<br>
                     ......<br>
                     <span class="stylecode">ncl 
                     ens_perturbations.ncl</span><br>
@@ -192,6 +191,7 @@ a:active {
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/Hybrid/be/be.dat ./be.dat
                 </p>
                 <p>Edit namelist.input (a sample file is provided as /kumquat/wrfhelp/DATA/WRFDA/Hybrid/namelist.input)</p>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Hybrid/namelist.input<br><br>vi namelist.input</p>
                 <p>Pay special attention to the following hybrid-related settings:</p>
                 <p> <span class="stylecode">&amp;wrfvar7<br>
                   je_factor = 2.0<br>

@@ -54,15 +54,16 @@ a:active {
               <blockquote>
                 <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run. </p>
                 <p>We recommend you create <em>/kumquat/users/${USER}/DA/radar</em> and cd there to be your working directory for this session. <br>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/radar</p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/radar</p>
                 </p>
               </blockquote>
               <p><span class="bodyh1">Input files</span>
               </p>
               <blockquote>
-                <p>The <a href="wrfda_testdata.html#testdata_radar">radar case</a> is different from the CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. It is a toy case and contains only 12 data points (<a href="../cases/radar_obsloc.png">view observation locations</a>).</p>
+                <p>The <a href="wrfda_testdata.html#testdata_radar">radar case</a> is different from the CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. It is a simple test case which contains only 12 data points (<a href="../cases/radar_obsloc.png">view observation locations</a>), real data will obviously have many more observations.</p>
                 <p>The procedure is the same as <a href="3dvar.html">Running WRFDA-3DVAR</a> except for an extra radar input file and adding and changing some namelist.input settings.</p>
                 <p><strong><em>ob.radar</em></strong> is in plain text format. Edit it to see the content. Its format is simple, but the radar data preprocessing is not trivial and it is user's responsibility. </p>
-                <p class="stylecode">cd /kumquat/users/${USER}/DA/radar</p>
                 <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.radar ./ob.radar</p>
                 <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.ascii ./ob.ascii<br>
                 ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./fg<br>
@@ -83,6 +84,11 @@ a:active {
                   use_radar_rv = .true.<br>
                   use_radar_rf = .true.<br>
                   /</p>
+                <p><span class="stylecode">...<br>
+                  &amp;domains<br>
+                  i_parent_start=33,<br>
+                  j_parent_start=33,</span> <span style="color:red">These two settings are needed because our first guess is from the inner domain of a nested WRF run.<br></p>
+   
               </blockquote>
               <p><span class="bodyh1">Run WRFDA</span>
               </p>Note that, as with other cases in this tutorial, the executable has been renamed (when building your own code it will be named <em>da_wrfvar.exe</em>

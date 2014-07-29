@@ -94,7 +94,7 @@ a:active {
               <p>A few additional contant files are needed for 4D-VAR runs.</p>
               <blockquote>
                 
-                <p> <span class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span> <span style="color:red"> # be sure to link the double-precision one for 4dvar runs and rename it</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span></p>
                 <p> <span class="stylecode">ln -fs  /kumquat/users/${USER}/DA/WRFDA/run/*.TBL .</span></p>
               </blockquote>
               <p>link first guess and boundary files.</p>
@@ -133,7 +133,7 @@ a:active {
                   /<br>
                   &amp;wrfvar6<br>
                 </span>
-                  ntmax=5</span><span style="color:red"> # for testing purpose only, reduce the maximum iteration number for quick test, as for each iteration, 4D-VAR takes a lot longer to run than 3D-VAR</span><br>
+                  ntmax=5</span><span style="color:red"> # for testing purpose only, reduce the maximum iterations, since 4D-VAR takes a lot longer to run than 3D-VAR</span><br>
                   /
               <br>
                   &amp;wrfvar18<br>
@@ -168,14 +168,6 @@ a:active {
                 smooth_option=0,<br>
                 nproc_x=0,<br>
                 /<br>
-                &amp;physics </span>(make sure the physics options here are consistent with those in the first guess file, fg. Use <span class="stylecode">ncdump -h fg</span> to look for the options listed in the global attributes.)<span class="stylecode"><br>
-                ......<br>
-                mp_physics=3<br>
-                sf_surface_physics=2<br>
-                  num_soil_layers=4<br>
-                  ......
-                  <br>
-                /<br>
                 &amp;perturbation<br>
                 trajectory_io=true,<br>
                 enable_identity=false,<br>
@@ -186,8 +178,11 @@ a:active {
             </blockquote>
             <span class="bodyh1">Running 4D-VAR</span>
             <blockquote>
-              <p><span class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_4dvar.exe &gt;&amp;! var4d.log </span></p>
+              <p><span class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_4dvar.exe &gt;&amp; var4d.log </span></p>
 <p class="stylecode">&nbsp; </p>
+              <p><span style="color:red">Helpful tip!</span>, after submitting an MPI job like this, you don't have to sit around without being able to see the progress of your run. After submitting the job, hit control+z on your keyboard to suspend the job, then type "bg" and enter to continue running the job in the background. Now, you can use the "tail" command to see the log files in real time!</p>
+              <p class="stylecode">tail -f rsl.out.0000</span>
+              <p>Press control+c at any time to quit "tail"</p>
             </blockquote>
             <p class="bodyh2"><a name="advance">Advanced</a></p>
             <blockquote>
