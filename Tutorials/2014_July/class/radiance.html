@@ -43,11 +43,12 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <span class="pagetitle">Radiance data assimilation  </span>
             <blockquote>
-              <p><span class="body">Reference: <a href="../docs/WRFDA_tutorial_radiance_201307.ppt">Download the tutorial presentation</a></span></p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_radiance.pdf">Download the tutorial presentation</a></span></p>
               <p><span class="bodyh1">Source code</span></p>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
                 <p><em>WRFDA/var/build/da_wrfvar_3dvar.exe</em> is the executable that will be used in this session.</p>
+                <p style="color:red"><b>Important note:</b> If you downloaded the pre-compiled code the first day, it was not compiled with RTTOV. If you wish to do this exercise with RTTOV you should get the most recent version of the code at <span class="stylecode">/kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_compiled.tar.gz</span></p>
               </blockquote>
               <p><span class="bodyh1">Choice of your working directory </span> </p>
               <blockquote>
@@ -59,7 +60,7 @@ a:active {
               </blockquote></blockquote>
               <p><span class="bodyh1">Input files</span> </p>
               <blockquote>
-                <p>The radiance case is the same CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. Keep in mind that when <a href="compile.html">compiling WRFDA yourself</a>, additional settings must be specified at compile time to utilize radiance data. This has been done for you in the pre-compiled code.</p>
+                <p>The radiance case is the same CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. Keep in mind that when <a href="compile.html">compiling WRFDA yourself</a>, additional settings (specifically, environment variables for BUFR and an RTM) must be specified at compile time to utilize radiance data. This has been done for you in the pre-compiled code.</p>
                 <p>Radiance assimilation for 3DVAR is much the same procedure as <a href="3dvar.html">Running WRFDA-3DVAR with conventional observations</a>. To begin this exercise, link/copy the basic input files above that you should have been familiar with by now:</p>
                 <blockquote>
                   <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL<br>
@@ -100,8 +101,8 @@ a:active {
               </ul>
               <blockquote>
                 <blockquote>
-                  <p>(CRTM only)<span class="stylecode"> ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/crtm_coeffs ./crtm_coeffs</span></p>
-                  <p>(RTTOV only) <span class="stylecode">ln -fs /kumquat/wrfhelp/WRFDA/external/rttov10/rtcoef_rttov10/rttov7pred51L ./rttov_coeffs </span></p>
+                  <p class="stylecode"> ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/crtm_coeffs ./crtm_coeffs</p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/WRFDA/external/rttov11/rtcoef_rttov11/rttov7pred54L ./rttov_coeffs</p>
                 </blockquote>
               </blockquote>
               <p><span class="bodyh1">Edit namelist.input</span> </p>
@@ -109,7 +110,7 @@ a:active {
                 <p>A sample namelist.input is provided in the WRFDA package as WRFDA/var/test/radiance/namelist.input</p>
                 <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/radiance/namelist.input ./namelist.input</p>
                 <p><span class="stylecode">vi namelist.input </span>(pay special attention to the following radiance-related settings)</p>
-                <p class="stylecode">&amp;wrfvar4<br>
+                <p><span class="stylecode">&amp;wrfvar4<br>
                   use_amsuaobs = .true.<br>
                   use_amsubobs = .true.<br>
                   /<br>
@@ -123,11 +124,11 @@ a:active {
                   qc_rad = .true.<br>
                   write_iv_rad_ascii = .false.<br>
                   write_oa_rad_ascii = .true.<br>
-                  rtm_option = 2<br>
-                  only_sea_rad = .false.<br>
+                  rtm_option = 2</span> &nbsp; (set to "1" for RTTOV)<br>
+                  <span class="stylecode">only_sea_rad = .false.<br>
                   use_varbc = .true.<br>
-                  <span style="color:red">use_crtm_kmatrix = .true.</span> (set "use_rttov_kmatrix" instead for RTTOV)<br>
-                  <span style="color:red">varbc_nbgerr = 5000</span>
+                  use_crtm_kmatrix = .true.</span> &nbsp; (set "use_rttov_kmatrix" instead for RTTOV)<br>
+                  <span class="stylecode">varbc_nbgerr = 5000</span>
                   <br>
                   /<br>
                   &amp;wrfvar21<br>

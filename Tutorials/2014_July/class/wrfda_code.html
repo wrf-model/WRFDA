@@ -51,7 +51,8 @@ a:active {
             <blockquote>
               <p>The pre-compiled WRFDA  can be accessed from <span class="stylecode">/kumquat/wrfhelp/SOURCE_CODE/WRFDA</span>.</p>
               <p>You should copy the pre-compiled code into your local working directory. Follow the steps below:</p>
-              <p><span class="stylecode">cd /kumquat/users/${USER}/DA</span>&nbsp;&nbsp;&nbsp; (your main working directory)<br>
+              <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA</span>&nbsp;&nbsp;&nbsp; (your main working directory)<br>
+                <span class="stylecode">cd /kumquat/users/${USER}/DA</span><br>
                 <span class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_compiled.tar.gz . </span><br>
                 <span class="stylecode">tar -xzf WRFDA_compiled.tar.gz</span></p>
               <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA package. The WRFDA code is pre-compiled to run in parallel (dmpar) mode using the PGI compiler.</p>
@@ -66,7 +67,7 @@ a:active {
             <blockquote>
               <p>The pre-compiled WRFPLUS can be accessed from the same directory:.</p>
               <p class="stylecode">cd /kumquat/users/${USER}/DA<br>
-                cp /kumquat/wrfhelp/SOURCE_CODE/WRFPLUS_compiled.tar.gz .<br>
+                cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFPLUS_compiled.tar.gz .<br>
                 tar -xzf WRFPLUS_compiled.tar.gz</p>
             </blockquote>
           <!-- InstanceEndEditable --><br>
