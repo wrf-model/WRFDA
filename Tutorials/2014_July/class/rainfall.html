@@ -95,6 +95,7 @@ a:active {
                 <p><span class="bodyh1">Run 4D-VAR with Accumulated Rainfall Observations</span></p> 
                 <blockquote>
                   <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_4dvar.exe </p>
+                  <p> <span style="color:red">Note!</span> In the provided namelist, we haven't set a small limit for ntmax (maximum number of iterations of the cost function minimization) like we did for the original practice 4DVAR case. Therefore, on the classroom computers this case will take some time, probably more than 10 minutes. If you would rather move on quickly and do not care about reaching the full minimization, set ntmax=5; this will still not be instantaneous, but will only take a few minutes.</p>
                 </blockquote>
               </blockquote>
 <!-- InstanceEndEditable --><br>

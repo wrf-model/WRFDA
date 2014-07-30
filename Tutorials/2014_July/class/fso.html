@@ -43,15 +43,15 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <p class="pagetitle">Forecast Sensitivity to Observations</p>
             <p>&nbsp;</p>
-            <p><span class="body">Reference: <a href="../docs/WRFDA_sensitivity.pdf">Download the tutorial presentation</a> and the <a href="../docs/README_FSO_v3.3.pdf">README file</a></span></p>
+            <p><span class="body">Reference: <a href="../docs/WRFDA_sensitivity.pdf">Download the tutorial presentation</a> and the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2012_July/docs/README_FSO_v3.3.pdf">README file</a></span></p>
 <p>              <span class="bodyh1">Source code</span>            </p>
             <blockquote>
                 <p>WRFDA and WRFPLUS are needed for this practice.</p>
                 <p>The pre-compiled WRFDA and WRFPLUS can be accessed from</p>
-                <p>/kumquat/wrfhelp/SOURCE_CODE/WRFDA and</p>
-                <p>/kumquat/wrfhelp/SOURCE_CODE/WRFPLUSV3</p>
-                <p><strong><em>wrapper_run_fso_v3.4.ksh</em></strong> is the main script that will be used in this practice.</p>
-<p>The <strong><em>wrapper_run_fso_v3.4.ksh</em></strong> calls other several scripts that are in the /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/scripts and /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/graphics/ncl directories.</p>
+                <p>/kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
+                <p>The FSO data, including the main script, can be found in /kumquat/wrfhelp/DATA/WRFDA/FSO</p>
+                <p><strong><em>wrapper_run_fso.ksh</em></strong> is the main script that will be used in this practice.</p>
+<p>The <strong><em>wrapper_run_fso.ksh</em></strong> calls other several scripts that are in the /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/scripts and /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/graphics/ncl directories.</p>
 <p>For example,<br>
 &nbsp;&nbsp;var/scripts/da_run_sensitivity.ksh<br>
 &nbsp;&nbsp;var/scripts/da_run_wrf.ksh<br>
@@ -70,35 +70,37 @@ are some of the scripts involved in the FSO procedures.
                 <p class="stylecode">mkdir /kumquat/users/$USER/DA/FSO<br>
                 cd /kumquat/users/$USER/DA/FSO</p>
                 <p>You will need to download and unpack the FSO tar package for this exercise</p>
-                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/FSO/fso_tutorial_v3.4.tar . <br><br>
-                tar -xvf fso_tutorial_v3.4.tar</p>
-                <p>Edit wrapper_run_fso_v3.4.ksh to set up the options for a regular WRFDA run.                </p>
+                <p class="stylecode">cp -r /kumquat/wrfhelp/DATA/WRFDA/FSO/* . </p>
+                <p>Edit wrapper_run_fso.ksh to set up the options for a regular WRFDA run.                </p>
                 <p>......<br>
                   export RUN_WRFVAR=<strong>true</strong><br>
                   export RUN_UPDATE_BC=<strong>true</strong></p>
                 <p>And ensure the following lines are commented (with a "#" at the beginning of the line):</p>
                 <p>#export RUN_ADJ_SENS=false<br>
-                #export RUN_OBS_IMPACT=false<br>
-                 #export NL_USE_LANCZOS=true<br>
-                        #export NL_WRITE_LANCZOS=true<br>
-                        #export NL_EPS=1E-5</p>
+                  #export RUN_OBS_IMPACT=false<br>
+                  #export NL_USE_LANCZOS=true<br>
+                  #export NL_WRITE_LANCZOS=true<br>
+                  #export NL_EPS=1E-5</p>
                 <p>                ......<br>
-                export NUM_PROCS=4</p>
+                  export NUM_PROCS=4</p>
                 <p>                ......<br>
-                export REL_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA_SOURCE<br>
-                export DAT_DIR=/kumquat/users/$USER/DA/FSO<br>
-                export WRFPLUS_DIR=$REL_DIR/WRFPLUSV3<br>
-                export WRFVAR_DIR=$REL_DIR/WRFDA<br>
-                export WRFNL_DIR=$WRFPLUS_DIR<br>
-                export SCRIPTS_DIR=$WRFVAR_DIR/var/scripts<br>
-                export GRAPHICS_DIR=$WRFVAR_DIR/var/graphics/ncl<br>
-                export BUILD_DIR=$WRFVAR_DIR/var/build<br>
-                export REG_DIR=$DAT_DIR<br>
-                export RUN_DIR=$REG_DIR/run<span style="color:red"> # your working directory</span> </p>
-                <p>export FC_DIR=${RUN_DIR}/fc</p>
+                  export REL_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA<br>
+                  export DAT_DIR=/kumquat/users/$USER/DA/FSO<br>
+                  export WRFPLUS_DIR=$REL_DIR/WRFPLUSV3<br>
+                  export WRFVAR_DIR=$REL_DIR/WRFDA<br>
+                  export WRFNL_DIR=$WRFPLUS_DIR<br>
+                  export SCRIPTS_DIR=$WRFVAR_DIR/var/scripts<br>
+                  export GRAPHICS_DIR=$WRFVAR_DIR/var/graphics/ncl<br>
+                  export BUILD_DIR=$WRFVAR_DIR/var/build<br>
+                  export REG_DIR=$DAT_DIR<br>
+                  export RUN_DIR=$REG_DIR/run<span style="color:red"> # your working directory</span> <br>
+                  export FC_DIR=${RUN_DIR}/fc</p>
+                <p style="color:red">Note: The following variables should be set in the "domain" section for the tutorial case, but not for data from WRF V3.5 or later.</p>
+                <p class="stylecode">export NL_I_PARENT_START=0 <br>
+                  export NL_J_PARENT_START=0</p>
                 <p>Execute the script </p>
-                <p class="stylecode">./wrapper_run_fso_v3.4.ksh</p>
-<p>After the script finishes, a file in your working directory (<em>/kumquat/users/$USER/DA/FSO/run</em>) will indicate whether the run was successful or not (a blank file will exist, either named "FAIL" or "SUCCESS"). If the run was successful, edit wrapper_run_fso_v3.4.ksh again, and change the following settings to do sensitivity and observation impact runs:</p>
+                <p class="stylecode">./wrapper_run_fso.ksh</p>
+<p>After the script finishes, a file in your working directory (<em>/kumquat/users/$USER/DA/FSO/run</em>) will indicate whether the run was successful or not (a blank file will exist, either named "FAIL" or "SUCCESS"). If the run was successful, edit wrapper_run_fso.ksh again, and change the following settings to do sensitivity and observation impact runs:</p>
 <p>......<br>
   export RUN_WRFVAR=<strong><span style="color:blue">false</span></strong><br>
 export RUN_UPDATE_BC=<strong><span style="color:blue">false</span></strong><br>
@@ -110,7 +112,7 @@ export RUN_OBS_IMPACT=<span style="color:red">true</span></p>
                         export NL_EPS=1E-5</p>
 <p>  .....</p>
 <p>Execute the script again</p>
-<p class="stylecode">./wrapper_run_fso_v3.4.ksh</p>
+<p class="stylecode">./wrapper_run_fso.ksh</p>
 </blockquote>
               <p>  <br>
                 <span class="bodyh1">Check Output </span></p>
