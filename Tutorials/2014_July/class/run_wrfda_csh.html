@@ -305,6 +305,9 @@ cat >! namelist.input << EOF
  e_vert                              = ${VERTICAL_GRID_NUMBER}
  dx                                  = ${GRID_DISTANCE}
  dy                                  = ${GRID_DISTANCE}
+ hypsometric_opt                     = 1
+ i_parent_start                      = 0,
+ j_parent_start                      = 0,
  /
  &physics
  mp_physics                          = 4,
