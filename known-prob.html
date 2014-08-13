@@ -145,7 +145,8 @@
                 <li><a href="#V3_3">Version 3.3</a></li>
                 <li><a href="#V3_2">Version 3.2</a></li>
                 <li><a href="#V3_1">Version 3.1</a></li>
-                <li><a href="#V3_0">Version 3.0</a></li></ul><br></blockquote></blockquote>
+                <li><a href="#V3_0">Version 3.0</a></li>
+                <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
             <a name="V3_6"></a><p class="pagetitle">WRFDA Version 3.6 : Known Problems and Fixes</p>
             <blockquote>
             <a name="V3_6_compile"><p class="pagetitle">Compilation Errors</p>
@@ -185,6 +186,18 @@
 
 
             <a name="V3_6_run"><p class="pagetitle">Run-time Errors</p>
+            <h1> Error writing final output when assimilating PREPBUFR data (posted 2014-08-08) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+             WRFDA fails after the minimization step with the following error:<br><br>
+             <code>&nbsp;---------------------------- FATAL ERROR -----------------------<br>
+             &nbsp;Fatal error in file: &lt;A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/cod<br>
+             &nbsp;e/trunk/da_read_omb_tmp.html"&gt;da_read_omb_tmp.inc&lt;/a&gt; &nbsp;LINE: &nbsp; &nbsp; 412<br>
+             &nbsp;Got unknown obs_type string: &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1 on unit &nbsp;26<br>
+             &nbsp;----------------------------------------------------------------<br>
+             wrf_abort</code><br><br>
+             This error may be seen when assimilating PREPBUFR data. The error has only been seen when running serially, but it may occur in parallel runs as well.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+             Replace the file "WRFDA/var/da/da_obs_io/da_read_obs_bufr.inc" with this copy: (<a href="fixes/v36/da_read_obs_bufr.inc">da_read_obs_bufr.inc</a>). Then run "<code>./clean -a</code>" and recompile.</p>
             <h1> Problems with 4DVAR radiance assimilation using RTTOV (posted 2014-07-27) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
              Assimilation fails while calculating innovation vector. May either fail with an error ("profile deallocation error"), a segmentation fault or hang indefinitely. Last message printed to the rsl.out files is usually "Calculate innovation vector(iv)" or messages related to "VARBC".</p>
@@ -385,6 +398,20 @@
               <p class="bodytext"><strong>Problem</strong>: Compile time very long on IBMs using xlf. </p>
               <p class="bodytext"><strong>Solution</strong>: Check your configure.var file and reduce optimization level from O3 to O2. This has also been included in the updated tar file. </p>
               <p class="bodytext">&nbsp;</p>
+            </blockquote>
+            <a name="compilers"></a><p class="pagetitle">Bad compilers</p>
+            <blockquote>
+              <p class="bodytext">The following compilers have bugs that will cause some or all versions WRFDA and/or WRFPLUS to fail. If no solution is listed, you must update/downgrade to a different compiler version, or use a different compiler.</p>
+            <p class="bodytext">Be sure your compiler meets the <a href="requirements.html#compilers">minimum requirements</a>. <br></p>
+              <ul class="bodytext"><li>Intel (ifort) version 14.0.3 (<a href="https://software.intel.com/en-us/forums/topic/506826">details</a>).
+                  <ul><li>Reducing the optimization in the <code>configure.wrf</code> file may solve this problem. Change the line "<code>FCOPTIM &nbsp; &nbsp; &nbsp; &nbsp; = &nbsp; &nbsp; &nbsp; -O3</code>" so that it instead reads "-O2" or "-O1" (note that this is a capital letter "O", not a zero)</li></ul></li>
+                <li>Intel (ifort) version 11.1 (<a href="https://software.intel.com/en-us/forums/topic/269937">details</a>).
+                  <ul><li><em>No solution at this time</em></li></ul></li>
+                <li>PGI (pgf90) versions 13.3 &ndash; 13.6
+                  <ul><li> Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.</li></ul></li>
+                <li>PGI (pgf90) versions 12.5, 13.9
+                  <ul><li><em>No solution at this time</em></li></ul></li>
+              <p>&nbsp;</p>
             </blockquote>            <p align="center" class="detailtextRed"> 
               <script language="JavaScript">
 

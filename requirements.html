@@ -136,12 +136,12 @@
             <a name="compilers"></a><h1>Compilers</h1>
             <p class="bodytext">WRFDA can be compiled with a number of different compilers.  Not all of these have been tested on all platforms, but some minimum requirements are known:</p>
             <ul class="bodytext"><li><b>gfortran</b>: Version 4.4 or later</li>
-              <li><b>pgf90</b>: Version 8.0 or later (NOTE: some PGI compiler versions later than this have known bugs, see the <a href="known-prob.html">Known Problems</a> page for details.)</li></ul>
+              <li><b>pgf90</b>: Version 8.0 or later</li></ul>
             <p class="bodytext">For the following compilers, the earliest compatible version is unknown, so the earliest tested version is listed:</p>
             <ul class="bodytext"><li><b>g95</b>: 0.9</li>
               <li><b>ifort</b>: 12.1.5</li>
               <li><b>xlf</b>: 12.1</li></ul>
-
+            <p class="bodytext">Some versions of these compilers have bugs that prevent WRFDA and/or WRFPLUS from compiling correctly. See the <a href="known-prob.html#compilers">Known Problems</a> page for details.</p>
             <a name="memory"></a><h1>Memory</h1>
             <p class="bodytext">There are no set minimum memory requirements for WRFDA; smaller 3DVAR cases can be run with less than 1GB of RAM, while larger 4DVAR cases may need terrabytes. WRFDA does not have any special handling of out-of-memory errors, so these will usually result in a segmentation fault. If your runs are failing abruptly and without warning, try using a smaller domain size or more processors.</p>
             <p class="bodytext">The tutorial case mentioned in the <a href="usersguide.html">User's Guide</a> requires about 1GB of RAM.</p>
