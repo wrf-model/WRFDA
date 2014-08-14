@@ -109,9 +109,8 @@
             <tr>
               <td><p align="center"><a href="../downloads.html" class="leftnavlink">Overview</a></p>
                 <p align="center"><a href="get_source.html" class="leftnavlink">WRFDA</a></p>
-                <p align="center"><a href="testdata.html" class="leftnavlink">Test data</a></p>
-                <p align="center"><a href="wrfnl.html" class="leftnavlink">WRFNL</a></p>
                 <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFPLUS</p>
+                <p align="center"><a href="testdata.html" class="leftnavlink">Test data</a></p>
                 <p align="center"><a href="fso.html" class="leftnavlink">FSO</a></p>
                 <p align="center"><a href="madis.html" class="leftnavlink">MADIS2LITTLER</a></p>
                 <p align="center"><a href="tools.html" class="leftnavlink">Tools</a></p>
@@ -124,14 +123,15 @@
 
           <td><p>&nbsp;</p>
             <p class="pagetitle">WRFPLUS</p>
-            <p class="bodytext"><strong>The most recent version of WRFPLUS (Version 3.6) can be found <a href="WRFPLUS_V3.6_r7153.tar.gz" class="style7">here</a>.</strong></p>
+            <p class="bodytext"><strong>The most recent version of WRFPLUS (Version 3.6.1) can be found <a href="WRFPLUS_V3.6.1_r7511.tar.gz" class="style7">here</a>.</strong></p>
             <p class="bodytext">WRFPLUS is a package containing the adjoint and tangent-linear version of WRF model, in addition to a specialized version of the non-linear WRF model (previously known as WRFNL). It is tailored for use with WRFDA 4D-Var only. You should use the same version number of WRFPLUS as you do WRFDA.</p>
             <p class="bodytext">How to build WRFPLUS:</p>
-            <ul>
+            <blockquote>
               <ul>
                 <li><span class="style3"><span class="style4">Download the desired WRFPLUS archive:</span></span></li>
                 <ul>
-                    <li class="style5"><strong><a href="WRFPLUS_V3.6_r7153.tar.gz" class="style7">Version 3.6 (most recent)</a></strong></li>
+                    <li class="style5"><strong><a href="WRFPLUS_V3.6.1_r7511.tar.gz" class="style7">Version 3.6.1 (most recent)</a></strong></li>
+                    <li class="style5"><a href="WRFPLUS_V3.6_r7153.tar.gz" class="style7">Version 3.6</a></li>
                     <li class="style5"><a href="WRFPLUS_V3.5.tar.gz" class="style7">Version 3.5</a>, can be used with WRFDA Version 3.5 or 3.5.1</li>
                     <li class="style5"><a href="WRFPLUS_V3.4.1_r5858.tar.gz" class="style7">Version 3.4.1</a></li>
                     <li class="style5"><a href="WRFPLUS_V3.4.tar.gz" class="style7">Version 3.4</a></li>
@@ -142,11 +142,13 @@
                 </ul>
                 <li class="style5"><kbd>gunzip &#060;filename&#062;.tar.gz</kbd></li>
                 <li class="style5"><kbd>tar -xvf &#060;filename&#062;.tar</kbd></li>
-                <li class="style5"><kbd>cd WRFPLUS</kbd></li>
+                <li class="style5"><kbd>cd WRFPLUSV3</kbd></li>
                 <li class="style5"><kbd>./configure wrfplus</kbd></li>
                 <li class="style5"><kbd>./compile em_real</kbd></li>
               </ul>
-            <p class="bodytext">For more detailed instructions, see the <a href="../usersguide.html">User's Guide</a>.</p>
+              <p class="bodytext">For more detailed instructions, see the <a href="../usersguide.html">User's Guide</a>.<br></p>
+              </blockquote>
+            <p class="bodytext">For older versions, see the <a href="../wrfnl.html">WRFNL</a> page. Note that WRFNL is no longer supported.</p>
                 </li>
               </ul>
             </ul>            
