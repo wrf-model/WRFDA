@@ -1,0 +1,176 @@
+<html>
+
+<head>
+
+<title>WRFDA User's Guide for Version 3.6.1</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2014 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../../scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="../../images/wrfstyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style2 {
+	color: #FFFFFF;
+	font-size: 9px;
+}
+.style3 {font-family: Verdana, Arial, Helvetica, sans-serif}
+.style4 {font-size: 12px}
+.style5 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; }
+-->
+</style>
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="../../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
+
+ <tr bgcolor="#000000">
+
+     <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="../../images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../../images/goldrule.jpg"><img src="../../images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../../images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" bgcolor="#009933" class="background">
+
+  <tr>
+
+    <td height="812" valign="top" bgcolor="#CBFFCD"><table width="780" height="880" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+
+        <td width="117" height="880" bgcolor="#009933"><p>&nbsp;</p>
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><p align="center"><a href="../../pub-doc.html" class="leftnavlink">WRFDA Publications</a></p>
+                <p align="center"><a href="../../technotes.html" class="leftnavlink">Technical Notes</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">User's Guide V3.6.1</p>
+                <p align="center"><a href="../user_guide_V3.6/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.6</a></p>
+                <p align="center"><a href="../user_guide_V3.5.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5.1</a></p>
+                <p align="center"><a href="../user_guide_V3.5/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5</a></p>
+                <p align="center"><a href="../user_guide_V3.4.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4.1</a></p>
+                <p align="center"><a href="../user_guide_V3.4/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4</a></p>
+                <p align="center"><a href="../user_guide_V3.3/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.3</a></p>
+                <p align="center"><a href="../user_guide_V3.2.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2.1</a></p>
+                <p align="center"><a href="../user_guide_V3.2/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2</a></p>
+                <p align="center"><a href="../user_guide_V3.1.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1.1</a></p>
+                <p align="center"><a href="../user_guide_V3.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1</a></p>
+                <p align="center"><a href="../../OnlineTutorial/index.html" class="leftnavlink">WRFDA Online Tutorial</a></p>
+                <p align="center"><a href="../../how_to_compile.html" class="leftnavlink">How to compile WRFDA</a></p>
+                <p align="center"><a href="../../yellowstone.html" class="leftnavlink">WRFDA on Yellowstone</a></p>
+                <p align="center"><a href="../../readBUFR.html" class="leftnavlink">Reading BUFR files</a></p>
+              </td>
+
+            </tr>
+
+          </table>          
+
+          <p>&nbsp;</p>          <p>&nbsp;</p>          <img src="../../images/shim112.gif" width="112" height="1"></td>
+
+          <td><p>&nbsp;</p>
+            <p class="pagetitle">User's Guide version 3.6.1</p>
+
+
+              <ul class="bodytext"><li><a href="users_guide_chap6.htm">HTML version</a></li>
+                <li><a href="WRFDA_Users_Guide.pdf">PDF version</a></li></ul>
+
+
+
+
+
+            <p class="bodytext"><br>
+              <br>
+          </p>            <img src="../../images/transgif.gif" width="1" height="1"><img src="../../images/shim162.gif" width="162" height="1">
+            <p align="center" class="detailtextRed">
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+              <br>
+          </p></td>
+ 
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+
