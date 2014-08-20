@@ -418,9 +418,8 @@ PlainStyle2,
 ,
 ,"Downloads Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/downloads.html",,,1
 ,"WRFDA","http://www.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html",,,1
-,"Test Data","http://www.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html",,,1
-,"WRFNL","http://www.mmm.ucar.edu/wrf/users/wrfda/download/wrfnl.html",,,1
 ,"WRFPLUS","http://www.mmm.ucar.edu/wrf/users/wrfda/download/wrfplus.html",,,1
+,"Test Data","http://www.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html",,,1
 ,"FSO","http://www.mmm.ucar.edu/wrf/users/wrfda/download/fso.html",,,1
 ,"MADIS2LITTLER","http://www.mmm.ucar.edu/wrf/users/wrfda/download/madis.html",,,1
 ,"TOOLS","http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,1
