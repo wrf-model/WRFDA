@@ -390,7 +390,7 @@ PlainStyle2,
 ,"Unidata (netCDF)","http://www.unidata.ucar.edu/",,,1
 ,"CISL NCAR Computing Support","http://www2.cisl.ucar.edu/cisl-support",,,1
 ,"MMM website","http://www.mmm.ucar.edu/",,,0
-,"NCAR website","http://www.ncar.ucar.edu/ncar/",,,0
+,"NCAR website","http://www.ncar.ucar.edu/",,,0
 ,"UCAR website","http://www.ucar.edu/ucar/",,,0
 ])
 
