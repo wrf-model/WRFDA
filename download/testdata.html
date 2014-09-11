@@ -124,12 +124,18 @@
           <p>&nbsp;</p>          <p>&nbsp;</p>          <img src="../images/shim112.gif" width="112" height="1"></td>
 
           <td><p>&nbsp;</p>
-<!--            <p style="padding-right: 45px;padding-left: 60px;"><table style="background-color:#DDFFDD;text-align:center" width="100%" border="1" class="bodytable"><tr><td><b>An updated test data set for Version 3.6 will be available shortly; <br>in the meantime, you can use the Version 3.5 test data set.</b></td></tr></table></p>-->
             <p class="pagetitle">Test case data</p>
             <p class="bodytext"><strong><a href="WRFDAV3.6-testdata.tar.gz">Click here to download the most recent test data set</a>. This test data set will work with Version 3.6 and 3.6.1.</strong></p>
-            <p class="bodytext">This is a zipped <code>.tar</code> file which includes the be.dat for cv_options=5, little_r format observational data, WRF-3/4D-Var ready observational data, first guess and boundary input for 2008020512Z and the AMSU-A and AMSU-B satellite radiance observational data valid at 2008020512Z. This test case data is for training and testing purposes only.</p>
+            <p class="bodytext">This is a zipped <code>.tar</code> file which includes data for the 2008-02-05 test cases mentioned in the <a href="../usersguide.html">User's Guide</a>:</p>
+              <blockquote><ul class="bodytext"><li>A sample be.dat for cv_options=5</li>
+              <li>LITTLE_R format observational data (12Z and 18z)</li>
+              <li>WRFDA-3DVAR and 4DVAR observational data (prepared by OBSPROC)</li>
+              <li>first guess and boundary input (12Z and 18z)</li>
+              <li>AMSU-A and AMSU-B satellite radiance observational data (12Z and 18z)</li>
+              <li>6-hour accumulated rainfall data (valid 18z)</li></ul></blockquote>
+            <p class="bodytext"><b>This test case data is for training and testing purposes only.</b></p>
             <p class="bodytext">For cv_options=5 training purposes, you can <a href="gen_be_forecasts_200802.tar.gz">download</a> the pre-generated 1-day forecasts and use the gen_be utility to generate the background error statistics file.</p> 
-            <p class="bodytext">To learn more about WRFDA and how to use it, please see the <a href="../usersguide.html">User's Guide</a>.<br class="style5">
+            <p class="bodytext">To learn more about WRFDA and how to use it, please see the <a href="../usersguide.html">User's Guide</a>.<br>
             <ul>
               <ul>
                 <li><span class="style4">Download the test dataset corresponding to your version of WRFDA:</span></li>
