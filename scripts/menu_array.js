@@ -315,7 +315,7 @@ PlainStyle2,
 ,
 0,
 ,
-,"WRFDA Publications","http://www.mmm.ucar.edu/wrf/users/wrfda/pub-doc.html",,,1
+,"WRFDA Publications","http://www.mmm.ucar.edu/wrf/users/wrfda/publications.html",,,1
 ,"Technical Notes","http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,1
 ,"WRFDA User's Guide","show-menu=userguide",,,0
 ,"WRFDA Online Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/index.html",,,1

@@ -438,7 +438,7 @@ PlainStyle2,
 ,
 0,
 ,
-,"Pubs & Docs Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/pub-doc.html",,,1
+,"Pubs & Docs Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/publications.html",,,1
 ,"Tech Notes","http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,0
 ,"WRFDA User's Guide","show-menu=userguide",,,0
 //,"Tutorial Presentation","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
