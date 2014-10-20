@@ -213,6 +213,7 @@ PlainStyle2,
 ,"WRFDA News","http://www.mmm.ucar.edu/wrf/users/wrfda/news.html",,,0
 ,"Public Domain Notice","http://www.mmm.ucar.edu/wrf/users/wrfda/public.html",,,0
 ,"Contact Us!","http://www.mmm.ucar.edu/wrf/users/wrfda/contact.html",,,0
+,"WRF Users Page","http://www.mmm.ucar.edu/wrf/users/",,,0
 ])
 
 
