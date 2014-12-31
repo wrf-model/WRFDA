@@ -69,7 +69,7 @@ PlainStyle2=[                 // PlainStyle is an array of properties. You can h
 "bold",                       // Font Weight (bold or normal)
 "arial,helvetica",          // Font Name
 3,                            // Menu Item Padding or spacing
-"http://www.mmm.ucar.edu/wrf/OnLineTutorial/images/arrow.gif",                  // Sub Menu Image (Leave this blank if not needed)
+"http://www2.mmm.ucar.edu/wrf/OnLineTutorial/images/arrow.gif",                  // Sub Menu Image (Leave this blank if not needed)
 0,                            // 3D Border & Separator bar
 "ffff00",                     // 3D High Color
 "ebe3de",                     // 3D Low Color
@@ -160,7 +160,7 @@ PlainStyle,
 ,"Exercises","show-menu=Exercises",,,0
 ,"Data&Code","show-menu=Data&Code",,,0
 ,"Feedback ","survey.html",,,0
-,"WRF Basic","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/index.html",,,0
+,"WRF Basic","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/index.html",,,0
 ])
 
 
@@ -391,12 +391,12 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview ","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/arw_overview.htm",,,1
-//,"Configure WRF-ARW ","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/configure_wrf.htm",,,1
-//,"Compile for Real case","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/compile_real.htm",,,0
-//,"Configure & Compile WPS ","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/configure_compile_wps.htm",,,1
-//,"Compile for Idealized cases","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/compile_ideal.htm",,,1
-,"Case Studies ","http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/wps_arw.htm",,,0
+,"Overview ","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/arw_overview.htm",,,1
+//,"Configure WRF-ARW ","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/configure_wrf.htm",,,1
+//,"Compile for Real case","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/compile_real.htm",,,0
+//,"Configure & Compile WPS ","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/configure_compile_wps.htm",,,1
+//,"Compile for Idealized cases","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/compile_ideal.htm",,,1
+,"Case Studies ","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/wps_arw.htm",,,0
 ])
 
 
@@ -423,11 +423,11 @@ PlainStyle2,
 ,
 0,
 ,
-,"Getting Started","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/index.htm",,,0
-,"Source Code","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_code.htm",,,0
-,"Environment Variables","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_setenv.htm",,,1
-,"Run SI - Manually","show-menu=runSI","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run1.htm",,0
-,"Run SI - with GUI","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_runGUI.htm",,,0
+,"Getting Started","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/index.htm",,,0
+,"Source Code","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_code.htm",,,0
+,"Environment Variables","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_setenv.htm",,,1
+,"Run SI - Manually","show-menu=runSI","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run1.htm",,0
+,"Run SI - with GUI","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_runGUI.htm",,,0
 ])
 
 addmenu(menu=[
@@ -452,9 +452,9 @@ PlainStyle2,
 ,
 0,
 ,
-,"Step 1 - Localization","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run1.htm",,,0
-,"Step 2 - deGrib Input","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run2.htm",,,0
-,"Step 3 - Interpolation","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run3.htm",,,0
+,"Step 1 - Localization","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run1.htm",,,0
+,"Step 2 - deGrib Input","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run2.htm",,,0
+,"Step 3 - Interpolation","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRFSI/si_run3.htm",,,0
 ])
 
 
@@ -481,9 +481,9 @@ PlainStyle2,
 ,
 0,
 ,
-,"General","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRF_real/index.htm",,,0
-,"Run real.exe","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRF_real/arw_real_1dom.htm",,,0
-,"Run wrf.exe","http://www.mmm.ucar.edu/wrf/OnLineTutorial/WRF_real/arw_wrf_1dom.htm",,,0
+,"General","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRF_real/index.htm",,,0
+,"Run real.exe","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRF_real/arw_real_1dom.htm",,,0
+,"Run wrf.exe","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/WRF_real/arw_wrf_1dom.htm",,,0
 ])
 
 addmenu(menu=[
@@ -508,10 +508,10 @@ PlainStyle2,
 ,
 0,
 ,
-//,"Pubs & Docs Overview","http://www.mmm.ucar.edu/wrf/users/pub-doc.html",,,0
-//,"WRF dynamics","http://www.mmm.ucar.edu/wrf/users/docs/wrf-dyn.html",,,0
-//,"WRF physics document","http://www.mmm.ucar.edu/wrf/users/docs/wrf-phy.html",,,0
-//,"Tutorial Presentation","http://www.mmm.ucar.edu/wrf/tutorial/2003/tutorial-2003.html",,,1
+//,"Pubs & Docs Overview","http://www2.mmm.ucar.edu/wrf/users/pub-doc.html",,,0
+//,"WRF dynamics","http://www2.mmm.ucar.edu/wrf/users/docs/wrf-dyn.html",,,0
+//,"WRF physics document","http://www2.mmm.ucar.edu/wrf/users/docs/wrf-phy.html",,,0
+//,"Tutorial Presentation","http://www2.mmm.ucar.edu/wrf/tutorial/2003/tutorial-2003.html",,,1
 ])
 
 
@@ -537,11 +537,11 @@ PlainStyle2,
 ,
 0,
 ,
-//,"WRF Links Overview","http://www.mmm.ucar.edu/wrf/users/links.html",,,0
+//,"WRF Links Overview","http://www2.mmm.ucar.edu/wrf/users/links.html",,,0
 //,"NCAR Graphics","http://ngwww.ucar.edu/",,,0
 //,"NCL example page","http://www.cgd.ucar.edu/csm/support/CSM_Graphics/index_bycat.shtml",,,1
 //,"NCAR SCD","show-menu=SCD",,,1
-//,"MMM Web Site","http://www.mmm.ucar.edu/",,,0
+//,"MMM Web Site","http://www2.mmm.ucar.edu/",,,0
 //,"NCAR Web Site","http://www.ncar.ucar.edu/ncar/",,,0
 //,"UCAR Web Site","http://www.ucar.edu/ucar/",,,0
 ])
@@ -569,7 +569,7 @@ PlainStyle2,
 ,
 0,
 ,
-//,"Forecast Overview","http://www.mmm.ucar.edu/wrf/users/forecasts.html",,,0
+//,"Forecast Overview","http://www2.mmm.ucar.edu/wrf/users/forecasts.html",,,0
 //,"MMM Real-time WRF","http://rain.mmm.ucar.edu/wrf/",,,0
 //,"Other Sites","http://rain.mmm.ucar.edu/mm5/pages/sites.html",,,0
 ])

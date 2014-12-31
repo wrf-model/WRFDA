@@ -163,7 +163,7 @@ PlainStyle,
 //,"Tools","show-menu=Tools","../Tools/index.html",,1
 //,"Data","../DATA/index.html",,,1
 //,"Feedback","http://survey.ucar.edu/opinio/s?s=3302",,,0
-//,"WRF SI","show-menu=SI","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/index.htm",,0
+//,"WRF SI","show-menu=SI","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/index.htm",,0
 ])
 
 //    MENU ITEM - HOME
@@ -190,8 +190,8 @@ PlainStyle2,
 0,
 , 
 ,"WRFDA Online Tutorial Front Page ","../index.html",,,0
-,"WRFDA Users Page ","http://www.mmm.ucar.edu/wrf/users/wrfda",,,0
-,"ARW Online Tutorial Home ","http://www.mmm.ucar.edu/wrf/OnLineTutorial/index.htm",,,0
+,"WRFDA Users Page ","http://www2.mmm.ucar.edu/wrf/users/wrfda",,,0
+,"ARW Online Tutorial Home ","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/index.htm",,,0
 ,"WRF Model Home Page ","http://www.wrf-model.org",,,0
 ])
 
@@ -410,14 +410,14 @@ PlainStyle2,
 ,
 0,
 , 
-,"Cases ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/index.html",,,1
-,"Default Case ","show-menu=JAN00","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/index.html",,0
-,"Single Domain Case ","show-menu=d01","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/index.html",,0
-,"Restart Run ","show-menu=RESTART","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Restart/index.html",,0
-,"SST Input ","show-menu=SST","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/index.html",,0
-,"Nested Model Runs ","show-menu=NEST","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/index.html",,0
-,"Analysis Nudging ","show-menu=FDDA","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/FDDA/index.html",,1
-,"Idealized Cases ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Ideal/index.html",,,0
+,"Cases ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/index.html",,,1
+,"Default Case ","show-menu=JAN00","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/index.html",,0
+,"Single Domain Case ","show-menu=d01","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/index.html",,0
+,"Restart Run ","show-menu=RESTART","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Restart/index.html",,0
+,"SST Input ","show-menu=SST","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/index.html",,0
+,"Nested Model Runs ","show-menu=NEST","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/index.html",,0
+,"Analysis Nudging ","show-menu=FDDA","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/FDDA/index.html",,1
+,"Idealized Cases ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Ideal/index.html",,,0
 ])
 
 
@@ -444,11 +444,11 @@ PlainStyle2,
 ,
 0,
 , 
-,"Case","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/index.html",,,0
-,"geogrid ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/geogrid.htm",,,0
-,"ungrib ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/ungrib.htm",,,0
-,"metgrid ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/metgrid.htm",,,0
-,"wrf ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/wrf.htm",,,0
+,"Case","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/index.html",,,0
+,"geogrid ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/geogrid.htm",,,0
+,"ungrib ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/ungrib.htm",,,0
+,"metgrid ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/metgrid.htm",,,0
+,"wrf ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/JAN00/wrf.htm",,,0
 ])
 
 
@@ -474,11 +474,11 @@ PlainStyle2,
 ,
 0,
 , 
-,"Case","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/index.html",,,0
-,"ungrib ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/ungrib.htm",,,0
-,"geogrid ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/geogrid.htm",,,0
-,"metgrid ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/metgrid.htm",,,0
-,"wrf ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/wrf.htm",,,0
+,"Case","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/index.html",,,0
+,"ungrib ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/ungrib.htm",,,0
+,"geogrid ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/geogrid.htm",,,0
+,"metgrid ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/metgrid.htm",,,0
+,"wrf ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SingleDomain/wrf.htm",,,0
 ])
 
 addmenu(menu=[
@@ -503,8 +503,8 @@ PlainStyle2,
 ,
 0,
 , 
-,"Case","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Restart/index.html",,,0
-,"wrf ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Restart/wrf.htm",,,0
+,"Case","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Restart/index.html",,,0
+,"wrf ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/Restart/wrf.htm",,,0
 ])
 
 addmenu(menu=[
@@ -529,21 +529,21 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/index.html",,,1
-,"2-way with 1 input file","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/2way1input.htm",,,0
-,"wrf ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/wrf_2way1input.htm",,,1
-,"2-way with 2 input files","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/2way2inputs.htm",,,0
-,"geogrid ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/geogrid_2way2inputs.htm",,,0
-,"metgrid ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/metgrid_2way2inputs.htm",,,0
-,"wrf - using all input","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/wrf_2way2inputs.htm",,,0
-,"wrf - using only static input","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/wrf_2way2inputs_static.htm",,,1
-,"1-way using ndown","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown.htm",,,0
-//,"Overview","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown1-1.htm",,,0
-,"STEP 1 - geogrid","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown1-2.htm",,,0
-,"STEP 1 - metgrid","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown1-3.htm",,,0
-,"STEP 2 - wrf for D01","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown2.htm",,,0
-,"STEP 3 - real for D02","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown3.htm",,,0
-,"STEP 4/5 - ndown and wrf for D02","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown4.htm",,,0
+,"Overview","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/index.html",,,1
+,"2-way with 1 input file","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/2way1input.htm",,,0
+,"wrf ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/wrf_2way1input.htm",,,1
+,"2-way with 2 input files","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/2way2inputs.htm",,,0
+,"geogrid ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/geogrid_2way2inputs.htm",,,0
+,"metgrid ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/metgrid_2way2inputs.htm",,,0
+,"wrf - using all input","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/wrf_2way2inputs.htm",,,0
+,"wrf - using only static input","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/wrf_2way2inputs_static.htm",,,1
+,"1-way using ndown","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown.htm",,,0
+//,"Overview","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown1-1.htm",,,0
+,"STEP 1 - geogrid","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown1-2.htm",,,0
+,"STEP 1 - metgrid","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown1-3.htm",,,0
+,"STEP 2 - wrf for D01","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown2.htm",,,0
+,"STEP 3 - real for D02","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown3.htm",,,0
+,"STEP 4/5 - ndown and wrf for D02","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/NestRuns/ndown4.htm",,,0
 ])
 
 addmenu(menu=[
@@ -568,10 +568,10 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/index.html",,,1
-,"metgrid - constant SST","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/metgrid.htm",,,1
-,"metgrid - varying SST","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/metgrid2.htm",,,0
-,"wrf - varying SST","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/wrf.htm",,,0
+,"Overview","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/index.html",,,1
+,"metgrid - constant SST","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/metgrid.htm",,,1
+,"metgrid - varying SST","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/metgrid2.htm",,,0
+,"wrf - varying SST","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/SST/wrf.htm",,,0
 ])
 
 addmenu(menu=[
@@ -596,8 +596,8 @@ PlainStyle2,
 ,
 0,
 , 
-,"Case","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/FDDA/index.html",,,0
-,"wrf ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/CASES/FDDA/wrf.htm",,,0
+,"Case","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/FDDA/index.html",,,0
+,"wrf ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/CASES/FDDA/wrf.htm",,,0
 ])
 
 
@@ -627,10 +627,10 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/index.html",,,1
-,"NCL ","show-menu=NCL","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/index.html",,0
-,"RIP4 ","show-menu=RIP4","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/index.html",,0
-,"ARWpost ","show-menu=ARWpost","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/index.html",,1
+,"Overview ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/index.html",,,1
+,"NCL ","show-menu=NCL","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/index.html",,0
+,"RIP4 ","show-menu=RIP4","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/index.html",,0
+,"ARWpost ","show-menu=ARWpost","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/index.html",,1
 ])
 
 
@@ -656,12 +656,12 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/index.html",,,0
-,"Basics ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_basics.htm",,,0
-,"Creating Scripts ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_scripts.htm",,,0
-,"Sample Scripts ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_examples.htm",,,1
-,"NCL WRF Functions ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_functions.htm",,,1
-,"FORTRAN in NCL ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_Fortran.htm",,,0
+,"Overview ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/index.html",,,0
+,"Basics ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_basics.htm",,,0
+,"Creating Scripts ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_scripts.htm",,,0
+,"Sample Scripts ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_examples.htm",,,1
+,"NCL WRF Functions ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_functions.htm",,,1
+,"FORTRAN in NCL ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/NCL/NCL_Fortran.htm",,,0
 ])
 
 
@@ -691,14 +691,14 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/index.html",,,0
-,"Code ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/start.htm",,,0
-,"Environment ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/env.htm",,,0
-,"Compile ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/compile.htm",,,0
-,"ripdp ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/ripdp.htm",,,0
-,"rip namelist ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/namelist.htm",,,0
-,"rip ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/rip.htm",,,0
-,"Examples ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/Examples/index.html",,,0
+,"Overview ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/index.html",,,0
+,"Code ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/start.htm",,,0
+,"Environment ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/env.htm",,,0
+,"Compile ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/compile.htm",,,0
+,"ripdp ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/ripdp.htm",,,0
+,"rip namelist ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/namelist.htm",,,0
+,"rip ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/rip.htm",,,0
+,"Examples ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/RIP4/Examples/index.html",,,0
 ])
 
 
@@ -728,12 +728,12 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/index.html",,,0
-,"Code ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/start.htm",,,0
-,"Environment ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/env.htm",,,0
-,"Compile ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/compile.htm",,,0
-,"Run ARWpost ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/arwpost.htm",,,0
-,"Examples ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/Examples/index.html",,,0
+,"Overview ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/index.html",,,0
+,"Code ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/start.htm",,,0
+,"Environment ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/env.htm",,,0
+,"Compile ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/compile.htm",,,0
+,"Run ARWpost ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/arwpost.htm",,,0
+,"Examples ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Graphics/ARWpost/Examples/index.html",,,0
 ])
 
 
@@ -763,12 +763,12 @@ PlainStyle2,
 ,
 0,
 , 
-,"Overview ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Tools/index.html",,,1
-,"read_wrf_nc ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Tools/read_wrf_nc.htm",,,0
-,"iowrf ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Tools/iowrf.htm",,,0
-,"p_interp ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Tools/p_interp.htm",,,0
-,"diffwrf ","http://www.mmm.ucar.edu/wrf/users/utilities/diffwrf.html",,,0
-,"Data & Graphics ","http://www.mmm.ucar.edu/wrf/OnlineTutorial/Tools/data_file_tools.htm",,,0
+,"Overview ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Tools/index.html",,,1
+,"read_wrf_nc ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Tools/read_wrf_nc.htm",,,0
+,"iowrf ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Tools/iowrf.htm",,,0
+,"p_interp ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Tools/p_interp.htm",,,0
+,"diffwrf ","http://www2.mmm.ucar.edu/wrf/users/utilities/diffwrf.html",,,0
+,"Data & Graphics ","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/Tools/data_file_tools.htm",,,0
 ])
 
 
@@ -798,11 +798,11 @@ PlainStyle2,
 ,
 0,
 ,
-,"Getting Started","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/index.htm",,,0
-,"Source Code","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_code.htm",,,0
-,"Environment Variables","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_setenv.htm",,,1
-,"Run SI - Manually","show-menu=runSI","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run1.htm",,0
-,"Run SI - with GUI","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_runGUI.htm",,,0
+,"Getting Started","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/index.htm",,,0
+,"Source Code","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_code.htm",,,0
+,"Environment Variables","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_setenv.htm",,,1
+,"Run SI - Manually","show-menu=runSI","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run1.htm",,0
+,"Run SI - with GUI","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_runGUI.htm",,,0
 ])
 
 addmenu(menu=[
@@ -827,9 +827,9 @@ PlainStyle2,
 ,
 0,
 ,
-,"Step 1 - Localization","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run1.htm",,,0
-,"Step 2 - deGrib Input","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run2.htm",,,0
-,"Step 3 - Interpolation","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run3.htm",,,0
+,"Step 1 - Localization","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run1.htm",,,0
+,"Step 2 - deGrib Input","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run2.htm",,,0
+,"Step 3 - Interpolation","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRFSI/si_run3.htm",,,0
 ])
 
 
@@ -856,9 +856,9 @@ PlainStyle2,
 ,
 0,
 ,
-,"General","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRF_real/index.htm",,,0
-,"Run real.exe","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRF_real/arw_real_1dom.htm",,,0
-,"Run wrf.exe","http://www.mmm.ucar.edu/wrf/OnlineTutorial/WRF_real/arw_wrf_1dom.htm",,,0
+,"General","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRF_real/index.htm",,,0
+,"Run real.exe","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRF_real/arw_real_1dom.htm",,,0
+,"Run wrf.exe","http://www2.mmm.ucar.edu/wrf/OnlineTutorial/WRF_real/arw_wrf_1dom.htm",,,0
 ])
 
 addmenu(menu=[
@@ -883,10 +883,10 @@ PlainStyle2,
 ,
 0,
 ,
-//,"Pubs & Docs Overview","http://www.mmm.ucar.edu/wrf/users/pub-doc.html",,,0
-//,"WRF dynamics","http://www.mmm.ucar.edu/wrf/users/docs/wrf-dyn.html",,,0
-//,"WRF physics document","http://www.mmm.ucar.edu/wrf/users/docs/wrf-phy.html",,,0
-//,"Tutorial Presentation","http://www.mmm.ucar.edu/wrf/tutorial/2003/tutorial-2003.html",,,1
+//,"Pubs & Docs Overview","http://www2.mmm.ucar.edu/wrf/users/pub-doc.html",,,0
+//,"WRF dynamics","http://www2.mmm.ucar.edu/wrf/users/docs/wrf-dyn.html",,,0
+//,"WRF physics document","http://www2.mmm.ucar.edu/wrf/users/docs/wrf-phy.html",,,0
+//,"Tutorial Presentation","http://www2.mmm.ucar.edu/wrf/tutorial/2003/tutorial-2003.html",,,1
 ])
 
 
@@ -912,11 +912,11 @@ PlainStyle2,
 ,
 0,
 ,
-//,"WRF Links Overview","http://www.mmm.ucar.edu/wrf/users/links.html",,,0
+//,"WRF Links Overview","http://www2.mmm.ucar.edu/wrf/users/links.html",,,0
 //,"NCAR Graphics","http://ngwww.ucar.edu/",,,0
 //,"NCL example page","http://www.cgd.ucar.edu/csm/support/CSM_Graphics/index_bycat.shtml",,,1
 //,"NCAR SCD","show-menu=SCD",,,1
-//,"MMM Web Site","http://www.mmm.ucar.edu/",,,0
+//,"MMM Web Site","http://www2.mmm.ucar.edu/",,,0
 //,"NCAR Web Site","http://www.ncar.ucar.edu/ncar/",,,0
 //,"UCAR Web Site","http://www.ucar.edu/ucar/",,,0
 ])
@@ -944,7 +944,7 @@ PlainStyle2,
 ,
 0,
 ,
-//,"Forecast Overview","http://www.mmm.ucar.edu/wrf/users/forecasts.html",,,0
+//,"Forecast Overview","http://www2.mmm.ucar.edu/wrf/users/forecasts.html",,,0
 //,"MMM Real-time WRF","http://rain.mmm.ucar.edu/wrf/",,,0
 //,"Other Sites","http://rain.mmm.ucar.edu/mm5/pages/sites.html",,,0
 ])

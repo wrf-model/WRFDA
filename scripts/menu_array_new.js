@@ -182,7 +182,7 @@ PlainStyle,
 ,"Download","show-menu=Download",,,1
 ,"Doc / Pub","show-menu=Pub",,,1
 ,"Links","show-menu=Links",,,1
-,"Internal","http://www.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
+,"Internal","http://www2.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
 ,"Users Forum","http://forum.wrfforum.com/",,,1
 ])
 
@@ -210,9 +210,9 @@ PlainStyle2,
 0,
 , 
 ,"WRF Main Home Page","http://www.wrf-model.org",,,0
-,"WRFDA Users Home Page","http://www.mmm.ucar.edu/wrf/users/wrfda/index.html",,,0
-,"Public Notice","http://www.mmm.ucar.edu/wrf/users/wrfda/public.html",,,0
-,"Contact WRF Support","http://www.mmm.ucar.edu/wrf/users/wrfda/contact.html",,,0
+,"WRFDA Users Home Page","http://www2.mmm.ucar.edu/wrf/users/wrfda/index.html",,,0
+,"Public Notice","http://www2.mmm.ucar.edu/wrf/users/wrfda/public.html",,,0
+,"Contact WRF Support","http://www2.mmm.ucar.edu/wrf/users/wrfda/contact.html",,,0
 ])
 
 
@@ -238,11 +238,11 @@ PlainStyle2,
 ,
 0,
 , 
-,"System Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/system.html",,,1
+,"System Overview","http://www2.mmm.ucar.edu/wrf/users/wrfda/system.html",,,1
 ,"WRF-Var V3.1.1","show-menu=WV311",,,0
 ,"WRF-Var V3.1","show-menu=WV31",,,0
-,"WRF-Var Online Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,1
-,"WRF-Var Tools","http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,0
+,"WRF-Var Online Tutorial","http://www2.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,1
+,"WRF-Var Tools","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,0
 ])
 
 addmenu(menu=[
@@ -267,11 +267,11 @@ PlainStyle2,
 ,
 0,
 ,
-,"Features in WRF-Var V3.0","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfvar.html",,,0
-,"Release Updates","http://www.mmm.ucar.edu/wrf/users/wrfda/updates.html",,,0
+,"Features in WRF-Var V3.0","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfvar.html",,,0
+,"Release Updates","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates.html",,,0
 ,"How to Compile","how_to_compile.html",,,0
-,"How to Run","http://www.mmm.ucar.edu/wrf/users//docs/user_guide_V3/users_guide_chap6.htm#_Running_WRF-Var_1",,,0
-,"Namelists","http://www.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap6.htm#_Description_of_Namelist",,,0
+,"How to Run","http://www2.mmm.ucar.edu/wrf/users//docs/user_guide_V3/users_guide_chap6.htm#_Running_WRF-Var_1",,,0
+,"Namelists","http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap6.htm#_Description_of_Namelist",,,0
 ,"Known Problems and Fixes","known-prob.html",,,0
 
 ])
@@ -299,11 +299,11 @@ PlainStyle2,
 ,
 0,
 ,
-,"Features in WRF-Var V3.1.1","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfvar.html",,,0
-,"Release Updates","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.1.1.html",,,0
-,"How to Compile","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Installing_WRF-Var",,,0
-,"How to Run","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Running_WRF-Var_1",,,0
-,"Namelists","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Description_of_Namelist_1",,,0
+,"Features in WRF-Var V3.1.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfvar.html",,,0
+,"Release Updates","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.1.1.html",,,0
+,"How to Compile","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Installing_WRF-Var",,,0
+,"How to Run","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Running_WRF-Var_1",,,0
+,"Namelists","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Description_of_Namelist_1",,,0
 
 ])
 
@@ -330,11 +330,11 @@ PlainStyle2,
 ,
 0,
 ,
-,"Features in WRF-Var V3.1","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfvar.html",,,0
-,"Release Updates","http://www.mmm.ucar.edu/wrf/users/wrfda/updates-3.1.html",,,0
-,"How to Compile","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Installing_WRF-Var",,,0
-,"How to Run","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Running_WRF-Var_1",,,0
-,"Namelists","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Description_of_Namelist_1",,,0
+,"Features in WRF-Var V3.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfvar.html",,,0
+,"Release Updates","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.1.html",,,0
+,"How to Compile","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Installing_WRF-Var",,,0
+,"How to Run","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Running_WRF-Var_1",,,0
+,"Namelists","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm#_Description_of_Namelist_1",,,0
 ,"Known Problems and Fixes","known-prob.html",,,0
 
 ])
@@ -362,20 +362,20 @@ PlainStyle2,
 ,
 0,
 ,
-,"General","http://www.mmm.ucar.edu/wrf/faqGeneral.html",,,0
-,"NCAR IBM","http://www.mmm.ucar.edu/wrf/faqIBM.html",,,0
-,"TERRAIN","http://www.mmm.ucar.edu/wrf/faqTerrain.html",,,0
-,"REGRID","http://www.mmm.ucar.edu/wrf/faqRegrid.html",,,0
-,"LITTLE_R","http://www.mmm.ucar.edu/wrf/faqLittleR.html",,,0
-,"RAWINS","http://www.mmm.ucar.edu/wrf/faqRawins.html",,,0
-//,"INTERPF","http://www.mmm.ucar.edu/mm5/faqInterpf.html",,,0
-,"MM5","http://www.mmm.ucar.edu/wrf/faqMM5.html",,,0
-//,"INTERPB","http://www.mmm.ucar.edu/mm5/demo.html",,,0
-//,"NESTDOWN","http://www.mmm.ucar.edu/mm5/demo.html",,,0
-,"GRAPH","http://www.mmm.ucar.edu/wrf/faqGraph.html",,,0
-//,"RIP","http://www.mmm.ucar.edu/mm5/demo.html",,,0
-,"Conventions in MM5","http://www.mmm.ucar.edu/mm5/faqConventions.html",,,0
-,"Computer Related","http://www.mmm.ucar.edu/mm5/faqTrouble.html",,,0
+,"General","http://www2.mmm.ucar.edu/wrf/faqGeneral.html",,,0
+,"NCAR IBM","http://www2.mmm.ucar.edu/wrf/faqIBM.html",,,0
+,"TERRAIN","http://www2.mmm.ucar.edu/wrf/faqTerrain.html",,,0
+,"REGRID","http://www2.mmm.ucar.edu/wrf/faqRegrid.html",,,0
+,"LITTLE_R","http://www2.mmm.ucar.edu/wrf/faqLittleR.html",,,0
+,"RAWINS","http://www2.mmm.ucar.edu/wrf/faqRawins.html",,,0
+//,"INTERPF","http://www2.mmm.ucar.edu/mm5/faqInterpf.html",,,0
+,"MM5","http://www2.mmm.ucar.edu/wrf/faqMM5.html",,,0
+//,"INTERPB","http://www2.mmm.ucar.edu/mm5/demo.html",,,0
+//,"NESTDOWN","http://www2.mmm.ucar.edu/mm5/demo.html",,,0
+,"GRAPH","http://www2.mmm.ucar.edu/wrf/faqGraph.html",,,0
+//,"RIP","http://www2.mmm.ucar.edu/mm5/demo.html",,,0
+,"Conventions in MM5","http://www2.mmm.ucar.edu/mm5/faqConventions.html",,,0
+,"Computer Related","http://www2.mmm.ucar.edu/mm5/faqTrouble.html",,,0
 
 ])
 
@@ -402,17 +402,17 @@ PlainStyle2,
 ,
 0,
 ,
-//,"User Support Overview","http://www.mmm.ucar.edu/wrf/users/support.html",,,0
-,"General Information","http://www.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
-,"wrfhelp","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
-,"wrf-news","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfnews.html",,,0
-,"wrf-users","http://www.mmm.ucar.edu/wrf/users/wrfda/wrfusers.html",,,0
-,"Become a registered user","http://www.mmm.ucar.edu/wrf/users/wrfda/regist.html",,,1
-,"Workshop","http://www.mmm.ucar.edu/wrf/users/wrfda/workshop.html",,,0
-,"Tutorial","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
+//,"User Support Overview","http://www2.mmm.ucar.edu/wrf/users/support.html",,,0
+,"General Information","http://www2.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
+,"wrfhelp","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
+,"wrf-news","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfnews.html",,,0
+,"wrf-users","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfusers.html",,,0
+,"Become a registered user","http://www2.mmm.ucar.edu/wrf/users/wrfda/regist.html",,,1
+,"Workshop","http://www2.mmm.ucar.edu/wrf/users/wrfda/workshop.html",,,0
+,"Tutorial","http://www2.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
 //,"Tutorial","show-menu=Tutorials",,,0
-//,"On-Line tutorial","http://www.mmm.ucar.edu/mm5/mm5v3/tutorial/teachyourself.html target=new",,,1
-//,"Users information","http://www.mmm.ucar.edu/mm5/institutes.html",,,0
+//,"On-Line tutorial","http://www2.mmm.ucar.edu/mm5/mm5v3/tutorial/teachyourself.html target=new",,,1
+//,"Users information","http://www2.mmm.ucar.edu/mm5/institutes.html",,,0
 ])
 
 
@@ -438,12 +438,12 @@ PlainStyle2,
 ,
 0,
 ,
-,"Pubs & Docs Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/publications.html",,,1
-,"Tech Notes","http://www.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,0
+,"Pubs & Docs Overview","http://www2.mmm.ucar.edu/wrf/users/wrfda/publications.html",,,1
+,"Tech Notes","http://www2.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,0
 ,"WRFDA User's Guide","show-menu=userguide",,,0
-//,"Tutorial Presentation","http://www.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
+//,"Tutorial Presentation","http://www2.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,0
 //,"WRF-Var Online Tutorial","",,,1
-//,"NCAR Tech Notes","http://www.mmm.ucar.edu/wrf/users/doc1.html",,,0
+//,"NCAR Tech Notes","http://www2.mmm.ucar.edu/wrf/users/doc1.html",,,0
 
 ])
 
@@ -470,8 +470,8 @@ PlainStyle2,
 0,
 ,
 
-,"WRF-Var V3.1.1","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm",,,0
-,"WRF-Var V3.1","http://www.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm",,,0
+,"WRF-Var V3.1.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm",,,0
+,"WRF-Var V3.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm",,,0
 ])
 
 
@@ -497,12 +497,12 @@ PlainStyle2,
 ,
 0,
 ,
-,"WRFDA Links Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/links.html",,,1
+,"WRFDA Links Overview","http://www2.mmm.ucar.edu/wrf/users/wrfda/links.html",,,1
 ,"NCAR Graphics","http://ngwww.ucar.edu/",,,0
 ,"NCL page","http://www.ncl.ucar.edu/",,,1
 ,"Unidata (for netCDF)","http://www.unidata.ucar.edu/",,,1
 ,"NCAR SCD","show-menu=SCD",,,1
-,"MMM Web Site","http://www.mmm.ucar.edu/",,,0
+,"MMM Web Site","http://www2.mmm.ucar.edu/",,,0
 ,"NCAR Web Site","http://www.ncar.ucar.edu/ncar/",,,0
 ,"UCAR Web Site","http://www.ucar.edu/ucar/",,,0
 ])
@@ -557,13 +557,13 @@ PlainStyle2,
 ,
 0,
 ,
-,"Downloads Overview","http://www.mmm.ucar.edu/wrf/users/wrfda/downloads.html",,,1
-,"WRFDA","http://www.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html",,,1
-,"TESTDATA","http://www.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html",,,1
-,"WRFNL","http://www.mmm.ucar.edu/wrf/users/wrfda/download/wrfnl.html",,,1
-,"WRFPLUS","http://www.mmm.ucar.edu/wrf/users/wrfda/download/wrfplus.html",,,1
-,"TOOLS","http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,1
-,"Input Data from NCAR","http://www.mmm.ucar.edu/wrf/users/wrfda/download/free_data.html",,,1
+,"Downloads Overview","http://www2.mmm.ucar.edu/wrf/users/wrfda/downloads.html",,,1
+,"WRFDA","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html",,,1
+,"TESTDATA","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html",,,1
+,"WRFNL","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/wrfnl.html",,,1
+,"WRFPLUS","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/wrfplus.html",,,1
+,"TOOLS","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,1
+,"Input Data from NCAR","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/free_data.html",,,1
 ,"NCEP ftp","ftp://ftpprd.ncep.noaa.gov/pub/data/nccf/com",,,0
 ])
 
