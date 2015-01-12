@@ -640,8 +640,8 @@ END;
    }
 
    if ($form["model"] == "arw") {
-     $goto_url = "http://www.mmm.ucar.edu/wrf/users/download/get_sources.html";
-#     $goto_url = "http://www.mmm.ucar.edu/wrf/users/download/get_source2.htm";
+     $goto_url = "http://www2.mmm.ucar.edu/wrf/users/download/get_sources.html";
+#     $goto_url = "http://www2.mmm.ucar.edu/wrf/users/download/get_source2.htm";
    } elseif ($form["model"] == "nmm") {
      $goto_url = "http://www.dtcenter.org/wrf-nmm/users/downloads/index.php?email=" . $form["email"];
    } else {

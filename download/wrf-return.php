@@ -255,13 +255,13 @@ $row = $result->fetch_array();
    # mysql_query($query);
    $result = $mysqli->query($query);
 
-  $goto_url = "http://www.mmm.ucar.edu/wrf/users/download/get_sources.html#WRF-DA";
+  $goto_url = "http://www2.mmm.ucar.edu/wrf/users/download/get_sources.html#WRF-DA";
   print '<p class="bodytext"><b>User registration verified.</b></p>';
   print '<p class="bodytext">Please <a href="' . $goto_url . '">click here</a> to proceed to the download page.</p>';
 
 #  db_connect("box.mmm.ucar.edu", "wrfweb", "wtwrf");
  } else {
-   $goto_url = "http://www.mmm.ucar.edu/wrf/users/download/wrf-regist.php";
+   $goto_url = "http://www2.mmm.ucar.edu/wrf/users/download/wrf-regist.php";
    print '<p class="bodytext"><b>Unable to verify user registration.</b></p>';
    print '<p class="bodytext">You will need to register to download the software</p>';
    print '<p class="bodytext">Please <a href="' . $goto_url . '">click here</a> to proceed to the registration page.</p>';
