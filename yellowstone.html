@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2014 by UCAR">
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -137,29 +137,40 @@
                 <td style="text-align:center"><b>Version</b></td>
                 <td><b>Status</b></td></tr>
               <tr>
-                <td rowspan="4";>Intel (ifort)</td>
+                <td style="text-align:center" rowspan="4";>Intel<br>(ifort)</td>
                 <td style="text-align:center">12.1.5</td>
                 <td>All tests pass!</td></tr>
+              <tr>
                 <td style="text-align:center;background-color:#DDDDAA;">13.0.1<br>13.1.2</td>
                 <td style="background-color:#DDDDAA;">Some 4DVAR tests fail; use caution</td></tr>
+              <tr>
                 <td style="text-align:center;background-color:#DDAAAA;">14.0.2</td>
-                <td style="background-color:#DDAAAA;"><b>WRFPLUS/4DVAR Compilation fails</b><br>Internal compiler error; no fix available</td></tr>
+                <td style="background-color:#DDAAAA;"><b>WRFPLUS/4DVAR compilation fails</b><br>Internal compiler error; no fix available</td></tr>
+              <tr>
                 <td style="text-align:center;background-color:#DDAAAA;">15.0.0</td>
                 <td style="background-color:#DDAAAA;"><b>Compilation fails</b><br>No fix available at this time</td></tr>
               <tr>
-                <td rowspan="2";>Gnu (gfortran)</td>
-                <td style="text-align:center">4.8.0<br>4.8.1<br>4.8.2<br>4.9.1<br>4.9.2</td>
+                <td style="text-align:center" rowspan="3";>GNU<br>(gfortran)</td>
+                <td style="text-align:center">4.6.4<br>4.7.1&nbsp;&ndash;&nbsp;4.7.4<br>4.8.0&nbsp;&ndash;&nbsp;4.8.2<br>4.9.1&nbsp;&ndash;&nbsp;4.9.2</td>
                 <td>All tests pass!</td></tr>
-                <td style="text-align:center;background-color:#DDAAAA;">4.8.3<br>4.8.4<br>4.9.0<br></td>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">4.4.6<br></td>
+                <td style="background-color:#DDAAAA;"><b>WRFPLUS/4DVAR compilation fails</b><br>No fix available at this time</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">4.4.7<br>4.8.3&nbsp;&ndash;&nbsp;4.8.4<br>4.9.0<br></td>
                 <td style="background-color:#DDAAAA;"><b>Compilation fails</b><br>Yellowstone module issue</td></tr>
-              <tr style="background-color:#DDDDAA;">
-                <td rowspan="2";>PGI (pgf90)</td>
-                <td style="text-align:center">13.3</td>
-                <td><b>Compilation fails</b><br>See the <a href="known-prob.html#V3_6">known problems</a> page for a fix that allows WRFDA to compile with PGI 13.3.</td></tr>
-                <td style="text-align:center;background-color:#DDAAAA;">13.9</td>
-                <td style="background-color:#DDAAAA;"><b>Compilation fails</b><br>No fix at this time; please use version 13.3 if you must use PGI.</td></tr>
+              <tr>
+                <td style="text-align:center" rowspan="3";>PGI<br>(pgf90)</td>
+                <td style="text-align:center">12.10<br></td>
+                <td>All tests pass!</td></tr>
+              <tr>
+                <td style="background-color:#DDDDAA;text-align:center">12.5<br>13.3, 13.9</td>
+                <td style="background-color:#DDDDAA;"><b>All tests pass, but use caution</b><br>Some tests do not produce bit-for-bit identical results on subsequent identical runs.</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">14.7, 14.9, 14.10</td>
+                <td style="background-color:#DDAAAA;"><b>4DVAR compilation fails</b><br>No fix available at this time</td></tr>
               <tr style="background-color:#DDAAAA;">
-                <td>Pathscale (pathf90)</td>
+                <td style="text-align:center">Pathscale<br>(pathf90)</td>
                 <td style="text-align:center">all</td>
                 <td><b>Compilation fails</b><br>PathScale can not be used with WRF or WRFDA.</td></tr>
             </table></p>
@@ -175,13 +186,14 @@
                 <td style="text-align:center">12.1.5</td>
                 <td>All tests pass!</td></tr>
               <tr>
-                <td>Gnu (gfortran)</td>
+                <td>GNU (gfortran)</td>
                 <td style="text-align:center">4.7.2<br>4.8.2</td>
                 <td>All tests pass!</td></tr>
               <tr style="background-color:#DDDDAA;">
                 <td rowspan="2";>PGI (pgf90)</td>
                 <td style="text-align:center">13.3</td>
                 <td><b>Compilation fails</b><br>See the <a href="known-prob.html#V3_6">known problems</a> page for a fix that allows WRFDA to compile with PGI 13.3.</td></tr>
+              <tr>
                 <td style="text-align:center;background-color:#DDAAAA;">13.9</td>
                 <td style="background-color:#DDAAAA;"><b>Compilation fails</b><br>No fix at this time; please use version 13.3 if you must use PGI.</td></tr>
               <tr style="background-color:#DDAAAA;">
@@ -197,7 +209,9 @@
 
             <p class="bodytext">Not all configurations have been tested, so if you encounter a problem running a version of WRFDA which is not listed here as a known problem, please contact <a href="wrfhelp.html">wrfhelp</a>.</p>
 
-            <p class="pagetitle">Working configurations</p>
+            <blockquote>
+            <h1>Working configurations</h1>
+            </blockquote>
             <p class="bodytext">The following configurations have been tested and should run normally. All are dmpar (distributed-memory parallel) builds unless otherwise noted:</p>
             <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
@@ -230,7 +244,9 @@
                 <td>Compiles<br>Runs basic test case<br>Runs CRTM radiance test case (see "Known problems with solutions" below)</td></tr>
             </table></p>
 
-            <p class="pagetitle">Known problems with solutions</p>
+            <blockquote>
+            <h1>Known problems with solutions</h1>
+            </blockquote>
             <p class="bodytext">Some problems with recent versions of WRFDA can not be fixed without some effort by the user. These problems and their solutions are offered below:</p>
 
             <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
@@ -254,7 +270,9 @@
             </table></p>
 
 
-            <p class="pagetitle">Older versions with major problems</p>
+            <blockquote>
+            <h1>Versions with major problems</h1>
+            </blockquote>
 <!--            <p class="bodytext"><b>NOTE: We <em>HIGHLY</em> recommend using the latest version of WRFDA on Yellowstone. However, if you must use an older version, you can try the fixes below.</b></p>-->
             <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
@@ -266,7 +284,9 @@
                   Once this step is completed, download the <a href="http://www2.mmm.ucar.edu/wrf/src/fix/configure_fix.tar">configure_fix.tar</a> file, and unpack it in the top WRFDA directory. This fix contains new "configure" script and a new "arch/configure_new.defaults" file. You should now be able to configure and compile WRFDA normally.</td></tr>
             </table></p>
 
-            <p class="pagetitle">Non-working configurations</p>
+            <blockquote>
+            <h1>Non-working configurations</h1>
+            </blockquote>
             <p class="bodytext">The following configurations have known problems which are being investigated:</p>
             <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
@@ -294,19 +314,7 @@
                 <td>Compilation error: PathScale is terrible. Will not support in the near future.</td></tr>
             </table></p>
 
-            <p class="pagetitle">Planned tests</p>
-            <p class="bodytext">The following configurations have not yet been tested, but we plan on testing them in the future:</p>
-            <blockquote>
-            <ul class="bodytext">
-              <li><b>Intel (ifort, icc)</b></li>
-                <ul><li>All supported versions tested</li></ul>
-              <li><b>PGI (pgf90, pgcc)</b></li>
-                <ul><li>WRFDA V3.2 through V3.3</li></ul>
-              <li><b>GNU (gfortran, gcc)</b></li>
-                <ul><li>WRFDA V3.2 through V3.3</li></ul>
-              <li><b>Serial builds</b></li>
-            </blockquote>
-            <p class="bodytext">We do not plan on supporting earlier versions, but if you have a specific question you can contact <a href="wrfhelp.html">wrfhelp</a>.</p>
+            <p class="bodytext"><b>We do not plan on supporting versions earlier than 3.2, but if you have a specific question you can contact <a href="wrfhelp.html">wrfhelp</a>.</b></p>
             <p class="pagetitle">Help</p>
             <p class="bodytext">If you need to run one of the version listed here as not working, or if you encounter a problem not listed here running WRFDA on Yellowstone, please contact <a href="wrfhelp.html">wrfhelp</a>.</p>
 

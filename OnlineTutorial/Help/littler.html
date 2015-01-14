@@ -133,6 +133,14 @@ body {
       <p class="bodytext"><strong id="Font14">The header record</strong> </p>
       <p class="bodytext"></p>
 
+<!-- 
+
+THE FOLLOWING SEEMS TO BE INCORRECT, BUT I'D LIKE TO SAVE IT JUST IN CASE
+
+     These tail integers only have meaning for when you have duplicate reports (two observations at the same location and time); there are three checks done by the "merge_obs" subroutine (in file var/obsproc/src/module_obs_merge.F90): first, if one report has more levels than the other, the one with fewer levels is discarded. Otherwise, if one has fewer write errors or fewer warnings, it is discarded. Otherwise, the first report (by order in the LITTLE_R file) is kept and the other discarded. As you can see, these are not really important for almost all cases (the number of errors should be zero if you have written your program correctly, unless there is a problem with your initial data), which is why we don't go into this much detail in the presentation I sent you.
+
+-->
+
 <!--
       <table width="90%" border="0" cellpadding="3" cellspacing="7">
         <tr>

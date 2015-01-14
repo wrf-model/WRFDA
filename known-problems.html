@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2014 by UCAR">
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -175,7 +175,7 @@
             <h1> Problems compiling on Mac OS X 10.9 (Mavericks) and potentially other systems (posted 2014-05-27) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFDA fails to compile, returning the following message at or near the end of the compilation log:<br><br>
-               Undefined symbols for architecture x86_64:<br>
+               <code>Undefined symbols for architecture x86_64:<br>
                &nbsp; "_irev_", referenced from:<br>
                &nbsp; &nbsp; &nbsp; _ipkm_ in libbufr.a(ipkm.o)<br>
                &nbsp; &nbsp; &nbsp; _pkb_ in libbufr.a(pkb.o)<br>
@@ -188,7 +188,7 @@
                &nbsp; &nbsp; &nbsp; _iupbs3_ in libbufr.a(iupbs3.o)<br>
                ld: symbol(s) not found for architecture x86_64<br>
                collect2: error: ld returned 1 exit status<br>
-               make[2]: [obsproc.exe] Error 1 (ignored)<br></p>
+               make[2]: [obsproc.exe] Error 1 (ignored)<br></code></p>
             <p class="bodytext"><strong>Solution:</strong><br>
                Please download and untar the following tar file (<a href="fixes/v36/bufr.tar">bufr.tar</a>), which contains a directory named "bufr". Delete the directory "WRFDA/var/external/bufr" and replace it with the new "bufr" directory. Then run "<code>./clean -a</code>" and recompile.</p>
             <h1> Problems compiling with PGI fortran (posted 2014-05-02, updated 2014-07-27) </h1>
@@ -240,6 +240,15 @@
 
             <a name="V3_5"></a><p class="pagetitle">WRFDA Version 3.5 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> Compilation failure on IBM AIX platforms (posted 2015-01-14) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Compilation of BUFR libraries fail on IBM AIX platforms using the cc_r C compiler, with the following message:<br><br>
+               <code>bort_exit.o: not found<br><br>
+               make: The error code from the last command is 1.<br>
+               make: Ignored error code 1 from last command.<br>
+               &nbsp; &nbsp; cc_r -o bort_exit.o -c -DNOUNDERSCORE&nbsp; -DMAX_HISTORY=25 -DNMM_CORE=0 -DUNDERSCORE bort_exit.c</code></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the file "var/external/bufr/Makefile" with this copy: (<a href="fixes/v35/Makefile">Makefile</a>). Then run "<code>./clean -a</code>" and recompile.
             <h1> WRFPLUS fails to compile with serial option is selected (posted 2014-01-30) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                Compilation of WRFPLUS fails at main/module_wrf_top.f90 with message "error #6404: This name does not have a type, and must have an explicit type." (or similar error message)</p>
