@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2014 by UCAR">
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -50,11 +50,17 @@
 .style5 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; }
 -->
 </style>
+
+<script type="text/javascript" src="yellowstone_gfortran_date.js"> </script>
+<script type="text/javascript" src="yellowstone_ifort_date.js"> </script>
+<script type="text/javascript" src="yellowstone_pgi_date.js"> </script>
+
+    <script src="jquery.js"></script> 
 </head>
 
 
 
-<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_date(); yellowstone_ifort_date(); yellowstone_pgi_date();">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
 
@@ -118,12 +124,13 @@
           <td><p>&nbsp;</p>
             <p class="pagetitle">WRFDA Regression testing</p>
             <p class="bodytext">Regression tests are run on a regular basis to ensure that additions to the combined WRF/WRFDA trunk code do not affect the results of standard WRFDA tests. The regression tests are run on a variety of platforms using a variety of compilers. You can view the latest results below.<br></p>
+            <p class="bodytext">The options in <b>bold</b> are the default compilers that are updated most frequently. Other versions may not be up to date; check the date listed on the summary page.
             <p class="pagetitle">Test results</p>
             <h2 class="bodytext">Yellowstone</h2>
-            <p class="bodytext">"Yellowstone" is NCAR's main supercomputer. It is a 64-bit Enterprise Linux system.</p>
-              <blockquote><ul class="bodytext"><li><a href="summary_gfortran_yellowstone.html">gfortran/gcc results</a></li>
-                <li><a href="summary_ifort_yellowstone.html">ifort/icc_results</a></li>
-                <li><a href="summary_pgi_yellowstone.html">pgf90/pgcc_results</a></li>
+            <p class="bodytext">"Yellowstone" is NCAR's main supercomputer. It is a 64-bit Enterprise Linux system. The default modules are used for testing unless noted.</p>
+              <blockquote><ul class="bodytext"><li><a href="summary_yellowstone_gfortran_4.8.2.html">gfortran/gcc results</a> (<em>last updated: <span id="yellowstone_gfortran_update"></span></em>)</li>
+                <li><a href="summary_yellowstone_ifort_12.1.5.html">ifort/icc_results</a> (<em>last updated: <span id="yellowstone_ifort_update"></span></em>)</li>
+                <li><a href="summary_yellowstone_pgi_12.10.html">pgf90/pgcc_results</a> (<em>last updated: <span id="yellowstone_pgi_update"></span></em>)<br><em>Note: PGI version 12.10 is tested rather than the default 13.3, which has problems on Yellowstone</em></li>
               </ul></blockquote>
             <h2 class="bodytext">Loblolly</h2>
             <p class="bodytext">"Loblolly" is a local PC. It is a 64-bit CentOS Linux system.</p>
