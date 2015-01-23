@@ -54,13 +54,14 @@
 <script type="text/javascript" src="yellowstone_gfortran_date.js"> </script>
 <script type="text/javascript" src="yellowstone_ifort_date.js"> </script>
 <script type="text/javascript" src="yellowstone_pgi_date.js"> </script>
+<script type="text/javascript" src="loblolly_gfortran_date.js"> </script>
 
     <script src="jquery.js"></script> 
 </head>
 
 
 
-<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_date(); yellowstone_ifort_date(); yellowstone_pgi_date();">
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_date(); yellowstone_ifort_date(); yellowstone_pgi_date(); loblolly_gfortran_date();">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
 
@@ -134,11 +135,11 @@
               </ul></blockquote>
             <h2 class="bodytext">Loblolly</h2>
             <p class="bodytext">"Loblolly" is a local PC. It is a 64-bit CentOS Linux system.</p>
-              <blockquote><ul class="bodytext"><li><a href="summary_gfortran_loblolly.html">gfortran/gcc results</a></li>
+              <blockquote><ul class="bodytext"><li><a href="summary_loblolly_gfortran_4.9.2.html">gfortran/gcc results</a> (<em>last updated: <span id="loblolly_gfortran_update"></span></em>)</li>
                 <li><a href="summary_pgf90_loblolly.html">pgf90/pgcc_results</a></li>
               </ul></blockquote>
-            <h2 class="bodytext">visit-05</h2>
-            <p class="bodytext">"visit-05" is a local Mac machine. It is a 64-bit OSX 10.8.5 (Mountain Lion) system.</p>
+            <h2 class="bodytext">visit-a05</h2>
+            <p class="bodytext">"visit-a05" is a local Mac machine. It is a 64-bit OSX 10.8.5 (Mountain Lion) system.</p>
               <blockquote><ul class="bodytext"><li><a href="summary_gfortran_visit-a05.html">gfortran/gcc results</a></li>
               </ul></blockquote>
             <h2 class="bodytext">Documentation</h2>
@@ -148,8 +149,11 @@
             <h2 class="bodytext">Download test cases</h2>
             <p class="bodytext">The data needed for running the regression test package can be found here:</p>
               <blockquote><p class="bodytext"><em>Latest release version (V3.6.1)</em>:</p>
-                <ul class="bodytext"><li><a href="WRFDA-data-EM_V36.tar.gz">Input data</a></li>
-                  <li><a href="BASELINE_V36.tar.gz">Baseline data</a></li>
+                <ul class="bodytext"><li><a href="WRFDA-data-EM_V361.tar.gz">Input data</a></li>
+                  <li>Baseline data:</li>
+                    <ul><li><a href="BASELINE_yellowstone_V361.tar.gz">Yellowstone</a></li>
+                    <li><a href="BASELINE_loblolly_V361.tar.gz">loblolly</a></li>
+                    <li><a href="BASELINE_visit-a05_V361.tar.gz">visit-a05</a></li></ul>
                 </ul>
 <!--                <p class="bodytext"><em>Latest internal revision (r7506; 2014-06-20)</em>:</p>
                 <ul class="bodytext"><li><a href="WRFDA-data-EM_r7506.tar.gz">Input data</a></li>
