@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2014 by UCAR">
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -124,7 +124,7 @@
           <p>&nbsp;</p>          
           <p>&nbsp;</p></td>
 
-          <td width="660" height="1739" colspan="2" bgcolor="#CBFFCD"><p>&nbsp;</p>
+          <td width="660" height="1239" colspan="2" bgcolor="#CBFFCD"><p>&nbsp;</p>
             <p class="pagetitle">WRFDA system requirements</p>
             <blockquote>
             <p class="bodytext">WRFDA is designed to be an extremely flexible data assimilation system, and as such can be compiled on a large number of quite different systems. It is impossible for us to test every possible configuration, but we have assembled a rough list of minimum requirements for installing and running WRFDA:</p>
@@ -134,7 +134,8 @@
 
 
             <a name="compilers"></a><h1>Compilers</h1>
-            <p class="bodytext">WRFDA can be compiled with a number of different compilers.  Not all of these have been tested on all platforms, but some minimum requirements are known:</p>
+            <p class="bodytext">WRFDA can be compiled with a number of different compilers. You can see a list of compilers/versions that have been specifically tested at the <a href="yellowstone.html">Yellowstone information page</a>, but note that some failures are platform-specific, this should only be used as a guideline for your purposes!</p>
+            <p class="bodytext">It is impossible to test all versions of all compilers on platforms, but some minimum requirements are known:</p>
             <ul class="bodytext"><li><b>gfortran</b>: Version 4.4 or later</li>
               <li><b>pgf90</b>: Version 8.0 or later</li></ul>
             <p class="bodytext">For the following compilers, the earliest compatible version is unknown, so the earliest tested version is listed:</p>
@@ -145,6 +146,13 @@
             <a name="memory"></a><h1>Memory</h1>
             <p class="bodytext">There are no set minimum memory requirements for WRFDA; smaller 3DVAR cases can be run with less than 1GB of RAM, while larger 4DVAR cases may need terrabytes. WRFDA does not have any special handling of out-of-memory errors, so these will usually result in a segmentation fault. If your runs are failing abruptly and without warning, try using a smaller domain size or more processors.</p>
             <p class="bodytext">The tutorial case mentioned in the <a href="usersguide.html">User's Guide</a> requires about 1GB of RAM.</p>
+
+            <a name="libraries"></a><h1>Required libraries</h1>
+            <p class="bodytext">There are only one or two libraries you will need to install separately (depending on what type of data you plan to assimilate:</p>
+            <ul class="bodytext"><li>As with WRF, it is necessary that netCDF libraries be installed prior to compiling WRFDA. You can find more information at the <a href="OnlineTutorial/Help/netcdf.html">netCDF tutorial page</a>.</li>
+              <li>If you plan on assimilating satellite radiance data, you have two options of radiative transfer model to use: CRTM (included in WRFDA), or RTTOV (must be installed separately). See <a href="http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap6.htm#_Installing_WRFDA_for">the WRFDA User's Guide</a> for more information.</li></ul>
+
+
             </blockquote>            <p align="center" class="detailtextRed"> 
               <script language="JavaScript">
 

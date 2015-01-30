@@ -144,44 +144,81 @@ body {
 <a name="how"></a>
       <table border="0" cellpadding="3" cellspacing="7">
       <tr><td><p class="style5" id="Font16">How do I choose the best option for my purposes</p>
-      <p class="bodytext">Because the same configuration script is used for all WRF-related products, you must specify that you want to compile WRFDA by issuing the command <span class="style6" id="Font12">./configure wrfda</span>. As an example, this is what this step will look like on a Linux x86_64 (64-bit) system:</p>
+      <p class="bodytext">Because the same configuration script is used for all WRF-related products, you must specify that you want to compile WRFDA by issuing the command <span class="style6" id="Font12">./configure wrfda</span>. As an example, this is what this step will look like on a Linux system:</p>
 
-      <p class="code">>./configure wrfda<br>
+      <p class="code">> ./configure wrfda<br>
                       checking for perl5... no<br>
                       checking for perl... found /usr/bin/perl (perl)<br>
-                      Will use NETCDF in dir: /usr/local/netcdf-3.6.3-gfortran<br>
+                      Will use NETCDF in dir: /usr/local/netcdf<br>
                       PHDF5 not set in environment. Will configure WRF for use without.<br>
-                      Will use 'time' to report timing information<br>
                       $JASPERLIB or $JASPERINC not found in environment, configuring to build without grib2 I/O...<br>
                       ------------------------------------------------------------------------<br>
-                      Please select from among the following Linux x86_64 options:<br>
-                      <br>
-                      &nbsp; 1. (serial)&nbsp; &nbsp;2. (smpar)&nbsp; &nbsp;3. (dmpar)&nbsp; &nbsp;4. (dm+sm)&nbsp; &nbsp;PGI (pgf90/gcc)<br>
-                      &nbsp; 5. (serial)&nbsp; &nbsp;6. (smpar)&nbsp; &nbsp;7. (dmpar)&nbsp; &nbsp;8. (dm+sm)&nbsp; &nbsp;PGI (pgf90/pgcc): SGI MPT<br>
-                      &nbsp; 9. (serial)&nbsp; 10. (smpar)&nbsp; 11. (dmpar)&nbsp; 12. (dm+sm)&nbsp; &nbsp;PGI (pgf90/gcc): PGI accelerator<br>
-                      &nbsp;13. (serial)&nbsp; 14. (smpar)&nbsp; 15. (dmpar)&nbsp; 16. (dm+sm)&nbsp; &nbsp;INTEL (ifort/icc)<br>
-                      &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;17. (dm+sm)&nbsp; &nbsp;INTEL (ifort/icc): Xeon Phi (MIC architecture)<br>
-                      &nbsp;18. (serial)&nbsp; 19. (smpar)&nbsp; 20. (dmpar)&nbsp; 21. (dm+sm)&nbsp; &nbsp;INTEL (ifort/icc): Xeon (SNB with AVX mods)<br>
-                      &nbsp;22. (serial)&nbsp; 23. (smpar)&nbsp; 24. (dmpar)&nbsp; 25. (dm+sm)&nbsp; &nbsp;INTEL (ifort/icc): SGI MPT<br>
-                      &nbsp;26. (serial)&nbsp; 27. (smpar)&nbsp; 28. (dmpar)&nbsp; 29. (dm+sm)&nbsp; &nbsp;INTEL (ifort/icc): IBM POE<br>
-                      &nbsp;30. (serial)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;31. (dmpar)&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; PATHSCALE (pathf90/pathcc)<br>
-                      &nbsp;32. (serial)&nbsp; 33. (smpar)&nbsp; 34. (dmpar)&nbsp; 35. (dm+sm)&nbsp; &nbsp;GNU (gfortran/gcc)<br>
-                      &nbsp;36. (serial)&nbsp; 37. (smpar)&nbsp; 38. (dmpar)&nbsp; 39. (dm+sm)&nbsp; &nbsp;IBM (xlf90_r/cc_r)<br>
-                      &nbsp;40. (serial)&nbsp; 41. (smpar)&nbsp; 42. (dmpar)&nbsp; 43. (dm+sm)&nbsp; &nbsp;PGI (ftn/gcc): Cray XT CLE<br>
-                      &nbsp;44. (serial)&nbsp; 45. (smpar)&nbsp; 46. (dmpar)&nbsp; 47. (dm+sm)&nbsp; &nbsp;CRAY CCE (ftn/gcc): Cray XE and XC30<br>
-                      &nbsp;48. (serial)&nbsp; 49. (smpar)&nbsp; 50. (dmpar)&nbsp; 51. (dm+sm)&nbsp; &nbsp;INTEL (ftn/icc): Cray XC30<br>
-                      &nbsp;52. (serial)&nbsp; 53. (smpar)&nbsp; 54. (dmpar)&nbsp; 55. (dm+sm)&nbsp; &nbsp;PGI (pgf90/pgcc)<br>
-                      &nbsp;56. (serial)&nbsp; 57. (smpar)&nbsp; 58. (dmpar)&nbsp; 59. (dm+sm)&nbsp; &nbsp;PGI (pgf90/gcc): -f90=pgf90<br>
-                      &nbsp;60. (serial)&nbsp; 61. (smpar)&nbsp; 62. (dmpar)&nbsp; 63. (dm+sm)&nbsp; &nbsp;PGI (pgf90/pgcc): -f90=pgf90<br>
-                      <br>
-                      Enter selection [1-63] :</p>
+                      Please select from among the following supported platforms.<br>
+                      &nbsp;<br>
+                      &nbsp; &nbsp;1.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (serial)</br>
+                      &nbsp; &nbsp;2.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (smpar)</br>
+                      &nbsp; &nbsp;3.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (dmpar)</br>
+                      &nbsp; &nbsp;4.&nbsp; Linux x86_64 i486 i586 i686, PGI compiler with gcc&nbsp; (dm+sm)</br>
+                      &nbsp; &nbsp;5.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (serial)</br>
+                      &nbsp; &nbsp;6.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (smpar)</br>
+                      &nbsp; &nbsp;7.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (dmpar)</br>
+                      &nbsp; &nbsp;8.&nbsp; Linux x86_64 i486 i586 i686 PGI compiler with pgcc YELLOWSTONE&nbsp; (dm+sm)</br>
+                      &nbsp; &nbsp;9.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (serial)</br>
+                      &nbsp; 10.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (smpar)</br>
+                      &nbsp; 11.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (dmpar)</br>
+                      &nbsp; 12.&nbsp; Linux x86_64, PGI compiler with pgcc, SGI MPT&nbsp; (dm+sm)</br>
+                      &nbsp; 13.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (serial)</br>
+                      &nbsp; 14.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (smpar)</br>
+                      &nbsp; 15.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (dmpar)</br>
+                      &nbsp; 16.&nbsp; Linux x86_64, PGI accelerator compiler with gcc&nbsp; (dm+sm)</br>
+                      &nbsp; 17.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (serial)</br>
+                      &nbsp; 18.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (smpar)</br>
+                      &nbsp; 19.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (dmpar)</br>
+                      &nbsp; 20.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc&nbsp; (dm+sm)</br>
+                      &nbsp; 21.&nbsp; Linux x86_64 i486 i586 i686, Xeon Phi (MIC architecture) ifort compiler with icc  (dm+sm)</br>
+                      &nbsp; 22.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (serial)</br>
+                      &nbsp; 23.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (smpar)</br>
+                      &nbsp; 24.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (dmpar)</br>
+                      &nbsp; 25.&nbsp; Linux x86_64 i486 i586 i686, Xeon (SNB with AVX mods) ifort compiler with icc  (dm+sm)</br>
+                      &nbsp; 26.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (serial)</br>
+                      &nbsp; 27.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (smpar)</br>
+                      &nbsp; 28.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (dmpar)</br>
+                      &nbsp; 29.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc YELLOWSTONE  (dm+sm)</br>
+                      &nbsp; 30.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (serial)</br>
+                      &nbsp; 31.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (smpar)</br>
+                      &nbsp; 32.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (dmpar)</br>
+                      &nbsp; 33.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, SGI MPT  (dm+sm)</br>
+                      &nbsp; 34.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (serial)</br>
+                      &nbsp; 35.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (smpar)</br>
+                      &nbsp; 36.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (dmpar)</br>
+                      &nbsp; 37.&nbsp; Linux x86_64 i486 i586 i686, ifort compiler with icc, IBM POE  (dm+sm)</br>
+                      &nbsp; 38.&nbsp; Linux i486 i586 i686 x86_64, PathScale compiler with pathcc  (serial)</br>
+                      &nbsp; 39.&nbsp; Linux i486 i586 i686 x86_64, PathScale compiler with pathcc  (dmpar)</br>
+                      &nbsp; 40.&nbsp; x86_64 Linux, gfortran compiler with gcc   (serial)</br>
+                      &nbsp; 41.&nbsp; x86_64 Linux, gfortran compiler with gcc   (smpar)</br>
+                      &nbsp; 42.&nbsp; x86_64 Linux, gfortran compiler with gcc   (dmpar)</br>
+                      &nbsp; 43.&nbsp; x86_64 Linux, gfortran compiler with gcc   (dm+sm)</br>
+                      &nbsp; 44.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (serial)</br>
+                      &nbsp; 45.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (smpar)</br>
+                      &nbsp; 46.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (dmpar)</br>
+                      &nbsp; 47.&nbsp; Cray XE and XC30 CLE/Linux x86_64, Cray CCE compiler  (dm+sm)</br>
+                      &nbsp; 48.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (serial)</br>
+                      &nbsp; 49.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (smpar)</br>
+                      &nbsp; 50.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (dmpar)</br>
+                      &nbsp; 51.&nbsp; Cray XC30 CLE/Linux x86_64, Xeon ifort compiler  (dm+sm)</br>
+                      &nbsp; 52.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (serial)</br>
+                      &nbsp; 53.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (smpar)</br>
+                      &nbsp; 54.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (dmpar)</br>
+                      &nbsp; 55.&nbsp; Linux x86_64, Fujitsu FX10 mpifrtpx and mpifccpx compilers  (dm+sm)</br>
+                      </br>
+                      Enter selection [1-55] :</p>
       </td>
       <td width="500" style=vertical-align:top><table border="0" cellpadding="3" cellspacing="7">
         <tr>
           <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td>
           <td width="95%" bgcolor="#DDAA55" class="bodytext"><b>
             <span class="style5">My configure script looks different! What gives?</span><br>
-            Starting with WRF/WRFDA version 3.7, the configure script was updated to make selecting options easier. This is the version of this page for version 3.7 and later; <a href=configuration.html>click here if you are using an older version</a>!</b>
+            Starting with WRF/WRFDA version 3.7, the configure script was updated to make selecting options easier. This is the version of this page for version 3.6.1 and earlier; <a href=configuration.html>click here for the newer version</a>!</b>
           </td>
         </tr>
       </table>
