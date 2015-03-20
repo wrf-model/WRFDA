@@ -1,0 +1,231 @@
+<html>
+
+<head>
+
+<title>Observation Error Tuning</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data assimilation Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style1 {
+	color: #FF0000;
+	font-style: italic;
+	font-weight: bold;
+}
+.style2 {color: #FF0000}
+.style3 {color: #000000}
+.style5 {color: #FF0000; font-weight: bold; }
+-->
+</style>
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="images/goldrule.jpg" bgcolor="#009933"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td valign="top" bgcolor="#CBFFCD"><table width="994" border="0" align="left" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+
+        <td width="117" height="880" bgcolor="#009933"><p>&nbsp;</p>
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><p align="center"><a href="publications.html" class="leftnavlink">WRFDA Publications</a></p>
+                <p align="center"><a href="technotes.html" class="leftnavlink">Technical Notes</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.6.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.6.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.6/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.6</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.5.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.5/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.4.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.4/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.4</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.3/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.3</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.2.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.2/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.2</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.1.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1.1</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.1/users_guide_chap6.htm" class="leftnavlink">User's Guide V3.1</a></p>
+                <p align="center"><a href="OnlineTutorial/index.html" class="leftnavlink">WRFDA Online Tutorial</a></p>
+                <p align="center"><a href="how_to_compile.html" class="leftnavlink">How to compile WRFDA</a></p>
+                <p align="center"><a href="yellowstone.html" class="leftnavlink">WRFDA on Yellowstone</a></p>
+                <p align="center"><a href="readBUFR.html" class="leftnavlink">Reading BUFR files</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt; font-size: 10pt; font-weight: bold;">Observation error tuning</p>
+              </td>
+
+            </tr>
+
+          </table>
+
+          <p>&nbsp;</p>          <p>&nbsp;</p>          <img src="images/shim112.gif" width="112" height="1"></td>
+
+          <td bgcolor="#CBFFCD"><p>&nbsp;</p>
+
+            <p class="pagetitle">Observation Error Tuning with WRFDA</p>
+
+            <p class="bodytext">For tuning observation and background errors, following two  methods are available with WRFDA.</p>
+
+            <ul class="toc">
+              <li>a) Hollingsworth method (Ref: Tellus (1986) 38, pp.111-161, Part I & II )</li>
+              <li>b) Desroziers method (Ref: QJRMS (2001), 127, pp. 1433-1452)</li></ul>
+
+            <h1>Steps for running Hollingsworth tuning method:</h1>
+
+            <p class="bodytext">Step 1: Make sure that you have the following executables in "var/build" directory. These get created along with the main WRFDA code when it is compiled.<br>
+              <code>da_tune_obs_hollingsworth1.exe<br>
+                    da_tune_obs_hollingsworth2.exe<br></code></p>
+
+            <p class="bodytext">Step 2: Download and unpack the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">WRFDA TOOLS package</a>.</p>
+            <p class="bodytext">Step 3: Make sure that you have already run WRFDA for a sufficiently long period (one month in recommended) in cycling mode.</p>
+            <p class="bodytext">Step 4: Write a suitable wrapper script for running the script found in the WRFDA TOOLS package that you downloaded: <code>var/scripts/da_tune_obs_hollingsworth.ksh</code>. The following variables need to be set:</p>
+
+            <blockquote>
+            <ul class="bodytext"><li><code>WRFVAR_DIR</code> : Directory path for main WRFDA</li>
+              <li><code>EXP_DIR</code> : Directory path holding "gts_omb_oma" files which are already created for the tuning period of the WRF-WRFDA cycling run.</li>
+              <li><code>START_DATE</code> : Start date for the tuning period</li>
+              <li><code>ENS_DATE</code> : End date for the tuning period</li></ul>
+            </blockquote>
+
+            <p class="bodytext">Step 5: Execute the wrapper created for this purpose.<br><br>
+            Note: For each desired observation type, a corresponding observation error file will be generated. For example, for sounding type you will see "sound_u_omb.sigma_o_b", "sound_v_omb.sigma_o_b" etc. These files basically hold the tuned statistics for observation and background errors.</p>
+
+            <h1>Steps for running Desroziers tuning method:</h1>
+
+            <p class="bodytext">Step 1: Make sure that you have the following executable in "var/build" directory. This program gets created along with the main WRFDA code when it is compiled.<br>
+              <code>da_tune_obs_desroziers.exe<br></code></p>
+
+            <p class="bodytext">Step 2: Run two sets of parallel WRFDA runs as follows:
+
+            <ul class="toc">
+              <li>a) "unperturbed" run: Run WRFDA with default options. Corresponding "RUN_DIR" needs to be assigned as "Y_DIR"</li>
+              <li>b) "perturbed" run: Run WRFDA with "omb_add_noise" and "put_rand_seed" set as .TRUE. Corresponding "RUN_DIR" needs to be assigned as "YP_DIR"</li></ul>
+
+            <p class="bodytext">Step 3: Download and unpack the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">WRFDA TOOLS package</a>.</p>
+            <p class="bodytext">Step 4: Write a suitable wrapper script to run "var/scripts/da_tune_obs_desroziers.ksh"</p>
+            <p class="bodytext">Step 5: Execute the wrapper script generated at Step 3. Look for "errfac.dat". It needs to be copied in "wrfda/run" directory for later use by setting "ucs_obs_errfac" = .TRUE.<br><br>
+              Note: While running Step 1, you may notice that huge number of files may get created. However, for running "Desroziers" tuning method, only following files are needed:
+            <blockquote>
+            <ul class="bodytext"><li><code>rand_obs_error</code> generated in Step 2 (b)</li>
+              <li><code>pert_obs</code> generated in Step 2 (b)</li>
+              <li><code>unpert_obs</code> generated in Step 2 (a)</li>
+              <li><code>jo</code> generated in Step 2 (a)</li>
+              <li><code><code>rsl.out.000.html</code> generated in Step 2 (a)</li></ul>
+            </blockquote>
+
+
+            <p align="center" class="detailtextRed">
+
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+</p>
+
+            <p class="bodytext">&nbsp;            </p>            <br>
+
+            <br>        <img src="images/transgif.gif" width="1" height="1"><img src="images/shim162.gif" width="162" height="1"></td>
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" valign="bottom" bgcolor="#009933"><div align="center" class="detailtext"><a href="/wrf/users/index.html
+
+" class="detailtext">Home</a> -- <a href="/wrf/users/model.html">Analysis
+
+          System</a> -- <a href="/wrf/users/support.html">User Support</a> -- <a href="/wrf/users/publications.html">Doc
+
+    / Pub</a> -- <a href="/wrf/users/links.html">Links</a> -- <a href="/wrf/users/downloads.html">Download</a></div></td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

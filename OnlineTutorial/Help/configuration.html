@@ -181,14 +181,22 @@ body {
           <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td>
           <td width="95%" bgcolor="#DDAA55" class="bodytext"><b>
             <span class="style5">My configure script looks different! What gives?</span><br>
-            Starting with WRF/WRFDA version 3.7, the configure script was updated to make selecting options easier. This is the version of this page for version 3.7 and later; <a href=configuration.html>click here if you are using an older version</a>!</b>
+            Starting with WRF/WRFDA version 3.7, the configure script was updated to make selecting options easier. This is the version of this page for version 3.7 and later; <a href=configuration_pre37.html>click here if you are using an older version</a>!</b>
           </td>
         </tr>
       </table>
       </td></tr></table>
 
-      <p class="bodytext">Each line contains several columns of data. All of these data are important, so be sure to pay attention:</p>
+      <p class="bodytext">Each line lists a lot of information, but don't worry, if you know just a little bit about your system you should have no trouble selecting the correct option.</p>
+      <p class="bodytext">First, note that the line above the listed options is specific to your operating system. In this case, it reads "Please select from among the following Linux x86_64 options", but for a Mac it will read "Please select from among the following Darwin ARCH options", and other machines (such as IBM AIX) will look different still.
       <ol><ol>
+        <li class="bodybullet"><b>Parallelization option</b><br>
+          The parallelization option is the term in parenthesis at the end of each line. We recommend selecting a "dmpar" (<b>d</b>istributed-<b>m</b>emory <b>par</b>allel) option for several reasons:<br>
+        <ul><li class="bodybullet">Code compiled to run in serial restricts you to a single processor for running WRFDA, leading to slower execution and the potential for segmentation faults if you choose too large a domain or too many observations.</li>
+        <li class="bodybullet">Code compiled to run in parallel takes about the same amount of compilation time.</li>
+        <li class="bodybullet">Code compiled to run in parallel can still be run in serial if the need arises.</li>
+        <li class="bodybullet">Shared-memory options (smpar and dm+sm) are not supported for WRFDA (they may work on some systems, but hidden errors and problems with irreproducability are likely due to the way most Fortran compilers handle shared memory). They will not provide a significant advantage over distributed-memory anyway.</li></ul></li>
+        <br>
         <li class="bodybullet"><b>Operating system and architecture</b><br>
           The text before the first comma indicates the operating system and architecture (processor type). You can type "uname -a" on the command line in most systems to see your system's specifications. Possible values are the following:<br>
             <ul><li>Linux. This is the most common operating system for modern supercomputers, and can also be used on PCs. Linux can be run on systems with several different architectures:
@@ -209,13 +217,6 @@ body {
             <li>Intel fortran compiler (ifort) with Intel C compiler (icc)</li></ul><br>
           If you are unsure whether you can use a certain compiler, you can issue the "which" command to see if that particular compiler exists in your path (for example: "which gfortran").<br>
         </li>
-        <br>
-        <li class="bodybullet"><b>Parallelization option</b><br>
-          The parallelization option is the term in parenthesis at the end of each line. We recommend selecting a "dmpar" (<b>d</b>istributed-<b>m</b>emory <b>par</b>allel) option for several reasons:<br>
-        <ul><li class="bodybullet">Code compiled to run in serial restricts you to a single processor for running WRFDA, leading to slower execution and the potential for segmentation faults if you choose too large a domain or too many observations.</li>
-        <li class="bodybullet">Code compiled to run in parallel takes about the same amount of compilation time.</li>
-        <li class="bodybullet">Code compiled to run in parallel can still be run in serial if the need arises.</li>
-        <li class="bodybullet">Shared-memory options (smpar and dm+sm) are not supported for WRFDA (they may work on some systems, but hidden errors and problems with irreproducability are likely due to the way most Fortran compilers handle shared memory). They will not provide a significant advantage over distributed-memory anyway.</li></ul></li>
       </ol></ol>
 
       <p class="bodytext">You should enter the number of the selection you choose, then hit [Enter]. Again, make sure that you choose the same compilers (both FORTRAN and C) that you used to compile your netCDF library!</p>
