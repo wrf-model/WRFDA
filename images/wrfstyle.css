@@ -4,8 +4,8 @@
 	line-height: 14pt;
 	color: #000000;
 	text-align: justify;
-	padding-right: 45px;
-	padding-left: 45px;
+	padding-right: 40px;
+	padding-left: 40px;
 
 }
 
@@ -24,8 +24,8 @@
         line-height: 14pt;
         color: #000000;
         text-align: justify;
-        padding-right: 45px;
-        padding-left: 65px;
+        padding-right: 40px;
+        padding-left: 60px;
 
 }
 
@@ -35,7 +35,7 @@
 	line-height: 14pt;
 	color: #000000;
 	text-align: justify;
-	padding-right: 45px;
+	padding-right: 40px;
 
 }
 
@@ -92,7 +92,7 @@ A.calloutlink:visited {
         line-height: 14pt;
         color: #000000;
         text-align: justify;
-        padding-right: 45px;
+        padding-right: 40px;
         padding-left: 60px;
 
 }
@@ -104,7 +104,7 @@ A.calloutlink:visited {
         line-height: 14pt;
         color: #000000;
         text-align: left;
-        padding-right: 45px;
+        padding-right: 40px;
         padding-left: 60px;
 
 }
@@ -265,5 +265,5 @@ h3 {
 	line-height: 13pt;
 	color: #000000;
 	padding-right: 30px;
-	padding-left: 65px;
+	padding-left: 60px;
 }

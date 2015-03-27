@@ -51,17 +51,19 @@
 -->
 </style>
 
-<script type="text/javascript" src="yellowstone_gfortran_date.js"> </script>
-<script type="text/javascript" src="yellowstone_ifort_date.js"> </script>
-<script type="text/javascript" src="yellowstone_pgi_date.js"> </script>
-<script type="text/javascript" src="loblolly_gfortran_date.js"> </script>
+<script type="text/javascript" src="yellowstone_gfortran_4.8.2_date.js"> </script>
+<script type="text/javascript" src="yellowstone_ifort_12.1.5_date.js"> </script>
+<script type="text/javascript" src="yellowstone_pgi_12.10_date.js"> </script>
+<!--<script type="text/javascript" src="yellowstone_pgi_date.js"> </script>-->
+<script type="text/javascript" src="loblolly_gfortran_4.9.2_date.js"> </script>
+<script type="text/javascript" src="visit-a05_gfortran_4.9.2_date.js"> </script>
 
     <script src="jquery.js"></script> 
 </head>
 
 
 
-<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_date(); yellowstone_ifort_date(); yellowstone_pgi_date(); loblolly_gfortran_date();">
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_4_8_2_date(); yellowstone_ifort_12_1_5_date(); yellowstone_pgi_12_10_date(); loblolly_gfortran_4_9_2_date(); visita05_gfortran_4_9_2_date();">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
 
@@ -105,7 +107,7 @@
 
   <tr>
 
-    <td height="812" valign="top" bgcolor="#CBFFCD"><table width="780" height="880" border="0" cellpadding="0" cellspacing="0">
+    <td height="812" valign="top" bgcolor="#CBFFCD"><table width="900" height="880" border="0" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
 
@@ -128,18 +130,21 @@
             <p class="pagetitle">Test results</p>
             <h2 class="bodytext">Yellowstone</h2>
             <p class="bodytext">"Yellowstone" is NCAR's main supercomputer. It is a 64-bit Enterprise Linux system. The default modules are used for testing unless noted.</p>
-              <blockquote><ul class="bodytext"><li><a href="summary_yellowstone_gfortran_4.8.2.html">gfortran/gcc results</a> (<em>last updated: <span id="yellowstone_gfortran_update"></span></em>)</li>
-                <li><a href="summary_yellowstone_ifort_12.1.5.html">ifort/icc_results</a> (<em>last updated: <span id="yellowstone_ifort_update"></span></em>)</li>
-                <li><a href="summary_yellowstone_pgi_12.10.html">pgf90/pgcc_results</a> (<em>last updated: <span id="yellowstone_pgi_update"></span></em>)<br><em>Note: PGI version 12.10 is tested rather than the default 13.3, which has problems on Yellowstone</em></li>
+              <blockquote><ul class="bodytext"><li><b>Weekly tests:</b><br><em>These tests are run regularly to ensure that changes to the trunk have not caused problems in the WRFDA code. Typically run once a week.</em></li>
+                <ul><li><a href="summary_yellowstone_gfortran_4.8.2.html">gfortran/gcc V4.8.2 results</a> (<em>last updated: <span id="yellowstone_gfortran_4_8_2_update"></span></em>)</li>
+                <li><a href="summary_yellowstone_ifort_12.1.5.html">ifort/icc_V12.1.5 results</a> (<em>last updated: <span id="yellowstone_ifort_12_1_5_update"></span></em>)</li>
+                <li><a href="summary_yellowstone_pgi_12.10.html">pgf90/pgcc_V12.10 results</a> (<em>last updated: <span id="yellowstone_pgi_12_10_update"></span></em>)</li></ul><br>
+<!--                <li><b>Occasional tests:</b><br><em>The following tests are done at each release and on other occasions as necessary. Some failures are expected, especially for PGI.</em></li>
+                <ul><li><a href="summary_yellowstone_pgi_13.3.html">pgf90/pgcc_V13.3 results</a> (<em>last updated: <span id="yellowstone_pgi_update"></span></em>)<br><em>Note: The default version 13.3 has problems with reproducibility on Yellowstone</em></li></ul>-->
               </ul></blockquote>
             <h2 class="bodytext">Loblolly</h2>
             <p class="bodytext">"Loblolly" is a local PC. It is a 64-bit CentOS Linux system.</p>
-              <blockquote><ul class="bodytext"><li><a href="summary_loblolly_gfortran_4.9.2.html">gfortran/gcc results</a> (<em>last updated: <span id="loblolly_gfortran_update"></span></em>)</li>
+              <blockquote><ul class="bodytext"><li><a href="summary_loblolly_gfortran_4.9.2.html">gfortran/gcc V4.9.2 results</a> (<em>last updated: <span id="loblolly_gfortran_4_9_2_update"></span></em>)</li>
 <!--                <li><a href="summary_pgf90_loblolly.html">pgf90/pgcc_results</a></li>-->
               </ul></blockquote>
             <h2 class="bodytext">visit-a05</h2>
             <p class="bodytext">"visit-a05" is a local Mac machine. It is a 64-bit OSX 10.9.5 (Mavericks) system.</p>
-              <blockquote><ul class="bodytext"><li><a href="summary_gfortran_visit-a05.html">gfortran/gcc results</a></li>
+              <blockquote><ul class="bodytext"><li><a href="summary_visit-a05_gfortran_4.9.2.html">gfortran/gcc V4.9.2 results</a> (<em>last updated: <span id="visita05_gfortran_4_9_2_update"></span></em>)</li>
               </ul></blockquote>
             <h2 class="bodytext">Documentation</h2>
             <blockquote><ul class="bodytext"><li><a href="README">README</a> <em>(still incomplete)</em></li>
