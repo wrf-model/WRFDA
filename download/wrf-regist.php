@@ -64,7 +64,9 @@ $affiliation_types = array("US Universities",
 #			 "Non Meteorological Applications",
 #			 "Other");
 
-$intended_usages = array('Numerical Weather Prediction',
+$intended_usages = array('WRFDA',
+                         'WRFPLUS',
+                         'Numerical Weather Prediction',
 			 'Idealized Simulations',
 			 'Coupled Models',
 			 'Regional Climate',
