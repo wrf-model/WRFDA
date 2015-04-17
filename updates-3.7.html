@@ -117,71 +117,38 @@
                 <li>A new <a href=#wrfplus_physics>mp_physics option is available for WRFPLUS in 4DVAR runs</a>.</li></ul>
 
               <h3><big>Updated features:</big></h3>
-              <ul class="bodytext"><li>WRFDA can now use WRF files with the  <a href="#latlon">"lat-lon" (cylindrical equidistant) map projection</a>. This does not include global WRF files.</li>
-                <li>WRFDA can now use WRF files with the  <a href="#latlon">"lat-lon" (cylindrical equidistant) map projection</a>. This does not include global WRF files.</li>
+              <ul class="bodytext"><li>WRFDA can now use WRF files with the "lat-lon" (cylindrical equidistant) map projection. This does not include global WRF files.</li>
                 <li>Updated libraries:</li>
                 <ul class="bodytext"><li>RTTOV interface now supports RTTOV Version 11.1 or 11.2</li></ul>
                 <li>Bug fixes and performance improvements</li>
                 <li><a href="download/wrfplus.html">WRFPLUS</a> (WRF adjoint and tangent linear model) has been upgraded to V3.7 and is consistent with the released WRF version 3.7.</li></ul>
-              <ul class="bodytext"></li>Previous versions of WRFDA gave incorrect results for WRF files which use the "lat-lon" (cylindrical equidistant) map projection. This has been fixed. This does not include global WRF files.</li>
-              <p class="bodytext">For instructions on compiling and running the latest version of WRFDA, please refer to the updated <a href="Docs/user_guide_V3.6/WRFDA_Users_Guide.html">User's Guide</a></p>
+              <p class="bodytext">For instructions on compiling and running the latest version of WRFDA, please refer to the updated <a href="Docs/user_guide_V3.7/WRFDA_Users_Guide.html">User's Guide</a></p>
 
             </blockquote>
             <p class="pagetitle">Version 3.7 update details</p>
             <blockquote>
-              <a name="dual_res"></a>
-              <h1>Dual-resolution hybrid assimilation</h1>
-              <p class="bodytext">WRFDA now has an option for dual-resolution hybrid data assimilation where a high-resolution background is combined with a low-resolution ensemble to produce a high-resolution analysis.  The procedure for hybrid assimilation (as described in <a href="Docs/user_guide_V3.6/users_guide_chap6.htm#_Hybrid_Data_Assimilation_2">the relevant section of the User's Guide</a>) is not changed, but there is an additional namelist option for the dual-resolution capability:</p>
-              <p class="bodytext">&wrfvar16<br>
-                &nbsp; hybrid_dual_res: &nbsp; (logical) Switch for using dual-resolution hybrid<br>
-                &nbsp; &nbsp; true:  use dual-resolution hybrid assimilation<br>
-                &nbsp; &nbsp; false: ensemble members and analysis will be the same resolution (default)</p>
-              <p class="bodytext">In addition, the user will need to provide a first guess file for the ensemble domain (named "fg_ens"); this is only needed to extract mapping info, so the exact file does not matter.</p>
+              <a name="cv7"></a>
+              <h1>CV7 background error option</h1>
+              <p class="bodytext">WRFDA now has an additional background error option. This new option, CV7, uses a different set of control variables as the other standard options: u, v, temperature, pseudo relative humidity (<em>RH_s</em>), and surface pressure (<em>P_s</em>). The pseudo relative humidity is defined as <em>Q/Q_b,s</em>, where <em>Qb,s</em> is the saturated specific humidity from the background field. The procedure for generating <code>be.dat</code> background error files with GEN_BE is the same as for CV5, with an additional variable which must be set in the GEN_BE wrapper script: <code>export NL_CV_OPTIONS=5</code>. See <a href="Docs/user_guide_V3.7/users_guide_chap6.htm#_Hybrid_Data_Assimilation_2">the relevant section of the User's Guide (UPDATE THIS LINK!!)</a>) for more detailed instructions.</p>
 
-              <a name="seviri"></a>
-              <h1>Meteosat SEVIRI assimilation</h1>
-              <p style="padding-right: 45px;padding-left: 45px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="padding-right: 45px;padding-left: 45px;"><b>Note:</b> There is a known bug in the original release version: <a href="known-prob.html#V3_6">see this page</a> for a solution.</td></tr></table></p>
-              <p class="bodytext">Metosat 8, 9, and 10 (AKA MSG 1, 2, and 3) carry the Spinning Enhanced Visible and InfraRed Imager (SEVIRI). WRFDA can now assimilate radiance observations from this instrument, which are available in BUFR format from EUMETSAT. This is a limited implementation for now, only covering the 8 infrared channels. The relevant namelist options are as follows:</p>
-              <p class="bodytext">&wrfvar4<br>
-                &nbsp; use_seviriobs: &nbsp; (logical) Switch for reading SEVIRI observations.<br>
-                &nbsp; &nbsp; true:  WRFDA will look for the "seviri.bufr" file and read it if it exists<br>
-                &nbsp; &nbsp; false: no SEVIRI data will be read (default)</p>
-              <p class="bodytext">&wrfvar14<br>
-                &nbsp; rtminit_platform = 12, ("MSG", Meteosat Second Generation)<br>
-                &nbsp; rtminit_satid = 1,2,3 (for MSG 1, 2, and 3 respectively)<br>
-                &nbsp; rtminit_sensor = 21, ("seviri")</p>
+              <a name="radar"></a>
+              <h1>Radar assimilation updates</h1>
+              <p class="bodytext">As of version 3.7, WRFDA has an improved radar data assimilation capability: there are now two different options for assimilating radar reflectivity data. In addition, radar can now be assimilated for 4DVAR.</p>
+              <p class="bodytext">The new reflectivity assimilation option (<code>use_radar_rhv</code>) is a scheme described in <a href="http://journals.ametsoc.org/doi/full/10.1175/JAMC-D-12-0120.1">Wang et al, 2013</a>. This option which assimilates rainwater mixing ratio that is estimated from radar reflectivity, described as an “indirect method” in the paper. This second option also includes an additional namelist option option (<code>use_radar_rqv</code>) that allows the assimilation of in-cloud humidity estimated from reflectivity using a method which is also described in Wang et al, 2013. <code>use_radar_rqv</code> also includes the assimilation of snow and graupel converted from reflectivity using formulas as described in <a href="http://journals.ametsoc.org/doi/abs/10.1175/JAS-D-11-0162.1">Gao and Stensrud, 2012</a>.</p>
+              <p class="bodytext">More detailed information about radar assimilation can be found in <a href="Docs/user_guide_V3.7/users_guide_chap6.htm#">a new section of the User's Guide</a>.
 
-              <a name="metop-b"></a>
-              <h1>Metop-B instruments</h1>
-              <p class="bodytext">Metop-B (AKA Metop 1) is a polar-orbiting satellite run by EUMETSAT, and is the sister satellite for Metop-A. Data from the IASI, AMSU-A, and MHS instruments from Metop-A could already be assimilated in WRFDA; starting with 3.6 this data can also be assimilated from Metop-B.</p>
-              <p class="bodytext"><em>Beware of the strange numbering system for Metop!</em> Use namelist setting "rtminit_platform = 10" for all Metop satellites. Metop-A, officially named "Metop 2", was the first operational Metop satellite. However, because "Metop-A" is officially named "Metop 2", you should set "rtminit_satid = 2" for Metop-A, and "rtminit_satid = 1" for Metop-B. These conventions are set by EUMETSAT: don't blame us.</p>
-
-              <a name="airep"></a>
-              <h1>AIREP humidity observations</h1>
-              <p class="bodytext">AIREP (short for "aircraft report") is an automated weather observation from an airplane. WRFDA has had the ability to assimilate AIREP observations of temperature and wind for many years, but not moisture. These moisture observations can now be read and assimilated by WRFDA. Users will not need to change any settings to assimilate these observations: if they are present in your observation files they will be read and assimilated.</p>
-
-              <a name="thinning"></a>
-              <h1>Observation thinning for conventional observations in ASCII format</h1>
-              <p class="bodytext">WRFDA now allows for the thinning of conventional observations assimilated in ASCII format; previously this options was only available for assimilating PREPBUFR-format observations. The relevant namelist options are as follows:</p>
-              <p class="bodytext">&wrfvar4<br>
-                &nbsp; thin_conv_ascii: &nbsp; (logical) Switch for thinning conventional obs for ob_format=2 (ASCII).<br>
-                &nbsp; &nbsp; true:  conventional observations will be thinned<br>
-                &nbsp; &nbsp; false: all observations with good quality will be assimilated (default)<br>
-                &nbsp; thin_mesh_conv: &nbsp; (real) The size of the thinning mesh boxes, in km (default: 20.).</p>
-              <p class="bodytext"><em>Note for users performing radar assimilation</em>: Thining routines have been implemented for radar observations, but the code has not been well tested. We recommend not using thinning with radar observations at this time.</p>
-
-              <a name="gpsro"></a>
-              <h1>GPSRO</h1>
-              <p class="bodytext">Users now have more flexibility when assimilating GPS Radio Occulation (GPSRO) observations. These observations can be read in ASCII text format (from file "ob.ascii", potentially along with other conventional observation types) or in NCEP PREPBUFR format (from file "gpsro.bufr"). Previously, users reading conventional observations from "ob.ascii" could not read GPSRO observations from "gpsro.bufr" at the same time, but now that is possible with the namelist option "ob_format_gpsro" under record &wrfvar3. For "ob_format_gpsro = 1", WRFDA will read GSPRO observations from "gpsro.bufr". For "ob_format_gpsro = 2", WRFDA will read GSPRO observations from "ob.ascii".</p>
+              <a name="wrfplus_physics"></a>
+              <h1>New WRFPLUS microphysics option</h1>
+              <p class="bodytext">New microphysics option</p>
 
               <p>&nbsp;</p>
 
             </blockquote>
             <p class="pagetitle">Helpful links</p>
             <blockquote>
-              <li class="bodytext"><big><a href="./Docs/user_guide_V3.6/users_guide_chap6.htm#_Installing_WRF-Var">Compiling WRFDA</a></big></li>
-              <li class="bodytext"><big><a href="./Docs/user_guide_V3.6/users_guide_chap6.htm#_Running_WRF-Var_1">Running WRFDA</a></big></li>
-              <li class="bodytext"><big><a href="./Docs/user_guide_V3.6/users_guide_chap6.htm#_Description_of_Namelist_1">List and description of namelist variables</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.7/users_guide_chap6.htm#_Installing_WRF-Var">Compiling WRFDA</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.7/users_guide_chap6.htm#_Running_WRF-Var_1">Running WRFDA</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.7/users_guide_chap6.htm#_Description_of_Namelist_1">List and description of namelist variables</a></big></li>
 
               <p class="bodytext"><br></p>
               <p align="center" class="detailtextRed"><br>
