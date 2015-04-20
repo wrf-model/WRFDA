@@ -187,37 +187,19 @@ body {
       </table>
       </td></tr></table>
 
-      <p class="bodytext">Each line lists a lot of information, but don't worry, if you know just a little bit about your system you should have no trouble selecting the correct option.</p>
-      <p class="bodytext">First, note that the line above the listed options is specific to your operating system. In this case, it reads "Please select from among the following Linux x86_64 options", but for a Mac it will read "Please select from among the following Darwin ARCH options", and other machines (such as IBM AIX) will look different still.
-      <ol><ol>
-        <li class="bodybullet"><b>Parallelization option</b><br>
-          The parallelization option is the term in parenthesis at the end of each line. We recommend selecting a "dmpar" (<b>d</b>istributed-<b>m</b>emory <b>par</b>allel) option for several reasons:<br>
-        <ul><li class="bodybullet">Code compiled to run in serial restricts you to a single processor for running WRFDA, leading to slower execution and the potential for segmentation faults if you choose too large a domain or too many observations.</li>
+      <p class="bodytext">Each line lists a lot of information, but don't worry, if you know just a little bit about your system you should have no trouble selecting the correct option:</p>
+      <p class="bodytext">First, note that the line above the listed options is specific to your operating system. In this case, it reads "Please select from among the following Linux x86_64 options", but for a Mac it will read "Please select from among the following Darwin ARCH options", and other machines (such as IBM AIX) will look different still.</p>
+      <p class="bodytext">Next, you will need to look for your compilers in the list. The end of each line indicates different platform/compiler combinations that are available. The configure script does not try to determine which compilers are actually present on your system, so you will have to determine which ones are available for yourself. The most common options are:</p>
+      <blockquote><ul><li class="bodybullet">GNU fortran compiler (gfortran) with GNU C compiler (gcc)</li>
+        <li class="bodybullet">Intel fortran compiler (ifort) with Intel C compiler (icc)</li>
+        <li class="bodybullet">PGI fortran compiler (pgf90) with PGI C compiler (pgcc)</li>
+        <li class="bodybullet">PGI fortran compiler (pgf90) with GNU C compiler (gcc)</li></ul></blockquote>
+      <p class="bodytext">If you are unsure whether you can use a certain compiler, you can issue the "which" command to see if that particular compiler exists in your path (for example: `<code>which gfortran</code>`). Some lines contain additional information to the right of the compilers; in most cases, you should choose the option that <b>does not</b> contain any extra information to the right of the compilers.</p>
+      <p class="bodytext">Finally, you need to choose your parallelization option. On the line which contains the compiler/platform combination that best describes your machine setup, you should see one or more numbered options. The words in parenthesis describe the <b>parallelization option</b>.  We recommend choosing a dmpar (<b>d</b>istributed-<b>m</b>emory <b>par</b>allel) option for several reasons:</p>
+        <blockquote><ul><li class="bodybullet">Code compiled to run in serial restricts you to a single processor for running WRFDA, leading to slower execution and the potential for segmentation faults if you choose too large a domain or too many observations.</li>
         <li class="bodybullet">Code compiled to run in parallel takes about the same amount of compilation time.</li>
         <li class="bodybullet">Code compiled to run in parallel can still be run in serial if the need arises.</li>
-        <li class="bodybullet">Shared-memory options (smpar and dm+sm) are not supported for WRFDA (they may work on some systems, but hidden errors and problems with irreproducability are likely due to the way most Fortran compilers handle shared memory). They will not provide a significant advantage over distributed-memory anyway.</li></ul></li>
-        <br>
-        <li class="bodybullet"><b>Operating system and architecture</b><br>
-          The text before the first comma indicates the operating system and architecture (processor type). You can type "uname -a" on the command line in most systems to see your system's specifications. Possible values are the following:<br>
-            <ul><li>Linux. This is the most common operating system for modern supercomputers, and can also be used on PCs. Linux can be run on systems with several different architectures:
-                <ul><li>x86_64, a very common 64-bit architecture</li>
-                <li>i386&ndash;686, older (but still fairly common) 32-bit architectures</li>
-                <li>ppc64, a 64-bit architecture for PowerPC processors</li>
-                <li>SGI Altix, an architecture for Altix supercomputers</li>
-                <li>ia64, a rarely-seen 64-bit architecture for Itanium systems</li></ul></li>
-            <li>Darwin (MACOS). This is the operating system for Apple PCs.</li>
-            <li>AIX. This is an IBM-specific operating system for Unix-based supercomputers</li></ul>
-        </li>
-        <br>
-        <li class="bodybullet"><b>Fortran and C compilers</b><br>
-          The next bit of text indicates the compilers WRFDA should be built with. The configure script does not try to determine which compilers are actually present on your system, so you will have to determine which ones are available for yourself. The most common options are:<br>
-            <ul><li>GNU fortran compiler (gfortran) with GNU C compiler (gcc)</li>
-            <li>PGI fortran compiler (pgf90) with PGI C compiler (pgcc)</li>
-            <li>PGI fortran compiler (pgf90) with GNU C compiler (gcc)</li>
-            <li>Intel fortran compiler (ifort) with Intel C compiler (icc)</li></ul><br>
-          If you are unsure whether you can use a certain compiler, you can issue the "which" command to see if that particular compiler exists in your path (for example: "which gfortran").<br>
-        </li>
-      </ol></ol>
+        <li class="bodybullet">Shared-memory options (smpar and dm+sm) are not supported for WRFDA (they may work on some systems, but hidden errors and problems with irreproducability are likely due to the way most Fortran compilers handle shared memory). They will not provide a significant advantage over distributed-memory anyway.</li></ul></blockquote>
 
       <p class="bodytext">You should enter the number of the selection you choose, then hit [Enter]. Again, make sure that you choose the same compilers (both FORTRAN and C) that you used to compile your netCDF library!</p>
 
