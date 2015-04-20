@@ -98,6 +98,7 @@
             <tr>
               <td><p align="center"><a href="publications.html" class="leftnavlink">WRFDA Publications</a></p>
                 <p align="center"><a href="technotes.html" class="leftnavlink">Technical Notes</a></p>
+                <p align="center"><a href="Docs/user_guide_V3.7/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.7</a></p>
                 <p align="center"><a href="Docs/user_guide_V3.6.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.6.1</a></p>
                 <p align="center"><a href="Docs/user_guide_V3.6/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.6</a></p>
                 <p align="center"><a href="Docs/user_guide_V3.5.1/WRFDA_Users_Guide.html" class="leftnavlink">User's Guide V3.5.1</a></p>
@@ -127,8 +128,60 @@
 
 
 
-            <p class="bodytext">Yellowstone is NCAR's high-performance supercomputer, used for research by NCAR, UCAR, and university users. The latest version of WRFDA (version 3.6.1) can be compiled and run using Yellowstone's default configuration, but some users may want to use different compilers. Here is a list of tested compilers, as well as some configurations which are known not to work:</p>
+            <p class="bodytext">Yellowstone is NCAR's high-performance supercomputer, used for research by NCAR, UCAR, and university users. The latest version of WRFDA (version 3.7) can be compiled and run using Yellowstone's default module (Intel 12.1.5), but some users may want to use different compilers. Here is a list of tested compilers, as well as some configurations which are known not to work:</p>
 
+
+<h2>For version 3.7:</h2>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Compiler</b></td>
+                <td style="text-align:center"><b>Version</b></td>
+                <td><b>Status</b></td></tr>
+              <tr>
+                <td style="text-align:center" rowspan="1";>Intel<br>(ifort)</td>
+                <td style="text-align:center">12.1.5<br>15.0.1</td>
+                <td>All tests pass!</td></tr>
+<!--              <tr>
+                <td style="text-align:center;background-color:#DDDDAA;">13.0.1<br>13.1.2</td>
+                <td style="background-color:#DDDDAA;">Some 4DVAR tests fail; use caution</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">14.0.2</td>
+                <td style="background-color:#DDAAAA;"><b>WRFPLUS/4DVAR compilation fails</b><br>Internal compiler error; no fix available</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">15.0.0</td>
+                <td style="background-color:#DDAAAA;"><b>Compilation fails</b><br>No fix available at this time</td></tr>-->
+              <tr>
+                <td style="text-align:center" rowspan="1";>GNU<br>(gfortran)</td>
+                <td style="text-align:center">4.8.2</td>
+                <td>All tests pass!</td></tr>
+<!--              <tr>
+                <td style="text-align:center" rowspan="3";>GNU<br>(gfortran)</td>
+                <td style="text-align:center">4.6.4<br>4.7.1&nbsp;&ndash;&nbsp;4.7.4<br>4.8.0&nbsp;&ndash;&nbsp;4.8.2<br>4.9.1&nbsp;&ndash;&nbsp;4.9.2</td>
+                <td>All tests pass!</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">4.4.6<br></td>
+                <td style="background-color:#DDAAAA;"><b>WRFPLUS/4DVAR compilation fails</b><br>No fix available at this time</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">4.4.7<br>4.8.3&nbsp;&ndash;&nbsp;4.8.4<br>4.9.0<br></td>
+                <td style="background-color:#DDAAAA;"><b>Compilation fails</b><br>Yellowstone module issue</td></tr>-->
+              <tr>
+                <td style="background-color:#DDDDAA;text-align:center" rowspan="1";>PGI<br>(pgf90)</td>
+                <td style="background-color:#DDDDAA;text-align:center">13.3<br></td>
+                <td style="background-color:#DDDDAA;"><b>All tests pass, but use caution</b><br>Some tests do not produce bit-for-bit identical results on subsequent identical runs.</td></tr>
+<!--                <td style="text-align:center" rowspan="3";>PGI<br>(pgf90)</td>
+                <td style="text-align:center">12.10<br></td>
+                <td>All tests pass!</td></tr>
+              <tr>
+                <td style="background-color:#DDDDAA;text-align:center">12.5<br>13.3, 13.9</td>
+                <td style="background-color:#DDDDAA;"><b>All tests pass, but use caution</b><br>Some tests do not produce bit-for-bit identical results on subsequent identical runs.</td></tr>
+              <tr>
+                <td style="text-align:center;background-color:#DDAAAA;">14.7, 14.9, 14.10<br>15.1</td>
+                <td style="background-color:#DDAAAA;"><b>4DVAR compilation fails</b><br>No fix available at this time</td></tr>-->
+              <tr style="background-color:#DDAAAA;">
+                <td style="text-align:center">Pathscale<br>(pathf90)</td>
+                <td style="text-align:center">all</td>
+                <td><b>Compilation fails</b><br>PathScale can not be used with WRF or WRFDA.</td></tr>
+            </table></p>
 
 <h2>For version 3.6.1:</h2>
             <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
