@@ -140,7 +140,11 @@
 
               <a name="wrfplus_physics"></a>
               <h1>New WRFPLUS microphysics option</h1>
-              <p class="bodytext">WRFPLUS now has two microphysics options to choose from for 4DVAR assimilation. The original</p>
+              <p class="bodytext">WRFPLUS now has two microphysics options to choose from for 4DVAR assimilation. The new scheme is a modified Kessler scheme. You can control which scheme is used with the following namelist option:</p>
+              <p class="bodytext">&physics<br>
+                &nbsp; mp_physics_ad: &nbsp; mp_physics option for WRFPLUS.<br>
+                &nbsp; &nbsp; 98: Use original large-scale condensation microphysics (default)<br>
+                &nbsp; &nbsp; 99: Use new modified Kessler scheme</p>
 
               <p>&nbsp;</p>
 
