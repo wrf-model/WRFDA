@@ -2429,7 +2429,7 @@ Data Assimilation</span></h2>
  <li class=MsoNormal style='margin-top:14.0pt'><a href="#_Introduction">Introduction</a></li>
  <li class=MsoNormal><a href="#_Installing_WRFDA_for">Installing WRFDA for 3D-Var
      Run</a></li>
- <li class=MsoNormal><a href="#WRFPlus">Installing WRFPLUS and WRFDA for 
+ <li class=MsoNormal><a href="#WRFPlus">Installing WRFPLUS and WRFDA forÂ 
      4D-Var Run</a></li>
  <li class=MsoNormal><a href="#_Running_Observation_Preprocessor_1">Running Observation
      Preprocessor (OBSPROC)</a></li>
@@ -2483,32 +2483,32 @@ src="users_guide_chap6_files/image001.png"></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
 margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><a
-name="_Setting_up_WRF-Var"></a><b><i>x<sup>b</sup></i></b>         first guess,
+name="_Setting_up_WRF-Var"></a><b><i>x<sup>b</sup></i></b>Â Â Â Â Â Â Â Â  first guess,
 either from a previous WRF forecast or from WPS/real.exe output.</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
-margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>x<sup>lbc</sup></i></b>       lateral
+margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>x<sup>lbc</sup></i></b>Â Â Â Â Â Â  lateral
 boundary from WPS/real.exe output.</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
-margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>x<sup>a</sup></i></b>         analysis
+margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>x<sup>a</sup></i></b>Â Â Â Â Â Â Â Â  analysis
 from the WRFDA data assimilation system.</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
-margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>x<sup>f</sup></i></b>         WRF
+margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>x<sup>f</sup></i></b>Â Â Â Â Â Â Â Â  WRF
 forecast output.</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
-margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>y<sup>o</sup></i></b>         observations
-processed by OBSPROC.  (note: PREPBUFR input, radar, radiance, and rainfall
+margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b><i>y<sup>o</sup></i></b>Â Â Â Â Â Â Â Â  observations
+processed by OBSPROC.Â  (note: PREPBUFR input, radar, radiance, and rainfall
 data do not go through OBSPROC)</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
-margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b>B<sub>0</sub></b>        background
+margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b>B<sub>0</sub></b>Â Â Â Â Â Â Â  background
 error statistics from generic BE data (CV3) or gen_be.</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.75in;
-margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b>R</b>         observational
+margin-bottom:.0001pt;text-align:justify;text-indent:-.5in'><b>R</b>Â Â Â Â Â Â Â Â  observational
 and representative error statistics.</p>
 
 <p>In this chapter, you will learn how to install and run the various
@@ -2516,18 +2516,18 @@ components of the WRFDA system. For training purposes, you are supplied with a
 test case, including the following input data: </p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
-margin-bottom:.0001pt;text-indent:-.25in'><span style='font-family:Symbol'>·<span
+margin-bottom:.0001pt;text-indent:-.25in'><span style='font-family:Symbol'>Â·<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>an observation file (which must be processed through OBSPROC),</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
-margin-bottom:.0001pt;text-indent:-.25in'><span style='font-family:Symbol'>·<span
+margin-bottom:.0001pt;text-indent:-.25in'><span style='font-family:Symbol'>Â·<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>a netCDF background file (WPS/real.exe output, the first guess of
 the analysis)</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
-margin-bottom:.0001pt;text-indent:-.25in'><span style='font-family:Symbol'>·<span
+margin-bottom:.0001pt;text-indent:-.25in'><span style='font-family:Symbol'>Â·<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>background error statistics (estimate of errors in the background
 file). </p>
@@ -2552,7 +2552,7 @@ with some of the many namelist variables. </p>
 <p class=MsoNormal><b>WARNING:</b> It is impossible to test every permutation
 of computer, compiler, number of processors, case, namelist option, etc. for
 every WRFDA release. The namelist options that are supported are indicated in
-the “<span style='font-size:10.0pt;font-family:Courier'>WRFDA/var/README.namelist</span>”,
+the â€œ<span style='font-size:10.0pt;font-family:Courier'>WRFDA/var/README.namelist</span>â€,
 and these are the default options. </p>
 
 <p>Hopefully, our test cases will prepare you for the variety of ways in which
@@ -2576,16 +2576,16 @@ Use With MM5: Implementation and Initial Results. <i>Mon. Wea. Rev</i>., <b>132<
 X. Zhang, J. Michalakes, W. Huang, T. Henderson, J. Bray, Y. Chen, Z. Ma, J.
 Dudhia, Y. Guo, X. Zhang, D.J. Won, H.C. Lin, and Y.H. Kuo, 2009:
 Four-Dimensional Variational Data Assimilation for WRF: Formulation and Preliminary
-Results. <i>Mon. Wea. Rev.</i>, 137, 299–314.</span></p>
+Results. <i>Mon. Wea. Rev.</i>, 137, 299â€“314.</span></p>
 
 <p class=MsoNormal><span style='color:navy'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='color:navy'>Barker, D., X.-Y. Huang, Z. Liu, T.
-Auligné, X. Zhang, S. Rugg, R. Ajjaji, A. Bourgeois, J. Bray, Y. Chen, M.
+AulignÃ©, X. Zhang, S. Rugg, R. Ajjaji, A. Bourgeois, J. Bray, Y. Chen, M.
 Demirtas, Y.-R. Guo, T. Henderson, W. Huang, H.-C. Lin, J. Michalakes, S.
 Rizvi, and X. Zhang, 2012: The Weather Research and Forecasting Model's
 Community Variational/Ensemble Data Assimilation System: WRFDA. <i>Bull. Amer.
-Meteor. Soc.</i>, 93, 831–843.</span></p>
+Meteor. Soc.</i>, 93, 831â€“843.</span></p>
 
 <p>Running WRFDA requires a Fortran 90 compiler. We have tested the WRFDA system
 on the following platforms: Linux (IFORT, GFORTRAN, PGF90), Macintosh (GFORTRAN/PGF90),
@@ -2608,8 +2608,8 @@ href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html"><span
 style='font-size:10.0pt;font-family:"Times New Roman","serif"'>http://www2.mmm.ucar.edu/wrf/users/wrfda/download/get_source.html</span></a><span
 style='font-family:"Times New Roman","serif"'>.</span></p>
 
-<p><b><i>Note</i>: WRFDA compiles with the –r8 (8-byte real numbers) option
-while WRF compiles with–r4 (4-byte real numbers).</b> For this reason, WRF and
+<p><b><i>Note</i>: WRFDA compiles with the â€“r8 (8-byte real numbers) option
+while WRF compiles withâ€“r4 (4-byte real numbers).</b> For this reason, WRF and
 WRFDA cannot reside or be compiled in the same directory tree.</p>
 
 <p>After the tar file is unzipped (<span style='font-size:10.0pt;font-family:
@@ -2749,10 +2749,10 @@ style='font-size:10.0pt;font-family:Courier'>setenv CRTM 1</span></p>
 <p>If the user wishes to use RTTOV, download and install the RTTOV v11 library
 before compiling WRFDA. This library can be downloaded from <a
 href="http://nwpsaf.eu/deliverables/rtm/index.html">http://nwpsaf.eu/deliverables/rtm/index.html</a>.
-<b>The RTTOV libraries must be compiled with the “emis_atlas” option in order
-to work with WRFDA; see the RTTOV “readme.txt” for instructions on how to do
+<b>The RTTOV libraries must be compiled with the â€œemis_atlasâ€ option in order
+to work with WRFDA; see the RTTOV â€œreadme.txtâ€ for instructions on how to do
 this.</b> After compiling RTTOV (see the RTTOV documentation for detailed
-instructions), set the “RTTOV” environment variable to the path where the <span
+instructions), set the â€œRTTOVâ€ environment variable to the path where the <span
 style='font-size:10.0pt;font-family:"Courier New"'>lib</span> directory
 resides. For example, if the library files can be found in <span
 style='font-size:10.0pt;font-family:"Courier New"'>/usr/local/rttov11/gfortran/lib/librttov11.*.a</span>,
@@ -2781,7 +2781,7 @@ font-family:Courier'>&gt; cd WRFDA<br>
 
 <p>A list of configuration options should appear. Each option combines an
 operating system, a compiler type, and a parallelism option. Since the
-configuration script doesn’t check which compilers are <i>actually</i>
+configuration script doesnâ€™t check which compilers are <i>actually</i>
 installed on your system, be sure to select only among the options that you
 have available to you. The available parallelism options are single-processor
 (serial), shared-memory parallel (smpar), distributed-memory parallel (dmpar),
@@ -2789,7 +2789,7 @@ and distributed-memory with shared-memory parallel (sm+dm). <b>However,
 shared-memory (smpar and sm+dm) options are not supported as of WRFDA Version
 3.7, so we do not recommend selecting any of these options.</b></p>
 
-<p>For example, on a Linux machine such as NCAR’s Yellowstone, the above steps
+<p>For example, on a Linux machine such as NCARâ€™s Yellowstone, the above steps
 will look similar to the following: </p>
 
 <p style='margin-top:.25in;margin-right:0in;margin-bottom:0in;margin-left:0in;
@@ -2925,136 +2925,136 @@ directory. You can list these executables by issuing the command:</p>
 var/build/*exe var/obsproc/src/obsproc.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user   885143 Apr  4 17:22 var/build/da_advance_time.exe</span></p>
+1 user Â Â 885143 AprÂ  4 17:22 var/build/da_advance_time.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1162003 Apr  4 17:24 var/build/da_bias_airmass.exe</span></p>
+1 user Â 1162003 AprÂ  4 17:24 var/build/da_bias_airmass.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1143027 Apr  4 17:23 var/build/da_bias_scan.exe</span></p>
+1 user Â 1143027 AprÂ  4 17:23 var/build/da_bias_scan.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1116933 Apr  4 17:23 var/build/da_bias_sele.exe</span></p>
+1 user Â 1116933 AprÂ  4 17:23 var/build/da_bias_sele.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1126173 Apr  4 17:23 var/build/da_bias_verif.exe</span></p>
+1 user Â 1126173 AprÂ  4 17:23 var/build/da_bias_verif.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1407973 Apr  4 17:23 var/build/da_rad_diags.exe</span></p>
+1 user Â 1407973 Apr Â 4 17:23 var/build/da_rad_diags.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1249431 Apr  4 17:22 var/build/da_tune_obs_desroziers.exe</span></p>
+1 user Â 1249431 AprÂ  4 17:22 var/build/da_tune_obs_desroziers.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1186368 Apr  4 17:24 var/build/da_tune_obs_hollingsworth1.exe</span></p>
+1 user Â 1186368 AprÂ  4 17:24 var/build/da_tune_obs_hollingsworth1.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1083862 Apr  4 17:24 var/build/da_tune_obs_hollingsworth2.exe</span></p>
+1 user Â 1083862 AprÂ  4 17:24 var/build/da_tune_obs_hollingsworth2.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1193390 Apr  4 17:24 var/build/da_update_bc_ad.exe</span></p>
+1 user Â 1193390 AprÂ  4 17:24 var/build/da_update_bc_ad.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1245842 Apr  4 17:23 var/build/da_update_bc.exe</span></p>
+1 user Â 1245842 AprÂ  4 17:23 var/build/da_update_bc.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1492394 Apr  4 17:24 var/build/da_verif_grid.exe</span></p>
+1 user Â 1492394 AprÂ  4 17:24 var/build/da_verif_grid.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1327002 Apr  4 17:24 var/build/da_verif_obs.exe</span></p>
+1 user Â 1327002 AprÂ  4 17:24 var/build/da_verif_obs.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user 26031927 Apr  4 17:31 var/build/da_wrfvar.exe</span></p>
+1 user 26031927 AprÂ  4 17:31 var/build/da_wrfvar.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1933571 Apr  4 17:23 var/build/gen_be_addmean.exe</span></p>
+1 user Â 1933571 AprÂ  4 17:23 var/build/gen_be_addmean.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1944047 Apr  4 17:24 var/build/gen_be_cov2d3d_contrib.exe</span></p>
+1 user Â 1944047 AprÂ  4 17:24 var/build/gen_be_cov2d3d_contrib.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1927988 Apr  4 17:24 var/build/gen_be_cov2d.exe</span></p>
+1 user Â 1927988 AprÂ  4 17:24 var/build/gen_be_cov2d.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1945213 Apr  4 17:24 var/build/gen_be_cov3d2d_contrib.exe</span></p>
+1 user Â 1945213 AprÂ  4 17:24 var/build/gen_be_cov3d2d_contrib.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1941439 Apr  4 17:24 var/build/gen_be_cov3d3d_bin3d_contrib.exe</span></p>
+1 user Â 1941439 AprÂ  4 17:24 var/build/gen_be_cov3d3d_bin3d_contrib.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1947331 Apr  4 17:24 var/build/gen_be_cov3d3d_contrib.exe</span></p>
+1 user Â 1947331 AprÂ  4 17:24 var/build/gen_be_cov3d3d_contrib.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1931820 Apr  4 17:24 var/build/gen_be_cov3d.exe</span></p>
+1 user Â 1931820 AprÂ  4 17:24 var/build/gen_be_cov3d.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1915177 Apr  4 17:24 var/build/gen_be_diags.exe</span></p>
+1 user Â 1915177 AprÂ  4 17:24 var/build/gen_be_diags.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1947942 Apr  4 17:24 var/build/gen_be_diags_read.exe</span></p>
+1 user Â 1947942 AprÂ  4 17:24 var/build/gen_be_diags_read.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1930465 Apr  4 17:24 var/build/gen_be_ensmean.exe</span></p>
+1 user Â 1930465 AprÂ  4 17:24 var/build/gen_be_ensmean.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1951511 Apr  4 17:24 var/build/gen_be_ensrf.exe</span></p>
+1 user Â 1951511 AprÂ  4 17:24 var/build/gen_be_ensrf.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1994167 Apr  4 17:24 var/build/gen_be_ep1.exe</span></p>
+1 user Â 1994167 AprÂ  4 17:24 var/build/gen_be_ep1.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1996438 Apr  4 17:24 var/build/gen_be_ep2.exe</span></p>
+1 user Â 1996438 AprÂ  4 17:24 var/build/gen_be_ep2.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  2001400 Apr  4 17:24 var/build/gen_be_etkf.exe</span></p>
+1 user Â 2001400 AprÂ  4 17:24 var/build/gen_be_etkf.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1942988 Apr  4 17:24 var/build/gen_be_hist.exe</span></p>
+1 user Â 1942988 AprÂ  4 17:24 var/build/gen_be_hist.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  2021659 Apr  4 17:24 var/build/gen_be_stage0_gsi.exe</span></p>
+1 user Â 2021659 AprÂ  4 17:24 var/build/gen_be_stage0_gsi.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  2012035 Apr  4 17:24 var/build/gen_be_stage0_wrf.exe</span></p>
+1 user Â 2012035 AprÂ  4 17:24 var/build/gen_be_stage0_wrf.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1973193 Apr  4 17:24 var/build/gen_be_stage1_1dvar.exe</span></p>
+1 user Â 1973193 AprÂ  4 17:24 var/build/gen_be_stage1_1dvar.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1956835 Apr  4 17:24 var/build/gen_be_stage1.exe</span></p>
+1 user Â 1956835 AprÂ  4 17:24 var/build/gen_be_stage1.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1963314 Apr  4 17:24 var/build/gen_be_stage1_gsi.exe</span></p>
+1 user Â 1963314 AprÂ  4 17:24 var/build/gen_be_stage1_gsi.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1975042 Apr  4 17:24 var/build/gen_be_stage2_1dvar.exe</span></p>
+1 user Â 1975042 AprÂ  4 17:24 var/build/gen_be_stage2_1dvar.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1938468 Apr  4 17:24 var/build/gen_be_stage2a.exe</span></p>
+1 user Â 1938468 AprÂ  4 17:24 var/build/gen_be_stage2a.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1952538 Apr  4 17:24 var/build/gen_be_stage2.exe</span></p>
+1 user Â 1952538 AprÂ  4 17:24 var/build/gen_be_stage2.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1202392 Apr  4 17:22 var/build/gen_be_stage2_gsi.exe</span></p>
+1 user Â 1202392 AprÂ  4 17:22 var/build/gen_be_stage2_gsi.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1947836 Apr  4 17:24 var/build/gen_be_stage3.exe</span></p>
+1 user Â 1947836 AprÂ  4 17:24 var/build/gen_be_stage3.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1928353 Apr  4 17:24 var/build/gen_be_stage4_global.exe</span></p>
+1 user Â 1928353 AprÂ  4 17:24 var/build/gen_be_stage4_global.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1955622 Apr  4 17:24 var/build/gen_be_stage4_regional.exe</span></p>
+1 user Â 1955622 AprÂ  4 17:24 var/build/gen_be_stage4_regional.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  1924416 Apr  4 17:24 var/build/gen_be_vertloc.exe</span></p>
+1 user Â 1924416 AprÂ  4 17:24 var/build/gen_be_vertloc.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  2057673 Apr  4 17:24 var/build/gen_mbe_stage2.exe</span></p>
+1 user Â 2057673 AprÂ  4 17:24 var/build/gen_mbe_stage2.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user  2110993 Apr  4 17:32 var/obsproc/src/obsproc.exe </span></p>
+1 user Â 2110993 AprÂ  4 17:32 var/obsproc/src/obsproc.exe </span></p>
 
 <p>The main executable for running WRFDA is<span style='font-size:10.0pt;
 font-family:Courier'> da_wrfvar.exe</span>. Make sure it has been created after
@@ -3101,7 +3101,7 @@ font-family:"Courier New"'>configure.wrf</span>, type:</p>
 
 <p style='margin-left:.5in'><span style='font-family:Courier'>./clean -a</span></p>
 
-<p>The <span style='font-size:10.0pt;font-family:Courier'>clean –a</span><span
+<p>The <span style='font-size:10.0pt;font-family:Courier'>clean â€“a</span><span
 style='font-family:Courier'> </span>command is recommended if your compilation
 fails, or if the configuration file has been changed and you wish to restore
 the default settings. </p>
@@ -3140,8 +3140,8 @@ WRFPLUSV3.7.tar </span></p>
 wrfplus</span></p>
 
 <p class=MsoNormal style='margin-top:14.0pt;margin-right:0in;margin-bottom:
-14.0pt;margin-left:.25in'>As with 3D-Var, “serial” means single-processor, and
-“dmpar” means Distributed Memory Parallel (MPI). Be sure to select the same
+14.0pt;margin-left:.25in'>As with 3D-Var, â€œserialâ€ means single-processor, and
+â€œdmparâ€ means Distributed Memory Parallel (MPI). Be sure to select the same
 option for WRFPLUS as you will use for WRFDA.</p>
 
 <ul style='margin-top:0in' type=disc>
@@ -3160,19 +3160,19 @@ main/*.exe</span><span style='font-family:"Courier New"'> </span></p>
 14.0pt;margin-left:.25in'>You should see the following files:</p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user users 23179920 Apr  3 15:22 main/ndown.exe</span></p>
+1 user users 23179920 AprÂ  3 15:22 main/ndown.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user users 22947466 Apr  3 15:22 main/nup.exe</span></p>
+1 user users 22947466 AprÂ  3 15:22 main/nup.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user users 23113961 Apr  3 15:22 main/real.exe</span></p>
+1 user users 23113961 AprÂ  3 15:22 main/real.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user users 22991725 Apr  3 15:22 main/tc.exe</span></p>
+1 user users 22991725 AprÂ  3 15:22 main/tc.exe</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>-rwxr-xr-x
-1 user users 32785447 Apr  3 15:20 main/wrf.exe</span></p>
+1 user users 32785447 AprÂ  3 15:20 main/wrf.exe</span></p>
 
 <p class=MsoNormal style='margin-top:14.0pt;margin-right:0in;margin-bottom:
 14.0pt;margin-left:0in'>Finally, set the environment variable <span
@@ -3233,48 +3233,48 @@ and HDF, the free data site also contains instructions for converting the
 observations to LITTLE_R format. To make the WRFDA system as general as
 possible, the LITTLE_R format was adopted as an intermediate observation data
 format for the WRFDA system, however, <i>the conversion of the user-specific
-source data to LITTLE_R format is the user’s task</i>. A more complete description
+source data to LITTLE_R format is the userâ€™s task</i>. A more complete description
 of the LITTLE_R format, as well as conventional observation data sources for
-WRFDA, can be found by reading the “Observation Pre-processing” tutorial found
-at  <a
+WRFDA, can be found by reading the â€œObservation Pre-processingâ€ tutorial found
+atÂ  <a
 href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2014_July/tutorial_presentation_summer_2014.html"><span
 style='font-size:10.0pt'>http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2014_July/tutorial_presentation_summer_2014.html</span></a>,
 or by referencing <a
 href="http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap7.htm#format">Chapter
-7 of this User’s Guide</a>.</p>
+7 of this Userâ€™s Guide</a>.</p>
 
 <p style='text-align:justify'>The purpose of OBSPROC is to:</p>
 
 <p style='margin-top:14.0pt;margin-right:0in;margin-bottom:0in;margin-left:
 .5in;margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>Remove observations outside the specified temporal and spatial
 domains</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
 margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>Re-order and merge duplicate (in time and location) data reports</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
 margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>Retrieve pressure or height based on observed information using
 the hydrostatic assumption</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
 margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span>Check multi-level observations for  vertical consistency and
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+</span></span>Check multi-level observations for Â vertical consistency and
 superadiabatic conditions</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
 margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>Assign observation errors based on a pre-specified error file</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:14.0pt;margin-left:
-.5in;text-indent:-.25in'><span style='font-size:10.0pt;font-family:Symbol'>·<span
+.5in;text-indent:-.25in'><span style='font-size:10.0pt;font-family:Symbol'>Â·<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>Write out the observation file to be used by WRFDA in ASCII or
 BUFR format</p>
@@ -3282,12 +3282,12 @@ BUFR format</p>
 <p>The OBSPROC program (<span style='font-size:10.0pt;font-family:Courier'>obsproc.exe</span>)
 should be found under the directory <span style='font-size:10.0pt;font-family:
 Courier'>$WRFDA_DIR/var/obsproc/src</span><span style='font-family:"Courier New"'>
-</span>if<span style='font-family:"Courier New"'> </span>“<span
-style='font-size:10.0pt;font-family:Courier'>compile all_wrfvar</span>”
+</span>if<span style='font-family:"Courier New"'> </span>â€œ<span
+style='font-size:10.0pt;font-family:Courier'>compile all_wrfvar</span>â€
 completed successfully.</p>
 
-<p>If you haven’t already, you should download the tutorial case, which
-contains example files for all the exercises in this User’s Guide. The case can
+<p>If you havenâ€™t already, you should download the tutorial case, which
+contains example files for all the exercises in this Userâ€™s Guide. The case can
 be found at the WRFDA website (<a
 href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html"><span
 style='font-size:10.0pt'>http://www2.mmm.ucar.edu/wrf/users/wrfda/download/testdata.html</span></a>).</p>
@@ -3297,7 +3297,7 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></spa
 lang=X-NONE>Prepare observational data for 3D-Var</span></h4>
 
 <p>As an example, to prepare the observation file at the analysis time, all the
-observations in the range ±1h will be processed, which means that (in the
+observations in the range Â±1h will be processed, which means that (in the
 example case) the observations between 23h and 1h are treated as the
 observations at 0h. This is illustrated in the following figure:</p>
 
@@ -3309,17 +3309,17 @@ successfully:</p>
 
 <p style='margin-top:14.0pt;margin-right:0in;margin-bottom:0in;margin-left:
 .5in;margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>A namelist file (namelist.obsproc)</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
 margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>An observation error file (obserr.txt)</p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:.5in;
 margin-bottom:.0001pt;text-indent:-.25in'><span style='font-size:10.0pt;
-font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span>One or more observation files</p>
 
 <p>To create the required namelist file, we have provided an example file (<span
@@ -3349,12 +3349,12 @@ copy or link the sample observation file (<span style='font-size:10.0pt;
 font-family:Courier'>ob/2008020512/obs.2008020512</span>) to the <span
 style='font-size:10.0pt;font-family:Courier'>obsproc</span> directory.
 Alternatively, you can edit the namelist variable <span style='font-size:10.0pt;
-font-family:Courier'>obs_gts_filename</span> to point to the observation file’s
+font-family:Courier'>obs_gts_filename</span> to point to the observation fileâ€™s
 full path.</p>
 
 <p style='text-align:justify'>To run OBSPROC, type</p>
 
-<p><b><i>            </i></b><span style='font-size:10.0pt;font-family:Courier'>&gt;
+<p><b><i>Â Â Â Â Â Â Â Â Â Â Â  </i></b><span style='font-size:10.0pt;font-family:Courier'>&gt;
 ./obsproc.exe &gt;&amp; obsproc.out</span></p>
 
 <p>Once <span style='font-size:10.0pt;font-family:Courier'>obsproc.exe</span>
@@ -3375,8 +3375,8 @@ are described in the last six lines of the header section.</p>
 =     86, </span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>AMDAR
-=     19, AIREP =    205, TAMDAR=      0, PILOT =     85, SATEM =    106, SATOB
-=   2556, </span></p>
+=Â Â Â Â  19, AIREP =Â Â Â  205, TAMDAR=Â  Â Â Â Â 0, PILOT =Â Â Â Â  85, SATEM =Â Â Â  106, SATOB
+=Â Â  2556, </span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>GPSPW =   
 187, GPSZD =      0, GPSRF =      3, GPSEP =      0, SSMT1 =      0, SSMT2
@@ -3390,8 +3390,8 @@ are described in the last six lines of the header section.</p>
 =   1.00,</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>base_temp=
-290.00, base_lapse=  50.00, PTOP  =  1000., base_pres=100000., base_tropo_pres=
-20000., base_strat_temp=   215.,</span></p>
+290.00, base_lapse=Â  50.00, PTOPÂ  =Â  1000., base_pres=100000., base_tropo_pres=
+20000., base_strat_temp=Â Â  215.,</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>IXC  
 =     60, JXC   =     90, IPROJ =      1, IDD   =      1, MAXNES=      1,</span></p>
@@ -3409,10 +3409,10 @@ are described in the last six lines of the header section.</p>
 60.00, </span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>NESTI
-=      1, </span></p>
+=Â Â Â Â Â  1, </span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>NESTJ
-=      1, </span></p>
+=Â Â Â Â Â  1, </span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>INFO  =
 PLATFORM, DATE, NAME, LEVELS, LATITUDE, LONGITUDE, ELEVATION, ID.</span></p>
@@ -3439,7 +3439,7 @@ observations ………</span></p>
 
 <p>Before running WRFDA, you may find it useful to learn more about various
 types of data that will be processed (e.g., their geographical distribution).
-This file is in ASCII format and so you can easily view it.  For a graphical
+This file is in ASCII format and so you can easily view it.Â  For a graphical
 view of the file's content, there are NCL scripts available which can display
 the distribution and type of observations. In the WRFDA Tools package (can be
 downloaded at <a
@@ -3462,7 +3462,7 @@ sub-windows (slot1 through slot7) as illustrated in the following figure:</p>
 <p align=center style='text-align:center'><img border=0 width=576 height=186
 src="users_guide_chap6_files/image003.png"></p>
 
-<p>NOTE: The “Analysis time” in the above figure is not the actual analysis
+<p>NOTE: The â€œAnalysis timeâ€ in the above figure is not the actual analysis
 time (0h). It indicates the time_analysis setting in the namelist file, which
 in this example is three hours later than the actual analysis time. The actual
 analysis time is still 0h.</p>
@@ -3505,7 +3505,7 @@ copy or link the sample observation file (<span style='font-size:10.0pt;
 font-family:Courier'>ob/2008020512/obs.2008020512</span>) to the <span
 style='font-size:10.0pt;font-family:Courier'>obsproc</span> directory. Alternatively,
 you can edit the namelist variable <span style='font-size:10.0pt;font-family:
-Courier'>obs_gts_filename</span> to point to the observation file’s full path.</p>
+Courier'>obs_gts_filename</span> to point to the observation fileâ€™s full path.</p>
 
 <p style='text-align:justify'>To run OBSPROC, type</p>
 
@@ -3544,14 +3544,14 @@ lang=X-NONE>Download Test Data </span></h4>
 <p style='text-align:justify'>The WRFDA system requires three input files to
 run:</p>
 
-<p style='margin-left:.75in;text-align:justify;text-indent:-.25in'> a)  WRF <i>first
+<p style='margin-left:.75in;text-align:justify;text-indent:-.25in'>Â a)Â  WRF <i>first
 guess </i>file, output from either WPS/real.exe (cold-start) or a WRF forecast
 (warm-start)</p>
 
-<p style='margin-left:.75in;text-align:justify;text-indent:-.25in'>b)   Observations
+<p style='margin-left:.75in;text-align:justify;text-indent:-.25in'>b)Â Â  Observations
 (in ASCII format, PREPBUFR or BUFR for radiance)</p>
 
-<p style='margin-left:.75in;text-align:justify;text-indent:-.25in'>c)   A
+<p style='margin-left:.75in;text-align:justify;text-indent:-.25in'>c)Â Â  A
 background error statistics file (containing background error covariance)</p>
 
 <p style='text-align:justify'>The following table summarizes the above info:</p>
@@ -3644,7 +3644,7 @@ background error statistics file (containing background error covariance)</p>
 environment variable <span style='font-size:10.0pt;font-family:Courier'>$DAT_DIR</span><i>.</i>
 This directory can be in any location, and it should have read access. Type</p>
 
-<p><b>            </b><span style='font-size:10.0pt;font-family:Courier'>&gt;
+<p><b>Â Â Â Â Â Â Â Â Â Â Â  </b><span style='font-size:10.0pt;font-family:Courier'>&gt;
 setenv DAT_DIR your_choice_of_dat_dir</span></p>
 
 <p style='text-align:justify'>Here, <span style='font-size:10.0pt;font-family:
@@ -3660,22 +3660,22 @@ style='font-size:10.0pt'>http://www2.mmm.ucar.edu/wrf/users/wrfda/download/testd
 file to <span style='font-size:10.0pt;font-family:Courier'>$DAT_DIR</span>, extract
 it by typing</p>
 
-<p><b>            </b><span style='font-size:10.0pt;font-family:Courier'>&gt;
+<p><b>Â Â Â Â Â Â Â Â Â Â Â  </b><span style='font-size:10.0pt;font-family:Courier'>&gt;
 gunzip WRFDAV3.7-testdata.tar.gz</span><span style='font-size:10.0pt'><br>
-</span><span style='font-size:10.0pt;font-family:Courier'>      &gt; tar -xvf
+</span><span style='font-size:10.0pt;font-family:Courier'>Â Â Â Â Â  &gt; tar -xvf
 WRFDAV3.7-testdata.tar</span><strong><span style='font-family:"Courier New";
 font-weight:normal'> </span></strong></p>
 
 <p>Now you should find the following four files under <span style='font-size:
-10.0pt;font-family:Courier'>“$DAT_DIR</span><span style='font-family:"Courier New"'>”</span></p>
+10.0pt;font-family:Courier'>â€œ$DAT_DIR</span><span style='font-family:"Courier New"'>â€</span></p>
 
-<p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>ob/2008020512/ob.2008020512     
-#  Observation data in “little_r” format</span><span style='font-size:9.0pt'><br>
-</span><span style='font-size:9.0pt;font-family:Courier'>rc/2008020512/wrfinput_d01         
-#  First guess file</span><span style='font-size:9.0pt;font-family:"Courier New"'><br>
-</span><span style='font-size:9.0pt;font-family:Courier'>rc/2008020512/wrfbdy_d01           
-#  lateral boundary file</span><span style='font-size:9.0pt'><br>
-</span><span style='font-size:9.0pt;font-family:Courier'>be/be.dat                     # 
+<p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>ob/2008020512/ob.2008020512Â Â Â Â Â 
+#Â  Observation data in â€œlittle_râ€ format</span><span style='font-size:9.0pt'><br>
+</span><span style='font-size:9.0pt;font-family:Courier'>rc/2008020512/wrfinput_d01Â Â Â  Â Â Â Â Â 
+#Â  First guess file</span><span style='font-size:9.0pt;font-family:"Courier New"'><br>
+</span><span style='font-size:9.0pt;font-family:Courier'>rc/2008020512/wrfbdy_d01Â Â Â Â Â  Â Â Â Â Â 
+#Â  lateral boundary file</span><span style='font-size:9.0pt'><br>
+</span><span style='font-size:9.0pt;font-family:Courier'>be/be.dat Â Â Â Â Â Â Â Â Â Â Â Â Â  Â Â Â Â Â Â #Â 
 Background error file</span></p>
 
 <p class=MsoNormal><span lang=PT-BR style='font-size:9.0pt;font-family:"Courier New"'>......</span></p>
@@ -3688,7 +3688,7 @@ code. If this is correct, you are ready to run WRFDA<span style='color:blue'>.</
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>b.<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
-lang=X-NONE>Run the Case—3D-Var</span></h4>
+lang=X-NONE>Run the Caseâ€”3D-Var</span></h4>
 
 <p>The data for the tutorial case is valid at 12 UTC 5 February 2008. The first
 guess comes from the NCEP FNL (Final) Operational Global Analysis data, passed
@@ -4068,7 +4068,7 @@ link the data as <span style='font-size:10.0pt;font-family:Courier'>ob.bufr</spa
 <p class=MsoNormal style='margin-left:.5pt'>&nbsp;</p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020512/gds1.t12.prepbufr.nr 
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020512/gds1.t12.prepbufr.nrÂ 
 ob.bufr</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
@@ -4101,7 +4101,7 @@ Strategy is not specified. Assuming 1D-Y</span></p>
 1 IS      1 IE     89 JS      1 JE     59</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>WRF NUMBER
-OF TILES =   1</span></p>
+OF TILES =Â Â  1</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Set up
 observations (ob)</span></p>
@@ -4164,7 +4164,7 @@ sonde_sfc             86 global,      86 local</span></p>
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Set up
-background errors for regional application for cv_options =   5</span></p>
+background errors for regional application for cv_options =Â Â  5</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
@@ -4186,22 +4186,22 @@ Humidity control variable is rh</span></p>
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Vertical
-truncation for psi    =  16(  99.00%)</span></p>
+truncation for psiÂ Â Â  =Â  16(Â  99.00%)</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Vertical
-truncation for chi_u  =  21(  99.00%)</span></p>
+truncation for chi_uÂ  =Â  21(Â  99.00%)</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Vertical
-truncation for t_u    =  28(  99.00%)</span></p>
+truncation for t_uÂ Â Â  =Â  28(Â  99.00%)</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Vertical
-truncation for rh     =  21(  99.00%)</span></p>
+truncation for rhÂ Â Â Â  =Â  21(Â  99.00%)</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
@@ -4233,13 +4233,13 @@ cost function using CG method</span></p>
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Starting
-outer iteration :   1</span></p>
+outer iteration :Â Â  1</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Starting
-cost function:  2.899074954207616D+04, Gradient=  4.257569431368675D+02</span></p>
+cost function:Â  2.899074954207616D+04, Gradient=Â  4.257569431368675D+02</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>For this
-outer iteration gradient target is:        4.257569431368675D+00</span></p>
+outer iteration gradient target is:Â Â Â Â Â Â Â  4.257569431368675D+00</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>----------------------------------------------------------</span></p>
 
@@ -4335,7 +4335,7 @@ Cost Function         Gradient             Step</span></p>
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>Inner
-iteration stopped after   28 iterations</span></p>
+iteration stopped afterÂ Â  28 iterations</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:Courier'>&nbsp;</span></p>
 
@@ -4425,16 +4425,16 @@ Diagnostics</a> section. </p>
 <p>To understand the role of various important WRFDA options, try re-running
 WRFDA by changing different namelist options. For example, try making the WRFDA
 convergence criterion more stringent. This is achieved by reducing the value of
-“<span style='font-size:10.0pt;font-family:Courier'>EPS</span>” to e.g. 0.0001
+â€œ<span style='font-size:10.0pt;font-family:Courier'>EPS</span>â€ to e.g. 0.0001
 by adding &quot;<span style='font-size:10.0pt;font-family:Courier'>EPS=0.0001</span>&quot;
 in the <span style='font-size:10.0pt;font-family:Courier'>namelist.input</span>
 record <span style='font-size:10.0pt;font-family:Courier'>&amp;wrfvar6</span>.
 See the section <a href="#_Additional_WRFDA_Exercises:_1">Additional WRFDA exercises</a>
 for more namelist options.</p>
 
-<h4 style='margin-left:.5in;text-indent:-.25in'><a name="_Run_the_Case—4D-Var"></a><span
+<h4 style='margin-left:.5in;text-indent:-.25in'><a name="_Run_the_Caseâ€”4D-Var"></a><span
 lang=X-NONE>c.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-</span></span><span lang=X-NONE>Run the Case—4D-Var</span></h4>
+</span></span><span lang=X-NONE>Run the Caseâ€”4D-Var</span></h4>
 
 <p>To run WRF 4D-Var, first create and enter a working directory, such as <span
 style='font-size:10.0pt;font-family:Courier'>$WRFDA_DIR/workdir</span>. Set the
@@ -4449,7 +4449,7 @@ directories are:</p>
 font-family:Courier'>&gt; setenv DAT_DIR {directory where data is stored}</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ls –lr $DAT_DIR</span></p>
+font-family:Courier'>&gt; ls â€“lr $DAT_DIR</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
 font-family:Courier'>ob/2008020512</span></p>
@@ -4501,19 +4501,19 @@ font-family:Courier'> etc</span>. </p>
 font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020512/ob.ascii+ ob01.ascii</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020513/ob.ascii  ob02.ascii</span></p>
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020513/ob.asciiÂ  ob02.ascii</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020514/ob.ascii  ob03.ascii</span></p>
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020514/ob.asciiÂ  ob03.ascii</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020515/ob.ascii  ob04.ascii</span></p>
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020515/ob.asciiÂ  ob04.ascii</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020516/ob.ascii  ob05.ascii</span></p>
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020516/ob.asciiÂ  ob05.ascii</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020517/ob.ascii  ob06.ascii</span></p>
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020517/ob.asciiÂ  ob06.ascii</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
 font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020518/ob.ascii- ob07.ascii</span></p>
@@ -4549,7 +4549,7 @@ font-family:Courier'>&gt; ln -fs $WRFDA_DIR/run/SOILPARM.TBL .</span></p>
 font-family:Courier'>&gt; ln -fs $WRFDA_DIR/run/VEGPARM.TBL .</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln –fs $WRFDA_DIR/run/RRTM_DATA_DBL RRTM_DATA</span></p>
+font-family:Courier'>&gt; ln â€“fs $WRFDA_DIR/run/RRTM_DATA_DBL RRTM_DATA</span></p>
 
 <p>3) Copy the sample namelist</p>
 
@@ -4591,11 +4591,11 @@ lang=EN-ZW>. Because 12UTC PREPBUFR data only includes the data from 9UTC to
 <p class=MsoNormal style='margin-left:-.5pt'><span lang=EN-ZW>&nbsp;</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020512/gds1.t12.prepbufr.nr 
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020512/gds1.t12.prepbufr.nrÂ 
 ob01.bufr</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020518/gds1.t18.prepbufr.nr 
+font-family:Courier'>&gt; ln -fs $DAT_DIR/ob/2008020518/gds1.t18.prepbufr.nrÂ 
 ob02.bufr</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
@@ -4635,11 +4635,11 @@ font-family:Courier'>var4d_lbc=false,</span></p>
 font-family:Courier'>var4d_bin=3600,</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……<br>
+font-family:Courier'>â€¦â€¦<br>
 /</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……</span></p>
+font-family:Courier'>â€¦â€¦</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
 font-family:Courier'>&amp;wrfvar18</span></p>
@@ -4651,7 +4651,7 @@ font-family:Courier'>analysis_date=&quot;2008-02-05_12:00:00.0000&quot;,</span><
 font-family:Courier'>/</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……</span></p>
+font-family:Courier'>â€¦â€¦</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
 font-family:Courier'>&amp;wrfvar21</span></p>
@@ -4663,7 +4663,7 @@ font-family:Courier'>time_window_min=&quot;2008-02-05_12:00:00.0000&quot;,</span
 font-family:Courier'>/</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……</span></p>
+font-family:Courier'>â€¦â€¦</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
 font-family:Courier'>&amp;wrfvar22</span></p>
@@ -4675,7 +4675,7 @@ font-family:Courier'>time_window_max=&quot;2008-02-05_18:00:00.0000&quot;,</span
 font-family:Courier'>/</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……</span></p>
+font-family:Courier'>â€¦â€¦</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
 font-family:Courier'>&amp;time_control</span></p>
@@ -4717,7 +4717,7 @@ font-family:Courier'>debug_level=0,</span></p>
 font-family:Courier'>/</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……</span></p>
+font-family:Courier'>â€¦â€¦</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt'><br>
 <br>
@@ -4753,7 +4753,7 @@ and scientific details, which will appear in a separate technical report and
 scientific paper. Namelist parameters controlling different aspects of radiance
 assimilation will be detailed in the following sections. It should be noted
 that this section does not cover general aspects of the assimilation process
-with WRFDA; these can be found in other sections of chapter 6 of this user’s
+with WRFDA; these can be found in other sections of chapter 6 of this userâ€™s
 guide, or other WRFDA documentation.</span></p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE
@@ -4762,8 +4762,8 @@ style='font-size:12.0pt'>a.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbs
 
 <p class=MsoNormal><span style='color:black'>In addition to the basic input
 files (</span><span style='font-size:10.0pt;font-family:Courier'>LANDUSE.TBL,
-fg, ob.ascii, be.dat</span><span style='color:black'>) mentioned in the “</span><a
-href="#_Running_WRF-Var_1">Running WRFDA</a><span style='color:black'>”
+fg, ob.ascii, be.dat</span><span style='color:black'>) mentioned in the â€œ</span><a
+href="#_Running_WRF-Var_1">Running WRFDA</a><span style='color:black'>â€
 section, the following additional files are required for radiances: radiance
 data in NCEP BUFR format, </span><span style='font-family:"Courier New";
 color:black'>radiance_info</span><span style='color:black'> files, </span><span
@@ -4784,25 +4784,25 @@ style='color:black'>)</span></p>
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>&gt; ln
--sf $DAT_DIR/gdas1.t00z.1bamua.tm00.bufr_d   ./amsua.bufr</span></p>
+-sf $DAT_DIR/gdas1.t00z.1bamua.tm00.bufr_dÂ Â  ./amsua.bufr</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>&gt; ln
--sf $DAT_DIR/gdas1.t00z.1bamub.tm00.bufr_d   ./amsub.bufr</span></p>
+-sf $DAT_DIR/gdas1.t00z.1bamub.tm00.bufr_dÂ Â  ./amsub.bufr</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>&gt; ln
--sf $WRFDA_DIR/var/run/radiance_info  ./radiance_info  # (radiance_info is a
+-sf $WRFDA_DIR/var/run/radiance_infoÂ  ./radiance_infoÂ  # (radiance_info is a
 directory)</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>&gt; ln
--sf $WRFDA_DIR/var/run/VARBC.in  ./VARBC.in</span></p>
+-sf $WRFDA_DIR/var/run/VARBC.inÂ  ./VARBC.in</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>(CRTM
-only)  &gt; ln -sf WRFDA/var/run/crtm_coeffs ./crtm_coeffs    #(crtm_coeffs is
+only)Â  &gt; ln -sf WRFDA/var/run/crtm_coeffs ./crtm_coeffsÂ Â Â  #(crtm_coeffs is
 a directory)</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>(RTTOV
-only) &gt; ln -sf your_RTTOV_path/rtcoef_rttov11/rttov7pred51L 
-./rttov_coeffs     #   (rttov_coeffs is a directory)</span></p>
+only) &gt; ln -sf your_RTTOV_path/rtcoef_rttov11/rttov7pred51LÂ 
+./rttov_coeffsÂ Â Â Â  #Â Â  (rttov_coeffs is a directory)</span></p>
 
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
@@ -4815,7 +4815,7 @@ style='font-size:12.0pt'>b.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbs
 
 <p class=MsoNormal><span style='color:black'>Currently, the ingest interface
 for NCEP BUFR radiance data is implemented in WRFDA. The radiance data are
-available through NCEP’s public ftp server (<u>ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.${yyyymmddhh}</u>)
+available through NCEPâ€™s public ftp server (<u>ftp://ftp.ncep.noaa.gov/pub/data/nccf/com/gfs/prod/gdas.${yyyymmddhh}</u>)
 in near real-time (with a 6-hour delay) and can meet requirements for both
 research purposes and some real-time applications.</span></p>
 
@@ -5014,8 +5014,8 @@ the NWP community, RTTOV (developed by ECMWF and UKMET in Europe), and CRTM
 are already implemented in the WRFDA system with a flexible and consistent user
 interface. WRFDA is designed to be able to compile with any combination of the
 two RTM libraries, or without RTM libraries (for those not interested in radiance
-assimilation), by the definition of environment variables “CRTM” and “RTTOV”
-(see the “Installing WRFDA” section). Note, however, that at runtime the user
+assimilation), by the definition of environment variables â€œCRTMâ€ and â€œRTTOVâ€
+(see the â€œInstalling WRFDAâ€ section). Note, however, that at runtime the user
 must select one of the two or neither, via the namelist parameter </span><span
 style='font-family:Courier;color:red'>RTM_OPTION</span><span style='color:black'>
 (1 for RTTOV, the default, and 2 for CRTM).</span></p>
@@ -5048,10 +5048,10 @@ for assimilating 14 of the sensors from 7 satellites is listed here:</span></p>
 = 1, 1, 1, 1, 9, 10, 1, 1, 1, 1, 1, 10, 9, 2, 10,</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>RTMINIT_SATID
-=   15, 16, 18, 19, 2, 2, 15, 16, 17, 18, 19, 2, 2, 16, 2</span></p>
+=Â Â  15, 16, 18, 19, 2, 2, 15, 16, 17, 18, 19, 2, 2, 16, 2</span></p>
 
 <p class=MsoNormal><span style='font-size:10.0pt;font-family:Courier'>RTMINIT_SENSOR
-=   3, 3, 3, 3, 3, 3, 4, 4, 4, 15, 15, 15, 11, 10, 16,</span></p>
+=Â Â  3, 3, 3, 3, 3, 3, 4, 4, 4, 15, 15, 15, 11, 10, 16,</span></p>
 
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
@@ -5062,7 +5062,7 @@ href="http://nwpsaf.eu/deliverables/rtm/rttov_description.html"><span
 style='font-size:10.0pt'>http://nwpsaf.eu/deliverables/rtm/rttov_description.html</span></a><span
 style='color:black'> </span><a
 href="http://research.metoffice.gov.uk/research/interproj/nwpsaf/rtm/rttov_description.html"></a><span
-style='color:black'>or in tables 2 and 3 in the RTTOV v11 User’s Guide (</span><a
+style='color:black'>or in tables 2 and 3 in the RTTOV v11 Userâ€™s Guide (</span><a
 href="http://nwpsaf.eu/deliverables/rtm/docs_rttov11/users_guide_11_v1.3.pdf"><span
 style='font-size:10.0pt'>http://nwpsaf.eu/deliverables/rtm/docs_rttov11/users_guide_11_v1.3.pdf</span></a><span
 style='color:black'>)</span></p>
@@ -5117,7 +5117,7 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></spa
 lang=X-NONE>Channel Selection</span></h4>
 
 <p class=MsoNormal><span style='color:black'>Channel selection in WRFDA is
-controlled by radiance ‘info’ files, located in the sub-directory </span><span
+controlled by radiance â€˜infoâ€™ files, located in the sub-directory </span><span
 style='font-size:10.0pt;font-family:"Courier New";color:black'>radiance_info</span><span
 style='color:black'>, under the working directory. These files are separated by
 satellites and sensors; e.g., </span><span style='font-size:10.0pt;font-family:
@@ -5128,35 +5128,35 @@ color:black'>dmsp-16-ssmis.info</span><span style='color:black'> and so on. An
 example of 5 channels from </span><span style='font-size:10.0pt;font-family:
 "Courier New";color:black'>noaa-15-amsub.info</span><span style='color:black'>
 is shown below. The fourth column is used by WRFDA to control when to use a
-corresponding channel. Channels with the value “-1” in the fourth column
-indicate that the channel is “not assimilated,” while the value “1” means “assimilated.”
+corresponding channel. Channels with the value â€œ-1â€ in the fourth column
+indicate that the channel is â€œnot assimilated,â€ while the value â€œ1â€ means â€œassimilated.â€
 The sixth column is used by WRFDA to set the observation error for each
 channel. Other columns are not used by WRFDA. It should be mentioned that these
 error values might not necessarily be optimal for your applications. It is the
-user’s responsibility to obtain the optimal error statistics for his/her own
+userâ€™s responsibility to obtain the optimal error statistics for his/her own
 applications.</span></p>
 
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
-color:black'>Sensor channel  IR/MW  use  idum   varch    polarization(0:vertical;1:horizontal)</span></p>
+color:black'>Sensor channelÂ  IR/MWÂ  useÂ  idum Â  varchÂ Â Â  polarization(0:vertical;1:horizontal)</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New"'>&nbsp;</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
-color:black'>415    1        1      -1   0      0.5500000000E+01    0.0000000000E+00</span></p>
+color:black'>415Â Â Â  1Â Â Â Â Â Â Â  1Â Â Â Â Â  -1Â Â  0Â Â Â Â Â  0.5500000000E+01Â Â Â  0.0000000000E+00</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
-color:black'>415    2        1      -1   0      0.3750000000E+01    0.0000000000E+00</span></p>
+color:black'>415Â Â Â  2Â Â Â Â Â Â Â  1Â Â Â Â Â  -1Â Â  0Â Â Â Â Â  0.3750000000E+01Â Â Â  0.0000000000E+00</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
-color:black'>415    3        1       1   0      0.3500000000E+01    0.0000000000E+00</span></p>
+color:black'>415Â Â Â  3Â Â Â Â Â Â Â  1Â Â Â Â Â   1Â Â  0Â Â Â Â Â  0.3500000000E+01Â Â Â  0.0000000000E+00</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
-color:black'>415    4        1      -1   0      0.3200000000E+01    0.0000000000E+00</span></p>
+color:black'>415Â Â Â  4Â Â Â Â Â Â Â  1Â Â Â Â Â  -1Â Â  0Â Â Â Â Â  0.3200000000E+01Â Â Â  0.0000000000E+00</span></p>
 
 <p class=MsoNormal><span style='font-size:9.0pt;font-family:"Courier New";
-color:black'>415    5        1       1   0      0.2500000000E+01    0.0000000000E+00</span></p>
+color:black'>415Â Â Â  5Â Â Â Â Â Â Â  1Â Â Â Â Â   1Â Â  0Â Â Â Â Â  0.2500000000E+01Â Â Â  0.0000000000E+00</span></p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE
 style='font-size:12.0pt'>e.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -5170,7 +5170,7 @@ to assimilating radiance data. There are two ways of performing bias correction
 in WRFDA. One is based on the Harris and Kelly (2001) method, and is carried
 out using a set of coefficient files pre-calculated with an off-line statistics
 package, which was applied to a training dataset for a month-long period. The
-other is Variational Bias Correction (VarBC).  Only VarBC is introduced here,
+other is Variational Bias Correction (VarBC).Â  Only VarBC is introduced here,
 and recommended for users because of its relative simplicity in usage.</span></p>
 
 <h5><span lang=X-NONE>Variational Bias Correction</span></h5>
@@ -5248,7 +5248,7 @@ style='color:black'> (default = 1.0).</span></p>
 
 <p class=MsoNormal><span style='color:black'>The analysis of the VarBC
 parameters can be performed &quot;offline&quot; ; i.e. independently from the
-main WRFDA analysis. No extra code is needed.  Just set the following </span><span
+main WRFDA analysis. No extra code is needed.Â  Just set the following </span><span
 style='font-family:Courier;color:black'>MAX_VERT_VAR*</span><span
 style='color:black'> namelist variables to be 0, which will disable the
 standard control variable and only keep the VarBC control variable.</span></p>
@@ -5308,18 +5308,18 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 assimilation</span></h4>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>RAD_MONITORING</span></b><span
-style='color:black'> (30)      </span></p>
+style='color:black'> (30)Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='color:black'>Integer
 array of dimension RTMINIT_NSENSOR, 0 for assimilating mode, 1 for monitoring
 mode (only calculates innovation).</span></p>
 
-<p class=MsoNormal><span style='color:black'>            </span></p>
+<p class=MsoNormal><span style='color:black'>Â Â Â Â Â Â Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>THINNING</span></b></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='color:black'>Logical,
-TRUE will perform thinning on radiance data.   </span></p>
+TRUE will perform thinning on radiance data.Â Â  </span></p>
 
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
@@ -5330,14 +5330,14 @@ style='color:black'> (30)</span></p>
 array with dimension RTMINIT_NSENSOR, values indicate thinning mesh (in km) for
 different sensors.</span></p>
 
-<p class=MsoNormal><span style='color:black'>            </span></p>
+<p class=MsoNormal><span style='color:black'>Â Â Â Â Â Â Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>QC_RAD</span></b></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='color:black'>Logical,
 controls if quality control is performed, always set to TRUE.</span></p>
 
-<p class=MsoNormal><span style='color:black'>            </span></p>
+<p class=MsoNormal><span style='color:black'>Â Â Â Â Â Â Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>WRITE_IV_RAD_ASCII</span></b></p>
 
@@ -5345,7 +5345,7 @@ controls if quality control is performed, always set to TRUE.</span></p>
 controls whether to output observation-minus-background (O-B) files, which are
 in ASCII format, and separated by sensors and processors.</span></p>
 
-<p class=MsoNormal><span style='color:black'>            </span></p>
+<p class=MsoNormal><span style='color:black'>Â Â Â Â Â Â Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>WRITE_OA_RAD_ASCII</span></b></p>
 
@@ -5354,7 +5354,7 @@ controls whether to output observation-minus-analysis (O-A) files (including
 also O-B information), which are in ASCII format, and separated by sensors and
 processors.</span></p>
 
-<p class=MsoNormal><span style='color:black'>            </span></p>
+<p class=MsoNormal><span style='color:black'>Â Â Â Â Â Â Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>USE_ERROR_FACTOR_RAD</span></b></p>
 
@@ -5364,7 +5364,7 @@ controls use of a radiance error tuning factor file <br>
 style='color:black'>) which is created with empirical values, or generated
 using a variational tuning method (Desroziers and Ivanov, 2001).</span></p>
 
-<p class=MsoNormal><span style='color:black'>            </span></p>
+<p class=MsoNormal><span style='color:black'>Â Â Â Â Â Â Â Â Â Â Â  </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier;color:black'>ONLY_SEA_RAD</span></b></p>
 
@@ -5441,7 +5441,7 @@ and AD routines for gradient calculation.</p>
 
 <p class=MsoNormal><b><span style='font-family:"Courier New"'>RTTOV_EMIS_ATLAS_IR</span></b></p>
 
-<p class=MsoNormal style='margin-left:.5in'>Integer,  controls the use of the
+<p class=MsoNormal style='margin-left:.5in'>Integer,Â  controls the use of the
 IR emissivity atlas.</p>
 
 <p class=MsoNormal style='margin-left:.5in'>Emissivity atlas data (should be
@@ -5494,7 +5494,7 @@ Data are not used in minimization.</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='color:black'>The value
 of </span><span style='font-family:"Courier New";color:black'>rad_monitoring</span><span
-style='color:black'> should correspond to the value of  </span><span
+style='color:black'> should correspond to the value ofÂ  </span><span
 style='font-family:"Courier New";color:black'>rtminit_nsensor</span><span
 style='color:black'>. If </span><span style='font-family:"Courier New";
 color:black'>rad_monitoring</span><span style='color:black'> is not set, then
@@ -5519,7 +5519,7 @@ color:black'>write_iv_rad_ascii </span></b></p>
 
 <p class=MsoNormal style='margin-left:1.0in'><span style='color:black'>Logical.
 TRUE to write out (observation-background, etc.) diagnostics information in
-plain-text files with the prefix ‘inv,’ followed by the instrument name and the
+plain-text files with the prefix â€˜inv,â€™ followed by the instrument name and the
 processor id. For example, 01_inv_noaa-17-amsub.0000 (01 is outerloop index,
 0000 is processor index)</span></p>
 
@@ -5530,7 +5530,7 @@ color:black'>write_oa_rad_ascii </span></b></p>
 
 <p class=MsoNormal style='margin-left:1.0in'><span style='color:black'>Logical.
 TRUE to write out (observation-background, observation-analysis, etc.)
-diagnostics information in plain-text files with the prefix ‘oma,’ followed by
+diagnostics information in plain-text files with the prefix â€˜oma,â€™ followed by
 the instrument name and the processor id. For example, </span><span
 style='font-size:10.0pt;font-family:"Courier New";color:black'>01_oma_noaa-18-mhs.0001</span></p>
 
@@ -5710,7 +5710,7 @@ style='color:black'>&nbsp;</span></p>
   <td width=337 valign=top style='width:252.9pt;padding:0in 5.4pt 0in 5.4pt'>
   <p class=MsoNormal style='layout-grid-mode:char'>only plot points with</p>
   <p class=MsoNormal>clwp &gt;= clwp_value (when clwp_value &gt; 0)</p>
-  <p class=MsoNormal>clwp &gt;  clwp_value (when clwp_value = 0)</p>
+  <p class=MsoNormal>clwp &gt;Â  clwp_value (when clwp_value = 0)</p>
   </td>
  </tr>
  <tr>
@@ -5726,7 +5726,7 @@ style='color:black'>&nbsp;</span></p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<h5> <span lang=X-NONE>Evolution of VarBC parameters</span></h5>
+<h5>Â <span lang=X-NONE>Evolution of VarBC parameters</span></h5>
 
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
@@ -5758,14 +5758,14 @@ This format is described in the radar tutorial presentation available on the
 WRFDA website (<a
 href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2010_Aug/docs/WRFDA_radar.pdf"><span
 style='font-size:10.0pt'>http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2010_Aug/docs/WRFDA_radar.pdf</span></a>).
-Because radar data comes in a variety of different formats, it is the user’s
+Because radar data comes in a variety of different formats, it is the userâ€™s
 responsibility to convert their data into this format. For 3DVAR, these observations
 should be placed in a file named <span style='font-size:10.0pt;font-family:
 "Courier New"'>ob.radar</span>. For 4DVAR, they should be placed in files named
 <span style='font-size:10.0pt;font-family:"Courier New"'>ob01.radar</span>, <span
 style='font-size:10.0pt;font-family:"Courier New"'>ob02.radar</span>, etc.,
 with one observation file per time slot, as described in the earlier <a
-href="#_Run_the_Case—4D-Var">4DVAR section</a>. </p>
+href="#_Run_the_Caseâ€”4D-Var">4DVAR section</a>. </p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>b.<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
@@ -5797,15 +5797,15 @@ font-family:"Arial","sans-serif";color:black'>&nbsp;</span></p>
 font-family:"Courier New";color:black'>&amp;wrfvar4</span></p>
 
 <p style='margin:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:"Courier New";color:black'>use_radarobs &nbsp;= .true.  ; </span><span
+font-family:"Courier New";color:black'>use_radarobs &nbsp;= .true.Â  ; </span><span
 style='font-size:10.0pt;color:black'>radar obs will be read by WRFDA</span></p>
 
 <p style='margin:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:"Courier New";color:black'>use_radar_rv &nbsp;= .true.  ; </span><span
+font-family:"Courier New";color:black'>use_radar_rv &nbsp;= .true.Â  ; </span><span
 style='font-size:10.0pt;color:black'>Assimilate radar velocity observations</span></p>
 
 <p style='margin:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:"Courier New";color:black'>use_radar_rf &nbsp;= .true.  ; </span><span
+font-family:"Courier New";color:black'>use_radar_rf &nbsp;= .true.Â  ; </span><span
 style='font-size:10.0pt;color:black'>Assimilate radar reflectivity using
 original reflectivity operator (total mixing ratio)</span></p>
 
@@ -5820,7 +5820,7 @@ style='font-size:10.0pt;color:black'>Assimilate radar reflectivity using rainwat
 and ice mixing ratios</span></p>
 
 <p style='margin:0in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:"Courier New";color:black'>use_3dvar_phy = .true.  ; </span><span
+font-family:"Courier New";color:black'>use_3dvar_phy = .true.Â  ; </span><span
 style='font-size:10.0pt;color:black'>Partition hydrometeors via the moist explicit
 scheme (warm rain process)</span></p>
 
@@ -5848,7 +5848,7 @@ href="http://journals.ametsoc.org/doi/full/10.1175/JAMC-D-12-0120.1"><span
 style='font-size:10.0pt;color:#1155CC'>http://journals.ametsoc.org/doi/full/10.1175/JAMC-D-12-0120.1</span></a><span
 style='color:black'>), which </span>assimilates <span style='color:black'>rainwater
 mixing ratio </span>that is estimated from radar reflectivity, described as an
-“indirect method” in the paper<span style='color:black'>. This </span>second
+â€œindirect methodâ€ in the paper<span style='color:black'>. This </span>second
 option also includes an option (<span style='font-size:10.0pt;font-family:"Courier New"'>use_radar_rqv</span>)
 that allows the assimilation of in-cloud humidity estimated from reflectivity
 using a method described in Wang et al, 2013. It also includes the assimilation
@@ -5894,8 +5894,8 @@ src="users_guide_chap6_files/image004.png" alt=2008020518></p>
 <p class=MsoNormal style='margin-right:-40.5pt'>It should be mentioned that <span
 style='font-family:"Times","serif"'>the </span>NCEP Stage IV archived data<span
 style='font-family:"Times","serif"'> is in GRIB1 format and it cannot be
-ingested into the WRFDA directly. A tool “</span>precip_converter<span
-style='font-family:"Times","serif"'>” is provided to reformat GRIB1 observations
+ingested into the WRFDA directly. A tool â€œ</span>precip_converter<span
+style='font-family:"Times","serif"'>â€ is provided to reformat GRIB1 observations
 into the WRFDA-readable ASCII format. It can be downloaded from the WRFDA users
 page at </span><a
 href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/precip_converter.tar.gz"><span
@@ -5915,7 +5915,7 @@ the accumulating time period.</p>
 <p class=MsoNormal>&nbsp;</p>
 
 <p class=MsoNormal style='margin-right:-40.5pt'>For users wishing to use their
-own observations instead of NCEP Stage IV, it is the user’s responsibility to
+own observations instead of NCEP Stage IV, it is the userâ€™s responsibility to
 write a Fortran main program and call subroutine writerainobs (in
 write_rainobs.f90) to generate their own precipitation data. For more information
 please refer to the README file in the <span style='font-size:10.0pt;
@@ -5996,11 +5996,11 @@ font-family:Courier'>var4d_bin=3600,</span></p>
 font-family:Courier'>var4d_bin_rain=21600,</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……<br>
+font-family:Courier'>â€¦â€¦<br>
 /</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:9.0pt;
-font-family:Courier'>……</span></p>
+font-family:Courier'>â€¦â€¦</span></p>
 
 <p class=MsoNormal style='margin-left:1.0in'><span style='font-size:9.0pt;
 font-family:Courier'>&amp;wrfvar4</span></p>
@@ -6026,7 +6026,7 @@ parallel mode,</span></p>
 Courier'>&nbsp;</span></p>
 
 <p class=MsoFootnoteText><span lang=X-NONE style='font-size:9.0pt;font-family:
-Courier'>            </span><span lang=X-NONE style='font-size:10.0pt;
+Courier'>Â Â Â Â Â Â Â Â Â Â Â  </span><span lang=X-NONE style='font-size:10.0pt;
 font-family:Courier'>&gt;./da_wrfvar.exe &gt;&amp; wrfda.log</span></p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'>c.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -6127,7 +6127,7 @@ font-family:Courier'>var4d_bin=3600,</span></p>
 font-family:Courier'>var4d_bin_rain=10800,</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:10.0pt;
-font-family:Courier'>……<br>
+font-family:Courier'>â€¦â€¦<br>
 /</span></p>
 
 <p class=MsoListBullet2 style='margin-left:72.5pt'><span style='font-size:10.0pt;
@@ -6180,7 +6180,7 @@ conditions, follow the steps below:</p>
 font-family:Courier'>&gt; cd $WRFDA_DIR/var/test/update_bc</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>&gt; cp –p $DAT_DIR/rc/2008020512/wrfbdy_d01 . </span></p>
+font-family:Courier'>&gt; cp â€“p $DAT_DIR/rc/2008020512/wrfbdy_d01 . </span></p>
 
 <p class=MsoNormal style='margin-left:1.0in'><span style='font-size:10.0pt'>(IMPORTANT:
 make a copy of </span><span style='font-size:10.0pt;font-family:"Courier New"'>wrfbdy_d01</span><span
@@ -6194,31 +6194,31 @@ font-family:Courier'>&gt; vi parame.in</span></p>
 
 <p class=vi><span lang=X-NONE>&amp;control_param</span></p>
 
-<p class=vi><span lang=X-NONE> da_file            = '../tutorial/wrfvar_output'</span></p>
+<p class=vi><span lang=X-NONE>Â da_fileÂ Â Â Â Â Â Â Â Â Â Â  = '../tutorial/wrfvar_output'</span></p>
 
-<p class=vi><span lang=X-NONE> </span><span lang=X-NONE>wrf_bdy_file       =
+<p class=vi><span lang=X-NONE>Â </span><span lang=X-NONE>wrf_bdy_fileÂ Â Â Â Â Â  =
 './wrfbdy_d01'</span></p>
 
-<p class=vi><span lang=X-NONE> </span><span lang=X-NONE>domain_id          = 1</span></p>
+<p class=vi><span lang=X-NONE>Â </span><span lang=X-NONE>domain_idÂ Â Â Â Â Â Â Â Â  = 1</span></p>
 
-<p class=vi><span lang=X-NONE> debug              = .true.</span></p>
+<p class=vi><span lang=X-NONE>Â debugÂ Â Â Â Â Â Â Â Â Â Â Â Â  = .true.</span></p>
 
-<p class=vi><span lang=X-NONE> update_lateral_bdy = .true.</span></p>
+<p class=vi><span lang=X-NONE>Â update_lateral_bdy = .true.</span></p>
 
-<p class=vi><span lang=X-NONE> update_low_bdy     = .</span>false<span
+<p class=vi><span lang=X-NONE>Â update_low_bdyÂ Â Â Â  = .</span>false<span
 lang=X-NONE>.</span></p>
 
-<p class=vi><span lang=X-NONE> update_lsm         = .false.</span></p>
+<p class=vi><span lang=X-NONE>Â update_lsmÂ Â Â Â Â Â Â Â  = .false.</span></p>
 
-<p class=vi><span lang=X-NONE> iswater            = 16</span></p>
+<p class=vi><span lang=X-NONE>Â iswaterÂ Â Â Â Â Â Â Â Â Â Â  = 16</span></p>
 
-<p class=vi><span lang=X-NONE> var4d_lbc          = .false.</span></p>
+<p class=vi><span lang=X-NONE>Â var4d_lbcÂ Â Â Â Â Â Â Â Â  = .false.</span></p>
 
 <p class=vi><span lang=X-NONE>/</span></p>
 
 <p class=vi><span lang=X-NONE>&nbsp;</span></p>
 
-<p class=vi><span lang=X-NONE>&gt; ln –sf $WRFDA_DIR/var/da/da_update_bc.exe .</span></p>
+<p class=vi><span lang=X-NONE>&gt; ln â€“sf $WRFDA_DIR/var/da/da_update_bc.exe .</span></p>
 
 <p class=vi><span lang=X-NONE>&gt; ./da_update_bc.exe</span></p>
 
@@ -6246,25 +6246,25 @@ information about the changes made to wrfbdy_01.</span></p>
 
 <p class=vi><span lang=X-NONE>&amp;control_param</span></p>
 
-<p class=vi><span lang=X-NONE> da_file            = '../tutorial/wrfvar_output'</span></p>
+<p class=vi><span lang=X-NONE>Â da_fileÂ Â Â Â Â Â Â Â Â Â Â  = '../tutorial/wrfvar_output'</span></p>
 
-<p class=vi><span lang=X-NONE> </span><span lang=X-NONE>wrf_bdy_file       =
+<p class=vi><span lang=X-NONE>Â </span><span lang=X-NONE>wrf_bdy_fileÂ Â Â Â Â Â  =
 './wrfbdy_d01'</span></p>
 
-<p class=vi><span lang=X-NONE> wrf_input          =
+<p class=vi><span lang=X-NONE>Â wrf_inputÂ Â Â Â Â Â Â Â Â  =
 '$DAT_DIR/rc/2008020512/wrfinput_d01'</span></p>
 
-<p class=vi><span lang=X-NONE> domain_id          = 1</span></p>
+<p class=vi><span lang=X-NONE>Â domain_idÂ Â Â Â Â Â Â Â Â  = 1</span></p>
 
-<p class=vi><span lang=X-NONE> debug              = .true.</span></p>
+<p class=vi><span lang=X-NONE>Â debugÂ Â Â Â Â Â Â Â Â Â Â Â Â  = .true.</span></p>
 
-<p class=vi><span lang=X-NONE> update_lateral_bdy = .true.</span></p>
+<p class=vi><span lang=X-NONE>Â update_lateral_bdy = .true.</span></p>
 
-<p class=vi><span lang=X-NONE> update_low_bdy     = .true.</span></p>
+<p class=vi><span lang=X-NONE>Â update_low_bdyÂ Â Â Â  = .true.</span></p>
 
-<p class=vi><span lang=X-NONE> update_lsm         = .false.</span></p>
+<p class=vi><span lang=X-NONE>Â update_lsmÂ Â Â Â Â Â Â Â  = .false.</span></p>
 
-<p class=vi><span lang=X-NONE> </span><span lang=X-NONE>var4d_lbc          =
+<p class=vi><span lang=X-NONE>Â </span><span lang=X-NONE>var4d_lbcÂ Â Â Â Â Â Â Â Â  =
 .false.</span></p>
 
 <p class=vi><span lang=X-NONE>/</span></p>
@@ -6422,7 +6422,7 @@ covariance. The recursive filters to model the horizontal covariance are also
 different with these BEs. We have not conducted the systematic comparison of
 the analyses based on these BEs. However, CV3 (a BE file provided with our
 WRFDA system) is a global BE and can be used for any regional domain, while CV5,
-CV6, and CV7 BE’s are domain-dependent, and so should be generated based on
+CV6, and CV7 BEâ€™s are domain-dependent, and so should be generated based on
 forecast or ensemble data from the same domain. </p>
 
 <p class=MsoNormal>&nbsp;</p>
@@ -6550,33 +6550,33 @@ file. You will have:</p>
 
 <p class=MsoNormal style='text-align:justify'>&nbsp;</p>
 
-<p class=MsoNormal style='text-align:justify'>            <span
+<p class=MsoNormal style='text-align:justify'>Â Â Â Â Â Â Â Â Â Â Â  <span
 style='font-size:9.0pt;font-family:Courier'>&gt;ls $FC_DIR</span></p>
 
 <p class=MsoNormal style='text-align:justify'><span style='font-size:9.0pt;
 font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>-rw-r--r--  1   users  11556492
+font-family:Courier'>-rw-r--r--Â  1Â Â  usersÂ  11556492
 2008020512/wrfout_d01_2008-02-06_00:00:00</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>-rw-r--r--  1   users  11556492
+font-family:Courier'>-rw-r--r--Â  1Â Â  usersÂ  11556492
 2008020512/wrfout_d01_2008-02-06_12:00:00</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>-rw-r--r--  1   users  11556492
+font-family:Courier'>-rw-r--r--Â  1Â Â  usersÂ  11556492
 2008020600/wrfout_d01_2008-02-06_12:00:00</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>-rw-r--r--  1   users  11556492 2008020600/wrfout_d01_2008-02-07_00:00:00</span></p>
+font-family:Courier'>-rw-r--r--Â  1Â Â  usersÂ  11556492 2008020600/wrfout_d01_2008-02-07_00:00:00</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>-rw-r--r--  1   users  11556492
+font-family:Courier'>-rw-r--r--Â  1Â Â  usersÂ  11556492
 2008020612/wrfout_d01_2008-02-07_00:00:00</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>-rw-r--r--  1   users  11556492
+font-family:Courier'>-rw-r--r--Â  1Â Â  usersÂ  11556492
 2008020612/wrfout_d01_2008-02-07_12:00:00</span></p>
 
 <p class=MsoNormal style='text-align:justify'>&nbsp;</p>
@@ -6602,26 +6602,26 @@ your case:</p>
 font-family:Courier'>export WRFVAR_DIR=/glade/p/work/wrfhelp/PRE_COMPILED_CODE/WRFDA</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>export NL_CV_OPTIONS=5        # 5 for CV5, 7 for CV7</span></p>
+font-family:Courier'>export NL_CV_OPTIONS=5Â Â Â Â Â Â  Â # 5 for CV5, 7 for CV7</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>export START_DATE=2008020612  # the first perturbation
+font-family:Courier'>export START_DATE=2008020612Â  # the first perturbation
 valid date</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>export END_DATE=2008020700    # the last perturbation
+font-family:Courier'>export END_DATE=2008020700Â Â Â  # the last perturbation
 valid date</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>export NUM_LEVELS=40          # e_vert - 1</span></p>
+font-family:Courier'>export NUM_LEVELS=40Â Â Â Â Â Â Â Â Â  # e_vert - 1</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:9.0pt;
-font-family:Courier'>export BIN_TYPE=5             # How data is binned for
+font-family:Courier'>export BIN_TYPE=5Â Â Â Â Â Â Â Â Â Â Â Â  # How data is binned for
 calculating statistics</span></p>
 
 <p class=MsoNormal style='margin-left:.5in;text-align:justify'><span
 style='font-size:9.0pt;font-family:Courier'>export
-FC_DIR=/glade/p/work/wrfhelp/WRFDA_DATA/fc   # where wrf forecasts are</span></p>
+FC_DIR=/glade/p/work/wrfhelp/WRFDA_DATA/fcÂ Â  # where wrf forecasts are</span></p>
 
 <p class=MsoNormal style='margin-left:.5in;text-align:justify'><span
 style='font-size:9.0pt;font-family:Courier'>export RUN_DIR=`pwd`/gen_be   #
@@ -6659,7 +6659,7 @@ directory.</p>
 <p class=MsoNormal>To get a clear idea about what is included in <span
 style='font-size:10.0pt;font-family:Courier'>be.dat</span>, the script <span
 style='font-size:10.0pt;font-family:Courier'>gen_be_plot_wrapper.ksh</span><span
-style='font-family:"Courier New"'> </span>may be used.  This plots<span
+style='font-family:"Courier New"'> </span>may be used.Â  This plots<span
 style='font-family:"Courier New"'> </span>various data in <span
 style='font-size:10.0pt;font-family:Courier'>be.dat</span>; for example: </p>
 
@@ -6702,8 +6702,8 @@ and <span style='font-size:10.0pt;font-family:Courier'>&amp;wrfvar19</span> of <
 style='font-size:10.0pt;font-family:Courier'>namelist.input</span>.</p>
 
 <p>With the settings shown below, WRFDA generates a single observation with a
-pre-specified <i>innovation</i> (Observation – First Guess) value at the
-desired location; e.g. at (in terms of grid coordinate) 23x23, level 14 for “U”
+pre-specified <i>innovation</i> (Observation â€“ First Guess) value at the
+desired location; e.g. at (in terms of grid coordinate) 23x23, level 14 for â€œUâ€
 observation with error characteristics 1 m/s, and innovation size = 1.0 m/s. </p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
@@ -6734,7 +6734,7 @@ font-family:Courier'>/</span></p>
 font-family:Courier'>&amp;wrfvar19</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>pseudo_var = “u”, (Note: pseudo_var can be u, v, t, p, q. </span><span
+font-family:Courier'>pseudo_var = â€œuâ€, (Note: pseudo_var can be u, v, t, p, q. </span><span
 style='font-size:10.0pt'><br>
 </span><span style='font-size:10.0pt;font-family:Courier'>If pseudo_var is q,
 then the reasonable values of pseudo_err and pseudo_val are 0.001)</span></p>
@@ -6743,7 +6743,7 @@ then the reasonable values of pseudo_err and pseudo_val are 0.001)</span></p>
 font-family:Courier'>/</span></p>
 
 <p>Note: You may wish to repeat this exercise for other observations, like
-temperature “t”, pressure “p”, specific humidity “q”, and so on. </p>
+temperature â€œtâ€, pressure â€œpâ€, specific humidity â€œqâ€, and so on. </p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>b.<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
@@ -6789,19 +6789,19 @@ of <span style='font-family:"Courier New"'>namelist.input.</span></p>
 font-family:Courier'>&amp;wrfvar7</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>var_scaling1 = 0.25,   # reduce psi variance by 75%</span></p>
+font-family:Courier'>var_scaling1 = 0.25,Â Â  # reduce psi variance by 75%</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>var_scaling2 = 0.25,   # reduce chi_u variance by 75%</span></p>
+font-family:Courier'>var_scaling2 = 0.25,Â Â  # reduce chi_u variance by 75%</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>var_scaling3 = 0.25,   # reduce T variance by 75%</span></p>
+font-family:Courier'>var_scaling3 = 0.25,Â Â  # reduce T variance by 75%</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>var_scaling4 = 0.25,   # reduce q variance by 75%</span></p>
+font-family:Courier'>var_scaling4 = 0.25,Â Â  # reduce q variance by 75%</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>var_scaling5 = 0.25,   # reduce Ps variance by 75%</span></p>
+font-family:Courier'>var_scaling5 = 0.25,Â Â  # reduce Ps variance by 75%</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
 font-family:Courier'>/</span></p>
@@ -6830,7 +6830,7 @@ font-family:Courier'>/</span></p>
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
 lang=X-NONE>Response of outer loop on minimization: </span></h4>
 
-<p>      Run the tutorial case with</p>
+<p>Â Â Â Â Â  Run the tutorial case with</p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
 font-family:Courier'>&amp;wrfvar6</span></p>
@@ -6841,11 +6841,11 @@ font-family:Courier'>max_ext_its = 2,</span></p>
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
 font-family:Courier'>/</span></p>
 
-<p>With this setting, the “outer loop” for the minimization procedure will be
+<p>With this setting, the â€œouter loopâ€ for the minimization procedure will be
 activated. You may wish to compare various diagnostics with an earlier run. </p>
 
-<p><b>Note: </b>The<b> </b>Maximum permissible value for “<span
-style='font-size:10.0pt;font-family:Courier'>MAX_EXT_ITS</span>” is 10.</p>
+<p><b>Note: </b>The<b> </b>Maximum permissible value for â€œ<span
+style='font-size:10.0pt;font-family:Courier'>MAX_EXT_ITS</span>â€ is 10.</p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>f.<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -6865,7 +6865,7 @@ style='font-family:"Courier New"'>.</span></p>
 <p>Turning on and off certain types of observations is widely used for
 assessing the impact of observations on data assimilations.</p>
 
-<p><b>Note</b>: It is important to go through the default “use_*” settings in
+<p><b>Note</b>: It is important to go through the default â€œuse_*â€ settings in
 record <span style='font-size:10.0pt;font-family:Courier'>&amp;wrfvar4</span>
 in <span style='font-size:10.0pt;font-family:Courier'>WRFDA/Registry/registry.var</span>
 to know what observations are activated in default.</p>
@@ -6889,8 +6889,8 @@ font-family:"Courier New"'>&amp;wrfvar2</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
 margin-bottom:.0001pt;text-indent:-1.25in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd        </span><span style='font-size:10.0pt'>true:</span><span
-style='font-size:10.0pt;font-family:"Courier New"'>  </span><span
+font-family:"Courier New"'>wind_sdÂ Â Â Â Â Â Â  </span><span style='font-size:10.0pt'>true:</span><span
+style='font-size:10.0pt;font-family:"Courier New"'>Â  </span><span
 style='font-size:10.0pt'>wind values which are reported as speed/direction will
 be assimilated as such<br>
 false: (default behavior) all wind obs are converted to u/v prior to
@@ -6898,7 +6898,7 @@ assimilation</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
 margin-bottom:.0001pt;text-indent:-1.25in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>qc_rej_both    </span><span style='font-size:10.0pt'>true: 
+font-family:"Courier New"'>qc_rej_bothÂ Â Â  </span><span style='font-size:10.0pt'>true:Â 
 if either u or v (spd or dir) do not pass quality control, both obs are
 rejected</span><span style='font-size:10.0pt;font-family:"Courier New"'><br>
 </span><span style='font-size:10.0pt'>false: (default behavior) qc on wind obs
@@ -6910,13 +6910,13 @@ font-family:"Courier New"'>&amp;wrfvar5</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
 margin-bottom:.0001pt;text-indent:-1.25in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>max_omb_spd    </span><span style='font-size:10.0pt'>Max
+font-family:"Courier New"'>max_omb_spdÂ Â Â  </span><span style='font-size:10.0pt'>Max
 absolute value of innovation for wind speed obs in m/s; greater than this and
 the innovation will be set to zero (default: 100.0)</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
 margin-bottom:.0001pt;text-indent:-1.25in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>max_omb_dir    </span><span style='font-size:10.0pt'>Max
+font-family:"Courier New"'>max_omb_dirÂ Â Â  </span><span style='font-size:10.0pt'>Max
 absolute value of innovation for wind direction obs in degrees; greater than
 this and the innovation will be set to zero (default: 1000.0)</span></p>
 
@@ -6931,12 +6931,12 @@ font-family:"Courier New"'>&amp;wrfvar5</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
 margin-bottom:.0001pt;text-indent:-1.25in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>max_error_spd  </span><span style='font-size:10.0pt'>Speed
+font-family:"Courier New"'>max_error_spdÂ  </span><span style='font-size:10.0pt'>Speed
 error factor (default: 5.0)</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
 margin-bottom:.0001pt;text-indent:-1.25in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>max_error_dir  </span><span style='font-size:10.0pt'>Direction
+font-family:"Courier New"'>max_error_dirÂ  </span><span style='font-size:10.0pt'>Direction
 error factor (default: 5.0)</span></p>
 
 <p>The assimilation of wind speed/direction can also be controlled by
@@ -6948,32 +6948,32 @@ font-family:"Courier New"'>&amp;wrfvar2</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_airep     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_airepÂ Â Â Â  </span><span style='font-size:
 10.0pt'>Aircraft reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_buoy      </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_buoyÂ Â Â Â Â  </span><span style='font-size:
 10.0pt'>Buoy reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_geoamv    </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_geoamvÂ Â Â  </span><span style='font-size:
 10.0pt'>Geostationary satellite atmospheric motion vectors</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_metar     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_metar Â Â Â  </span><span style='font-size:
 10.0pt'>METAR reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_mtgirs    </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_mtgirs Â Â  </span><span style='font-size:
 10.0pt'>Meteosat Third Generation </span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_pilot     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_pilot Â Â Â  </span><span style='font-size:
 10.0pt'>Pilot reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
@@ -6988,40 +6988,40 @@ font-family:"Courier New"'>wind_sd_profiler  </span><span style='font-size:
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_qscat     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_qscat Â Â Â  </span><span style='font-size:
 10.0pt'>QuikScat reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_ships     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_ships Â Â Â  </span><span style='font-size:
 10.0pt'>Ship reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_sound     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_sound Â Â Â  </span><span style='font-size:
 10.0pt'>Sounding reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_synop     </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_synop Â Â Â  </span><span style='font-size:
 10.0pt'>Synoptic reports</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_sd_tamdar    </span><span style='font-size:
+font-family:"Courier New"'>wind_sd_tamdar Â Â  </span><span style='font-size:
 10.0pt'>TAMDAR reports</span></p>
 
 <p style='margin-top:6.0pt;margin-right:0in;margin-bottom:6.0pt;margin-left:
-1.25in;text-indent:-1.25in'><span style='font-size:10.0pt;font-family:"Courier New"'>               </span><span
+1.25in;text-indent:-1.25in'><span style='font-size:10.0pt;font-family:"Courier New"'>Â Â Â Â Â Â Â Â Â Â Â Â Â Â  </span><span
 style='font-size:10.0pt'>true:</span><span style='font-size:10.0pt;font-family:
-"Courier New"'>  </span><span style='font-size:10.0pt'>wind values which are
+"Courier New"'>Â  </span><span style='font-size:10.0pt'>wind values which are
 reported as speed/direction will be assimilated as such<br>
 false: (default behavior) all wind obs are converted to u/v prior to
 assimilation</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.5in;
 margin-bottom:.0001pt;text-indent:-1.5in'><span style='font-size:10.0pt;
-font-family:"Courier New"'>wind_stats_sd     </span><span style='font-size:
+font-family:"Courier New"'>wind_stats_sd Â Â Â  </span><span style='font-size:
 10.0pt'>Assimilate wind in u/v format, but output speed/direction statistics</span></p>
 
 <p style='margin-top:0in;margin-right:0in;margin-bottom:0in;margin-left:1.25in;
@@ -7063,7 +7063,7 @@ via a suitable wrapper script. The rest of the procedure remains the same as
 with normal running of the <span style='font-size:10.0pt;font-family:Courier'>gen_be</span><span
 style='font-size:10.0pt'> </span>utility.<b> </b>A<b> </b>successful run will
 create a <span style='font-size:10.0pt;font-family:Courier'>be.dat</span> file
-in the <span style='font-size:10.0pt;font-family:Courier'>RUN_DIR</span> directory.<b> 
+in the <span style='font-size:10.0pt;font-family:Courier'>RUN_DIR</span> directory.<b>Â 
 </b></p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>b.<span
@@ -7084,7 +7084,7 @@ style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></spa
 lang=X-NONE>How to tune multivariate background error statistics</span></h4>
 
 <p style='text-align:justify'>Below is a list of nine tuning parameters
-available in WRFDA. Default values for these variables are set as “1.0”.
+available in WRFDA. Default values for these variables are set as â€œ1.0â€.
 Setting corresponding values &gt; 1.0 (&lt; 1.0) will increase (decrease) the
 corresponding contributions as described in the following Table:</p>
 
@@ -7099,7 +7099,7 @@ corresponding contributions as described in the following Table:</p>
   <td width=429 valign=top style='width:322.0pt;border:solid black 1.0pt;
   padding:0in 5.4pt 0in 5.4pt;height:10.3pt'>
   <p style='margin-top:0in;margin-right:-83.7pt;margin-bottom:0in;margin-left:
-  0in;margin-bottom:.0001pt;layout-grid-mode:char'><b>                           
+  0in;margin-bottom:.0001pt;layout-grid-mode:char'><b>Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â 
   Description</b></p>
   </td>
  </tr>
@@ -7286,7 +7286,7 @@ clear=all style='page-break-before:auto'>
 <p><b>Note:</b> Make sure that you remove the first two lines (header) in <span
 style='font-size:10.0pt;font-family:Courier'>cost_fn</span><i> </i>and <span
 style='font-size:10.0pt;font-family:Courier'>grad_fn</span><i> </i>before you
-plot<i>. </i> You also need to specify the directory name for these two files. </p>
+plot<i>. </i>Â You also need to specify the directory name for these two files. </p>
 
 <p><span style='font-size:10.0pt;font-family:Courier'>gts_omb_oma_01</span>: It
 contains (in ASCII format) information on all of the observations used by the
@@ -7295,7 +7295,7 @@ error, observation minus background (OMB), and observation minus analysis
 (OMA). This information is very useful for both analysis and forecast
 verification purposes.</p>
 
-<p><span style='font-size:10.0pt;font-family:Courier'>namelist.input</span>: 
+<p><span style='font-size:10.0pt;font-family:Courier'>namelist.input</span>:Â 
 This is the WRFDA input namelist file, which contains all the user-defined
 non-default options. Any namelist-defined options that do not appear in this
 file should have their names checked against the values in <span
@@ -7311,8 +7311,8 @@ listed in the registry value will be used.</p>
 containing information for standard WRFDA output from individual processors
 when multiple processors are used. It contains a host of information on a
 number of observations, minimization, timings, etc. Additional diagnostics may
-be printed in these files by including various “print” WRFDA namelist options.
-To learn more about these additional “print” options, search for the “print_”
+be printed in these files by including various â€œprintâ€ WRFDA namelist options.
+To learn more about these additional â€œprintâ€ options, search for the â€œprint_â€
 string in <span style='font-size:10.0pt;font-family:Courier'>$WRFDA_DIR/Registry/registry.var</span>.</p>
 
 <p><span style='font-size:10.0pt;font-family:Courier'>statistics</span>: Text
@@ -7326,7 +7326,7 @@ increment values found in the analysis, and where they are in the WRF-model
 grid space.</p>
 
 <p>The WRFDA analysis file is <span style='font-size:10.0pt;font-family:Courier'>wrfvar_output</span>.
-It is in WRF (netCDF) format. It will become the  input file <span
+It is in WRF (netCDF) format. It will become theÂ  input file <span
 style='font-size:10.0pt;font-family:"Courier New"'>wrfinput_d01</span> of any
 subsequent WRF run after lateral boundary and/or lower boundary conditions are
 updated by another WRFDA utility (See the section <a
@@ -7356,7 +7356,7 @@ font-family:Courier'>plot_data = an</span></p>
 <p>When you execute the following command from <span style='font-size:10.0pt;
 font-family:Courier'>$WRFDA_DIR/var/graphics/ncl</span>. </p>
 
-<p>            <span style='font-size:10.0pt;font-family:Courier'>&gt; ncl
+<p>Â Â Â Â Â Â Â Â Â Â Â  <span style='font-size:10.0pt;font-family:Courier'>&gt; ncl
 WRF-Var_plot.ncl</span></p>
 
 <p>The plot should look like:</p>
@@ -7381,17 +7381,17 @@ will give you a feel for the impact of the input observation data you
 assimilated via WRFDA by modifying the input analysis first guess. </p>
 
 <p style='margin-left:.5in'>How long did WRFDA take to converge? Does it really
-converge?  You will get the answers of all these questions by looking into the <span
+converge?Â  You will get the answers of all these questions by looking into the <span
 style='font-size:10.0pt;font-family:Courier'>rsl.*</span> -files, as it
 indicates the number of iterations taken by WRFDA to converge. If this is the
 same as the maximum number of iterations specified in the namelist (<span
 style='font-size:10.0pt;font-family:Courier'>NTMAX</span>), or its default
 value (=200) set in <span style='font-size:10.0pt;font-family:Courier'>$WRFDA_DIR/Registry/registry.var</span>,
 then it means that the analysis solution did not converge. If this is the case,
-you may need to increase the value of “<span style='font-size:10.0pt;
-font-family:Courier'>NTMAX</span>” and rerun your case to ensure that the
+you may need to increase the value of â€œ<span style='font-size:10.0pt;
+font-family:Courier'>NTMAX</span>â€ and rerun your case to ensure that the
 convergence is achieved. On the other hand, a normal WRFDA run should usually
-converge within 100 iterations. If it still doesn’t converge in 200 iterations,
+converge within 100 iterations. If it still doesnâ€™t converge in 200 iterations,
 that means there may be a problem in the observations or first guess.</p>
 
 <p>A good way to visualize the impact of assimilation of observations is to
@@ -7417,7 +7417,7 @@ font-family:Courier'>var = &quot;T&quot;</span></p>
 font-family:Courier'>fg = first_guess-&gt;T ;Theta- 300</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
-font-family:Courier'>an = analysis-&gt;T    ;Theta- 300</span></p>
+font-family:Courier'>an = analysis-&gt;TÂ Â Â  ;Theta- 300</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
 font-family:Courier'>plot_data = an - fg</span></p>
@@ -7508,7 +7508,7 @@ ensemble can be found at <a
 href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/wrfda_hybrid_etkf_testdata.tar.gz"><span
 style='font-size:10.0pt'>http://www2.mmm.ucar.edu/wrf/users/wrfda/download/wrfda_hybrid_etkf_testdata.tar.gz</span></a><span
 style='font-size:10.0pt'>.</span> In this example, the ensemble forecasts were
-initialized at 2006102712 and valid 2006102800.  A hybrid analysis at
+initialized at 2006102712 and valid 2006102800.Â  A hybrid analysis at
 2006102800 will be performed using the ensemble valid 2006102800 as input. Once
 you have the initial ensemble, the ensemble mean and perturbations can be calculated
 following the steps below:</p>
@@ -7517,7 +7517,7 @@ following the steps below:</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>1)   Set an
+<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>1)Â Â  Set an
 environment variable for your working directory and your data directory</p>
 
 <p class=bodytext style='margin-left:.5in'><span style='font-size:10.0pt;
@@ -7525,7 +7525,7 @@ font-family:Courier'>&gt; setenv WORK_DIR <i>your_hybrid_path</i><br>
 &gt; setenv DAT_DIR <i>your_data_path<br>
 </i>&gt; cd $WORK_DIR</span></p>
 
-<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>2)   Calculate
+<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>2)Â Â  Calculate
 the ensemble mean</p>
 
 <p class=MsoNormal>&nbsp;</p>
@@ -7537,12 +7537,12 @@ directory. The ensemble members are identified by three-digit numbers following
 the valid time. </p>
 
 <p class=bodytext style='margin-left:.75in'><span style='font-size:10.0pt;
-font-family:Courier'>&gt; ln –sf $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00:00:00.e*
+font-family:Courier'>&gt; ln â€“sf $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00:00:00.e*
 .</span></p>
 
 <p class=MsoNormal style='margin-left:.5in;text-indent:-.25in'>b)<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span>Provide
-two template files  (ensemble mean and variance files) in your working directory. 
+two template filesÂ  (ensemble mean and variance files) in your working directory.Â 
 These files will be overwritten with the ensemble mean and variance as discussed
 below.</p>
 
@@ -7601,7 +7601,7 @@ class=viChar><span lang=X-NONE style='font-size:10.0pt'> gen_be_ensmean.exe</spa
 to your working directory and run it.</p>
 
 <p class=bodytext style='margin-left:.75in'><span style='font-size:10.0pt;
-font-family:Courier'>&gt; ln –sf  $WRFDA_DIR/var/build/gen_be_ensmean.exe . <br>
+font-family:Courier'>&gt; ln â€“sfÂ  $WRFDA_DIR/var/build/gen_be_ensmean.exe . <br>
 &gt; ./gen_be_ensmean.exe</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'>Check the output files. <em><span
@@ -7612,7 +7612,7 @@ is the ensemble variance</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>3)   Calculate
+<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>3)Â Â  Calculate
 ensemble perturbations</p>
 
 <p class=MsoNormal>&nbsp;</p>
@@ -7627,7 +7627,7 @@ font-family:Courier'>&nbsp;</span></p>
 
 <p class=bodytext style='margin-top:0in;margin-right:-.05in;margin-bottom:0in;
 margin-left:.75in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Courier'>&gt; mkdir –p ./ep</span><span style='font-size:10.0pt;
+font-family:Courier'>&gt; mkdir â€“p ./ep</span><span style='font-size:10.0pt;
 font-family:Courier'><br>
 </span><span style='font-size:10.0pt;font-family:Courier'>&gt; cd ./ep </span></p>
 
@@ -7654,10 +7654,10 @@ font-family:Courier'>&nbsp;</span></p>
 
 <p class=bodytext style='margin-top:0in;margin-right:-.05in;margin-bottom:0in;
 margin-left:.75in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
-font-family:Courier'>&gt; ln –sf WRFDA/var/build/gen_be_ep2.exe  .</span><span
+font-family:Courier'>&gt; ln â€“sf WRFDA/var/build/gen_be_ep2.exeÂ  .</span><span
 style='font-size:10.0pt;font-family:Courier'><br>
 </span><span style='font-size:10.0pt;font-family:Courier'>&gt;
-./gen_be_ep2.exe  2006102800  10  .  ../wrfout_d01_2006-10-28_00:00:00</span></p>
+./gen_be_ep2.exeÂ  2006102800Â  10Â  .Â  ../wrfout_d01_2006-10-28_00:00:00</span></p>
 
 <p class=bodytext style='margin-top:0in;margin-right:-.05in;margin-bottom:0in;
 margin-left:.5in;margin-bottom:.0001pt'><span style='font-size:10.0pt;
@@ -7673,8 +7673,8 @@ removed.</span></p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>4)   Back in
-the working directory, create the input file for vertical localization.  This
+<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>4)Â Â  Back in
+the working directory, create the input file for vertical localization.Â  This
 program requires one command-line argument: the number of vertical levels of
 the model configuration (same value as <span style='font-size:10.0pt;
 font-family:"Courier New"'>e_vert</span> in the namelist; for the tutorial
@@ -7687,7 +7687,7 @@ style='font-size:10.0pt;font-family:Courier'>&nbsp;</span></p>
 style='font-size:10.0pt;font-family:Courier'>&gt; cd $WORK_DIR</span></p>
 
 <p class=bodytext style='margin:0in;margin-bottom:.0001pt;text-indent:.5in'><span
-style='font-size:10.0pt;font-family:Courier'>&gt; ln –sf
+style='font-size:10.0pt;font-family:Courier'>&gt; ln â€“sf
 $WRFDA_DIR/var/build/gen_be_vertloc.exe&nbsp; &nbsp;.</span><span
 style='font-size:10.0pt;font-family:Courier'> </span></p>
 
@@ -7701,7 +7701,7 @@ font-family:Courier'>&gt; ./gen_be_vertloc.exe 42</span></p>
 
 <p class=MsoNormal>&nbsp;</p>
 
-<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>5)   Run WRFDA
+<p class=MsoNormal style='margin-left:.25in;text-indent:-.25in'>5)Â Â  Run WRFDA
 in hybrid mode</p>
 
 <p class=MsoNormal>&nbsp;</p>
@@ -7713,12 +7713,12 @@ follows: </p>
 
 <p class=bodytext style='margin-left:.75in'><span style='font-size:10.0pt;
 font-family:Courier'>&gt; ln -fs ./ep/* . <br>
-&gt; ln -fs ./wrfout_d01_2006-10-28_00:00:00.mean ./fg <span class=style8> (first
+&gt; ln -fs ./wrfout_d01_2006-10-28_00:00:00.mean ./fg <span class=style8>Â (first
 guess is the ensemble mean)</span> <br>
 &gt; ln -fs $WRFDA_DIR/run/LANDUSE.TBL .<br>
 &gt; ln -fs $DAT_DIR/Hybrid/ob/2006102800/ob.ascii ./ob.ascii (or ob.bufr)<br>
 &gt; ln -fs $DAT_DIR/Hybrid/be/be.dat ./be.dat <br>
-&gt; ln –fs $WRFDA_DIR/var/build/da_wrfvar.exe .<br>
+&gt; ln â€“fs $WRFDA_DIR/var/build/da_wrfvar.exe .<br>
 &gt; cp $DAT_DIR/Hybrid/namelist.input . </span></p>
 
 <p class=MsoNormal style='margin-left:.5in;text-indent:-.25in'>b)<span
@@ -7777,8 +7777,8 @@ ensdim_alpha is larger than zero</span> </span></p>
 
 <p class=stylecode style='margin-top:.1pt;margin-right:0in;margin-bottom:.1pt;
 margin-left:.5in'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>1=perturbations
-in control variable space (“psi”,”chi_u”,”t_u”,”rh”,”ps_u”); 2=perturbations in
-model space (“u”,”v”,”t”,”q”,”ps”). Option 2 is extensively tested and
+in control variable space (â€œpsiâ€,â€chi_uâ€,â€t_uâ€,â€rhâ€,â€ps_uâ€); 2=perturbations in
+model space (â€œuâ€,â€vâ€,â€tâ€,â€qâ€,â€psâ€). Option 2 is extensively tested and
 recommended to use. </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier'>alpha_corr_type </span></b></p>
@@ -7803,7 +7803,7 @@ standard deviation. Default value is 1.0 </span></p>
 
 <p class=stylecode style='margin-top:.1pt;margin-right:0in;margin-bottom:.1pt;
 margin-left:.5in'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>for
-vertical localization.  .true.=use vertical localization; .false.=no vertical
+vertical localization.Â  .true.=use vertical localization; .false.=no vertical
 localization </span></p>
 
 <h3><a name="_Description_of_Namelist_1"></a><a name="_Description_of_Namelist"></a><a
@@ -7844,7 +7844,7 @@ font-family:Courier'>&nbsp;</span></p>
 font-family:Courier'>WRFDA/var/build/da_wrfvar.exe</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'> </span></p>
+"Times New Roman","serif"'>Â </span></p>
 
 <p class=MsoBodyText><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>&nbsp;</span></p>
 
@@ -7892,31 +7892,31 @@ the steps below:</span></p>
 <p class=MsoBodyText><span lang=X-NONE>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>1)   Set </span><span style='font-size:12.0pt;
+"Times New Roman","serif"'>1)Â Â  Set </span><span style='font-size:12.0pt;
 font-family:"Times New Roman","serif"'>environment variables for convenience</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 setenv WORK_DIR_ETKF <i>your_etkf_path</i></span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 setenv DAT_DIR <i>your_data_path</i></span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 setenv </span><span style='font-family:Courier'>WRFDA</span><span lang=X-NONE
 style='font-family:Courier'>_DIR <i>your_</i></span><i><span style='font-family:
 Courier'>WRFDA</span></i><i><span lang=X-NONE style='font-family:Courier'>_path</span></i></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 cd $WORK_DIR_ETKF</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>2)   Prepare the filtered observation</span><span
+"Times New Roman","serif"'>2)Â Â  Prepare the filtered observation</span><span
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>s</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
@@ -7935,67 +7935,67 @@ style='font-size:12.0pt;font-family:"Times New Roman","serif"'> <span
 lang=X-NONE>and link all the necessary files and directories as follows: </span></span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>             </span></p>
+"Times New Roman","serif"'>Â Â Â Â Â Â Â Â Â Â Â  Â </span></p>
 
 <p class=MsoBodyText style='margin-left:27.0pt;text-indent:-9.0pt'><span
-lang=X-NONE style='font-family:Courier'>   &gt; mkdir obs_filter</span></p>
+lang=X-NONE style='font-family:Courier'>Â Â  &gt; mkdir obs_filter</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 cd obs_filter</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 ln -fs $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00.mean
-./fg  (first guess is the ensemble mean) </span></p>
+./fgÂ  (first guess is the ensemble mean) </span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 ln -fs $WRFDA_DIR/run/LANDUSE.TBL .</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'>    &gt; ln -fs
-$DAT_DIR/Hybrid/ob/2006102800/ob.ascii ./ob.ascii (or  ob.bufr)</span></p>
+style='font-family:Courier'>Â Â Â  &gt; ln -fs
+$DAT_DIR/Hybrid/ob/2006102800/ob.ascii ./ob.ascii (or Â ob.bufr)</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 ln -fs $DAT_DIR/Hybrid/be/be.dat ./be.dat </span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt; ln
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt; ln
 -fs $WRFDA_DIR/var/build/da_wrfvar.exe .</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>      &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â Â Â  &gt;
 cp $DAT_DIR/ETKF/namelist.input .</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>     b)   Edit namelist.input, paying special
-attention to the following 'QC-OBS'-related        settings:</span></p>
+"Times New Roman","serif"'>Â Â Â Â  b)Â Â  Edit namelist.input, paying special
+attention to the following 'QC-OBS'-related Â Â Â Â Â Â Â settings:</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'>    &amp;wrfvar17</span></p>
+style='font-family:Courier'>Â Â Â  &amp;wrfvar17</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'>    analysis_type                       = 'QC-OBS',</span></p>
+style='font-family:Courier'>Â Â Â  analysis_typeÂ Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â Â  = 'QC-OBS',</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'>    / </span></p>
+style='font-family:Courier'>Â Â Â  / </span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>     c)   Execute the WRFDA file, running in QC-OBS
+"Times New Roman","serif"'>Â Â Â Â  c)Â Â  Execute the WRFDA file, running in QC-OBS
 mode</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'>    </span><span style='font-family:Courier'>&gt;</span><span
+style='font-family:Courier'>Â Â Â  </span><span style='font-family:Courier'>&gt;</span><span
 lang=X-NONE style='font-family:Courier'> ./da_wrfvar.exe &gt;&amp; wrfda.log</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
@@ -8008,7 +8008,7 @@ lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'> are
 the same as when you run WRF 3D-Var</span><span style='font-size:12.0pt;
 font-family:"Times New Roman","serif"'>, </span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>and the
-'filtered_obs_01' </span><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'> file
+'filtered_obs_01' </span><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>Â file
 contains the </span><span lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>filtered
 observation</span><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>s</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>. </span></p>
@@ -8017,82 +8017,82 @@ lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>. </s
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>3)   Prepare omb files for ETKF</span></p>
+"Times New Roman","serif"'>3)Â Â  Prepare omb files for ETKF</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>   a)   In your ETKF working directory, make a subdirectory
+"Times New Roman","serif"'>Â Â  a)Â Â  In your ETKF working directory, make a subdirectory
 to prepare the omb files for each ensemble member and link all the necessary
 files and directories as follows:</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>             </span></p>
+"Times New Roman","serif"'>Â Â Â Â Â Â Â Â Â Â Â  Â </span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cd $WORK_DIR_ETKF</span></p>
+style='font-family:Courier'>Â &gt; cd $WORK_DIR_ETKF</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; mkdir -p omb/working.e001</span></p>
+style='font-family:Courier'>Â &gt; mkdir -p omb/working.e001</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cd omb/working.e001</span></p>
+style='font-family:Courier'>Â &gt; cd omb/working.e001</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -fs
+style='font-family:Courier'>Â &gt; ln -fs
 $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00.e001
-./fg  (first guess is the ensemble member) </span></p>
+./fgÂ  (first guess is the ensemble member) </span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -fs $WRFDA_DIR/run/LANDUSE.TBL .</span></p>
+style='font-family:Courier'>Â &gt; ln -fs $WRFDA_DIR/run/LANDUSE.TBL .</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -fs
+style='font-family:Courier'>Â &gt; ln -fs
 $WORK_DIR_ETKF/obs_filter/filtered_obs_01 ./ob.ascii </span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -fs $DAT_DIR/Hybrid/be/be.dat ./be.dat </span></p>
+style='font-family:Courier'>Â &gt; ln -fs $DAT_DIR/Hybrid/be/be.dat ./be.dat </span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln </span><span style='font-family:Courier'>-</span><span
+style='font-family:Courier'>Â &gt; ln </span><span style='font-family:Courier'>-</span><span
 lang=X-NONE style='font-family:Courier'>fs $WRFDA_DIR/var/build/da_wrfvar.exe .</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cp $DAT_DIR/ETKF/namelist.input .</span></p>
+style='font-family:Courier'>Â &gt; cp $DAT_DIR/ETKF/namelist.input .</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  b)   Edit namelist.input, paying special attention
+"Times New Roman","serif"'>Â  b)Â Â  Edit namelist.input, paying special attention
 to the following 'VERIFY'-related settings:</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &amp;wrfvar17</span></p>
+style='font-family:Courier'>Â &amp;wrfvar17</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> analysis_type                       = 'VERIFY',</span></p>
+style='font-family:Courier'>Â analysis_typeÂ Â Â Â Â Â Â Â  Â Â Â Â Â Â Â Â Â Â Â Â Â Â = 'VERIFY',</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> / </span></p>
+style='font-family:Courier'>Â / </span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  c)   Execute the WRFDA file, running in VERIFY
+"Times New Roman","serif"'>Â  c)Â Â  Execute the WRFDA file, running in VERIFY
 mode</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> </span><span style='font-family:Courier'>&gt;</span><span
+style='font-family:Courier'>Â </span><span style='font-family:Courier'>&gt;</span><span
 lang=X-NONE style='font-family:Courier'> ./da_wrfvar.exe &gt;&amp; wrfda.log</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
@@ -8119,8 +8119,8 @@ files</span><span lang=X-NONE style='font-size:12.0pt;font-family:"Times New Rom
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'> </span><span lang=X-NONE style='font-size:12.0pt;
-font-family:"Times New Roman","serif"'> d)   Combine the ob.etkf.0* files and
+"Times New Roman","serif"'>Â </span><span lang=X-NONE style='font-size:12.0pt;
+font-family:"Times New Roman","serif"'>Â d)Â Â  Combine the ob.etkf.0* files and
 add the observation number in the head of</span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'> </span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>ob.etkf.e0*</span></p>
@@ -8129,34 +8129,34 @@ lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>ob.et
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cat ob.etkf.0* &gt; ob.all</span></p>
+style='font-family:Courier'>Â &gt; cat ob.etkf.0* &gt; ob.all</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; wc -l ob.all &gt; ob.etkf.e001</span></p>
+style='font-family:Courier'>Â &gt; wc -l ob.all &gt; ob.etkf.e001</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cat ob.all &gt;&gt; ob.etkf.e001</span></p>
+style='font-family:Courier'>Â &gt; cat ob.all &gt;&gt; ob.etkf.e001</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  e)   Likewise, prepare ob.etkf.e0* files for other
+"Times New Roman","serif"'>Â  e)Â Â  Likewise, prepare ob.etkf.e0* files for other
 ensemble members</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>4)   Run ETKF</span></p>
+"Times New Roman","serif"'>4)Â Â  Run ETKF</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  a)   Copy or link the ensemble mean and forecasts
+"Times New Roman","serif"'>Â  a)Â Â  Copy or link the ensemble mean and forecasts
 and ob.etkf.e0* files to your working </span><span lang=X-NONE
-style='font-size:12.0pt;font-family:"Times New Roman","serif"'> </span><span
+style='font-size:12.0pt;font-family:"Times New Roman","serif"'>Â </span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>directory
 and make a parameter</span><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>
 directory</span><span lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>
@@ -8166,18 +8166,18 @@ to save the parameter files.</span></p>
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> </span><span lang=X-NONE style='font-family:Courier'>&gt;
+style='font-family:Courier'>Â </span><span lang=X-NONE style='font-family:Courier'>&gt;
 cd $WORK_DIR_ETK</span><span style='font-family:Courier'>F</span></p>
 
-<p class=MsoBodyText style='text-indent:13.5pt'><span style='font-family:Courier'> <span
+<p class=MsoBodyText style='text-indent:13.5pt'><span style='font-family:Courier'>Â <span
 lang=X-NONE>&gt; setenv PAR_DIR_ETKF $WORK_DIR_ETK</span></span><span
 style='font-family:Courier'>F/param</span></p>
 
-<p class=MsoBodyText style='text-indent:13.5pt'><span style='font-family:Courier'> </span><span
+<p class=MsoBodyText style='text-indent:13.5pt'><span style='font-family:Courier'>Â </span><span
 lang=X-NONE style='font-family:Courier'>&gt; </span><span style='font-family:
 Courier'>mkdir $</span><span lang=X-NONE style='font-family:Courier'>PAR_DIR_ETKF</span></p>
 
-<p class=MsoBodyText style='text-indent:13.5pt'><span style='font-family:Courier'> </span><span
+<p class=MsoBodyText style='text-indent:13.5pt'><span style='font-family:Courier'>Â </span><span
 lang=X-NONE style='font-family:Courier'>&gt; ln -sf
 $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
@@ -8185,7 +8185,7 @@ style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier
 ./etkf_input</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -sf $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
+style='font-family:Courier'>Â &gt; ln -sf $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00.e001
 ./etkf_input.e001</span></p>
@@ -8194,7 +8194,7 @@ style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier
 style='font-family:Courier'>...</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -sf $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
+style='font-family:Courier'>Â &gt; ln -sf $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00.e010
 ./etkf_input.e010</span></p>
@@ -8203,26 +8203,26 @@ style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier
 style='font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -sf omb/working.e001/ob.etkf.e001 .</span></p>
+style='font-family:Courier'>Â &gt; ln -sf omb/working.e001/ob.etkf.e001 .</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
 style='font-family:Courier'>...</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; ln -sf omb/working.e010/ob.etkf.e010 .</span></p>
+style='font-family:Courier'>Â &gt; ln -sf omb/working.e010/ob.etkf.e010 .</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  b)   Provide template files. These files will be
+"Times New Roman","serif"'>Â  b)Â Â  Provide template files. These files will be
 overwritten with the ensemble perturbations.</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cp $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
+style='font-family:Courier'>Â &gt; cp $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00.e001
 ./etkf_output.e001</span></p>
@@ -8231,7 +8231,7 @@ style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier
 style='font-family:Courier'>...</span></p>
 
 <p class=MsoBodyText style='text-indent:13.5pt'><span lang=X-NONE
-style='font-family:Courier'> &gt; cp $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
+style='font-family:Courier'>Â &gt; cp $DAT_DIR/Hybrid/fc/2006102712/wrfout_d01_2006-10-28_00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00</span><span
 style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier'>00.e010
 ./etkf_output.e010</span></p>
@@ -8240,108 +8240,108 @@ style='font-family:Courier'>_</span><span lang=X-NONE style='font-family:Courier
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  c)   Copy gen_be_etkf_nl.nl (cp
+"Times New Roman","serif"'>Â  c)Â Â  Copy gen_be_etkf_nl.nl (cp
 $DAT_DIR/ETKF/gen_be_etkf_nl.nl .) </span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>     </span><span lang=X-NONE style='font-size:12.0pt;
-font-family:"Times New Roman","serif"'>    </span><span lang=X-NONE
+"Times New Roman","serif"'>Â Â Â  Â </span><span lang=X-NONE style='font-size:12.0pt;
+font-family:"Times New Roman","serif"'>Â Â Â Â </span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>You will need to
 set the information in this script as follows:</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>   &amp;gen_be_etkf_nl</span></p>
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  Â &amp;gen_be_etkf_nl</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     num_members
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  Â Â Â num_members
 = 10,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     nv = 7,</span></p>
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â  Â Â nv = 7,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     cv =
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â  Â Â cv =
 'U', 'V', 'W', 'PH', 'T', 'QVAPOR', 'MU',</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     </span><span
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â  Â Â </span><span
 lang=FR style='font-family:Courier'>naccumt1 = 20,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>     naccumt2 =
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â  naccumt2 =
 20,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 nstartaccum1 = 1,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>     nstartaccum2
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â  nstartaccum2
 = 1,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>     nout = 1,</span></p>
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â  nout = 1,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 tainflatinput = 1,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>     rhoinput =
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â  rhoinput =
 1,</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 infl_fac_file = '$PAR_DIR_ETKF/inflation_factor.dat',</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 infl_let_file = '$PAR_DIR_ETKF/inflation_letkf.dat',</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 eigen_val_file = '$PAR_DIR_ETKF/eigen_value.dat',</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 inno2_val_file = '$PAR_DIR_ETKF/innovation_value.dat',</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>    
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â 
 proj2_val_file = '$PAR_DIR_ETKF/projection_value.dat',</span></p>
 
-<p class=MsoBodyText><span lang=FR style='font-family:Courier'>     </span><span
+<p class=MsoBodyText><span lang=FR style='font-family:Courier'>Â Â Â Â  </span><span
 lang=X-NONE style='font-family:Courier'>infl_fac_TRNK = .false.,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     infl_fac_WG03
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â infl_fac_WG03
 = .false.,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     infl_fac_WG07
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â infl_fac_WG07
 = .true.,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     infl_fac_BOWL
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â infl_fac_BOWL
 = .false.,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     letkf_flg=.false.,</span></p>
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â letkf_flg=.false.,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     rand_filt
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â rand_filt
 = .false.,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     rnd_seed
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â rnd_seed
 = 2006102800,</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     rnd_nobs
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â rnd_nobs
 = 5000</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_erro_max
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_erro_max
 = 20.</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_erro_min
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_erro_min
 = .00001</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_inno_max
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_inno_max
 = 20.</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_inno_min
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_inno_min
 = .00001</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_erro_flg
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_erro_flg
 = .true.</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_inno_flg
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_inno_flg
 = .true.</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>     etkf_wrfda
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â Â  Â etkf_wrfda
 = .false.</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>   /</span></p>
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â  /</span></p>
 
 <p class=MsoBodyText><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>&nbsp;</span></p>
 
@@ -8361,25 +8361,25 @@ lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>here
 various namelist parameters are as follows:</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-family:Courier'>num_members</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'> is
 the ensemble members size</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span style='font-family:Courier'>nv</span><span
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'> <span
 lang=X-NONE>is the number of variables</span></span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span style='font-family:Courier'>cv</span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'> the name of
 variables</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-family:Courier'>n</span><span
 style='font-family:Courier'>accumt1</span><span style='font-size:12.0pt;
 font-family:"Times New Roman","serif"'> <span lang=X-NONE>and </span></span><span
@@ -8389,7 +8389,7 @@ lang=X-NONE>are number of previous cycles used to accumulate for inflation and
 rho factor</span></span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-family:Courier'>n</span><span
 style='font-family:Courier'>startaccumt1</span><span style='font-size:12.0pt;
 font-family:"Times New Roman","serif"'> </span><span style='font-size:12.0pt;
@@ -8400,12 +8400,12 @@ style='font-size:12.0pt;font-family:"Times New Roman","serif"'>are not used for
 ordinary ETKF</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>nout
 is the cycle index</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span style='font-family:Courier'>tainflatinput</span><span
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'> <span
 lang=X-NONE>and </span></span><span style='font-family:Courier'>rhoinput</span><span
@@ -8413,7 +8413,7 @@ style='font-size:12.0pt;font-family:"Times New Roman","serif"'> <span
 lang=X-NONE>are prescribed factors for inflation and rho factor</span></span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=FR style='font-family:Courier'>infl_fac_file</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>, </span><span
 lang=FR style='font-family:Courier'>eigen_val_file</span><span lang=X-NONE
@@ -8425,7 +8425,7 @@ style='font-size:12.0pt;font-family:"Times New Roman","serif"'> are files to
 save template parameters</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-family:Courier'>infl_fac_TRNK</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>,</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'> </span><span
@@ -8444,7 +8444,7 @@ for different adaptive inflation</span><span lang=X-NONE style='font-size:12.0pt
 font-family:"Times New Roman","serif"'> schemes</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-style='font-size:12.0pt;font-family:Symbol'>·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+style='font-size:12.0pt;font-family:Symbol'>Â·<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-family:Courier'>rand_filt</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>, </span><span
 lang=X-NONE style='font-family:Courier'>rnd_seed</span><span lang=X-NONE
@@ -8454,7 +8454,7 @@ style='font-size:12.0pt;font-family:"Times New Roman","serif"'> are options for
 using filtered observation and random observations</span></p>
 
 <p class=MsoBodyText style='margin-left:.5in;text-indent:-.25in'><span
-lang=X-NONE style='font-size:12.0pt;font-family:Symbol'>·<span
+lang=X-NONE style='font-size:12.0pt;font-family:Symbol'>Â·<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 </span></span><span lang=X-NONE style='font-family:Courier'>etkf_erro_max</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>, </span><span
@@ -8476,16 +8476,16 @@ conduct further observation filtering. </span></p>
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  d)   Link gen_be_etkf.exe to your working
+"Times New Roman","serif"'>Â  d)Â Â  Link gen_be_etkf.exe to your working
 directory and run it.</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  &gt; ln -sf 
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  &gt; ln -sfÂ 
 $WRFDA_DIR/var/build/gen_be_etkf.exe . </span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  &gt;
 ./gen_be_etkf.exe</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
@@ -8499,10 +8499,10 @@ files. etkf_output.* files are updated ensemble pertubations.</span></p>
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'> </span></p>
+"Times New Roman","serif"'>Â </span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>5)   Add updated ensemble perturbations to </span><span
+"Times New Roman","serif"'>5)Â Â  Add updated ensemble perturbations to </span><span
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>the </span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>ensemble
 mean </span><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>to
@@ -8512,47 +8512,47 @@ new emsemble members</span></p>
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  &gt; cd
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  &gt; cd
 $WORK_DIR_ETKF</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  a)   Copy add_mean_nl.nl (cp
+"Times New Roman","serif"'>Â  a)Â Â  Copy add_mean_nl.nl (cp
 $DAT_DIR/ETKF/add_mean_nl.nl .) </span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>     </span><span lang=X-NONE style='font-size:12.0pt;
-font-family:"Times New Roman","serif"'>   </span><span lang=X-NONE
+"Times New Roman","serif"'>Â Â Â Â  </span><span lang=X-NONE style='font-size:12.0pt;
+font-family:"Times New Roman","serif"'>Â Â Â </span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>You will need to
 set the information in this script as follows for each member:</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  &amp;add_mean_nl</span></p>
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  &amp;add_mean_nl</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  num_members
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  num_members
 = 10</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  cv         
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  cvÂ Â Â Â Â Â Â Â Â 
 = 'U', 'V', 'W', 'PH', 'T', 'QVAPOR', 'MU'</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  nv         
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  nvÂ Â Â Â Â Â Â Â Â 
 = 7</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  path       
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  pathÂ Â Â Â Â Â Â 
 = '$WORK_DIR_ETKF'</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  file_mean  
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  file_meanÂ Â 
 = 'etkf_input' </span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>  file_pert  
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â  file_pertÂ Â 
 = 'etkf_output.e001' (for each member,</span><span lang=X-NONE
 style='font-family:Courier'> </span><span lang=X-NONE style='font-family:Courier'>etkf_output.e0*...)</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'> /</span></p>
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â /</span></p>
 
 <p class=MsoBodyText><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>&nbsp;</span></p>
 
@@ -8562,26 +8562,26 @@ be sure to substitute the actual path in the place of $WORK_DIR_ETKF</span></i><
 <p class=MsoBodyText><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>  b)   Run gen_</span><span style='font-size:12.0pt;
+"Times New Roman","serif"'>Â  b)Â Â  Run gen_</span><span style='font-size:12.0pt;
 font-family:"Times New Roman","serif"'>be_</span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>addmean.exe.</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'> </span></p>
+"Times New Roman","serif"'>Â </span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>   &gt; ln -sf
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â  &gt; ln -sf
 </span><span style='font-family:Courier'>$WRFDA_DIR</span><span lang=X-NONE
 style='font-family:Courier'>/var/build/gen_</span><span style='font-family:
-Courier'>be_</span><span lang=X-NONE style='font-family:Courier'>addmean.exe  .</span></p>
+Courier'>be_</span><span lang=X-NONE style='font-family:Courier'>addmean.exeÂ  .</span></p>
 
-<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>   &gt;
+<p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>Â Â  &gt;
 ./gen_</span><span style='font-family:Courier'>be_</span><span lang=X-NONE
 style='font-family:Courier'>addmean.exe </span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-family:Courier'>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'> Check the output files. etkf_output.e0* files are
+"Times New Roman","serif"'>Â Check the output files. etkf_output.e0* files are
 the new ensemble members.</span></p>
 
 <h3><a name="_Description_of_Namelist_2"></a><span lang=X-NONE>Description of
@@ -8660,7 +8660,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>seconds,
-  observation sub-window length for 4D-Var   </p>
+  observation sub-window length for 4D-VarÂ Â  </p>
   </td>
  </tr>
  <tr>
@@ -8817,10 +8817,10 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1</p>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'> 1:
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Â 1:
   fg_format_wrf_arw_regional (default)</p>
-  <p class=MsoNormal style='margin-right:-.05in'> 3: fg_format_wrf_arw_global</p>
-  <p class=MsoNormal style='margin-right:-.05in'> 4: fg_format_kma_global</p>
+  <p class=MsoNormal style='margin-right:-.05in'>Â 3: fg_format_wrf_arw_global</p>
+  <p class=MsoNormal style='margin-right:-.05in'>Â 4: fg_format_kma_global</p>
   <p class=MsoNormal style='margin-right:-.05in'>Options 3 and 4 are untested;
   use with caution!</p>
   <p class=MsoNormal style='margin-right:-.05in'>&nbsp;</p>
@@ -9221,21 +9221,21 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
  </tr>
  <tr>
   <td width=614 colspan=9 valign=top style='width:460.25pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>     ;
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Â Â Â Â  ;
   use_hirs2obs, use_hirs3obs, use_hirs4obs, use_mhsobs</p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; use_msuobs, use_amsuaobs,
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; use_msuobs, use_amsuaobs,
   use_amsubobs, use_airsobs,</p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; use_eos_amsuaobs,
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; use_eos_amsuaobs,
   use_hsbobs, use_ssmisobs are</p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; radiance-related
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; radiance-related
   variables that only control if </p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; corresponding BUFR
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; corresponding BUFR
   files are read into WRFDA or not, but</p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; do not control if the
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; do not control if the
   data is assimilated or not.</p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; Additional variables
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; Additional variables
   have to be set in &amp;wrfvar14 in order</p>
-  <p class=MsoNormal style='margin-right:-.05in'>     ; to assimilate radiance
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â  ; to assimilate radiance
   data.</p>
   </td>
  </tr>
@@ -9452,8 +9452,8 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='layout-grid-mode:char;text-autospace:ideograph-numeric'>.true.:
-  reject the observations whose innovations (O-B) are  larger than a maximum
-  value defined as a multiple of  the observation error for each observation.
+  reject the observations whose innovations (O-B) areÂ  larger than a maximum
+  value defined as a multiple ofÂ  the observation error for each observation.
   i.e., inv &gt; (obs_error*factor) --&gt; fails_error_max; the default maximum
   value is 5 times the observation error ; the factor of 5 can be changed
   through max_error_* settings.</p>
@@ -9637,7 +9637,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>minimization
   convergence criterion (uses dimension: max_ext_its); minimization stops when
   the norm of the gradient of the cost function gradient is reduced by a factor
-  of eps. inner minimization stops either when the criterion is met or  when
+  of eps. inner minimization stops either when the criterion is met orÂ  when
   inner iterations reach ntmax.</p>
   </td>
  </tr>
@@ -9793,7 +9793,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>tuning
-  factor of background error covariance for  control variable 2 - unbalanced
+  factor of background error covariance forÂ  control variable 2 - unbalanced
   velocity potential. For cv_options=5 only.</p>
   </td>
  </tr>
@@ -9821,7 +9821,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>tuning
-  factor of background error covariance for  control variable 4 - pseudo relative
+  factor of background error covariance forÂ  control variable 4 - pseudo relative
   humidity. For cv_options=5 only.</p>
   </td>
  </tr>
@@ -9835,7 +9835,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>tuning
-  factor of background error covariance for  control variable 5 - unbalanced
+  factor of background error covariance forÂ  control variable 5 - unbalanced
   surface pressure. For cv_options=5 only.</p>
   </td>
  </tr>
@@ -9921,7 +9921,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
  </tr>
  <tr>
   <td width=614 colspan=9 valign=top style='width:460.25pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'><b>&amp;wrfvar8 
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'><b>&amp;wrfvar8Â 
   ;not used</b></p>
   </td>
  </tr>
@@ -9975,7 +9975,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Unit
-  number for tracing output.  Note that units 10 and 9 are reserved for reading
+  number for tracing output.Â  Note that units 10 and 9 are reserved for reading
   namelist.input and writing namelist.output respectively.</p>
   </td>
  </tr>
@@ -10137,7 +10137,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>.true.:
-  warning messages that would normally allow the   program to continue are
+  warning messages that would normally allow theÂ  Â program to continue are
   treated as fatal errors.</p>
   </td>
  </tr>
@@ -10210,7 +10210,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in'>1 --&gt; supersaturation
   (rh&gt; 100%) and minimum rh (rh&lt;10%) check, and make the local adjustment
   of q.</p>
-  <p class=MsoNormal style='margin-right:-.05in'>2 --&gt;  supersaturation
+  <p class=MsoNormal style='margin-right:-.05in'>2 --&gt;Â  supersaturation
   (rh&gt; 95%) and minimum rh (rh&lt;11%) check and make the multi-level q
   adjustment under the constraint of conserved column integrated water vapor</p>
   </td>
@@ -10225,10 +10225,10 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='layout-grid-mode:char;text-autospace:ideograph-numeric'>1
-  --&gt;  surface observations will be assimilated based on the lowest model
+  --&gt;Â  surface observations will be assimilated based on the lowest model
   level first guess. Observations are not used when the elevation difference
   between the observing site and the lowest model level is larger than 100m.</p>
-  <p class=MsoNormal style='text-autospace:ideograph-numeric'>2 --&gt;  surface
+  <p class=MsoNormal style='text-autospace:ideograph-numeric'>2 --&gt;Â  surface
   observations will be assimilated based on surface similarity theory in PBL.
   Innovations are computed based on 10-m wind, 2-m temperature and 2-m
   moisture.</p>
@@ -10354,7 +10354,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>specify
-  the maximum truncation value (percentage) to explain the  variance of unbalanced
+  the maximum truncation value (percentage) to explain theÂ  variance of unbalanced
   potential velocity in eigenvector decomposition</p>
   </td>
  </tr>
@@ -10382,7 +10382,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>specify
-  the maximum truncation value (percentage) to explain the variance of  pseudo
+  the maximum truncation value (percentage) to explain the variance ofÂ  pseudo
   relative humidity in eigenvector decomposition</p>
   </td>
  </tr>
@@ -10474,7 +10474,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <td width=310 colspan=3 valign=top style='width:232.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>sensor
   IDs array (used dimension: rtminit_nsensor); e.g., 0 for HIRS, 3 for AMSU-A,
-  4 for AMSU-B,  15 for MHS, 10 for SSMIS, 11 for AIRS</p>
+  4 for AMSU-B,Â  15 for MHS, 10 for SSMIS, 11 for AIRS</p>
   </td>
  </tr>
  <tr>
@@ -10608,7 +10608,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   Transfer Model) to use (WRFDA must be compiled with the desired model
   included, see first section for details)<br>
   1: RTTOV <br>
-  2: CRTM  </p>
+  2: CRTMÂ  </p>
   </td>
  </tr>
  <tr>
@@ -10722,7 +10722,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <td width=310 colspan=3 valign=top style='width:232.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>.true.:
   uses the observation brightness temperature for AIRS Window channel #914 as
-  criterion for GSI  thinning (with a higher amplitude than the distance from
+  criterion for GSIÂ  thinning (with a higher amplitude than the distance from
   the observation location to the nearest grid point).</p>
   </td>
  </tr>
@@ -10864,7 +10864,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Set the
-  innovation of the  ob; wind in m/s, pressure in Pa, temperature in K,
+  innovation of theÂ  ob; wind in m/s, pressure in Pa, temperature in K,
   specific humidity in kg/kg </p>
   <p class=MsoNormal style='margin-right:-.05in'>&nbsp;</p>
   </td>
@@ -10956,12 +10956,12 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   style='font-size:10.0pt;font-family:"Courier New"'>analysis_type</span></p>
   </td>
   <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>“3D-VAR”</p>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>â€œ3D-VARâ€</p>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>&quot;3D-VAR&quot;:
   3D-VAR mode (default);</p>
-  <p class=MsoNormal style='margin-right:-.05in'> &quot;QC-OBS&quot;: 3D-VAR
+  <p class=MsoNormal style='margin-right:-.05in'>Â &quot;QC-OBS&quot;: 3D-VAR
   mode plus extra filtered_obs output; </p>
   <p class=MsoNormal style='margin-right:-.05in'>&quot;VERIFY&quot;:
   verification mode. WRFDA resets check_max_iv=.false. and ntmax=0; </p>
@@ -10995,7 +10995,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   style='font-size:10.0pt;font-family:"Courier New"'>analysis_date</span></p>
   </td>
   <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>“2002-08-03_00:00:00.0000”</p>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>â€œ2002-08-03_00:00:00.0000â€</p>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>specify
@@ -11017,7 +11017,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   style='font-size:10.0pt;font-family:"Courier New"'>pseudo_var</span></p>
   </td>
   <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>“t”</p>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>â€œtâ€</p>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Set the
@@ -11047,7 +11047,7 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   style='font-size:10.0pt;font-family:"Courier New"'>documentation_url</span></p>
   </td>
   <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>“http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk”</p>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>â€œhttp://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunkâ€</p>
   </td>
   <td width=334 colspan=4 valign=top style='width:250.25pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>&nbsp;</p>
@@ -11329,7 +11329,7 @@ lang=X-NONE>OBSPROC namelist variables</span></h4>
   style='font-size:10.0pt;font-family:"Courier New"'>fatal_if_exceed_max_obs</span></p>
   </td>
   <td width=435 valign=top style='width:326.55pt;padding:0in 5.4pt 0in 5.4pt'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>.TRUE.: 
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>.TRUE.:Â 
   will stop when more than max_number_of_obs are loaded</p>
   <p class=MsoNormal style='margin-right:-.05in'>.FALSE.: will process the
   first max_number_of_obs loaded observations. </p>
@@ -11471,7 +11471,7 @@ lang=X-NONE>OBSPROC namelist variables</span></h4>
   </td>
   <td width=435 valign=top style='width:326.55pt;padding:0in 5.4pt 0in 5.4pt'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>.TRUE.
-  will  write diagnostic on space duplicate removal in file
+  willÂ  write diagnostic on space duplicate removal in file
   obs_duplicate_loc.diag</p>
   </td>
  </tr>
@@ -11482,7 +11482,7 @@ lang=X-NONE>OBSPROC namelist variables</span></h4>
   </td>
   <td width=435 valign=top style='width:326.55pt;padding:0in 5.4pt 0in 5.4pt'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>.TRUE.
-  will  write diagnostic on time duplicate removal in file
+  willÂ  write diagnostic on time duplicate removal in file
   obs_duplicate_time.diag</p>
   </td>
  </tr>
@@ -11916,9 +11916,9 @@ lang=X-NONE>OBSPROC namelist variables</span></h4>
   <td width=435 valign=top style='width:326.55pt;padding:0in 5.4pt 0in 5.4pt'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>output
   1, PREPBUFR OBS file only;</p>
-  <p class=MsoNormal style='margin-right:-.05in'>           2, ASCII OBS file
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â Â Â Â Â Â Â  2, ASCII OBS file
   only;</p>
-  <p class=MsoNormal style='margin-right:-.05in'>           3, Both PREPBUFR
+  <p class=MsoNormal style='margin-right:-.05in'>Â Â Â Â Â Â Â Â Â Â  3, Both PREPBUFR
   and ASCII OBS files.</p>
   </td>
  </tr>
