@@ -126,16 +126,6 @@
             <p class="bodytext">Before installing WRFDA, ensure your system meets the <a href="requirements.html">minimum requirements</a>. <br></p>
             <p class="bodytext">If your issue is not found on this page, please contact <a href="wrfhelp.html">wrfhelp</a> for assistance.<br><br></p>
             <blockquote>
-<!--              <h1>Compile-time errors</h1>
-              <p class="bodytext"><strong>Problem <em>(Posted 2009-04-09)</em>: </strong><br>
-                WRFDA doesn't compile with gfortran below version 4.3.0 on Linux OS.</p>
-              <p class="bodytext"><strong>Solution:</strong><br>
-              WRFDA is incompatible with this and some other old compiler versions. 
-              Upgrade gfortran to version 4.3.0 or above, or use another compiler.</p>
-              <p class="bodytext"><strong>Problem <em>(Posted 2012-07-26)</em>: </strong><br>
-                PGI compiler returns message "<code>PGF90-F-0007-Subprogram too large to compile at this optimization level</code>".</p>
-              <p class="bodytext"><strong>Solution:</strong><br>
-                After running "<code>./configure</code>", edit "FCOPTIM" in <code>configure.wrf</code> to a lower optimization level ("-O2 -fast" -> "-O1").</p>-->
               <blockquote><ul class="bodytext"><li><a href="#V3_7">Version 3.7</a>
                 <li><a href="#V3_6_1">Version 3.6.1</a></li>
                 <li><a href="#V3_6">Version 3.6</a></li>
@@ -149,9 +139,15 @@
                 <li><a href="#V3_1">Version 3.1</a></li>
                 <li><a href="#V3_0">Version 3.0</a></li>
                 <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
-            <a name="V3_6_1"></a><p class="pagetitle">WRFDA Version 3.7 : Known Problems and Fixes</p>
+            <a name="V3_7"></a><p class="pagetitle">WRFDA Version 3.7 : Known Problems and Fixes</p>
             <blockquote>
-            <p class="bodytext"><strong>No known issues with V3.7</strong></p>
+            <h1> Problems with PGI compilers (posted 2015-04-21) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               There are several known issues with WRFDA compiled with PGI compilers:</p>
+               <blockquote><ul class="bodytext"><li>Certain 4DVAR tests fail</li>
+                   <li>Bit-for-bit reproducability errors with PGI version 13.3, 13.9, and possibly others</li>
+                   <li>PGI version 14+: 4DVAR compilation fails</li></ul></blockquote>
+            <p class="bodytext"><strong>No solution available at this time; use another compiler if possible</strong></p>
             </blockquote>
             <a name="V3_6_1"></a><p class="pagetitle">WRFDA Version 3.6.1 : Known Problems and Fixes</p>
             <blockquote>

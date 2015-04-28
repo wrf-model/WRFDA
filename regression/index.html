@@ -55,7 +55,7 @@
 <script type="text/javascript" src="yellowstone_ifort_12.1.5_date.js"> </script>
 <script type="text/javascript" src="yellowstone_ifort_15.0.1_date.js"> </script>
 <script type="text/javascript" src="yellowstone_pgi_12.10_date.js"> </script>
-<!--<script type="text/javascript" src="yellowstone_pgi_date.js"> </script>-->
+<script type="text/javascript" src="yellowstone_pgi_13.3_date.js"> </script>
 <script type="text/javascript" src="loblolly_gfortran_4.9.2_date.js"> </script>
 <script type="text/javascript" src="visit-a05_gfortran_4.9.2_date.js"> </script>
 
@@ -64,7 +64,7 @@
 
 
 
-<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_4_8_2_date(); yellowstone_ifort_12_1_5_date(); yellowstone_ifort_15_0_1_date(); yellowstone_pgi_12_10_date(); loblolly_gfortran_4_9_2_date(); visita05_gfortran_4_9_2_date();">
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0" onLoad="yellowstone_gfortran_4_8_2_date(); yellowstone_ifort_12_1_5_date(); yellowstone_ifort_15_0_1_date(); yellowstone_pgi_12_10_date(); yellowstone_pgi_13_3_date(); loblolly_gfortran_4_9_2_date(); visita05_gfortran_4_9_2_date();">
 
 <table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
 
@@ -133,11 +133,11 @@
             <p class="bodytext">"Yellowstone" is NCAR's main supercomputer. It is a 64-bit Enterprise Linux system. The default modules are used for testing unless noted.</p>
               <blockquote><ul class="bodytext"><li><b>Weekly tests:</b><br><em>These tests are run regularly to ensure that changes to the trunk have not caused problems in the WRFDA code. Typically run once a week.</em></li>
                 <ul><li><a href="summary_yellowstone_gfortran_4.8.2.html">gfortran/gcc V4.8.2 results</a> (<em>last updated: <span id="yellowstone_gfortran_4_8_2_update"></span></em>)</li>
-                <li><a href="summary_yellowstone_ifort_12.1.5.html">ifort/icc_V12.1.5 results</a> (<em>last updated: <span id="yellowstone_ifort_12_1_5_update"></span></em>)</li>
-                <li><a href="summary_yellowstone_ifort_15.0.1.html">ifort/icc_V15.0.1 results</a> (<em>last updated: <span id="yellowstone_ifort_15_0_1_update"></span></em>)</li>
-                <li><a href="summary_yellowstone_pgi_12.10.html">pgf90/pgcc_V12.10 results</a> (<em>last updated: <span id="yellowstone_pgi_12_10_update"></span></em>)</li></ul><br>
-<!--                <li><b>Occasional tests:</b><br><em>The following tests are done at each release and on other occasions as necessary. Some failures are expected, especially for PGI.</em></li>
-                <ul><li><a href="summary_yellowstone_pgi_13.3.html">pgf90/pgcc_V13.3 results</a> (<em>last updated: <span id="yellowstone_pgi_update"></span></em>)<br><em>Note: The default version 13.3 has problems with reproducibility on Yellowstone</em></li></ul>-->
+                  <li><a href="summary_yellowstone_ifort_12.1.5.html">ifort/icc_V12.1.5 results</a> (<em>last updated: <span id="yellowstone_ifort_12_1_5_update"></span></em>)</li>
+                  <li><a href="summary_yellowstone_pgi_13.3.html">pgf90/pgcc_V13.3 results</a> (<em>last updated: <span id="yellowstone_pgi_13_3_update"></span></em>)<br><em>Note: PGI 13.3 has problems with reproducibility on Yellowstone</em></li></ul><br>
+                <li><b>Occasional tests:</b><br><em>The following tests are done at each release and on other occasions as necessary. Some failures are expected, especially for PGI.</em></li>
+                <ul><li><a href="summary_yellowstone_ifort_15.0.1.html">ifort/icc_V15.0.1 results</a> (<em>last updated: <span id="yellowstone_ifort_15_0_1_update"></span></em>)</li>
+                  <li><a href="summary_yellowstone_pgi_12.10.html">pgf90/pgcc_V12.10 results</a> (<em>last updated: <span id="yellowstone_pgi_12_10_update"></span></em>)</li></ul>
               </ul></blockquote>
             <h2 class="bodytext">Loblolly</h2>
             <p class="bodytext">"Loblolly" is a local PC. It is a 64-bit CentOS Linux system.</p>
@@ -154,7 +154,14 @@
             <p class="bodytext"><em>More coming soon</em></p></blockquote>
             <h2 class="bodytext">Download test cases</h2>
             <p class="bodytext">The data needed for running the regression test package can be found below. The full test (including compilation) takes about 20-30 minutes on Yellowstone, 2 hours on a Linux PC (using 6 cores):</p>
-              <blockquote><p class="bodytext"><em>Latest release version (V3.6.1)</em>:</p>
+              <blockquote><p class="bodytext"><em>Latest release version (V3.7)</em>:</p>
+                <ul class="bodytext"><li><a href="WRFDA-data-EM_V37.tar.gz">Input data</a></li>
+                  <li>Baseline data:</li>
+                    <ul><li><a href="BASELINE_yellowstone_V37.tar.gz">Yellowstone</a></li>
+                    <li><a href="BASELINE_loblolly_V37.tar.gz">Linux PC</a></li>
+                    <li><a href="BASELINE_visit-a05_V37.tar.gz">Mac OS</a></li></ul>
+                </ul>
+                <p class="bodytext"><em>Version 3.6.1</em>:</p>
                 <ul class="bodytext"><li><a href="WRFDA-data-EM_V361.tar.gz">Input data</a></li>
                   <li>Baseline data:</li>
                     <ul><li><a href="BASELINE_yellowstone_V361.tar.gz">Yellowstone</a></li>
