@@ -66,6 +66,7 @@ $affiliation_types = array("US Universities",
 
 $intended_usages = array('WRFDA',
                          'WRFPLUS',
+                         'MADIS2LITTLER',
                          'Numerical Weather Prediction',
 			 'Idealized Simulations',
 			 'Coupled Models',

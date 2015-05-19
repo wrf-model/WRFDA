@@ -272,11 +272,16 @@
             </blockquote>
             <a name="V3_4"></a><p class="pagetitle">WRFDA Version 3.4 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> gfortran "Graphite loop optimizations" error (posted 2015-05-18) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails to compile: gfortran gives the message "sorry, unimplemented: Graphite loop optimizations can only be used if the libcloog-ppl0 package is installed"</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+                After running the configuration script (<code>./configure wrfda</code>) edit the "<code>configure.wrf</code>" file to remove the text "-ftree-loop-linear" at or near line 115 (where the variable "FCOPTIM" is defined). Then compile WRFDA.</p>
             <h1> Problem with WRFPLUS under certain "mp_physics" settings (posted 2012-07-24) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFPlus adjoint model fails with a segmentation fault or a fatal error message "<code>subscript out of range for array head_grid%g_moist (mediation_pertmod_io.f90: 428)</code>" when <code>mp_physics =</code> any of the following: 9,10,13,14,16,17, or 18.</p>
             <p class="bodytext"><strong>Solution:</strong><br>
-               Download and unpack <a href="fixes/v34/Registry.EM_COMMON.tar.gz">Registry.EM_COMMON.tar.gz</a>, and use this file to overwrite the <kbd>WRFPLUS/Registry/Registry.EM_COMMON</kbd> file. Then run "<code>./clean -a</code>" and recompile.
+               Download and unpack <a href="fixes/v34/Registry.EM_COMMON.tar.gz">Registry.EM_COMMON.tar.gz</a>, and use this file to overwrite the <kbd>WRFPLUS/Registry/Registry.EM_COMMON</kbd> file. Then run "<code>./clean -a</code>" and recompile.</p>
             <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
@@ -289,6 +294,11 @@
             </blockquote>
             <a name="V3_3"></a><p class="pagetitle">WRFDA Version 3.3 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> gfortran "Graphite loop optimizations" error (posted 2015-05-18) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails to compile: gfortran gives the message "sorry, unimplemented: Graphite loop optimizations can only be used if the libcloog-ppl0 package is installed"</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+                After running the configuration script (<code>./configure wrfda</code>) edit the "<code>configure.wrf</code>" file to remove the text "-ftree-loop-linear" at or near line 115 (where the variable "FCOPTIM" is defined). Then compile WRFDA.</p>
             <h1> Problem with WRFPLUS, especially with PGI compiler (posted 2011-06-24) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                The adjoint model integration fails with either a segmentation fault or the error message: <code>0: ALLOCATE: 18446744072053605056 bytes requested; not enough memory</code>.</p>
