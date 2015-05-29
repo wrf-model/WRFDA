@@ -1,0 +1,236 @@
+<html>
+
+<head>
+
+<title>WRFDA USER SUPPORT: Frequently Asked Questions</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+</head>
+
+
+
+<body bgcolor="#FFFFFF" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="images/goldrule.jpg" bgcolor="#009933"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="91%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td height="863" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+
+        <td width="117" height="900" bgcolor="#009933"><p>&nbsp;</p>
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+
+            <tr> 
+              <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt; font-weight: bold;">FAQ</p>
+              <p align="center"><a href="support.html" class="leftnavlink">WRFDA community support</a></p>
+              <p align="center"><a href="known-prob.html" class="leftnavlink">Known problems and solutions</a></p>
+              <p align="center"><a href="requirements.html" class="leftnavlink">System requirements</a></p>
+              <p align="center"><a href="wrfhelp.html" class="leftnavlink">About wrfhelp</a></p>
+              <p align="center"><a href="wrfnews.html" class="leftnavlink">wrf-news list</a></p>
+              <p align="center"><a href="wrfusers.html" class="leftnavlink">wrf-users list</a></p>
+              <p align="center"><a href="regist.html" class="leftnavlink">Becoming a registered user</a></p>
+              <p align="center"><a href="workshop.html" class="leftnavlink">WRF Workshop</a></p>
+              <p align="center"><a href="tutorial.html" class="leftnavlink">WRFDA Tutorials</a></p>
+              <p align="center"><a href="usersguide.html" class="leftnavlink">Users' Guide</a></p>
+            </tr>
+          </table>
+
+          <p>&nbsp;</p>          <p>&nbsp;</p>            <img src="images/shim112.gif" width="112" height="1"></td>
+
+          <td bgcolor="#CBFFCD"><p>&nbsp;</p>
+
+            <p class="pagetitle">WRFDA User Support: Frequently Asked Questions</p>
+            <p class="bodytext"><em>Note: be sure to check the <a href="known-problems.html">Known Problems page</a> if you are experiencing an error not listed here.</em></p>
+            <blockquote>
+              <ul class="bodytext"><li><a href="#general">General questions</a></li>
+<!--              <li><a href="#compiling">Compiling WRFDA</a></li>-->
+              <li><a href="#compiling">Running WRFDA</a></li></ul><br></blockquote>
+
+
+            <h1><a name="general">General WRFDA questions</h1>
+
+            <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
+              <tr>
+                <td width="5%"><strong>Q1</strong></td>
+                <td class="font11"><strong>What are the system requirements for running WRFDA?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A1</strong></td>
+                <td style="color:#900">WRFDA is designed to be highly scalable and versatile, so depending on your case the system requirements will vary greatly. There are some known minimum requirements, which are listed at the  <a href="requirements.html">system requirements page</a>.</td>
+              </tr>
+              <tr>
+                <td width="5%"><strong>Q2</strong></td>
+                <td><strong>Can my observations be assimilated in WRFDA?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A2</strong></td>
+                <td style="color:#900">WRFDA is able to assimilate many different types of data, which are listed at <a href="system.html#methods_and_obs">this page</a>.<br>
+                  WRFDA can assimilate conventional observations in several formats:
+                  <ul><li>LITTLE_R (text-based format) through the OBSPROC utility</li>
+                      <li>NCEP PREPBUFR (binary format)</li>
+                      <li>MADIS (netCDF format), through the <a href="download/madis.html">MADIS2LITTLER</a> converter</li></ul>
+                  Other types of observations are assimilated in their own formats:
+                  <ul><li>Radiance data (AMSU, HIRS, IASI, etc.) are assimilated in BUFR format.</li>
+                      <li>Precipitation data is assimilated in a text format similar to LITTLE_R. <a href="download/precip_converter.tar.gz">A converter is provided</a> for converting NCEP Stage IV data into this text format.</li>
+                      <li>Radar data is assimilated in yet another text format.</li></ul>
+                  If your observations are not in one of the formats listed above, you must convert them into one of the supported formats. LITTLE_R is likely the easiest.<br>
+                  See the <a href="usersguide.html">User's Guide</a> for more detailed information.
+                </td>
+              </tr>
+            </table></p>
+
+
+<!--            <h1><a name="compiling">Compiling WRFDA</h1>
+
+            <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
+              <tr>
+                <td width="5%"><strong>Q1</strong></td>
+                <td class="font11"><strong>What are the system requirements for running WRFDA?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A1</strong></td>
+                <td style="color:#900">WRFDA is designed to be highly scalable and versatile, so depending on your case the system requirements will vary greatly. There are some known minimum requirements, which are listed at the  <a href="requirements.html">system requirements page</a>.</td>
+              </tr>
+              <tr>
+                <td width="5%"><strong>Q2</strong></td>
+                <td><strong>Can my observations be assimilated in WRFDA?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A2</strong></td>
+                <td style="color:#900">WRFDA can assimilate conventional observations in several formats:
+                  <ul><li>LITTLE_R (text-based format) through the OBSPROC utility</li>
+                      <li>NCEP PREPBUFR (binary format)</li>
+                      <li>MADIS (netCDF format), through the <a href="madis.html">MADIS2LITTLER</a> utility</li><ul>
+                  Other types of observations
+                </td>
+              </tr>
+            </table></p> -->
+
+
+            <h1><a name="running">Running WRFDA</h1>
+
+            <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
+              <tr>
+                <td width="5%"><strong>Q1</strong></td>
+                <td class="font11"><strong>When I try to run WRFDA I get an error: "ERRORS while reading one or more namelists from namelist.input". How can I fix this?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A1</strong></td>
+                <td style="color:#900">This error indicates that WRFDA had a problem reading one or more sections of your <code>namelist.input</code> file. Typically this is because an invalid namelist option was specified, or the option name was misspelled. Usually the error message will also state which namelist section had a problem (for example, "ERROR while reading namelist wrfvar4"), so check every namelist option in that section to make sure it is valid. See the <a href="usersguide.html">User's Guide</a> specific to your version; there is a section at the end listing valid namelist options.</td>
+              </tr>
+            </table></p>
+
+
+            <blockquote>
+
+              <blockquote>&nbsp;</blockquote>
+            </blockquote>                        
+
+            <p align="center" class="detailtextRed">
+
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+</p>
+
+            <p class="bodytext">&nbsp;            </p>            <br>
+
+            <br>        <img src="images/transgif.gif" width="1" height="1"><img src="images/shim162.gif" width="162" height="1"></td>
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

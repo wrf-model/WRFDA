@@ -1,0 +1,186 @@
+&wrfvar1
+ var4d                               = false,
+ multi_inc                           = 0,
+ print_detail_be                     = .true.,
+/
+&wrfvar2
+/
+&wrfvar3
+ ob_format                           = 1,
+/
+&wrfvar4
+ use_gpspwobs                        = false,
+ use_gpsrefobs                       = false,
+ use_airsobs                         = true,
+/
+&wrfvar5
+ check_max_iv                        = true,
+ put_rand_seed                       = false,
+/
+&wrfvar6
+ ntmax                               = 10,
+ eps                                 = 0.05,
+/
+&wrfvar7
+ cv_options                          = 5,
+ je_factor                           = 1.0,
+/
+&wrfvar8
+/
+&wrfvar9
+ trace_use                           = .true.,
+/
+&wrfvar10
+ interpolate_stats                   = .true.
+ be_eta                              = 0.9965, 0.988, 0.9765, 0.962, 0.944, 0.9215, 0.8945, 0.870466, 0.8513981,0.8323301, 0.8132621, 0.7856923, 0.750281, 0.7161703, 0.6833204,0.6516926, 0.6212491, 0.5919532, 0.5637692, 0.5366621, 0.5105981,0.485544, 0.4614677, 0.438338, 0.4161243, 0.3947971, 0.3743273, 0.354687,0.3358489, 0.3177863, 0.3004734, 0.2838851, 0.267997, 0.2527852,0.2382268, 0.2242991, 0.2109805, 0.1982496, 0.1860859, 0.1744694,0.1633806, 0.1528006, 0.142711, 0.1330941, 0.1239325, 0.1152095,0.1069086, 0.09901416, 0.09151071, 0.08438335, 0.0776176, 0.0711994,0.06511511, 0.05935146, 0.0538956, 0.04873502, 0.04385756, 0.0392514,0.03490504, 0.03080723, 0.02694698, 0.02331351, 0.01989618, 0.01668441,0.01366756, 0.01083472, 0.008174398, 0.005673915, 0.003318218, 0.001087244,
+/
+&wrfvar11
+ cv_options_hum                      = 1,
+ check_rh                            = 0,
+ seed_array1                         = 2003010100,
+ seed_array2                         = 2003010100,
+ lat_stats_option                    = false,
+ calculate_cg_cost_fn                = true,
+/
+&wrfvar12
+/
+&wrfvar13
+/
+&wrfvar14
+ rtminit_nsensor                     = 1,
+ rtminit_platform                    = 9,
+ rtminit_satid                       = 2,
+ rtminit_sensor                      = 11,
+ thinning_mesh                       = 120.0,
+ thinning                            = true,
+ biascorr                            = false,
+ qc_rad                              = true,
+ write_iv_rad_ascii                  = true,
+ write_oa_rad_ascii                  = true,
+ rtm_option                          = 2,
+ use_varbc                           = true,
+ freeze_varbc                        = false,
+ varbc_factor                        = 10.0,
+ use_crtm_kmatrix                    = true,
+/
+&wrfvar15
+/
+&wrfvar16
+ alphacv_method                      = 2,
+ ensdim_alpha                        = 0,
+ alpha_truncation                    = 0,
+ alpha_corr_type                     = 3,
+ alpha_corr_scale                    = 1500,
+ alpha_std_dev                       = 1.0,
+/
+&wrfvar17
+ analysis_type                       = "QC-OBS",
+/
+&wrfvar18
+ analysis_date                       = "2007-12-01_00:00:00.0000",
+/
+&wrfvar19
+/
+&wrfvar20
+/
+&wrfvar21
+ time_window_min                     = "2007-11-30_23:00:00.0000",
+/
+&wrfvar22
+ time_window_max                     = "2007-12-01_01:00:00.0000",
+/
+&wrfvar23
+ jcdfi_use                           = false,
+ jcdfi_io                            = false,
+/
+&time_control
+ run_hours                           = 6,
+ start_year                          = 2007,
+ start_month                         = 12,
+ start_day                           = 01,
+ start_hour                          = 00,
+ end_year                            = 2007,
+ end_month                           = 12,
+ end_day                             = 01,
+ end_hour                            = 00,
+ interval_seconds                    = 21600,
+ input_from_file                     = true,
+ history_interval                    = 360,
+ frames_per_outfile                  = 1,
+ debug_level                         = 0,
+ inputout_interval                   = 360,
+ inputout_begin_h                    = 6,
+ inputout_end_h                      = 6,
+ input_outname                       = "wrfinput_d<domain>_<date>",
+ write_input                         = true,
+/
+&fdda
+/
+&domains
+ time_step                           = 400,
+ e_we                                = 80,
+ e_sn                                = 80,
+ e_vert                              = 71,
+ num_metgrid_levels                  = 27,
+ p_top_requested                     = 1000,
+ interp_type                         = 1,
+ t_extrap_type                       = 1,
+ force_sfc_in_vinterp                = 3,
+ adjust_heights                      = .false.,
+ dx                                  = 200000,
+ dy                                  = 200000,
+ i_parent_start                      = 1,
+ j_parent_start                      = 1,
+ feedback                            = 0,
+ smooth_option                       = 1,
+ eta_levels                          =  1.000000,0.999000,0.998000,0.997000,0.996000,0.995000, 
+                                     0.994000,0.993000,0.992000,0.990300,0.988100,0.985200,
+                                     0.981800,0.977900,0.974000,0.970000,0.966000,0.962000,
+                                     0.958000,0.954700,0.952000,0.948900,0.943400,0.933400,
+                                     0.920000,0.900000,0.880000,0.860000,0.840000,0.820000,
+                                     0.800000,0.780000,0.760000,0.740000,0.720000,0.700000,
+                                     0.680000,0.660000,0.640000,0.620000,0.600000,0.580000,
+                                     0.560000,0.540000,0.520000,0.500000,0.480000,0.460000,
+                                     0.440000,0.420000,0.400000,0.380000,0.360000,0.340000,
+                                     0.320000,0.300000,0.280000,0.260000,0.240000,0.220000,
+                                     0.200000,0.180000,0.160000,0.140000,0.120000,0.100000,
+                                     0.080000,0.060000,0.040000,0.020000,0.00000
+/
+&dfi_control
+/
+&tc
+/
+&physics
+ mp_physics                          = 6,
+ ra_lw_physics                       = 1,
+ ra_sw_physics                       = 1,
+ radt                                = 90,
+ sf_sfclay_physics                   = 1,
+ sf_surface_physics                  = 2,
+ bl_pbl_physics                      = 1,
+ cu_physics                          = 1,
+ cudt                                = 5,
+ num_soil_layers                     = 4,
+ mp_zero_out                         = 0,
+ co2tf                               = 0,
+/
+&scm
+/
+&dynamics
+ w_damping                           = 1,
+ diff_opt                            = 1,
+ km_opt                              = 4,
+ dampcoef                            = 0.01,
+ time_step_sound                     = 0,
+ base_temp                           = 290.0,
+/
+&bdy_control
+ specified                           = true,
+ real_data_init_type                 = 3,
+/
+&grib2
+/
+&fire
+/
+&namelist_quilt
+/

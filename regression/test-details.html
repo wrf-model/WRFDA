@@ -1,0 +1,303 @@
+<html>
+
+<head>
+
+<title>WRFDA Regression Test details</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Mesoscale Model Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2015 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="../scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="../scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+.style2 {
+	color: #FFFFFF;
+	font-size: 9px;
+}
+.style3 {font-family: Verdana, Arial, Helvetica, sans-serif}
+.style4 {font-size: 12px}
+.style5 {font-family: Verdana, Arial, Helvetica, sans-serif; font-size: 12px; }
+-->
+</style>
+
+    <script src="jquery.js"></script> 
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="../images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellpadding="0" cellspacing="0" bgcolor="#CBFFCD">
+
+ <tr bgcolor="#000000">
+
+     <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="../images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="../images/goldrule.jpg"><img src="../images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="../images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" bgcolor="#009933" class="background">
+
+  <tr>
+
+    <td height="812" valign="top" bgcolor="#CBFFCD"><table width="1000" height="880" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+
+        <td width="117" height="880" bgcolor="#009933"><p>&nbsp;</p>
+
+          <table width="117" border="0" align="center" cellpadding="0" cellspacing="0">
+            <tr>
+              <td><p align="center"><a href="../internal.html" class="leftnavlink">Internal pages</a></p>
+                <p align="center"><a href="index.html" class="leftnavlink">Regression testing</a></p>
+                <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">Test details</p>
+              </td>
+            </tr>
+
+          </table>          
+
+          <p>&nbsp;</p>          <p>&nbsp;</p>          <img src="../images/shim112.gif" width="112" height="1"></td>
+
+          <td><p>&nbsp;</p>
+            <p class="pagetitle">WRFDA Regression testing: Test details</p>
+            <p class="bodytext">This page contains information about each individual regression test. Some tests are quite complicated, containing multiple parts run in sequence (for example, CYCLING tests).</p>
+            <p class="bodytext">Click a link below or scroll to see the details on each test.</p>
+            <blockquote>
+              <ul class="bodytext"><li><a href="#afwa_t7_ssmi">afwa_t7_ssmi</a></li>
+              <li><a href="#afwa_t7_ssmi_32">afwa_t7_ssmi_32</a></li>
+              <li><a href="#ASR_airs">ASR_airs</a></li>
+              <li><a href="#ASR_prepbufr">ASR_prepbufr</a></li>
+              <li><a href="#cv3_guo">cv3_guo</a></li>
+              <li><a href="#cv3_guo_32">cv3_guo_32</a></li>
+              <li><a href="#cwb_ascii">cwb_ascii</a></li>
+              <li><a href="#cwb_ascii_outerloop_rizvi">cwb_ascii_outerloop_rizvi</a></li>
+              <li><a href="#cwb_ascii_thinning">cwb_ascii_thinning</a></li>
+              <li><a href="#cycle_sene_hires">cycle_sene_hires</a></li>
+              <li><a href="#cycle_ne_blizzard">cycle_ne_blizzard</a></li>
+              <li><a href="#iasi_kavulich">iasi_kavulich</a></li>
+              <li><a href="#lat_lon_outerloops">lat_lon_outerloops</a></li>
+              <li><a href="#outerloop_ztd_bench_guo">outerloop_ztd_bench_guo</a></li>
+              <li><a href="#radar_4dvar_cv7">radar_4dvar_cv7</a></li>
+              <li><a href="#radar_cv7">radar_cv7</a></li>
+              <li><a href="#radar_meixu">radar_meixu</a></li>
+              <li><a href="#rainfall_outerloops">rainfall_outerloops</a></li>
+              <li><a href="#rttov_4dvar_madagascar">rttov_4dvar_madagascar</a></li>
+              <li><a href="#seviri_varbc">seviri_varbc</a></li>
+              <li><a href="#sfc_assi_2_outerloop_guo">sfc_assi_2_outerloop_guo</a></li>
+              <li><a href="#t44_liuz">t44_liuz</a></li>
+              <li><a href="#t44_prepbufr">t44_prepbufr</a></li>
+              <li><a href="#tut_xinzhang_4dvar">tut_xinzhang_4dvar</a></li>
+              <li><a href="#tut_xinzhang_fgat">tut_xinzhang_fgat</a></li>
+              <li><a href="#tut_xinzhang_obsproc">tut_xinzhang_obsproc</a></li>
+              <li><a href="#tut_xinzhang_rttov_genbe">tut_xinzhang_rttov_genbe</a></li>
+              <li><a href="#wind_sd">wind_sd</a></li></ul><br></blockquote>
+
+            <a name="afwa_t7_ssmi"><p class="pagetitle">afwa_t7_ssmi</p>
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr style="vertical-align: top;">
+                <td class="bodytext">A polar winter case, assimilating conventional obs and SSMI retrievals. This test uses a large polar domain with a polar stereographic projection.</td>
+                <td class="bodytext"><a href="afwa_t7_ssmi/afwa_t7_ssmi.png"><img src="afwa_t7_ssmi/afwa_t7_ssmi.png" alt="afwa_t7_ssmi domain" width="300" height="300"></a></td>
+              </tr>
+            </table>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Test type(s)</b></td>
+                <td>3DVAR</td></tr>
+              <tr>
+                <td><b>Parallelism(s)</b></td>
+                <td>serial, dmpar (4 cores)</td></tr>
+              <tr>
+                <td><b>Background file</b></td>
+                <td>OUTPUT FROM WRF V3.7 MODEL<br>12-hour forecast output starting at 2009-01-19_18:00:00, valid at 2009-01-20_06:00:00<br>100x100, 57 vertical levels, 100 km resolution<br><a href="afwa_t7_ssmi/afwa_t7_ssmi.ncdump.txt">Full ncdump text</a></td></tr>
+              <tr>
+                <td><b>Observations</b></td>
+                <td><b>Conventional:</b> SOUND, GEOAMV, AIREP, METAR, SHIPS<br><b>Other:</b> SSMI retrievals</td></tr>
+              <tr>
+                <td><b>Test settings</b></td>
+                <td><a href="afwa_t7_ssmi/afwa_t7_ssmi.namelist.txt">Full namelist file</a></td></tr>
+            </table></p>
+
+            <a name="afwa_t7_ssmi_32"><p class="pagetitle">afwa_t7_ssmi_32</p>
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr style="vertical-align: top;">
+                <td class="bodytext">A polar winter case, assimilating conventional obs and SSMI retrievals. This test uses a large polar domain with a polar stereographic projection.<br>This is the same as the "afwa_t7_ssmi" test, but with a WRF V3.2 first guess file. This will help test for back-compatable regressions.</td>
+                <td class="bodytext"><a href="afwa_t7_ssmi_32/afwa_t7_ssmi_32.png"><img src="afwa_t7_ssmi_32/afwa_t7_ssmi_32.png" alt="afwa_t7_ssmi_32 domain" width="300" height="300"></a></td>
+              </tr>
+            </table>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Test type(s)</b></td>
+                <td>3DVAR</td></tr>
+              <tr>
+                <td><b>Parallelism(s)</b></td>
+                <td>serial, dmpar (4 cores)</td></tr>
+              <tr>
+                <td><b>Background file</b></td>
+                <td>OUTPUT FROM WRF V3.2 MODEL<br>12-hour forecast output starting at 2009-01-19_18:00:00, valid at 2009-01-20_06:00:00<br>100x100, 57 vertical levels, 100 km resolution<br><a href="afwa_t7_ssmi_32/afwa_t7_ssmi_32.ncdump.txt">Full ncdump text</a></td></tr>
+              <tr>
+                <td><b>Observations</b></td>
+                <td><b>Conventional:</b> SOUND, GEOAMV, AIREP, METAR, SHIPS<br><b>Other:</b> SSMI retrievals</td></tr>
+              <tr>
+                <td><b>Test settings</b></td>
+                <td><a href="afwa_t7_ssmi_32/afwa_t7_ssmi_32.namelist.txt">Full namelist file</a></td></tr>
+            </table></p>
+
+            <a name="ASR_airs"><p class="pagetitle">ASR_airs</p>
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr style="vertical-align: top;">
+                <td class="bodytext">This is the "ASR180" domain used for a test case in the WRFDA tutorial. A polar early-winter case, assimilating AIRS radiance data. This test uses a very large polar domain with a polar stereographic projection.</td>
+                <td class="bodytext"><a href="ASR_airs/ASR_airs.png"><img src="ASR_airs/ASR_airs.png" alt="ASR_airs domain" width="300" height="300"></a></td>
+              </tr>
+            </table>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Test type(s)</b></td>
+                <td>3DVAR</td></tr>
+              <tr>
+                <td><b>Parallelism(s)</b></td>
+                <td>dmpar (16 cores)</td></tr>
+              <tr>
+                <td><b>Background file</b></td>
+                <td>OUTPUT FROM WRF V3.5 MODEL<br>12-hour forecast output starting at 2007-11-30_12:00:00, valid at 2007-12-01_00:00:00<br>80x80, 71 vertical levels, 200 km resolution<br><a href="ASR_airs/ASR_airs.ncdump.txt">Full ncdump text</a></td></tr>
+              <tr>
+                <td><b>Observations</b></td>
+                <td><b>Radiance:</b> AIRS</td></tr>
+              <tr>
+                <td><b>Test settings</b></td>
+                <td><a href="ASR_airs/ASR_airs.namelist.txt">Full namelist file</a></td></tr>
+            </table></p>
+
+
+
+
+
+
+
+            <a name="untested"><p class="pagetitle">Untested options</p>
+            <p class="bodytext">The following assimilation method/observation combinations are NOT yet included in current tests:</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Completely untested</b></td>
+                <td>SSMI TB</td></tr>
+              <tr>
+                <td><b>Untested for 3DVAR</b></td>
+                <td>...</td></tr>
+            </table></p>
+
+
+
+
+
+            <h2 class="bodytext">Download test cases</h2>
+            <p class="bodytext">The data needed for running the regression test package can be found below. The full test (including compilation) takes about 20-30 minutes on Yellowstone, 2 hours on a Linux PC (using 6 cores):</p>
+              <blockquote><p class="bodytext"><em>Latest release version (V3.7)</em>:</p>
+                <ul class="bodytext"><li><a href="WRFDA-data-EM_V37.tar.gz">Input data</a></li>
+                  <li>Baseline data:</li>
+                    <ul><li><a href="BASELINE_yellowstone_V37.tar.gz">Yellowstone</a></li>
+                    <li><a href="BASELINE_loblolly_V37.tar.gz">Linux PC</a></li>
+                    <li><a href="BASELINE_visit-a05_V37.tar.gz">Mac OS</a></li></ul>
+                </ul>
+                <p class="bodytext"><em>Version 3.6.1</em>:</p>
+                <ul class="bodytext"><li><a href="WRFDA-data-EM_V361.tar.gz">Input data</a></li>
+                  <li>Baseline data:</li>
+                    <ul><li><a href="BASELINE_yellowstone_V361.tar.gz">Yellowstone</a></li>
+                    <li><a href="BASELINE_loblolly_V361.tar.gz">Linux PC</a></li>
+                    <li><a href="BASELINE_visit-a05_V361.tar.gz">Mac OS</a></li></ul>
+                </ul>
+<!--                <p class="bodytext"><em>Latest internal revision (r7506; 2014-06-20)</em>:</p>
+                <ul class="bodytext"><li><a href="WRFDA-data-EM_r7506.tar.gz">Input data</a></li>
+                  <li><a href="BASELINE.NEW_r7506.tar.gz">Baseline data</a></li>
+                </ul>--></blockquote>
+
+            <p class="bodytext"><br>
+              <br>
+          </p>            <img src="../images/transgif.gif" width="1" height="1"><img src="../images/shim162.gif" width="162" height="1">
+            <p align="center" class="detailtextRed">
+              <script language="JavaScript">
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+              <br>
+          </p></td>
+ 
+        </tr>
+
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

@@ -160,13 +160,14 @@
             <p class="citetext">Barker, D., X.-Y. Huang, Z. Liu, T. Aulign&eacute;, X. Zhang, S. Rugg, R. Ajjaji, A. Bourgeois, J. Bray, Y. Chen, M. Demirtas, Y.-R. Guo, T. Henderson, W. Huang, H.-C. Lin, J. Michalakes, S. Rizvi, and X. Zhang, 2012: <a href="http://journals.ametsoc.org/doi/abs/10.1175/BAMS-D-11-00167.1">The Weather Research and Forecasting Model's Community Variational/Ensemble Data Assimilation System: WRFDA</a>. <i>Bull. Amer. Meteor. Soc.</i>, <b>93</b>, 831&ndash;843.</p>
 </blockquote>
             <p class="bodytext">You can find additional publications on specific portions of the WRFDA system at our <a href="publications.html">Publications Page</a>.</p>
-            <p><strong>WRFDA assimilation methods and observation types</strong></p>
-          <p class="bodytext">WRFDA is an assimilation system which contains several different methods of data assimilation:</p>
+
+            <a name="methods_and_obs"><p><strong>WRFDA assimilation methods and observation types</strong></p>
+            <p class="bodytext">WRFDA is an assimilation system which contains several different methods of data assimilation:</p>
              <ul class="bodytext"><li>3DVAR</li>
                <li>4DVAR</li>
                <li>Ensemble DA</li>
                <li>Hybrid 3DVAR/Ensemble</li></ul>
-          <p class="bodytext">Using these assimilation methods, WRFDA is capable of ingesting a wide variety of observation types. Most data types can be assimilated in LITTLE_R (ASCII text) or PREPBUFR (binary) format, but satellite radiances are assimilated in BUFR format.</p>
+            <p class="bodytext">Using these assimilation methods, WRFDA is capable of ingesting a wide variety of observation types. Most data types can be assimilated in LITTLE_R (ASCII text) or PREPBUFR (binary) format, but satellite radiances are assimilated in BUFR format.</p>
              <ul class="bodytext"><li><b>In-situ</b>
                  <ul class="bodytext"><li>Surface (SYNOP, METAR, SHIP, BUOY)</li>
                  <li>Upper air (TEMP, PIBAL, AIREP, ACARS, TAMDAR)</li></ul></ul>
@@ -174,7 +175,7 @@
                  <ul class="bodytext"><li>Atmospheric Motion Vectors (GOES, Polar)</li>
                  <li>GPS Refractivity (COSMIC)</li>
                  <li>GPS Precipitable Water (PW) and Zenith Total Delay (ZTD)</li>
-                 <li>Radar reflectivity and velocity <em>(3DVAR only)</em></li>
+                 <li>Radar reflectivity and velocity</li>
                  <li>QuikScat and ASCAT oceanic surface winds</li>
                  <li>SSM/I oceanic surface wind speed</li>
                  <li>SSM/I Total Precipitable Water (TPW)</li>
@@ -191,7 +192,7 @@
                  <li>ATMS (Suomi-NPP)</li>
                  <li>MWTS (FY-3)</li>
                  <li>MWHS (FY-3)</li></ul></ul>
-          <p class="bodytext">Satellite radiance assimilation requires the use of a radiative transfer model. WRFDA supports the use of CRTM (included) and RTTOV (must be downloaded separately).</p>
+            <p class="bodytext">Satellite radiance assimilation requires the use of a radiative transfer model. WRFDA supports the use of CRTM (included) and RTTOV (must be downloaded separately).</p>
             <p><br></p>
             </blockquote>
              <p class="bodytext"><big>A more complete introduction to WRFDA, along with instructions on how to compile and run the various components, can be found in the <a href="usersguide.html">WRFDA User Guide</a>.</big></p>
