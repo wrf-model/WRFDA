@@ -227,6 +227,82 @@
                 <td><a href="ASR_airs/ASR_airs.namelist.txt">Full namelist file</a></td></tr>
             </table></p>
 
+            <a name="ASR_prepbufr"><p class="pagetitle">ASR_prepbufr</p>
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr style="vertical-align: top;">
+                <td class="bodytext">This is the "ASR180" domain used for a test case in the WRFDA tutorial. A polar early-winter case, assimilating conventional obs, SSMI retrievals, and GPS radio occultations. This test uses a very large polar domain with a polar stereographic projection (same as ASR_airs test).</td>
+                <td class="bodytext"><a href="ASR_prepbufr/ASR_prepbufr.png"><img src="ASR_prepbufr/ASR_prepbufr.png" alt="ASR_prepbufr domain" width="300" height="300"></a></td>
+              </tr>
+            </table>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Test type(s)</b></td>
+                <td>3DVAR</td></tr>
+              <tr>
+                <td><b>Parallelism(s)</b></td>
+                <td>dmpar (16 cores)</td></tr>
+              <tr>
+                <td><b>Background file</b></td>
+                <td>OUTPUT FROM WRF V3.5 MODEL<br>12-hour forecast output starting at 2007-11-30_12:00:00, valid at 2007-12-01_00:00:00<br>80x80, 71 vertical levels, 200 km resolution<br><a href="ASR_prepbufr/ASR_prepbufr.ncdump.txt">Full ncdump text</a></td></tr>
+              <tr>
+                <td><b>Observations</b></td>
+                <td><b>Conventional:</b> SOUND, SYNOP, PILOT, GEOAMV, AIREP, METAR, SHIPS, QSCAT, PROFILER, BUOY<br><b>Other:</b>GPS RO</td></tr>
+              <tr>
+                <td><b>Test settings</b></td>
+                <td><a href="ASR_prepbufr/ASR_prepbufr.namelist.txt">Full namelist file</a></td></tr>
+            </table></p>
+
+            <a name="cv3_guo"><p class="pagetitle">cv3_guo</p>
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr style="vertical-align: top;">
+                <td class="bodytext">Western Pacific/Asian domain, Lambert-conformal projection. A mid-summer case, assimilating conventional obs, SSMI retrievals, and GPS radio occultations, using the CV3 background error option. This is a "QC-OBS" test, but the filtered obs files are not checked.</td>
+                <td class="bodytext"><a href="cv3_guo/cv3_guo.png"><img src="cv3_guo/cv3_guo.png" alt="cv3_guo domain" width="300" height="300"></a></td>
+              </tr>
+            </table>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Test type(s)</b></td>
+                <td>3DVAR</td></tr>
+              <tr>
+                <td><b>Parallelism(s)</b></td>
+                <td>dmpar (16 cores)</td></tr>
+              <tr>
+                <td><b>Background file</b></td>
+                <td>OUTPUT FROM WRF V3.2 MODEL<br>12-hour forecast output starting at 2007-08-12_12:00:00, valid at 2007-08-13_00:00:00.0000<br>100x58, 45 vertical levels, 100 km resolution<br><a href="cv3_guo/cv3_guo.ncdump.txt">Full ncdump text</a></td></tr>
+              <tr>
+                <td><b>Observations</b></td>
+                <td><b>Conventional:</b> SOUND, SYNOP, PILOT, GEOAMV, AIREP, METAR, SHIPS, QSCAT, PROFILER, BUOY<br><b>Other:</b>GPS RO</td></tr>
+              <tr>
+                <td><b>Test settings</b></td>
+                <td><a href="cv3_guo/cv3_guo.namelist.txt">Full namelist file</a></td></tr>
+            </table></p>
+
+            <a name="cv3_guo_32"><p class="pagetitle">cv3_guo_32</p>
+            <table border="0" cellpadding="0" cellspacing="0">
+              <tr style="vertical-align: top;">
+                <td class="bodytext">Western Pacific/Asian domain, Lambert-conformal projection. A mid-summer case, assimilating conventional obs, SSMI retrievals, and GPS radio occultations, using the CV3 background error option. This is a "QC-OBS" test, but the filtered obs files are not checked.<br>This is the same as the "cv3_guo" test, but with a WRF V3.2 first guess file. This will help test for back-compatable regressions.</td>
+                <td class="bodytext"><a href="cv3_guo_32/cv3_guo_32.png"><img src="cv3_guo_32/cv3_guo_32.png" alt="cv3_guo_32 domain" width="300" height="300"></a></td>
+              </tr>
+            </table>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Test type(s)</b></td>
+                <td>3DVAR</td></tr>
+              <tr>
+                <td><b>Parallelism(s)</b></td>
+                <td>dmpar (16 cores)</td></tr>
+              <tr>
+                <td><b>Background file</b></td>
+                <td>OUTPUT FROM WRF V3.2 MODEL<br>12-hour forecast output starting at 2007-08-12_12:00:00, valid at 2007-08-13_00:00:00.0000<br>100x58, 45 vertical levels, 100 km resolution<br><a href="cv3_guo_32/cv3_guo_32.ncdump.txt">Full ncdump text</a></td></tr>
+              <tr>
+                <td><b>Observations</b></td>
+                <td><b>Conventional:</b> SOUND, SYNOP, PILOT, GEOAMV, AIREP, METAR, SHIPS, QSCAT, PROFILER, BUOY<br><b>Other:</b>GPS RO</td></tr>
+              <tr>
+                <td><b>Test settings</b></td>
+                <td><a href="cv3_guo_32/cv3_guo_32.namelist.txt">Full namelist file</a></td></tr>
+            </table></p>
+
+
 
 
 
