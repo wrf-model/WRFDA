@@ -47,14 +47,14 @@ a:active {
             </blockquote>
 <p class="pagetitle"><a name="compile_3dvar"></a>Compiling WRFDA for 3DVAR</p>
             <blockquote>
-              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
+              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
-                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_V3.6.tar.gz .</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.7.tar.gz .</p>
               </blockquote>
               <p>Unzip and untar the file:</p>
               <blockquote>
-                <p class="stylecode">tar -zxf WRFDA_V3.6.tar.gz </p>
+                <p class="stylecode">tar -zxf WRFDA_V3.7.tar.gz </p>
               </blockquote>
               <p>You should now see the directory <span class="stylecode">WRFDA</span>, which contains the WRFDA source code.</p>
               <p>To reduce compilation time you can compile in parallel (this is a separate process from deciding to <em>run</em> WRFDA in serial or parallel mode). You can do this by setting the environment variable J="-j #", where "#" is the number of processors.</p>
@@ -67,19 +67,28 @@ a:active {
                 <p class="stylecode">setenv BUFR 1</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
                 <p class="stylecode">setenv CRTM 1<br>
-                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov11</p>
+                  setenv RTTOV /kumquat/wrfhelp/external/rttov11</p>
                 <p class="stylecode">./configure wrfda</p>
-                <p><i>Choose<span class="stylecode"><strong> 50 </strong></span>for pgf90/pgcc, dmpar</i></p>
+                <p><i>Choose<span class="stylecode"><strong> 34 </strong></span>for GNU (gfortran/gcc), dmpar</i></p>
                 <p class="stylecode">./compile all_wrfvar &gt;&amp; compile_3dvar.log &amp;</p>
               </blockquote>
+              <p>The "<span class="stylecode">&gt;&amp; compile_3dvar.log</span>" part of the command instructs the terminal to direct all output and error messages from the compile script to the file "compile_3dvar.log". The "&amp;" at the end will cause the script to run in the background. You can use the UNIX "<span class="stylecode">tail</span>" command to follow the progress of the script by seeing what's written to the log file.</p>
+              <blockquote>
+                <p class="stylecode">tail -f compile_3dvar.log</p>
+              </blockquote>
+              <p>When compilation is completed, at the end of the log file you will see "build started:" and "build completed:" indicating the start and finish time for the script. However, <b>this does not mean that compilation was successful!</b> You need to check that all the necessary files were created; use the following command:</p>
+              <blockquote>
+                <p class="stylecode">ls var/build/*exe var/obsproc/src/obsproc.exe</p>
+              </blockquote>
+              <p>You should see 44 executables: 43 in the var/build/ directory, plus var/obsproc/src/obsproc.exe. The most important of these is var/build/da_wrfvar.exe; this is the main WRFDA executable.</p>
             </blockquote>
             <p class="pagetitle"><a name="compile_wrfplus"></a>Compiling WRFPLUS</p>
             <blockquote>
               <p>WRFPLUS contains both the non-linear and the tangent-linear/adjoint WRF code. It is needed for 4DVAR and Forecast Sensitivity to Observations (FSO).</p>
-              <p>Get the WRFPLUS zipped tar file from /kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
+              <p>Get the WRFPLUS zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/$USER/DA</p>
-                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFPLUS_V3.6_r7153.tar.gz .</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFPLUS_V3.7.tar.gz .</p>
               </blockquote>
               <p>Set "J" to compile in parallel</p>
               <blockquote>
@@ -87,7 +96,7 @@ a:active {
               </blockquote>
               <p>Unzip and untar the file</p>
               <blockquote>
-                <p class="stylecode">tar -zxf WRFPLUS_V3.6_r7153.tar.gz</p>
+                <p class="stylecode">tar -zxf WRFPLUS_V3.7.tar.gz</p>
               </blockquote>
               <p>Configure</p>
               <blockquote>
@@ -103,16 +112,16 @@ a:active {
             <p class="pagetitle"><a name="compile_4dvar"></a>Compiling WRFDA for 4DVAR</p>
             <blockquote>
               <p>To compile WRFDA for 4DVAR, you should have already compiled WRFPLUS (see <a href=#compile_wrfplus>above</a>).</p>
-              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
+              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/$USER/DA</p>
-                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_V3.6.tar.gz .</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.7.tar.gz .</p>
                 <p><i>If you have already built WRFDA in this directory for 3DVAR, be sure to rename that directory first.</i></p>
                 <p class="stylecode">mv /kumquat/users/$USER/DA/WRFDA /kumquat/users/$USER/DA/WRFDA_3DVAR</p>
               </blockquote>
               <p>Unzip and untar the file</p>
               <blockquote>
-                <p class="stylecode">tar -zxf WRFDA_V3.6.tar.gz </p>
+                <p class="stylecode">tar -zxf WRFDA_V3.7.tar.gz </p>
               </blockquote>
               <p>Configure and Compile</p>
               <blockquote>
