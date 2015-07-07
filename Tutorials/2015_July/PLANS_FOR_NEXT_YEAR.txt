@@ -1,0 +1,19 @@
+1. 4DVAR talk can be shortened by 10 minutes. Still needs more material though (at least talk about precipitation)
+
+2. FSO talk can be dropped or (more likely) combined with TOOLS talk 
+
+3. Should add Radar talk
+
+4. Start both days at 8:30, end both at 5:30? Should at least be consistent.
+
+5. Add practice sessions:
+   - FSO
+   - Add a page specifically for scripts/visualization, and link where appropriate 
+
+6. In pre-compiled code, link da_wrfvar_3dvar.exe as da_wrfvar.exe, so that
+scripts such as FSO and Cycling will work with pre-compiled code that users
+download
+
+7. Need to find a way to emphasise the concept of a working directory.
+
+
