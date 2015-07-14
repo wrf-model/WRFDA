@@ -41,10 +41,6 @@ a:active {
     <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
-            <blockquote>
-              <p class="body">Compiling takes a long time on classroom computers; you should only compile the code yourself after you have finished the basic lessons.</p>
-              <p>&nbsp;</p>
-            </blockquote>
 <p class="pagetitle"><a name="compile_3dvar"></a>Compiling WRFDA for 3DVAR</p>
             <blockquote>
               <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
@@ -76,7 +72,7 @@ a:active {
               <blockquote>
                 <p class="stylecode">tail -f compile_3dvar.log</p>
               </blockquote>
-              <p>When compilation is completed, at the end of the log file you will see "build started:" and "build completed:" indicating the start and finish time for the script. However, <b>this does not mean that compilation was successful!</b> You need to check that all the necessary files were created; use the following command:</p>
+              <p>Compilation should take about 5 minutes on the classroom computers. When compilation is completed, at the end of the log file you will see "build started:" and "build completed:" indicating the start and finish time for the script. However, <b>this does not mean that compilation was successful!</b> You need to check that all the necessary files were created; use the following command:</p>
               <blockquote>
                 <p class="stylecode">ls var/build/*exe var/obsproc/src/obsproc.exe</p>
               </blockquote>

@@ -309,7 +309,7 @@ PlainStyle2,
 ])
 
 addmenu(menu=[
-"wrfda-basic",
+"wrfda-practice-2",
 ,
 ,
 160,
@@ -333,12 +333,11 @@ PlainStyle2,
 ,"OBSPROC ","../class/obsproc.html",,,1
 ,"3DVAR-realdata","../class/3dvar.html",,,1
 ,"3DVAR-PSOT ","../class/psot.html",,,1
-,"GEN_BE ","../class/genbe.html",,,1
-,"Compiling WRFDA ","../class/compile.html",,,0
+,"GEN_BE ","../class/genbe.html",,,0
 ])
 
 addmenu(menu=[
-"wrfda-optional",
+"wrfda-practice-3",
 ,
 ,
 160,
@@ -358,12 +357,36 @@ PlainStyle2,
 ,
 ,
 0,
-, 
+,
 ,"Radiance DA ","../class/radiance.html",,,1
-,"4DVAR ","../class/4dvar.html",,,1
+,"4DVAR ","../class/4dvar.html",,,0
+])
+
+addmenu(menu=[
+"wrfda-practice-4",
+,
+,
+160,
+1,
+,
+PlainStyle2,
+0,
+,
+"Fade(duration=0.5);Shadow(color=777777, Direction=135, Strength=5)",
+0,
+0,
+0,
+,
+,
+0,
+0,
+,
+,
+0,
+,
 ,"Hybrid DA ","../class/hybrid.html",,,1
 ,"Radar DA ","../class/radar.html",,,1
-,"Rainfall DA ","../class/rainfall.html",,,0
+,"Tools/Verification ","../class/tools.html",,,0
 ])
 
 addmenu(menu=[
@@ -388,12 +411,9 @@ PlainStyle2,
 ,
 0,
 , 
-,"OBSPROC ","../class/obsproc.html#advance",,,1
-,"3DVAR-realdata ","../class/3dvar.html#advance",,,1
-,"Radiance ","../class/radiance.html#advance",,,1
-,"4D-VAR ","../class/4dvar.html#advance",,,1
 ,"WRFDA/WRF Cycling ","../class/cycling.html",,,1
-,"FSO ","../class/fso.html",,,0
+,"FSO ","../class/fso.html",,,1
+,"Rainfall DA ","../class/rainfall.html",,,0
 ])
 
 //    MENU ITEM - ARW

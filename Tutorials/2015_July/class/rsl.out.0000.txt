@@ -1,0 +1,118 @@
+taskid: 0 hostname: lab108.mmm.ucar.edu
+ Namelist logging not found in namelist.input. Using registry defaults for variables in logging.
+***  VARIATIONAL ANALYSIS ***
+ Ntasks in X            2 , ntasks in Y            2
+ *************************************
+ Parent domain
+ ids,ide,jds,jde            1          90           1          60
+ ims,ime,jms,jme           -4          52          -4          37
+ ips,ipe,jps,jpe            1          45           1          30
+ *************************************
+DYNAMICS OPTION: Eulerian Mass Coordinate
+   alloc_space_field: domain            1 ,             151980432  bytes allocated
+ Background (fg) file appears to be from earlier than WRF V3.4;
+ Resetting the hypsometric_opt from default value of 2 to 1
+ Tile Strategy is not specified. Assuming 1D-Y
+WRF TILE   1 IS      1 IE     45 JS      1 JE     30
+WRF NUMBER OF TILES =   1
+Set up observations (ob)
+  
+Using ASCII format observation input
+  
+Observation summary
+   ob time  1
+      sound                 86 global,      19 local
+      synop                750 global,      69 local
+      pilot                 85 global,      18 local
+      satem                105 global,      42 local
+      geoamv              2499 global,     666 local
+      airep                221 global,      24 local
+      gpspw                187 global,      62 local
+      gpsrf                  3 global,       0 local
+      metar               2408 global,     470 local
+      ships                140 global,      26 local
+      qscat               2126 global,       0 local
+      profiler              61 global,      30 local
+      buoy                 247 global,      19 local
+      sonde_sfc             86 global,      19 local
+ 
+Set up background errors for regional application for cv_options =   5
+
+  
+
+   Using the averaged regression coefficients for unbalanced part
+  
+   WRFDA dry control variables are: psi, chi_u, t_u and ps_u
+   Humidity control variable is rh
+  
+Vertical truncation for psi    =  15(  99.00%)
+ 
+Vertical truncation for chi_u  =  20(  99.00%)
+ 
+Vertical truncation for t_u    =  29(  99.00%)
+ 
+Vertical truncation for rh     =  22(  99.00%)
+ 
+  
+   Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05
+   Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05
+   Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05
+   Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05
+   Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05
+Calculate innovation vector(iv)
+  
+Minimize cost function using CG method
+  
+Starting outer iteration :   1
+Starting cost function:  2.950305214559687D+04, Gradient=  2.902624345817567D+02
+For this outer iteration gradient target is:        2.902624345817567D+00
+----------------------------------------------------------
+Iter    Cost Function         Gradient             Step
+  1      2.744096183805913D+04      2.549550642900670D+02      4.895037344490193D-02
+  2      2.569572284134954D+04      2.222671218848495D+02      5.369793913187038D-02
+  3      2.433396239231023D+04      1.627329378596501D+02      5.512901846655863D-02
+  4      2.353770254858752D+04      1.267532009291903D+02      6.013590900790119D-02
+  5      2.308525352313065D+04      9.803716568826130D+01      5.632248159831736D-02
+  6      2.282921333100151D+04      7.478656553641987D+01      5.327907128353259D-02
+  7      2.268807071743630D+04      5.424345168911307D+01      5.047089103985567D-02
+  8      2.261095271208110D+04      4.688801746029998D+01      5.241929178739091D-02
+  9      2.254761877234662D+04      3.529370930683275D+01      5.761595435219388D-02
+ 10      2.251840265671408D+04      2.641544075194522D+01      4.690918220384273D-02
+ 11      2.249775580041970D+04      2.071618839901368D+01      5.917907978981498D-02
+ 12      2.248687278630068D+04      1.565534102964869D+01      5.071769227670938D-02
+ 13      2.248003066968921D+04      1.156364480013926D+01      5.583357060344870D-02
+ 14      2.247666614416207D+04      8.709717231347071D+00      5.032274667309523D-02
+ 15      2.247451362288970D+04      7.211624912460353D+00      5.675045355115219D-02
+ 16      2.247297418889815D+04      4.819209413841142D+00      5.920042258021480D-02
+ 17      2.247220860462636D+04      3.820190070704960D+00      6.592822773086834D-02
+ 18      2.247177714819255D+04      3.159701805263116D+00      5.912851913819010D-02
+ 19      2.247152119574865D+04      2.231366571504328D+00      5.127398590980659D-02
+----------------------------------------------------------
+ 
+Inner iteration stopped after   19 iterations
+ 
+Final:  19 iter, J= 2.247152119574881D+04, g= 2.231366571504311D+00
+----------------------------------------------------------
+  
+Diagnostics
+   Final cost function J       =     22471.52
+  
+   Total number of obs.        =    39789
+   Final value of J            =     22471.52120
+   Final value of Jo           =     19516.88996
+   Final value of Jb           =      2954.63123
+   Final value of Jc           =         0.00000
+   Final value of Je           =         0.00000
+   Final value of Jp           =         0.00000
+   Final value of Jl           =         0.00000
+   Final J / total num_obs     =         0.56477
+   Jb factor used(1)           =         1.00000
+   Jb factor used(2)           =         1.00000
+   Jb factor used(3)           =         1.00000
+   Jb factor used(4)           =         1.00000
+   Jb factor used(5)           =         1.00000
+   Jb factor used              =         1.00000
+   Je factor used              =         1.00000
+   VarBC factor used           =         1.00000
+  
+*** WRF-Var completed successfully ***
