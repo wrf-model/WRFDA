@@ -44,50 +44,43 @@ a:active {
             <span class="pagetitle">Running WRFDA and WRF cycling system</span>
             <blockquote>
               <p><span class="bodyh1">Source code</span></p>
-                <p>Get the <a href="wrfda_code.html">WRFDA pre-compiled code</a> and <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/source_code.php">WRF pre-compiled code</a>, if you have not done so. <span class="stylecode">WRFDA/var/build/da_wrfvar_3dvar.exe</span>, <span class="stylecode">WRFDA/var/build/da_update_bc.exe</span>, and <span class="stylecode">WRFV3/main/wrf.exe</span> are the three executables that will be used in this session.</p>
+                <p>Get the <a href="wrfda_code.html">WRFDA pre-compiled code</a> and <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/source_code.php">WRF pre-compiled code</a>, if you have not done so. <span class="stylecode">WRFDA/var/build/da_wrfvar.exe</span>, <span class="stylecode">WRFDA/var/build/da_update_bc.exe</span>, and <span class="stylecode">WRFV3/main/wrf.exe</span> are the three executables that will be used in this session.</p>
                 <p>Three scripts for running the cycling system are also provided for this practical session:</p>
-                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrf_from_real_csh.html">run_wrf_from_real.csh</a></strong><br>
-                  /kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrfda_csh.html">run_wrfda.csh</a></strong><br>
-                  /kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong><a href="run_wrf_from_wrfda_csh.html">run_wrf_from_wrfda.csh</a></strong></p>
+                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong><a href="run_wrf_from_real_csh.html">run_wrf_from_real.csh</a></strong><br>
+                  /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong><a href="run_wrfda_csh.html">run_wrfda.csh</a></strong><br>
+                  /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong><a href="run_wrf_from_wrfda_csh.html">run_wrf_from_wrfda.csh</a></strong></p>
               <p><span class="bodyh1">Input data</span></p>
-                <p>wrfbdy, wrfinput and observations for 4 initial times are provided in <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180</span></p>
-                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong>rc</strong></span> contains wrfbdy and wrfinput from WPS/real program.</p>
-                <p> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong>ob</strong></span> contains observations (including radiance data, NCEP PREPBUFR file, ob.ascii processed by OBSPROC). You can set up your WRFDA runs with the observations you are interested in.</p>
-                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/ASR180/<strong>be</strong></span> contains the background error statistics file for cv_options=5.</p>
+                <p>wrfbdy, wrfinput and observations for 10 initial times are provided in <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case</span></p>
+                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong>rc</strong></span> contains wrfbdy and wrfinput from WPS/real program.</p>
+                <p> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong>ob</strong></span> contains observations (including radiance data, NCEP PREPBUFR file, ob.ascii processed by OBSPROC). You can set up your WRFDA runs with the observations you are interested in.</p>
+                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong>be</strong></span> contains the background error statistics file for cv_options=5.</p>
+                <p>This test forecast will follow the life cycle of a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">powerful cyclone that impacted western Europe</a> in late-December, 2013. You will analyze the forecasts generated in this exercise later in the session on <a href="tools.html">verification tools</a>, so be sure your forecasts and assimilation cycles complete successfully!</p>
               <span class="bodyh1">Procedures</span>
               <p>&nbsp;</p>
               <blockquote>
-                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/ASR180/run_*.csh ${your_script_dir}</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/run_*.csh ${your_script_dir}</p>
               </blockquote>
               <p>Edit the run*csh files to set the proper paths.</p>
               <p>It is recommended that you read through all the scripts to understand what files are created and used for cycling runs.</p>
               <p><strong>For 1-domain configuration</strong></p>
               <blockquote>
-                <p>For the first cycle, run <span class="stylecode">run_wrf_from_real.csh</span> with "DATE = 2007010100" to get 6-hour forecast valid at 2007010106.</p>
-                <p>Note that the following namelist variables are needed for writing out wrfout in wrfinput format for the next cycle of WRFDA run:</p>
-                <blockquote>
-                  <p>write_input                         = .true.,<br>
-                    inputout_interval                   = 360,<br>
-                    inputout_begin_h                    =   6,<br>
-                    inputout_end_h                      =   6,<br>
-                    input_outname=&quot;wrfvar_input_d&lt;domain&gt;_&lt;date&gt;&quot;,              </p>
-                </blockquote>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2007010106 with the 6-hour forecast as the first guess.</p>
-                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2007010106.</p>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2007010112</p>
-                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2007010112</p>
-                <p>The cycle goes on......</p>
+                <p>For the first cycle, run <span class="stylecode">run_wrf_from_real.csh</span> with "DATE = 2013010100" to get 6-hour forecast valid at 2013122306. This forecast should take about 5 minutes to complete on the classroom machines.</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013120106 with the 6-hour forecast as the first guess. The assimlation process should take less than a minute on the classroom machines.</p>
+                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122306.</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122312</p>
+                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122312</p>
+                <p>And so on. </p>
               </blockquote>
               <p>&nbsp;</p>
               <p><strong>For 2-domain configuration</strong></p>
               <blockquote>
-                <p>For the first cycle, run run_wrf_from_real.csh with DATE = 2007010100,  MAX_DOM     = 2</p>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2007010106, DOMAIN_ID    = 01</p>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2007010106, DOMAIN_ID    = 02</p>
-                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2007010106, MAX_DOM = 2</p>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2007010112, DOMAIN_ID = 01</p>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2007010112, DOMAIN_ID = 02</p>
-                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2007010112, MAX_DOM = 2</p>
+                <p>For the first cycle, run run_wrf_from_real.csh with DATE = 2013122300,  MAX_DOM     = 2</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122306, DOMAIN_ID    = 01</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122306, DOMAIN_ID    = 02</p>
+                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122306, MAX_DOM = 2</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122312, DOMAIN_ID = 01</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122312, DOMAIN_ID = 02</p>
+                <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122312, MAX_DOM = 2</p>
                 <p>The cycle goes on......</p>
               </blockquote>
             </blockquote>

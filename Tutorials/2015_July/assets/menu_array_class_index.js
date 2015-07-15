@@ -330,10 +330,10 @@ PlainStyle2,
 ,
 0,
 ,
-,"OBSPROC ","../class/obsproc.html",,,1
-,"3DVAR-realdata","../class/3dvar.html",,,1
-,"3DVAR-PSOT ","../class/psot.html",,,1
-,"GEN_BE ","../class/genbe.html",,,0
+,"OBSPROC ","class/obsproc.html",,,1
+,"3DVAR-realdata","class/3dvar.html",,,1
+,"3DVAR-PSOT ","class/psot.html",,,1
+,"GEN_BE ","class/genbe.html",,,0
 ])
 
 addmenu(menu=[
@@ -358,8 +358,8 @@ PlainStyle2,
 ,
 0,
 ,
-,"Radiance DA ","../class/radiance.html",,,1
-,"4DVAR ","../class/4dvar.html",,,0
+,"Radiance DA ","class/radiance.html",,,1
+,"4DVAR ","class/4dvar.html",,,0
 ])
 
 addmenu(menu=[
@@ -384,9 +384,9 @@ PlainStyle2,
 ,
 0,
 ,
-,"Hybrid DA ","../class/hybrid.html",,,1
-,"Radar DA ","../class/radar.html",,,1
-,"Tools/Verification ","../class/tools.html",,,0
+,"Hybrid DA ","class/hybrid.html",,,1
+,"Radar DA ","class/radar.html",,,1
+,"Tools/Verification ","class/tools.html",,,0
 ])
 
 addmenu(menu=[
@@ -411,9 +411,9 @@ PlainStyle2,
 ,
 0,
 ,
-,"WRFDA/WRF Cycling ","../class/cycling.html",,,1
-,"FSO ","../class/fso.html",,,1
-,"Rainfall DA ","../class/rainfall.html",,,0
+,"WRFDA/WRF Cycling ","class/cycling.html",,,1
+,"FSO ","class/fso.html",,,1
+,"Rainfall DA ","class/rainfall.html",,,0
 ])
 
 
