@@ -47,8 +47,7 @@ a:active {
               <p><span class="bodyh1">Source code</span></p>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
-                <p><em>WRFDA/var/build/da_wrfvar_3dvar.exe</em> is the executable that will be used in this session.</p>
-                <p style="color:red"><b>Important note:</b> If you downloaded the pre-compiled code the first day, it was not compiled with RTTOV. If you wish to do this exercise with RTTOV you should get the most recent version of the code at <span class="stylecode">/kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_compiled.tar.gz</span></p>
+                <p><em>WRFDA/var/build/da_wrfvar.exe</em> is the executable that will be used in this session.</p>
               </blockquote>
               <p><span class="bodyh1">Choice of your working directory </span> </p>
               <blockquote>
@@ -102,7 +101,7 @@ a:active {
               <blockquote>
                 <blockquote>
                   <p class="stylecode"> ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/crtm_coeffs ./crtm_coeffs</p>
-                  <p class="stylecode">ln -fs /kumquat/wrfhelp/WRFDA/external/rttov11/rtcoef_rttov11/rttov7pred54L ./rttov_coeffs</p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/external/rttov11/rtcoef_rttov11/rttov7pred54L ./rttov_coeffs</p>
                 </blockquote>
               </blockquote>
               <p><span class="bodyh1">Edit namelist.input</span> </p>
@@ -141,7 +140,7 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Run WRFDA</span> </p>
               <blockquote>
-                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_3dvar.exe</p>
+                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span> </p>
               <blockquote>

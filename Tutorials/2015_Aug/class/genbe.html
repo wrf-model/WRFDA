@@ -85,10 +85,10 @@ a:active {
                   <p class="stylecode">......<br>
                     export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
                     ......<br>
-                    export START_DATE = 2008020612 &nbsp; # the first perturbation valid date<br>
-                    export END_DATE = 2008020700 # the last perturbation valid date<br>
+                    export START_DATE = 2008020400 &nbsp; # the first perturbation valid date<br>
+                    export END_DATE = 2008020812 # the last perturbation valid date<br>
                     export NUM_LEVELS = 40 # e_vert -1<br>
-                    export BIN_TYPE = 5<br>
+                    export NL_CV_OPTIONS=5 # Specify control variable options<br>
                     export FC_DIR = /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc<br>
                     export RUN_DIR =/kumquat/users/${USER}/DA/gen_be<br>
                     export DOMAIN = 01<br>
@@ -98,6 +98,7 @@ a:active {
                   export STRIDE = 1</p>
                 </blockquote>
                 <p>FC_DIR specifies the directory where the WRF forecast files (wrfout*) reside. Observe the directory structure and how the wrfout files are stored. To generate your own BE file for your own case and domain in the future, you will need to prepare and arrange your wrfout files in the same way (for example, 2008020512/wrfout_d01_2008-02-06_12:00:00; 2008020512 is the initial time, wrfout_d01_2008-02-06_12:00:00 is the 24-hour forecast valid at 2008020612).</p>
+                <p>NL_CV_OPTIONS specifies the control variable option. 5 is for the default wind control variables (psi and chi_u). 7 is for the new option in WRFDA 3.7, which uses u and v as the wind control variables.</p> 
               </blockquote>
               <p><span class="bodyh1">Run gen_be_wrapper.ksh</span></p>
               <blockquote>
