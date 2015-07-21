@@ -218,7 +218,7 @@ PlainStyle2,
 , 
 ,"Download code","../class/wrfda_code.html",,,1
 ,"Compiling WRFDA ","../class/compile.html",,,1
-,"Download data","../class/wrfda_testdata.html",,,1
+,"Download data","../class/wrfda_testdata.html",,,0
 ])
 
 
@@ -278,38 +278,11 @@ PlainStyle2,
 ,"Practice Session 1 ","show-menu=wrfda-practice-1","../class/wrfda_sessions.html#session_1",,1
 ,"Practice Session 2 ","show-menu=wrfda-practice-2","../class/wrfda_sessions.html#session_2",,1
 ,"Practice Session 3 ","show-menu=wrfda-practice-3","../class/wrfda_sessions.html#session_3",,1
-,"Practice Session 4 ","show-menu=wrfda-practice-4","../class/wrfda_sessions.html#session_4",,1
-,"Practice Session 5 ","show-menu=wrfda-advanced","../class/wrfda_sessions.html#session_advanced",,1
+,"Practice Session 4 ","show-menu=wrfda-practice-4","../class/wrfda_sessions.html#session_advanced",,1
 ])
 
 addmenu(menu=[
 "wrfda-practice-1",
-,
-,
-160,
-1,
-,
-PlainStyle2,
-0,
-,
-"Fade(duration=0.5);Shadow(color=777777, Direction=135, Strength=5)",
-0,
-0,
-0,
-,
-,
-0,
-0,
-,
-,
-0,
-, 
-,"WRFDA Basics","../class/basics.html",,,1
-,"Compiling WRFDA ","../class/compile.html",,,0
-])
-
-addmenu(menu=[
-"wrfda-practice-2",
 ,
 ,
 160,
@@ -337,7 +310,7 @@ PlainStyle2,
 ])
 
 addmenu(menu=[
-"wrfda-practice-3",
+"wrfda-practice-2",
 ,
 ,
 160,
@@ -363,7 +336,7 @@ PlainStyle2,
 ])
 
 addmenu(menu=[
-"wrfda-practice-4",
+"wrfda-practice-3",
 ,
 ,
 160,
@@ -390,7 +363,7 @@ PlainStyle2,
 ])
 
 addmenu(menu=[
-"wrfda-advanced",
+"wrfda-practice-4",
 ,
 ,
 160,
@@ -413,7 +386,8 @@ PlainStyle2,
 , 
 ,"WRFDA/WRF Cycling ","../class/cycling.html",,,1
 ,"FSO ","../class/fso.html",,,1
-,"Rainfall DA ","../class/rainfall.html",,,0
+,"Rainfall DA ","../class/rainfall.html",,,1
+,"Compiling WRFDA ","../class/compile.html",,,0
 ])
 
 //    MENU ITEM - ARW

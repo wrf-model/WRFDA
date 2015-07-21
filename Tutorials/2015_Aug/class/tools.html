@@ -61,7 +61,19 @@ a:active {
                 <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_run_suite_verif_obs.ksh .<br>
                                      cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_verif_obs_plot.ksh .</p>
                 </blockquote>
-              </blockquote></blockquote>
+                <p>The easiest way to control this scripts is by creating a "wrapper" script that sets the appropriate environment variables, then calls the scripts in order. Open a new file "verif_obs_wrapper.ksh" in vi (or your preferred text editor), and type the following:</p>
+                <blockquote>
+                <p class="stylecode">> vi verif_obs_wrapper.ksh<br>
+                                     cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_verif_obs_plot.ksh .</p>
+                </blockquote>
+                <p>Now make the script you just made executable using "chmod", then run it.</p>
+                <blockquote>
+                <p class="stylecode">> chmod +x verif_obs_wrapper.ksh</p>
+                </blockquote>
+              </blockquote>
+            </blockquote>
+            <span class="pagetitle">WRFDA Tools: Analysis-based verification</span>
+            <blockquote>
               <span class="bodyh1">Input files</span>
 <!--              <blockquote>
                 <p>The setup for a pseduo-observation test is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
