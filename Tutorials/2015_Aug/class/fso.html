@@ -82,23 +82,24 @@ are some of the scripts involved in the FSO procedures.
                   #export NL_WRITE_LANCZOS=true<br>
                   #export NL_EPS=1E-5</p>
                 <p>                ......<br>
-                  export NUM_PROCS=4</p>
+                  export NUM_PROCS=6</p>
                 <p>                ......<br>
-                  export REL_DIR=/kumquat/wrfhelp/SOURCE_CODE/WRFDA<br>
-                  export DAT_DIR=/kumquat/users/$USER/DA/FSO<br>
+                  export REL_DIR=/kumquat/users/$USER/DA/<br>
+                  export DAT_DIR=$REL_DIR/FSO<br>
                   export WRFPLUS_DIR=$REL_DIR/WRFPLUSV3<br>
                   export WRFVAR_DIR=$REL_DIR/WRFDA<br>
                   export WRFNL_DIR=$WRFPLUS_DIR<br>
-                  export SCRIPTS_DIR=$WRFVAR_DIR/var/scripts<br>
-                  export GRAPHICS_DIR=$WRFVAR_DIR/var/graphics/ncl<br>
+                  export TOOLS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/
+                  export SCRIPTS_DIR=$TOOLS_DIR/scripts<br>
+                  export GRAPHICS_DIR=$TOOLS_DIR/graphics/ncl<br>
                   export BUILD_DIR=$WRFVAR_DIR/var/build<br>
                   export REG_DIR=$DAT_DIR<br>
-                  export RUN_DIR=$REG_DIR/run<span style="color:red"> # your working directory</span> <br>
+                  export RUN_DIR=$REG_DIR/run<span style="color:red"> # where the script will produce output</span> <br>
                   export FC_DIR=${RUN_DIR}/fc</p>
                 <p style="color:red">Note: The following variables should be set in the "domain" section for the tutorial case, but not for data from WRF V3.5 or later.</p>
                 <p class="stylecode">export NL_I_PARENT_START=0 <br>
                   export NL_J_PARENT_START=0</p>
-                <p>Execute the script </p>
+                <p>Execute the script. This part should take less than a minute.</p>
                 <p class="stylecode">./wrapper_run_fso.ksh</p>
 <p>After the script finishes, a file in your working directory (<em>/kumquat/users/$USER/DA/FSO/run</em>) will indicate whether the run was successful or not (a blank file will exist, either named "FAIL" or "SUCCESS"). If the run was successful, edit wrapper_run_fso.ksh again, and change the following settings to do sensitivity and observation impact runs:</p>
 <p>......<br>
@@ -111,13 +112,13 @@ export RUN_OBS_IMPACT=<span style="color:red">true</span></p>
                         export NL_WRITE_LANCZOS=true<br>
                         export NL_EPS=1E-5</p>
 <p>  .....</p>
-<p>Execute the script again</p>
+<p>Execute the script again. This part will take a bit longer; about 5-10 minutes.</p>
 <p class="stylecode">./wrapper_run_fso.ksh</p>
 </blockquote>
               <p>  <br>
                 <span class="bodyh1">Check Output </span></p>
               <blockquote>
-                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. var/graphics/ncl/plot_adj_sensitivity.ncl can be used to make some plots.</p>
+                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. You can quickly view this file using ncview to ensure there is nothing strange going on. plot_adj_sensitivity.ncl, which can be found in the TOOLS package, can be used to make some plots.</p>
                 <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/index.html contains the text output from running var/graphics/ncl/adj_diagnostics.ncl to get the <strong>diagnostics of error reduction in the forecasts from Xb (background) to Xa (analysis)</strong>.</p>
                 <p>/kumquat/users/$USER/DA/FSO/run/2007010100/obsimpact/rsl.out.0000 contains the <strong>cumulated impact of each observation type on the forecast errors</strong>.</p>
               </blockquote>
