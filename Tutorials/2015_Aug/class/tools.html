@@ -64,7 +64,61 @@ a:active {
                 <p>The easiest way to control this scripts is by creating a "wrapper" script that sets the appropriate environment variables, then calls the scripts in order. Open a new file "verif_obs_wrapper.ksh" in vi (or your preferred text editor), and type the following:</p>
                 <blockquote>
                 <p class="stylecode">> vi verif_obs_wrapper.ksh<br>
-                                     cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_verif_obs_plot.ksh .</p>
+                  #!/bin/ksh -aeux<br>
+                  <br>
+                  # Wrapper script for running WRFDA obs verification package<br>
+                  <br>
+                  # Settings for ./da_run_suite_verif_obs.ksh<br>
+                  <br>
+                  export CLEAN=false<br>
+                  export INITIAL_DATE=2013122312<br>
+                  export FINAL_DATE=2013122512<br>
+                  export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                  export SCRIPTS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts<br>
+                  export EXP_DIR=`pwd`/verify06<br>
+                  export OB_DIR=/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/<br>
+                  export FILTERED_OBS_DIR=/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/filt_ob/<br>
+                  export BE_DIR=/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/be/<br>
+                  export FC_DIR=/kumquat/wrfhelp/DATA/WRFDA/cycling/run<br>
+                  export WINDOW_START=-3<br>
+                  export WINDOW_END=3<br>
+                  export CYCLE_PERIOD=6<br>
+                  export NUM_PROCS=4<br>
+                  export VERIFY_HOUR=6<br>
+                  export RUN_CMD="mpirun -np $NUM_PROCS"<br>
+                  export VERIFICATION_FILE_STRING=wrfout<br>
+                  # Here is where you set the appropriate namelist variables that the script will use to run WRFDA<br>
+                  export NL_ANALYSIS_TYPE=verify<br>
+                  export NL_E_WE=181<br>
+                  export NL_E_SN=181<br>
+                  export NL_E_VERT=41<br>
+                  export NL_DX=60000<br>
+                  export NL_DY=60000<br>
+                  export NL_SF_SURFACE_PHYSICS=2<br>
+                  <br>
+                  ./da_run_suite_verif_obs.ksh<br>
+                  # Settings for da_verif_obs_plot.ksh<br>
+                  <br>
+                  export START_DATE=2013122312<br>
+                  export END_DATE=2013122512<br>
+                  export RUN_DIR=$EXP_DIR/plots<br>
+                  export NUM_EXPT=1<br>
+                  export REG_DIR=$EXP_DIR<br>
+                  export EXP_NAMES='verify06'<br>
+                  export EXP_LEGENDS='(/"verify06"/)'<br>
+                  export EXP_DIRS="$EXP_DIR"<br>
+                  export INTERVAL=6<br>
+                  export NUM_PROCS=4<br>
+                  export VERIFY_HOUR=00<br>
+                  export GRAPHICS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl<br>
+                  export WRF_FILE="/kumquat/wrfhelp/DATA/WRFDA/cycling/run/2013122300/wrfout_d01_2013-12-23_00:00:00"<br>
+                  export Verify_Date_Range="12z 23 Dec - 12z 25 Dec, 2015 (${INTERVAL} hour Cycle)"<br>
+                  export OBS_TYPES=synop sound airep geoamv gpspw<br>
+                  export NUM_OBS_TYPES=5<br>
+                  export PLOT_WKS=pdf #"pdf" will save plots in pdf format; "x11" will display the plots and not save them<br>
+                  <br>
+                  ./da_verif_obs_plot.ksh</p>
+
                 </blockquote>
                 <p>Now make the script you just made executable using "chmod", then run it.</p>
                 <blockquote>

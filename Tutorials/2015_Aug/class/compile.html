@@ -98,12 +98,13 @@ a:active {
               <blockquote>
                 <p class="stylecode">cd  /kumquat/users/$USER/DA/WRFPLUSV3 </p>
                 <p class="stylecode"> ./configure wrfplus</p>
-                <p><i>Choose<strong class="stylecode"> 26 </strong>for pgf90/pgcc, dmpar</i></p>
+                <p><i>Choose<strong class="stylecode"> 18 </strong>for gfortran/gcc, dmpar</i></p>
               </blockquote>
               <p>Compile WRFPLUS</p>
               <blockquote>
                 <p class="stylecode"> ./compile em_real &gt;&amp; compile_wrfplus.log &amp;</p>
               </blockquote>
+              <p>Compilation should take 5-10 minutes on the classroom computers. When compilation is completed, at the end of the log file you will see "                  Executables successfully built                  " if the build was successful, in addition to some timing information.</p>
             </blockquote>
             <p class="pagetitle"><a name="compile_4dvar"></a>Compiling WRFDA for 4DVAR</p>
             <blockquote>
@@ -124,15 +125,25 @@ a:active {
                 <p class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</p>
                 <p class="stylecode">./clean -a</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
-                <p class="stylecode">setenv BUFR 1<br>
-                  setenv CRTM 1<br>
-                  setenv RTTOV /kumquat/wrfhelp/WRFDA/external/rttov11</span></p>
+                <p class="stylecode">setenv CRTM 1<br>
+                  setenv RTTOV /kumquat/wrfhelp/external/rttov11</span></p>
                 <p><i>Set the environment variable WRFPLUS_DIR to point to the WRFPLUS build you just installed</i></p>
                 <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/WRFPLUSV3</p>
                 <p class="stylecode">./configure 4dvar</p>
-                <p><i>Choose <span class="stylecode"><strong>26</strong></span> for pgf90/pgcc, dmpar</i></p>
+                <p><i>Choose <span class="stylecode"><strong>18</strong></span> for gfortran/gcc, dmpar</i></p>
                 <p class="stylecode">./compile all_wrfvar &gt;&amp; compile_4dvar.log &amp;</p>
               </blockquote>
+              <p>Compilation should take about 5 minutes on the classroom computers. When compilation is completed, at the end of the log file you will see "build started:" and "build completed:" indicating the start and finish time for the script. However, <b>this does not mean that compilation was successful!</b> You need to check that all the necessary files were created; use the following command:</p>
+              <blockquote>
+                <p class="stylecode">ls var/build/*exe var/obsproc/src/obsproc.exe</p>
+              </blockquote>
+              <p>You should see 44 executables: 43 in the var/build/ directory, plus var/obsproc/src/obsproc.exe. The most important of these is var/build/da_wrfvar.exe; this is the main WRFDA executable.</p>
+              </blockquote>
+            <p class="pagetitle"><a name="compile_4dvar"></a>Compiling for CLOUD_CV options</p>
+            <blockquote>
+                <p>If you want to compile for CLOUD_CV, set the environment variable "CLOUD_CV" equal to 1 before running the configure script.</p>
+                <p class="stylecode">setenv CLOUD_CV 1</p>
+                <p>This will work for either 3DVAR or 4DVAR (WRFPLUS does not need to be compiled with this option). Note that this will result in slower code even if you are not using the CLOUD_CV control variable options, so it is recommended that you only use this code for experiments that are using the CLOUD_CV moisture control variables!</p>
               <p class="stylecode">&nbsp;</p>
             </blockquote>
           <!-- InstanceEndEditable --><br>

@@ -70,6 +70,7 @@ a:active {
                 ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat<br>
                 ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
 </blockquote>
+                <p>In this exercise, be.dat was created for cv_options=7.</p>
               <p><span class="bodyh1">Edit namelist.input</span>
               </p>
               <blockquote>
@@ -80,18 +81,20 @@ a:active {
                   calc_w_increment = .true.<br>
                   /<br>
                   &amp;wrfvar4<br>
-                  use_radarobs = .true.<br>
-                  use_radar_rv = .true.<br>
-                  use_radar_rf = .true.<br>
+                  use_radarobs    = .true.<br>
+                  use_radar_rv    = .true.<br>
+                  use_radar_rf    = .true.<br>
+                  use_radar_rqv   = .true.<br>
+                  use_radar_rhv   = .false.<br>
+                  use_3dvar_phy   = .true.<br>
+                  /<br>
+                  &amp;wrfvar7<br>
+                  cv_options=7,<br>
                   /</p>
-                <p><span class="stylecode">...<br>
-                  &amp;domains<br>
-                  i_parent_start=33,<br>
-                  j_parent_start=33,</span> <span style="color:red">These two settings are needed because our first guess is from the inner domain of a nested WRF run.<br></p>
    
+                <p>Note that in this exercise, be.dat was created for cv_options=7. It is important that if you use cv_options=7, you are sure to specify that option when you create the be.dat file with GEN_BE</p>
               </blockquote>
               <p><span class="bodyh1">Run WRFDA</span>
-              </p>Note that, as with other cases in this tutorial, the executable has been renamed (when building your own code it will be named <em>da_wrfvar.exe</em>
               <blockquote>
                 <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
               </blockquote>
@@ -107,10 +110,47 @@ a:active {
               <blockquote>
                 <p>Compare the results using different settings:<br>
                   use_radar_rv = .true. only<br>
-                use_radar_rf = .true. only<br>
-                both use_radar_rv = .true. and use_radar_rf = .true.                </p>
-</blockquote>
+                  use_radar_rf = .true. only<br>
+                  both use_radar_rv = .true. and use_radar_rf = .true.</p>
+              </blockquote>
             </blockquote>
+            <span class="pagetitle">4DVAR radar assimilation</span>
+            <blockquote>
+              <p><span class="bodyh1">Source code</span></p>
+              <blockquote>
+                <p><em>WRFDA/var/build/da_wrfvar_4dvar.exe</em> (this is renamed from da_wrfvar.exe)<br>
+                  is the executable that will be used in the 4D-VAR session.              </p>
+                <p>You should create a separate working directory <em> /kumquat/users/${USER}/DA/radar_4dvar</em> so that you can compare the two methods.</p>
+                <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA/radar_4dvar</span><br>
+                <span class="stylecode">cd /kumquat/users/${USER}/DA/radar_4dvar</span></p>
+            </blockquote>
+            <span class="bodyh1">Input data</span>
+            <blockquote>
+              <p>As in the regular 4DVAR case with conventional obs, more files are needed than just for 3DVAR. Observations need to be processed into multiple time-slot files. The naming convention for different time slots is also the same as for conventional obs (ob01.radar, ob02.radar, etc.)</p>
+              <p>Test data for this case are in the same directory as the 3dvar case, /kumquat/wrfhelp/DATA/WRFDA/Radar.</p>
+            </blockquote>
+            <blockquote>
+              <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob01.radar ./ob01.radar<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob02.radar ./ob02.radar<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob03.radar ./ob03.radar<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob04.radar ./ob04.radar</p>
+              <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./wrfinput_d01<br>
+                  ln -fs wrfbdy_d01 ./fg<br>
+                  cp /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfbdy_d01 ./wrfbdy_d01<br>
+                  cp /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat</p>
+              <p> <span class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span></p>
+              <p> <span class="stylecode">ln -fs  /kumquat/users/${USER}/DA/WRFDA/run/*.TBL .</span></p>
+              <p>A few additional contant files are needed for 4D-VAR runs.</p>
+            </blockquote>
+              <p><span class="bodyh1">Run WRFDA</span>
+              <blockquote>
+                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_4dvar.exe</p>
+              </blockquote>
+              <p>Compare the output of the 3dvar test to the 4dvar test using ncdiff. Is the difference significant?</p>
+<!--            <span class="pagetitle">Radar assimilation with CLOUD_CV options</span>
+            <blockquote>
+              <p><span class="bodyh1">Source code</span></p>
+            </blockquote>-->
             <p>&nbsp;</p>
             <!-- InstanceEndEditable --><br>
             
