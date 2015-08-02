@@ -42,8 +42,9 @@ a:active {
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
 <p class="pagetitle"><a name="compile_3dvar"></a>Compiling WRFDA for 3DVAR</p>
+              <p class="body">Reference: <a href="../docs/WRFDA_Software_Compilation.pdf">Download the tutorial presentation</a><p>
             <blockquote>
-              <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
+              <p>Get the WRFDA zipped tar file from <em>/kumquat/wrfhelp/SOURCE_CODE</em></p>
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
                 <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.7.tar.gz .</p>
@@ -52,14 +53,14 @@ a:active {
               <blockquote>
                 <p class="stylecode">tar -zxf WRFDA_V3.7.tar.gz </p>
               </blockquote>
-              <p>You should now see the directory <span class="stylecode">WRFDA</span>, which contains the WRFDA source code.</p>
-              <p>To reduce compilation time you can compile in parallel (this is a separate process from deciding to <em>run</em> WRFDA in serial or parallel mode). You can do this by setting the environment variable J="-j #", where "#" is the number of processors.</p>
+              <p>Using <span class="stylecode">ls</span>, you should now see the directory <em>WRFDA</em>, which contains the WRFDA source code.</p>
+              <p>To reduce compilation time you can compile in parallel (this is a separate process from deciding to <b>run</b> WRFDA in serial or parallel mode). You can do this by setting the environment variable J="-j #", where "#" is the number of processors.</p>
               <blockquote>
                 <p class="stylecode">setenv J "-j 6"</p>
               </blockquote>
               <p>Configure and compile</p>
               <blockquote>
-                <p><span class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</span></p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</p>
                 <p><i>Only one radiative transfer model is necessary, but WRFDA can be compiled with both, so set the CRTM and/or RTTOV environment variables as below</i></p>
                 <p class="stylecode">setenv CRTM 1<br>
                   setenv RTTOV /kumquat/wrfhelp/external/rttov11</p>
@@ -67,7 +68,7 @@ a:active {
                 <p><i>Choose<span class="stylecode"><strong> 34 </strong></span>for GNU (gfortran/gcc), dmpar</i></p>
                 <p class="stylecode">./compile all_wrfvar &gt;&amp; compile_3dvar.log &amp;</p>
               </blockquote>
-              <p>The "<span class="stylecode">&gt;&amp; compile_3dvar.log</span>" part of the command instructs the terminal to direct all output and error messages from the compile script to the file "compile_3dvar.log". The "&amp;" at the end will cause the script to run in the background. You can use the UNIX "<span class="stylecode">tail</span>" command to follow the progress of the script by seeing what's written to the log file.</p>
+              <p>The "<span class="stylecode">&gt;&amp; compile_3dvar.log</span>" part of the command instructs the terminal to direct all output and error messages from the compile script to the file <em>compile_3dvar.log</em>. The "&amp;" at the end will cause the script to run in the background. You can use the UNIX "<span class="stylecode">tail</span>" command to follow the progress of the script by seeing what's written to the log file (use <span class="stylecode">Ctrl-C</span> to quit <span class="stylecode">tail</span>).</p>
               <blockquote>
                 <p class="stylecode">tail -f compile_3dvar.log</p>
               </blockquote>
@@ -75,7 +76,7 @@ a:active {
               <blockquote>
                 <p class="stylecode">ls var/build/*exe var/obsproc/src/obsproc.exe</p>
               </blockquote>
-              <p>You should see 44 executables: 43 in the var/build/ directory, plus var/obsproc/src/obsproc.exe. The most important of these is var/build/da_wrfvar.exe; this is the main WRFDA executable.</p>
+              <p>You should see 44 executables: 43 in the <span class="stylecode">var/build/</span> directory, plus <span class="stylecode">var/obsproc/src/obsproc.exe</span>. The most important of these is <span class="stylecode">var/build/da_wrfvar.exe</span>; this is the main WRFDA executable.</p>
             </blockquote>
             <p class="pagetitle"><a name="compile_wrfplus"></a>Compiling WRFPLUS</p>
             <blockquote>

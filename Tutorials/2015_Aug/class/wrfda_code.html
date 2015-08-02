@@ -47,25 +47,33 @@ a:active {
               If you are interested in compiling the code yourself, you can do that as a <a href="compile.html">separate exercise</a>.
               <br>
             </p>
-<span class="bodyh1">Pre-compiled code for 3DVAR and 4DVAR</span>
-            <blockquote>
-              <p>The pre-compiled WRFDA can be accessed from <span class="stylecode">/kumquat/wrfhelp/PRE_COMPILED/WRFDA</span>.</p>
+            <p>The pre-compiled WRFDA code can be accessed from <span class="stylecode">/kumquat/wrfhelp/PRE_COMPILED/WRFDA</span>.</p>
               <p>You should copy the pre-compiled code into your local working directory. Follow the steps below:</p>
+            <span class="bodyh1">Pre-compiled code for 3DVAR</span>
+            <blockquote>
               <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA</span>&nbsp;&nbsp;&nbsp; (your main working directory)<br>
                 <span class="stylecode">cd /kumquat/users/${USER}/DA</span><br>
-                <span class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFDA_compiled.tar.gz . </span><br>
-                <span class="stylecode">tar -xzf WRFDA_compiled.tar.gz</span></p>
-              <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA package. The WRFDA code is pre-compiled to run in parallel (dmpar) mode using the PGI compiler.</p>
-              <p>The command for running a dmpar job on the classroom machine is<br>
-              <span class="stylecode">mpirun -np 4 ${your_exe_file}</span></p>
-              <p>Note: In the pre-compiled tar file, the code was compiled for 3D-VAR and 4D-VAR separately, but the executables are placed under the same WRFDA/var/build directory with the 3DVAR and 4DVAR executables renamed as da_wrfvar_3dvar.exe and da_wrfvar_4dvar.exe respectively.
-              </p>
-              <p>Note: In the pre-compiled tar file, the un-supported scripts (can be downloaded separately from <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html" target="_blank">http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html</a>) are already included.<br>
+                <span class="stylecode">cp /kumquat/wrfhelp/PRE_COMPILED/WRFDA/WRFDA_3DVAR_compiled.tar.gz . </span><br>
+                <span class="stylecode">tar -xzf WRFDA_3DVAR_compiled.tar.gz</span></p>
+              <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA-3DVAR code. This WRFDA package is pre-compiled to run in parallel (dmpar) mode using the GNU compiler (gfortran/gcc 4.9.2).</p>
+              <p>The command for running dmpar jobs on the classroom machines is</p>
+              <p class="stylecode">mpirun -np 6 ${your_exe_file}</p>
+              <p>Note: In the pre-compiled tar file, the WRFDA TOOLS scripts (can be downloaded separately from <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html" target="_blank">http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html</a>) are already included.<br>
               </p>
             </blockquote>
-            <p><span class="bodyh1">Pre-compiled code for WRFPLUS</span></p>
+            <span class="bodyh1">Pre-compiled code for 4DVAR</span>
             <blockquote>
-              <p>The pre-compiled WRFPLUS can be accessed from the same directory:.</p>
+              <p><b>NOTE: if you already have a "WRFDA" directory in your main working directory <em>/kumquat/users/${USER}/DA</em>, be sure to rename it before extracting the new code.</b></p>
+                <span class="stylecode">cd /kumquat/users/${USER}/DA</span><br>
+                <span class="stylecode">mv WRFDA WRFDA_3DVAR </span><br>
+                <span class="stylecode">cp /kumquat/wrfhelp/PRE_COMPILED/WRFDA/WRFDA_4DVAR_compiled.tar.gz . </span><br>
+                <span class="stylecode">tar -xzf WRFDA_4DVAR_compiled.tar.gz</span></p>
+              <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA-4DVAR package. The WRFDA code is pre-compiled to run in parallel (dmpar) mode using the GNU compiler (gfortran/gcc 4.9.2). It is not necessary to copy over the WRFPLUS code unless you will be running it directly, like with the <a href="fso.html">FSO exercise</a>.</p>
+              </p>
+            </blockquote>
+            <span class="bodyh1">Pre-compiled code for WRFPLUS</span>
+            <blockquote>
+              <p>The pre-compiled WRFPLUS package can be accessed from the same directory:</p>
               <p class="stylecode">cd /kumquat/users/${USER}/DA<br>
                 cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA/WRFPLUS_compiled.tar.gz .<br>
                 tar -xzf WRFPLUS_compiled.tar.gz</p>

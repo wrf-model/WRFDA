@@ -30,7 +30,7 @@ a:active {
 <body id="top" bgcolor="#FFFFFF">
 <table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
   <tr> 
-    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+    <td  colspan="3" bgcolor="#EEFFDD"><div align="center">
       <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
     </div></td>
   </tr>
@@ -42,21 +42,21 @@ a:active {
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" --><span class="pagetitle">WRFDA Practice Sessions</span><br>
               <blockquote>
-                <table width="600" border="1" cellpadding="10" cellspacing="5" bgcolor="#ffffff">
+                <table align=center width="90%" border="1" cellpadding="10">
                   <tr>
-                    <td class="style8"><p><strong>GETTING STARTED: After you have logged on and opened a terminal window, change directory to the main working directory for WRFDA tutorial practice:</strong></p>
+                    <td class="style8"><p><b>GETTING STARTED:</b> After you have logged on and opened a terminal window (<b>Applications</b> --&gt; <b>System Tools</b> --&gt; <b>Terminal</b>), change directory to the main working directory for WRFDA tutorial practice:</p>
                     <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
                     <p>If the directory does not exist yet, you should create it.</p>
                     <p class="stylecode">mkdir /kumquat/users/${USER}/DA</p></td>
                   </tr>
                 </table>
                 <p class="body">&nbsp;</p>
-                <p>Refer to <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/usersguide.html">WRFDA User's Guide</a> if you need more detailed descriptions on various components of the WRF Data Assimilation System.</p>
-<p>Tutorial presentations can be accessed through the links on each session's page.                </p>
-                <table width="600" border="1" cellpadding="10" cellspacing="5" bgcolor="#ffffff">
+                <p>Refer to the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/usersguide.html">WRFDA User's Guide</a> if you need more detailed descriptions on various components of the WRF Data Assimilation System.</p>
+                <p>Tutorial presentations can be accessed through the links on each session's page.</p>
+                <p>The exercises are organized in the order each topic is introduced. For each exercise, you will have a basic practice with preset namelists and step-by-step commands to guide the first-time users through the procedures. Most exercises also contain advanced practices listed in the end of each page; for these advanced exercises, users will need to refer to documention and previous lessons to figure out how to accomplish the tasks.</p>
+                <table align=center width="90%" border="1" cellpadding="10">
                   <tr>
-                    <td class="style8"><p>These practice pages are designed for the Summer 2015 WRFDA tutorial at NCAR Foothills lab. The path names on this web site are tailored for the NCAR classroom environment. The path names that start with / are absolute paths and they are specific to the classroom computers. The paths that do not start with / are relative paths. Users need to fill in or change the full path names when necessary.</p>
-                    <p>The exercises are organized in the order each topic is introduced. For each exercise, you will have a basic practice with preset namelists and step-by-step commands to guide the first-time users through the procedures. Most exercises also contain advanced practices listed in the end of each page; for these advanced exercises, users will need to refer to documention and previous lessons to figure out how to accomplish the tasks.</p></td>
+                    <td class="style8"><p>These practice pages are designed for the Summer 2015 WRFDA tutorial at NCAR Foothills lab. The path names on this web site are tailored for the NCAR classroom environment. The path names that start with a forward slash / are absolute paths and they are specific to the classroom computers. The paths that do not start with a slash are relative paths. Users need to fill in or change the full path names when necessary.</p></td>
                   </tr>
                 </table>
                 <p><br>
@@ -65,9 +65,9 @@ a:active {
                 <blockquote>
                   <ul class="body">
                     <li><p><a href="obsproc.html">Observation Preprocessing</a></p></li>
-                    <li><p><a name="session_runvar_realdata"></a><a href="3dvar.html">Running WRFDA-3DVAR &ndash; real data</a></p></li>
-                    <li><p><a name="session_runvar_psot" href="psot.html">Running WRFDA-3DVAR &ndash; pseudo single observation test (PSOT)</a></p></li>
-                    <li><a name="session_gen_be" href="genbe.html">GEN_BE</a> </li>
+                    <li><p><a name="session_runvar_realdata"></a><a href="3dvar.html">Running WRFDA-3DVAR (real data)</a></p></li>
+                    <li><p><a name="session_gen_be" href="genbe.html">GEN_BE</a> </p></li>
+                    <li><a name="session_runvar_psot" href="psot.html">Running WRFDA-3DVAR (PSOT)</a></li>
                   </ul>
                   <p>&nbsp;</p>
                 </blockquote>
@@ -75,7 +75,7 @@ a:active {
                 <blockquote>
                   <ul class="body">
                     <li><p><a href="radiance.html">Radiance data assimilation</a></p></li>
-                    <li><p><a href="4dvar.html">4DVAR</a></p></li>
+                    <li><p><a href="4dvar.html">Running WRFDA-4DVAR</a></p></li>
                   </ul>
                   <p>&nbsp;</p>
                 </blockquote>
@@ -110,10 +110,12 @@ a:active {
                   <ul>
                     <li class=body>There are advanced practice cases listed near the end of the following practice sessions: 
                       <ul>
-                        <li><a href="../class/obsproc.html#advance">OBSPROC</a></li>
-                        <li><a href="../class/3dvar.html#advance">WRFDA-3DVAR -- real data</a></li>
-                        <li><a href="../class/radiance.html#advance">Radiance Data Assimilation</a></li>
-                        <li><a href="../class/4dvar.html#advance">WRFDA-4DVAR</a></li>
+                        <li><a href="../class/obsproc.html#advanced">OBSPROC</a></li>
+                        <li><a href="../class/3dvar.html#advanced">WRFDA-3DVAR -- real data</a></li>
+                        <li><a href="../class/genbe.html#advanced">GEN_BE</a></li>
+                        <li><a href="../class/psot.html#advanced">Hybrid Single-Obs Test (PSOT)</a></li>
+                        <li><a href="../class/radiance.html#advanced">Radiance Data Assimilation</a></li>
+                        <li><a href="../class/4dvar.html#advanced">WRFDA-4DVAR</a></li>
                       </ul>
                   </ul>
                   <ul>

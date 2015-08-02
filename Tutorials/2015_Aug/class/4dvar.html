@@ -43,21 +43,21 @@ a:active {
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <p><span class="pagetitle">Running 4D-VAR</span></p>
-            <p><span class="body">Reference: <a href="../docs/WRFDA_4dvar.pdf">Download the tutorial presentation</a></span>
+            <p><span class="body">Reference: <a href="../docs/WRFDA_4DVAR.pdf">Download the tutorial presentation</a></span>
             </p>
             <p><span class="bodyh1">source code</span>
             </p>
             <blockquote>
-              <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so.</p>
-              <p><em>WRFDA/var/build/da_wrfvar_4dvar.exe</em> (this is renamed from da_wrfvar.exe)<br>
-                is the executable that will be used in the 4D-VAR session.              </p>
+              <p>Get the <a href="wrfda_code.html">pre-compiled 4DVAR code</a>, if you have not done so.</p>
+              <p class="stylecode">WRFDA/var/build/da_wrfvar.exe</p>
+              <p>is the executable that will be used in the 4D-VAR session. Make sure this executable was compiled for 4DVAR, or 4DVAR assimilation will not work!</p>
             </blockquote>
             <span class="bodyh1">Choice of your working directory</span>
             <blockquote>
               <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
               <p>We recommend you create<em> /kumquat/users/${USER}/DA/4dvar</em> and cd there to be your working directory for this session.</p>
-              <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA/4dvar</span><br>
-                <span class="stylecode">cd /kumquat/users/${USER}/DA/4dvar</span> (or other your choice of working directory)</p>
+              <p class="stylecode">mkdir /kumquat/users/${USER}/DA/4dvar<br>
+                cd /kumquat/users/${USER}/DA/4dvar</p>
             </blockquote>
             <span class="bodyh1">Input data</span>
             <blockquote>
@@ -91,7 +91,7 @@ a:active {
             <span class="bodyh1">Linking files</span>
             <blockquote>
               <p class="stylecode">cd /kumquat/users/${USER}/DA/4dvar</p>
-              <p>A few additional contant files are needed for 4D-VAR runs.</p>
+              <p>A few additional contant files are needed for 4DVAR runs. These are necessary for running the nonlinear model as part of the 4DVAR assimilation.</p>
               <blockquote>
                 
                 <p> <span class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span></p>
@@ -107,35 +107,30 @@ a:active {
               </blockquote>
               <p>link observation files</p>
               <blockquote>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/ob.ascii+ ./ob01.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071601/ob.ascii ./ob02.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071602/ob.ascii ./ob03.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071603/ob.ascii ./ob04.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071604/ob.ascii ./ob05.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071605/ob.ascii ./ob06.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/ob.ascii ./ob07.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/ob.ascii+ ./ob01.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020513/ob.ascii ./ob02.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020514/ob.ascii ./ob03.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020515/ob.ascii ./ob04.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020516/ob.ascii ./ob05.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020517/ob.ascii ./ob06.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020518/ob.ascii- ./ob07.ascii</span></p>
               </blockquote>
               <p>link background error file</p>
               <blockquote>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/be/be.dat .</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat .</span></p>
               </blockquote>
             </blockquote>
-<span class="bodyh1">Edit namelists</span>
+            <span class="bodyh1">Edit namelists</span>
             <blockquote>
-                <p>A very basic namelist.input for running the 4D-VAR tutorial case is available at <em>/kumquat/wrfhelp/DATA/WRFDA/4dvar/namelist.input</em></p>
-                <p><span class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/4dvar/namelist.input .</span></p>
-                <p class="stylecode">vi namelist.input</p>
+              <p>A very basic namelist.input for running the 4D-VAR tutorial case is available at <em>/kumquat/wrfhelp/DATA/WRFDA/4dvar/namelist.input</em></p>
+              <p><span class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/4dvar/namelist.input .</span></p>
+              <p class="stylecode">vi namelist.input</p>
               <p>Pay special attention to the following namelist variables.</p>
                 <p><span class="stylecode">&amp;wrfvar1<br>
                   var4d=true,<br>
                   var4d_lbc=true,<br>
                   var4d_bin=3600,<br>
                   /<br>
-                  &amp;wrfvar6<br>
-                </span>
-                  ntmax=5</span><span style="color:red"> # for testing purpose only, reduce the maximum iterations, since 4D-VAR takes a lot longer to run than 3D-VAR</span><br>
-                  /
-              <br>
                   &amp;wrfvar18<br>
                   analysis_date='2005-07-16_00:00:00&quot;,<br>
                   /<br>
@@ -178,18 +173,100 @@ a:active {
             </blockquote>
             <span class="bodyh1">Running 4D-VAR</span>
             <blockquote>
-              <p><span class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_4dvar.exe &gt;&amp; var4d.log </span></p>
+              <p><span class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe &gt;&amp; var4d.log &amp;</span></p>
 <p class="stylecode">&nbsp; </p>
               <p><span style="color:red">Helpful tip!</span>, after submitting an MPI job like this, you don't have to sit around without being able to see the progress of your run. After submitting the job, hit control+z on your keyboard to suspend the job, then type "bg" and enter to continue running the job in the background. Now, you can use the "tail" command to see the log files in real time!</p>
               <p class="stylecode">tail -f rsl.out.0000</span>
               <p>Press control+c at any time to quit "tail"</p>
             </blockquote>
-            <p class="bodyh2"><a name="advance">Advanced</a></p>
+            <span class="bodyh1">Using lateral boundary control variables</span>
             <blockquote>
-              <p>Try setting up a different 4D-VAR run using CONUS60 case (/kumquat/wrfhelp/DATA/WRFDA/CONUS60) and compare the results with the 3D-VAR run. A sample namelist.input is provided in the WRFDA source tar file as WRFDA/var/test/4dvar/namelist.input for the CONUS60 case.<br>
-                <br>
-                The CONUS60 case is not used as the default 4D-VAR practice case
-                because of its relatively large domain dimensions for 4D-VAR tutorial purpose.</p>
+              <p>WRFDA 4DVAR has the option to add an additional cost function term based on the lateral boundary conditions. You can activate it by setting <em>var4d_lbc=true</em> in <em>&amp;wrfvar1</em>, and linking the following files.</p>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfavn_d01 ./fg02</span></p>
+                <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
+              </blockquote>
+              <p>"fg02" and "ana02" are the same file, and are the "first guess" field for the same domain at the <b>end</b> of the 4DVAR assimilation window (in this case, the analysis at 2005-07-16 06Z.</p>
+            </blockquote>
+            <p class="bodyh2"><a name="advanced">Advanced</a></p>
+            <blockquote>
+              <p>Try setting up a different 4D-VAR run using CONUS60 case (/kumquat/wrfhelp/DATA/WRFDA/CONUS60) and compare the results with the 3D-VAR run. Use the same namelist from the 3dvar case, and modify the following settings:<br>
+                <p><span class="stylecode">cp /kumquat/users/${USER}/DA/3dvar/namelist.input .</span></p>
+                <p class="stylecode">vi namelist.input</p>
+              <p>Pay special attention to the following namelist variables, which are essential for 4DVAR runs</p>
+                <p><span class="stylecode">&amp;wrfvar1<br>
+                  var4d=true,<br>
+                  var4d_lbc=false,<br>
+                  var4d_bin=3600,<br>
+                  /<br>
+                  &amp;wrfvar6<br>
+                </span>
+                  ntmax=4</span><span style="color:red"> # for testing purpose only; this reduces the maximum iterations, since 4D-VAR takes a lot longer to run than 3D-VAR</span><br>
+                  /
+              <br>
+                  &amp;wrfvar18<br>
+                  analysis_date=&quot;2008-02-05_12:00:00&quot;,<br>
+                  /<br>
+                  &amp;wrfvar21<br>
+                  time_window_min=&quot;2008-02-05_12:00:00&quot;,<br>
+                  /<br>
+                  &amp;wrfvar22</span><br>
+                  <span class="stylecode">time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
+                /<br>
+                &amp;time_control<br>
+                run_hours=6,<br>
+                start_year=2008,<br>
+                start_month=02,<br>
+                start_day=05,<br>
+                start_hour=12,<br>
+                end_year=2008,<br>
+                end_month=02,<br>
+                end_day=05,<br>
+                end_hour=18,<br>
+                interval_seconds=21600,<br>
+                /<br>
+                &amp;domains<br>
+                time_step=600,<br>
+                e_we=90,<br>
+                e_sn=60,<br>
+                e_vert=41,<br>
+                dx=60000,<br>
+                dy=60000,<br>
+                /<br>
+                &amp;perturbation<br>
+                trajectory_io=true,<br>
+                enable_identity=false,<br>
+                jcdfi_use=true,<br>
+                jcdfi_diag=1,<br>
+                jcdfi_penalty=1000.0,<br>
+                /                </span>            </p>
+            </blockquote>
+            <ul>
+              <li>Observations
+                <blockquote>
+                  <p>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/ob.ascii+<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020513/ob.ascii<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020514/ob.ascii<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020515/ob.ascii<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020516/ob.ascii<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020517/ob.ascii<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020518/ob.ascii-</p>
+                </blockquote>
+              </li>
+              <li>First guess
+                <blockquote>
+                  <p>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01<br>
+                    /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfbdy_d01</p>
+                </blockquote>
+              </li>
+              <li>Background error statistics
+                <blockquote>
+                  <p>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat            </p>
+                </blockquote>
+              </li>
+            </ul>
+            <br>
+            <p><b>NOTE: The CONUS60 case will take more than 15 minutes to complete on the classroom computers, even with a low value of ntmax=4.</b> 4DVAR is very computationally expensive! This is why a much smaller, simplified case is provided for the basic tutorial above.</p>
               <p>&nbsp;</p>
 </blockquote>
           <!-- InstanceEndEditable --><br>

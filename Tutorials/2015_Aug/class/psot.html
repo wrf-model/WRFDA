@@ -43,7 +43,7 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <span class="pagetitle">Running WRFDA - pseudo single ob test</span>
             <blockquote>
-              <p>The pseudo single ob test is usually the first step to try out WRFDA after you have generated your own be.dat. It is a very useful tool, which can be used to investigate your choice of background error and its impact on your analysis. See <a href="../docs/WRFDA_BE.pdf#23">the Background Error presentation</a> for more information (starting on slide 23).</p>
+              <p>The pseudo single ob test is usually the first step to try out WRFDA after you have generated your own be.dat. It is a very useful tool, which can be used to investigate your choice of background error and its impact on your analysis. See <a href="../docs/WRFDA_BE.pdf#22">the Background Error presentation</a> for more information (starting on slide 22).</p>
               <span class="bodyh1">Source code</span>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
@@ -61,7 +61,7 @@ a:active {
                 <p>The setup for a pseduo-observation test is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
                 <blockquote>
                   <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL <br>
-                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat <br>
+                  ln -fs /kumquat/users/${USER}/DA/gen_be/workdir/be.dat ./be.dat <br>
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg <br>
                 </blockquote>
               </blockquote>
@@ -88,7 +88,7 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Run WRFDA (da_wrfvar.exe)</span> </p>
               <blockquote>
-                <p class="stylecode">mpirun -np 4 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span>          </p>
               <blockquote>
@@ -116,9 +116,9 @@ a:active {
               <ul>
                 <li>Response of BE length scaling parameters
                   <blockquote>
-                    <p>                Run single ob test with the following additional parameters</p>
-                    <p>                <span class="stylecode">vi namelist.input</span> (reduce length scale by 50%)</p>
-                    <p class="stylecode">                &amp;wrfvar7<br>
+                    <p>Run single ob test with the following additional parameters</p>
+                    <p><span class="stylecode">vi namelist.input</span> (reduce length scale by 50%)</p>
+                    <p class="stylecode">&amp;wrfvar7<br>
                       len_scaling1 = 0.5<br>
                       len_scaling2 = 0.5<br>
                       len_scaling3 = 0.5<br>
@@ -127,7 +127,7 @@ a:active {
                       /</p>
                   </blockquote>
                 </li>
-                <li>                  Response of changing BE variances
+                <li>Response of changing BE variances
                   <blockquote>
                     <p>                Run single ob test with the following additional parameters</p>
                     <p><span class="stylecode">vi namelist.input</span> (reduce variance by 75%)</p>
@@ -138,10 +138,17 @@ a:active {
                       var_scaling4 = 0.25<br>
                       var_scaling5 = 0.25<br>
                       / </p>
-                    <p>If this was successful, you can <a href="wrfda_sessions.html#session_gen_be">continue to the next practice case</a>.</p>
-                  </blockquote>
                 </li>
+                <p>If this was successful, you have reached the end of the basic day 1 exercises! If you have extra time remaining, there are some more exercises you can try:</p>
+                <blockquote>
+                  <li>Try the advanced exercises for <a href="wrfda_sessions.html#session_1">the day 1 exercises</a>; they can be found at the bottom of each page<br><br></li>
+                  <li>Try <a href="compile.html">compiling WRFDA yourself</a></li>
+                </blockquote>
               </ul>
+            </blockquote>
+            <span class="bodyh1"><a name="advanced">Advanced practice</span>
+            <blockquote>
+              <p>After you have run the <a href="hybrid.html">hybrid tutorial case</a>, try running PSOT with hybrid assimilation. This exercise can be found at that page.</p>
             </blockquote>
 <p>&nbsp;</p>
             <!-- InstanceEndEditable --><br>
