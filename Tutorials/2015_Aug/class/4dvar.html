@@ -100,10 +100,8 @@ a:active {
               <p>link first guess and boundary files.</p>
               <blockquote>
                 <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfinput_d01 ./fg</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfavn_d01 ./fg02</span></p>
                 <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfinput_d01 .</span></p>
                 <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfbdy_d01 .</span></p>
-                <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
               </blockquote>
               <p>link observation files</p>
               <blockquote>
@@ -187,31 +185,32 @@ a:active {
                 <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
               </blockquote>
               <p>"fg02" and "ana02" are the same file, and are the "first guess" field for the same domain at the <b>end</b> of the 4DVAR assimilation window (in this case, the analysis at 2005-07-16 06Z.</p>
+              <p>&nbsp;</p>
+              <p class="body">You are now done with the basic 4DVAR practice case. If you still have time, you can go back to the <a href="radiance.html#advanced">radiance practice case</a> to try some of the advanced exercises (if you have not already done so), or try the advanced 4DVAR exercise below:<br><br></p>
             </blockquote>
             <p class="bodyh2"><a name="advanced">Advanced</a></p>
             <blockquote>
               <p>Try setting up a different 4D-VAR run using CONUS60 case (/kumquat/wrfhelp/DATA/WRFDA/CONUS60) and compare the results with the 3D-VAR run. Use the same namelist from the 3dvar case, and modify the following settings:<br>
-                <p><span class="stylecode">cp /kumquat/users/${USER}/DA/3dvar/namelist.input .</span></p>
-                <p class="stylecode">vi namelist.input</p>
+              <p><span class="stylecode">cp /kumquat/users/${USER}/DA/3dvar/namelist.input .</span></p>
+              <p class="stylecode">vi namelist.input</p>
               <p>Pay special attention to the following namelist variables, which are essential for 4DVAR runs</p>
-                <p><span class="stylecode">&amp;wrfvar1<br>
-                  var4d=true,<br>
-                  var4d_lbc=false,<br>
-                  var4d_bin=3600,<br>
-                  /<br>
-                  &amp;wrfvar6<br>
-                </span>
-                  ntmax=4</span><span style="color:red"> # for testing purpose only; this reduces the maximum iterations, since 4D-VAR takes a lot longer to run than 3D-VAR</span><br>
-                  /
-              <br>
-                  &amp;wrfvar18<br>
-                  analysis_date=&quot;2008-02-05_12:00:00&quot;,<br>
-                  /<br>
-                  &amp;wrfvar21<br>
-                  time_window_min=&quot;2008-02-05_12:00:00&quot;,<br>
-                  /<br>
-                  &amp;wrfvar22</span><br>
-                  <span class="stylecode">time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
+              <p class="stylecode">&amp;wrfvar1<br>
+                var4d=true,<br>
+                var4d_lbc=false,<br>
+                var4d_bin=3600,<br>
+                /<br>
+                &amp;wrfvar6<br>
+                ntmax=4<span style="color:red"> # for testing purpose only; this reduces the maximum iterations, since this 4DVAR case takes a long time to run</span><br>
+                /
+                <br>
+                &amp;wrfvar18<br>
+                analysis_date=&quot;2008-02-05_12:00:00&quot;,<br>
+                /<br>
+                &amp;wrfvar21<br>
+                time_window_min=&quot;2008-02-05_12:00:00&quot;,<br>
+                /<br>
+                &amp;wrfvar22<br>
+                time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
                 /<br>
                 &amp;time_control<br>
                 run_hours=6,<br>
@@ -239,8 +238,8 @@ a:active {
                 jcdfi_use=true,<br>
                 jcdfi_diag=1,<br>
                 jcdfi_penalty=1000.0,<br>
-                /                </span>            </p>
-            </blockquote>
+                / </p>
+              </blockquote>
             <ul>
               <li>Observations
                 <blockquote>
