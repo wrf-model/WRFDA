@@ -91,7 +91,7 @@ a:active {
             <span class="bodyh1">Linking files</span>
             <blockquote>
               <p class="stylecode">cd /kumquat/users/${USER}/DA/4dvar</p>
-              <p>A few additional contant files are needed for 4DVAR runs. These are necessary for running the nonlinear model as part of the 4DVAR assimilation.</p>
+              <p>A few additional constant files are needed for 4DVAR runs. These are necessary for running the nonlinear model as part of the 4DVAR assimilation.</p>
               <blockquote>
                 
                 <p> <span class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span></p>
@@ -105,17 +105,16 @@ a:active {
               </blockquote>
               <p>link observation files</p>
               <blockquote>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/ob.ascii+ ./ob01.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020513/ob.ascii ./ob02.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020514/ob.ascii ./ob03.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020515/ob.ascii ./ob04.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020516/ob.ascii ./ob05.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020517/ob.ascii ./ob06.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020518/ob.ascii- ./ob07.ascii</span></p>
-              </blockquote>
-              <p>link background error file</p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/ob.ascii+ ./ob01.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071601/ob.ascii ./ob02.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071602/ob.ascii ./ob03.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071603/ob.ascii ./ob04.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071604/ob.ascii ./ob05.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071605/ob.ascii ./ob06.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/ob.ascii ./ob07.ascii</span></p>
+              </blockquote>              <p>link background error file</p>
               <blockquote>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat .</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/be/be.dat .</span></p>
               </blockquote>
             </blockquote>
             <span class="bodyh1">Edit namelists</span>
@@ -149,7 +148,6 @@ a:active {
                 end_day=16,<br>
                 end_hour=06,<br>
                 interval_seconds=21600,<br>
-                debug_level=-300,<br>
                 /<br>
                 &amp;domains<br>
                 time_step=600,<br>

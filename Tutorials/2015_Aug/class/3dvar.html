@@ -182,15 +182,10 @@ a:active {
                 <p>Edit plot_cost_grad_fn.ncl to provide the current working directory. You can also edit "domain_name" to change the plot captions.</p>
                 <blockquote>
                   <p class="stylecode">......<br>
-                  dir = "/kumquat/users/${USER}/DA/3dvar/"<br>
+                  dir = "/kumquat/users/$USER/DA/3dvar/"<br>
                   domain_name = &quot;my test case&quot;<br>
                   ......              </p>
                 </blockquote>
-                <table align=center width="90%" border="1" cellpadding="10">
-                  <tr>
-                    <td class="style8"><p><b>NOTE:</b> Unlike shell scripts, NCL scripts can not parse environment variables directly, so you will have to manually change "${USER}" to match your login name when you set "dir".</p></td>
-                  </tr>
-                </table>
                 <p><br>Run the NCL script</p>
                   <blockquote><p class="stylecode">ncl plot_cost_grad_fn.ncl</p></blockquote>
                 <p>You will notice that by default, WRFDA only prints information about the first and last iterations to cost_fn and grad_fn, so the plot will just be a straight line. If you wish to see a more detailed plot, run the test case again, but with the option "<span class="stylecode">calculate_cg_cost_fn = .true.</span>" under the &wrfvar11 namelist section.</p>
@@ -257,7 +252,7 @@ a:active {
                 <li>Try running WRFDA with a different BE option (cv_options=3) using a pre-supplied be.dat available in the WRFDA package <em>WRFDA/var/run/be.dat.cv3</em>. Compare the results with previous cv_options=5 runs.
                   <blockquote>
                     <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/be.dat.cv3 ./be.dat</p>
-                    <p class="stylecode">vi namelist</p>
+                    <p class="stylecode">vi namelist.input</p>
                     <p class="stylecode">&amp;wrfvar7<br>
                       cv_options = 3<br>
                       /
@@ -266,14 +261,14 @@ a:active {
                 </li>
                 <li>Try adding the following namelist settings and compare the results with previous runs (Remember to check log and diagnostic files first) .
                   <blockquote>
+                    <p class="stylecode">vi namelist.input</p>
                     <p class="stylecode">&amp;wrfvar5<br>
                       max_error_t = 3.0<br>
                       max_error_uv = 3.0<br>
                       max_error_q = 3.0<br>
                       max_error_p = 3.0
                       <br>
-                      /
-                    </p>
+                      /</p>
                   </blockquote>
                 </li>
               </ul>
