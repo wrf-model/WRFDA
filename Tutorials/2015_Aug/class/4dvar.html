@@ -183,12 +183,23 @@ a:active {
                 <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
               </blockquote>
               <p>"fg02" and "ana02" are the same file, and are the "first guess" field for the same domain at the <b>end</b> of the 4DVAR assimilation window (in this case, the analysis at 2005-07-16 06Z.</p>
-              <p>&nbsp;</p>
-              <p class="body">You are now done with the basic 4DVAR practice case. If you still have time, you can go back to the <a href="radiance.html#advanced">radiance practice case</a> to try some of the advanced exercises (if you have not already done so), or try the advanced 4DVAR exercise below:<br><br></p>
+              <p class="body"><br>You are now done with the basic 4DVAR practice case. If you still have time, you can go back to the <a href="radiance.html#advanced">radiance practice case</a> to try some of the additional exercises (if you have not already done so), or try the additional 4DVAR exercises below:<br><br></p>
             </blockquote>
-            <p class="bodyh2"><a name="advanced">Advanced</a></p>
+            <p class="bodyh2"><a name="advanced">Additional practice</a></p>
             <blockquote>
-              <p>Try setting up a different 4D-VAR run using CONUS60 case (/kumquat/wrfhelp/DATA/WRFDA/CONUS60) and compare the results with the 3D-VAR run. Use the same namelist from the 3dvar case, and modify the following settings:<br>
+              <p>Try using PREPBUFR data instead of ASCII format data. Since PREPBUFR files from GDAS contain 6 hours of data which is different from our 6-hour assimlation window (PREPBUFR files contain data from 21z&ndash;03z, 03z&ndash;09z, etc.) you will need to link two different observation files to cover the whole assimilation window:<br>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/prepbufr.gdas.2005071600.wo40 ./ob01.bufr</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/prepbufr.gdas.2005071606.wo40 ./ob02.bufr</span></p>
+              </blockquote>
+              <p>Radiance assimilation works in much the same way, since radiance data in GDAS BUFR files follows the same time window conventions.</p>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/gdas.1bamua.t00z.20050716.bufr ./amsua01.bufr</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/gdas.1bamua.t06z.20050716.bufr ./amsua02.bufr</span></p>
+              </blockquote>
+              <p>Don't forget to change the appropriate namelist options for these new data types!<br><br></p>
+              <hr>
+              <p><br>Try setting up a different 4D-VAR run using CONUS60 case (/kumquat/wrfhelp/DATA/WRFDA/CONUS60) and compare the results with the 3D-VAR run. Use the same namelist from the 3dvar case, and modify the following settings:<br>
               <p><span class="stylecode">cp /kumquat/users/${USER}/DA/3dvar/namelist.input .</span></p>
               <p class="stylecode">vi namelist.input</p>
               <p>Pay special attention to the following namelist variables, which are essential for 4DVAR runs</p>
@@ -263,6 +274,7 @@ a:active {
               </li>
             </ul>
             <br>
+            <p>You can also try assimilating PREPBUFR and radiance data, as described above. Those observation files can be found in the appropriate sub-directories in /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob</p>
             <p><b>NOTE: The CONUS60 case will take more than 15 minutes to complete on the classroom computers, even with a low value of ntmax=4.</b> This is why a much smaller, simplified case is provided for the basic tutorial above.</p>
               <p>&nbsp;</p>
 </blockquote>

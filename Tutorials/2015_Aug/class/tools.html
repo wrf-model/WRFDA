@@ -44,6 +44,7 @@ a:active {
             <span class="pagetitle">WRFDA Tools: Observation-based verification</span>
             <blockquote>
               <p>This exercise will teach you how to run WRFDA verification tools for observation-based verification.</p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_Verification_Tools.pdf">Download the tutorial presentation</a></span></p>
             </blockquote>
             <span class="bodyh1">Source code</span>
             <blockquote>
@@ -154,12 +155,12 @@ a:active {
                   export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
                   export SCRIPTS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts<br>
                   export GRAPHICS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl<br>
-                  export NUM_EXPT=1<br>
-                  export CONTROL_EXP_DIR=/kumquat/wrfhelp/DATA/WRFDA/cycling/no_da<br>
-                  export EXP_DIRS=/kumquat/users/wrfhelp/DA/cycling/<br>
-                  export EXP_NAMES='ALL_DA'<br>
+                  export NUM_EXPT=3<br>
+                  export CONTROL_EXP_DIR=/kumquat/wrfhelp/DATA/WRFDA/verification/no_da<br>
+                  export EXP_DIRS='/kumquat/wrfhelp/DATA/WRFDA/verification/conv_only /kumquat/wrfhelp/DATA/WRFDA/verification/rad_only /kumquat/wrfhelp/DATA/WRFDA/verification/all_obs'<br>
+                  export EXP_NAMES='CONV_ONLY RAD_ONLY ALL_OBS'<br>
                   export VERIFICATION_FILE_STRING='wrfout'<br>
-                  export EXP_LEGENDS='(/"All DA"/)'<br>
+                  export EXP_LEGENDS='(/"Conv only","Rad only","All ob types"/)'<br>
                   export START_DATE=2013122312<br>
                   export END_DATE=2013122512<br>
                   export INTERVAL=06<br>

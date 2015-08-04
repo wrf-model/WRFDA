@@ -136,7 +136,7 @@ a:active {
                   </blockquote>
                   <p>This script displays the mean and standard deviation for the ensemble at a single level for a single variable. You can change the level and variable by changing these lines a bit further down in the script:</p>
                   <blockquote>
-                    <p class="stylecode">kl = 32<br>
+                    <p class="stylecode">kl = 24<br>
                     <br>
                     f1 = file1-&gt;U    ; ens_mean<br>
                     f2 = file2-&gt;U    ; variance from the file</p>
@@ -149,7 +149,7 @@ a:active {
               </ul>
               <ul>
                 <ul>
-                  <li>Create another sub-directory where you will be working for ensemble perturbations.</li>
+                  <li>This step will extract the ensemble perturbations from the existing ensemble wrfout files provided for you. Create another sub-directory where you will be working for this step.</li>
                 </ul>
                 <blockquote>
                   <p class="stylecode">cd /kumquat/users/${USER}/DA/hybrid</p>
@@ -202,7 +202,7 @@ a:active {
                   &amp;wrfvar16<br>
                   ensdim_alpha = 10 </span> <span style="color:red"># hybrid mode is activated when ensdim_alpha is larger than zero.</span><br>
                   <span class="stylecode">alphacv_method = 2<br>
-                  alpha_corr_scale = 200.0<br>
+                  alpha_corr_scale = 500.0<br>
                   /</span>
                 </p>
                 <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
@@ -210,6 +210,32 @@ a:active {
               <p>View the different output files to see how they differ from a 3DVAR assimilation run. For example, in <em>cost_fn</em> and <em>grad_fn</em>, you will see the ensemble terms of the cost function and gradient, respectively.</p>
               <span class="bodyh1">Other practice</span>
               <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>Do a pseudo-single obs test (PSOT) like we learned in <a href="psot.html">a previous exercise</a>. Edit the following namelist options to run the test:</p>
+                      <blockquote>
+                        <p class="stylecode">&amp;wrfvar15<br>
+                          num_pseudo = 1,<br>
+                          pseudo_x = 50.0,<br>
+                          pseudo_y = 50.0,<br>
+                          pseudo_z = 10.0,<br>
+                          pseudo_err = 1.0,<br>
+                          pseudo_val = 1.0,<br>
+                          /<br>
+                          . . .<br>
+                          &amp;wrfvar19<br>
+                          pseudo_var = 'u'<br>
+                          /</p>
+                      <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+                      <p class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
+                        ncview increment.nc</p>
+                      </blockquote>
+                      <p>To the right you can see what the lowest level pressure perturbation should look like. Notice the differences from the <a href="images/psot_ncview_u.P.png">basic 3dvar case</a> due to the BE contribution from the ensemble.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/hybrid_psot_u.P.png"><img src="images/hybrid_psot_u.P.png" alt="Pressure perturbation from PSOT with the above settings." height="300"></a></td>
+                  </tr>
+                </table>
                 <p>Do a pseudo-single obs test (PSOT) like we learned in <a href="psot.html">a previous exercise</a>. Edit the following namelist options to run the test:</p>
                 <blockquote>
                   <p class="stylecode">&amp;wrfvar15<br>
@@ -235,7 +261,7 @@ a:active {
                     <span class="stylecode">je_factor = 1.25</span> (jb = 5)<br>
                     <span class="stylecode">je_factor = 1.1</span> (jb = 11)</p>
                   <p>Hybrid covariance localization scale (alpha_corr_scale): try<br>
-                    <span class="stylecode">alpha_corr_scale = 500.0</span><br>
+                    <span class="stylecode">alpha_corr_scale = 200.0</span><br>
                     <span class="stylecode">alpha_corr_scale = 1500.0</span></p>
                 </blockquote>
                 <p>Try setting ensdim_alpha = 0, and compare the results.</p>
