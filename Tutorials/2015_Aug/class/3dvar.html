@@ -61,14 +61,23 @@ a:active {
               <p><span class="bodyh1">Input data</span>
               </p>
               <blockquote>
-                <p>A very basic namelist file for running the tutorial case is available at <span class="stylecode">WRFDA/var/test/tutorial/namelist.input</span></p>
-                <blockquote>
-                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</p>
-                </blockquote>
-                <p>A land-use table is needed as well (provided in the WRFDA package)</p>
-                <blockquote>
-                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
-                </blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>This case utilizes a continental USA domain, 90x60 gridpoints, 41 vertical levels, and 60km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/CONUS60). The exact area of the domain is shown at right.</a>
+                      <p>It features a storm which produced a <a href="https://en.wikipedia.org/wiki/2008_Super_Tuesday_tornado_outbreak">deadly tornado outbreak</a> across the Central/Southern USA on February 5, 2008.</p> 
+                      <p>A very basic namelist file for running the tutorial case is available at <span class="stylecode">WRFDA/var/test/tutorial/namelist.input</span></p>
+                      <blockquote>
+                        <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</p>
+                      </blockquote>
+                      <p>A land-use table is needed as well (provided in the WRFDA package)</p>
+                      <blockquote>
+                        <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
+                      </blockquote>
+                    </td>
+                    <td class="bodytext"><a href="images/CONUS60.png"><img src="images/CONUS60.png" alt="Domain of this test case" height="300"></a></td>
+                  </tr>
+                </table>
                  <p>Besides namelist.input and LANDUSE.TBL, the other three major input files to WRFDA-3DVAR are observations (ob.ascii), background error statistics (be.dat), and first guess (fg).</p>
               </blockquote>
               <ul>

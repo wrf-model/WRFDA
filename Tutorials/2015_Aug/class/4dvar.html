@@ -61,8 +61,16 @@ a:active {
             </blockquote>
             <span class="bodyh1">Input data</span>
             <blockquote>
-              <p>For running 3D-VAR, the 3 major input files are observations (ob.ascii), background error statistics (be.dat) and first guess (fg). For 4D-VAR, the similar concept holds except that now the observations need to be processed into multiple time-slot files. </p>
-              <p>Test data for this 4D-VAR tutorial case are in /kumquat/wrfhelp/DATA/WRFDA/4dvar.</p>
+              <table border="0" cellpadding="0" cellspacing="0">
+                <tr style="vertical-align: top;">
+                  <td>
+                    <p>For running 3D-VAR, the 3 major input files are observations (ob.ascii), background error statistics (be.dat) and first guess (fg). For 4D-VAR, the similar concept holds except that now the observations need to be processed into multiple time-slot files. </p>
+                    <p><a href=wrfda_testdata.html#testdata_4dvar>This case</a> utilizes a western Pacific, 31x25 gridpoints, 17 vertical levels, and 135km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/4dvar). This is a much lower resolution than should normally be run to see good results; the test is kept small for tutorial purposes. The exact area of the domain is shown at right.</a>
+                    <p>It features <a href="https://en.wikipedia.org/wiki/Typhoon_Haitang_%282005%29">Typhoon Haitang</a> south of Japan on July 16, 2005. Due to the low resolution, the typhoon is not well-resolved in this case.</p>
+                  </td>
+                  <td class="bodytext"><a href="images/4dvar.png"><img src="images/4dvar.png" alt="Domain of this test case" height="300"></a></td>
+                </tr>
+              </table>
             </blockquote>
             <ul>
               <li>Observations

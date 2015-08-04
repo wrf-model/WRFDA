@@ -61,16 +61,27 @@ a:active {
               <p><span class="bodyh1">Input files</span>
               </p>
               <blockquote>
-                <p>The <a href="wrfda_testdata.html#testdata_radar">radar case</a> is different from the CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions.</p>
-                <p>The procedure is the same as <a href="3dvar.html">Running WRFDA-3DVAR</a> except for an extra radar input file and adding and changing some namelist.input settings.</p>
-                <p><strong><em>ob.radar</em></strong> is in plain text format. Edit it to see the content. Its format is simple, but the radar data preprocessing is not trivial and it is user's responsibility. </p>
-                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.radar ./ob.radar</p>
-                <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.ascii ./ob.ascii<br>
-                ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./fg<br>
-                ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat<br>
-                ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
-</blockquote>
+              <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>The <a href="wrfda_testdata.html#testdata_radar">radar case</a> is different from the CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. It utilizes a high-resolution domain over Taiwan, 61x51 gridpoints, 30 vertical levels, and 15km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/Radar).</a>
+                      <p>It features <a href="https://en.wikipedia.org/wiki/Typhoon_Fanapi">Typhoon Fanapi</a> striking the island on September 19, 2010.</p>
+                      <p>&nbsp;</p>
+                      <p>The procedure is the same as <a href="3dvar.html">Running WRFDA-3DVAR</a> except for an extra radar input file and adding and changing some namelist.input settings.</p>
+                      <p><strong><em>ob.radar</em></strong> is in plain text format. Open it with a text editor to see the content. Its format is simple, but the radar data preprocessing is not trivial and it is user's responsibility.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/radar.png"><img src="images/radar.png" alt="Domain of this test case" height="300"></a></td>
+                  </tr>
+                </table>
+                <blockquote>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.radar ./ob.radar</p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.ascii ./ob.ascii<br>
+                    ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./fg<br>
+                    ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat<br>
+                    ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
+                  </blockquote>
                 <p>In this exercise, be.dat was created for cv_options=7.</p>
+              </blockquote>
               <p><span class="bodyh1">Edit namelist.input</span>
               </p>
               <blockquote>
