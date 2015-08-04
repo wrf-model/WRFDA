@@ -64,8 +64,8 @@ a:active {
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr style="vertical-align: top;">
                     <td>
-                      <p>This case utilizes a continental USA domain, 90x60 gridpoints, 41 vertical levels, and 60km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/CONUS60). The exact area of the domain is shown at right.</a>
-                      <p>It features a storm which produced a <a href="https://en.wikipedia.org/wiki/2008_Super_Tuesday_tornado_outbreak">deadly tornado outbreak</a> across the Central/Southern USA on February 5, 2008.</p> 
+                      <p>This case utilizes a continental USA domain, 90x60 gridpoints, 41 vertical levels, and 60km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/CONUS60). The exact area of the domain is shown at right. All of today's exercises (OBSPROC, 3DVAR real and PSOT, GENBE) will use this case.</a>
+                      <p>It features a storm system which produced a <a href="https://en.wikipedia.org/wiki/2008_Super_Tuesday_tornado_outbreak">deadly tornado outbreak</a> across the Central/Southern USA on February 5, 2008.</p> 
                       <p>A very basic namelist file for running the tutorial case is available at <span class="stylecode">WRFDA/var/test/tutorial/namelist.input</span></p>
                       <blockquote>
                         <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</p>
@@ -118,7 +118,7 @@ a:active {
                 dy=60000,<br>
                 /<br>
                 </span> </p>
-</blockquote>
+              </blockquote>
               <p><span class="bodyh1">Run WRFDA-3DVAR (da_wrfvar.exe)</span></p>
               <blockquote>
                 <p>For convenience, link the executable to your current working directory. Then run the executable</p>
@@ -145,45 +145,60 @@ a:active {
                   <p class="stylecode">ncview increment.nc</p>
                 </blockquote>
                 <p>You should see differences in the fields P, QVAPOR, T, U, and V.</p>
-                <p>To create plots rather than a raw difference file, <span class="stylecode">WRFDA/var/graphics/ncl/WRF-Var_plot.ncl</span> and <span class="stylecode">WRFDA/var/graphics/ncl/WRF_contributed.ncl.test</span> can be used:<br>
-                <blockquote>
-                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF-Var_plot.ncl .<br>
-                  cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF_contributed.ncl.test .</p>
-                </blockquote>
-                <p>Edit <span class="stylecode">WRF-Var_plot.ncl</span> to provide the filenames, level index, field name, and what plot_data to plot for your case.</p>
-                <blockquote>
-                  <p class="stylecode">vi WRF-Var_plot.ncl</p>
-                  <p class="stylecode">......<br>
-                  first_guess = addfile(&quot;fg&quot;+&quot;.nc&quot;, &quot;r&quot;)<br>
-                  analysis = addfile(&quot;wrfvar_output&quot;+&quot;.nc&quot;, &quot;r&quot;)                <br>
-                  ......<br>
-                  kl = 18<br>
-                  var = "U"<br>
-                  fg = first_guess-&gt;U<br>
-                  an = analysis-&gt;U<br>
-                  plot_data = an - fg<br>
-                ; plot_data = an     <br></p>
-                </blockquote>
-                <p>Then run the ncl script</p>
-                <blockquote>
-                  <p class="stylecode">ncl WRF-Var_plot.ncl<br>
-                  display WRF-VAR_U_level_18.pdf</p>
-                </blockquote>
-                <p><span class="stylecode">WRFDA/var/graphics/ncl/plot_gts_omb_oma_simple.ncl</span> can be used to plot the contents of <span class="stylecode">gts_omb_oma_01.</span> </p>
-                <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_gts_omb_oma_simple.ncl .</p></blockquote>
-                <p>Edit plot_gts_omb_oma_simple.ncl to provide the date, filenames and options of your case.</p>
-                <blockquote>
-                  <p class="stylecode">......<br>
-                  plotdir = &quot;ncl_plot/&quot; ;where plot files will be created<br>
-                  expt = "my_plots" ; for output naming purposes, spaces are not allowed<br>
-                  datdir = "/kumquat/users/class105/DA/3dvar/" ; the path of the working directory<br>
-                  ......              <br>
-                  fgname = "fg"  ; for retrieving mapping info<br>
-                  ......              </p>
-                </blockquote>
-                <p>Run the NCL script</p>
-                  <blockquote><p class="stylecode">ncl plot_gts_omb_oma_simple.ncl</p></blockquote>
-                <p>This script may take a few minutes to complete; it will generate many plots depending on your settings. View the plots using <span class="stylecode">display</span>. Use spacebar and backspace to scroll through the different plots, showing OMB, OMA, and bias statistics for the observations at different pressure levels. There will be one output file per observation type; if you have time you can try plotting different observation types by editing the "proc_*" variables further down in the script.</p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>To create plots rather than a raw difference file, <span class="stylecode">WRFDA/var/graphics/ncl/WRF-Var_plot.ncl</span> and <span class="stylecode">WRFDA/var/graphics/ncl/WRF_contributed.ncl.test</span> can be used:<br>
+                      <blockquote>
+                        <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF-Var_plot.ncl .<br>
+                        cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF_contributed.ncl.test .</p>
+                      </blockquote>
+                      <p>Edit <span class="stylecode">WRF-Var_plot.ncl</span> to provide the filenames, level index, field name, and what plot_data to plot for your case.</p>
+                      <blockquote>
+                        <p class="stylecode">vi WRF-Var_plot.ncl</p>
+                        <p class="stylecode">......<br>
+                        first_guess = addfile(&quot;fg&quot;+&quot;.nc&quot;, &quot;r&quot;)<br>
+                        analysis = addfile(&quot;wrfvar_output&quot;+&quot;.nc&quot;, &quot;r&quot;)                <br>
+                        ......<br>
+                        kl = 18<br>
+                        var = "U"<br>
+                        fg = first_guess-&gt;U<br>
+                        an = analysis-&gt;U<br>
+                        plot_data = an - fg<br>
+                        ; plot_data = an     <br></p>
+                      </blockquote>
+                      <p>Then run the ncl script</p>
+                      <blockquote>
+                        <p class="stylecode">ncl WRF-Var_plot.ncl<br>
+                        display WRF-VAR_U_level_18.pdf</p>
+                      </blockquote>
+                      <p>You should see a plot similar to the one on the right.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/WRF-VAR_U_level_18.png"><img src="images/WRF-VAR_U_level_18.png" height="300"></a></td>
+                  </tr>
+                </table>
+                <p><br><span class="stylecode">WRFDA/var/graphics/ncl/plot_gts_omb_oma_simple.ncl</span> can be used to plot the contents of <span class="stylecode">gts_omb_oma_01.</span> </p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_gts_omb_oma_simple.ncl .</p></blockquote>
+                      <p>Edit plot_gts_omb_oma_simple.ncl to provide the date, filenames and options of your case.</p>
+                      <blockquote>
+                        <p class="stylecode">......<br>
+                        plotdir = &quot;ncl_plot/&quot; ;where plot files will be created<br>
+                        expt = "my_plots" ; for output naming purposes, spaces are not allowed<br>
+                        datdir = "/kumquat/users/$USER/DA/3dvar/" ; the path of the working directory<br>
+                        ......              <br>
+                        fgname = "fg"  ; for retrieving mapping info<br>
+                        ......              </p>
+                      </blockquote>
+                      <p>Run the NCL script</p>
+                        <blockquote><p class="stylecode">ncl plot_gts_omb_oma_simple.ncl</p></blockquote>
+                      <p>This script may take a few minutes to complete; it will generate many plots depending on your settings. View the plots using <span class="stylecode">display</span>. An example of one of these plots, showing the OMA and OMB of sounding observations around 500 hPa, can be seen at right. Use spacebar and backspace to scroll through the different plots, showing OMB, OMA, and bias statistics for the observations at different pressure levels. There will be one output file per observation type; if you have time you can try plotting different observation types by editing the "proc_*" variables further down in the script.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/my_plots_sound_2008020512-22.png"><img src="images/my_plots_sound_2008020512-22.png" height="300"></a></td>
+                  </tr>
+                </table>
                   <blockquote><p class="stylecode">display ncl_plot/my_plots_sound_2008020512.pdf</p></blockquote>
                 <p>There will be one output file per observation type; if you have time you can try plotting different observation types. You can also edit the "plevs" variable to change the way observations are arranged by pressure level.</p>
                 <p><span class="stylecode">WRFDA/var/graphics/ncl/plot_cost_grad_fn.ncl</span> can be used to plot cost function evolution.</p>
@@ -197,7 +212,7 @@ a:active {
                 </blockquote>
                 <p><br>Run the NCL script</p>
                   <blockquote><p class="stylecode">ncl plot_cost_grad_fn.ncl</p></blockquote>
-                <p>You will notice that by default, WRFDA only prints information about the first and last iterations to cost_fn and grad_fn, so the plot will just be a straight line. If you wish to see a more detailed plot, run the test case again, but with the option "<span class="stylecode">calculate_cg_cost_fn = .true.</span>" under the &wrfvar11 namelist section.</p>
+                <p>You will notice that by default, WRFDA only prints information about the first and last iterations to cost_fn and grad_fn, so <a href="images/cost_grad.png">the plots will just be straight lines</a>. If you wish to see <a href="images/cost_grad_detail.png">more detailed plots</a>, run the test case again, but with the option "<span class="stylecode">calculate_cg_cost_fn = .true.</span>" under the &amp;wrfvar11 namelist section.</p>
                 <p>Other <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF graphic tools</a> can be used as well.</p>
                 <p>The full list of namelist options, including those not specified by the user (and so were assigned default values), can be found in the <span class="stylecode">namelist.output.da</span> file. Most of these options will not be useful for most purposes (e.g. the large list of "AUXINPUT" variables), so a more condensed list of WRFDA-related namelist options can be found <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.7/users_guide_chap6.htm#_Description_of_Namelist_2">at the end of the Users' Guide</a>.</p>
               </blockquote>
@@ -247,7 +262,7 @@ a:active {
                   </p>
                 </li>
               
-                <li>Try running WRFDA using NCEP PREPBUFR data (<span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr.linux</span>) as the observation input
+                <li>Try running WRFDA using NCEP PREPBUFR data (<span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr</span>) as the observation input
                   <blockquote>
                     <p class="stylecode">ln -fs  /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/gdas1.t12z.prepbufr.nr ob.bufr</p>
                     <p class="stylecode">vi namelist.input</p>

@@ -83,7 +83,7 @@ a:active {
                     pseudo_var = 'u'<br>
                     /</p>
                 </blockquote>
-                <p>Note: pseudo_var can be u, v, t, p, q. If pseudo_var is q, then the reasonable values of pseudo_err and pseudo_val are 0.001 in order to have reasonable analysis increments.</p>
+                <p>Note: pseudo_var can be u, v, t, p, q. If pseudo_var is q, then reasonable values of pseudo_err and pseudo_val are 0.001 rather than 1.0.</p>
                 <p>By setting <span class="stylecode">num_pseudo = 1</span>, WRFDA will ignore real data and simply assimilate the pseudo-observation</p>
               </blockquote>
               <p><span class="bodyh1">Run WRFDA (da_wrfvar.exe)</span> </p>
@@ -106,14 +106,32 @@ a:active {
               </blockquote>
               <span class="bodyh1">Graphics</span>
               <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.<br><br>
                 <p>Some useful NCL scripts for this exercise are:<br>
                   <br>
                   WRFDA/var/graphics/ncl/WRF-Var_plot.ncl<br>
                   WRFDA/var/graphics/ncl/WRF_contributed.ncl.test<br>
                   WRFDA/var/graphics/ncl/psot_xy_auto.ncl<br>
                   WRFDA/var/graphics/ncl/psot_xz_auto.ncl<br>
-                  WRFDA/var/graphics/ncl/psot_yz_auto.ncl
+                  WRFDA/var/graphics/ncl/psot_yz_auto.ncl<br>
+                  WRFDA/var/graphics/ncl/psot_h.ncl
                 </p>
+                <p>The plot at right was generated using psot_h.ncl using the following settings:</p>
+                <blockquote>
+                  <p class="stylecode">   works = "pdf"<br>
+                    expt = ""<br>
+                    directory = "/kumquat/users/$USER/DA/singleob/"<br>
+                    first_guess     = addfile(directory+"fg.nc", "r")<br>
+                    analysis        = addfile(directory+"wrfvar_output.nc", "r")<br>
+                    kl=12
+                  </p>
+                </blockquote>
+                <p>Using these settings as a guide, try out the other scripts listed above.</p>
+                    <td class="bodytext"><a href="images/psot_h.png"><img src="images/psot_h.png" height="300"></a></td>
+                  </tr>
+                </table>
               </blockquote>
             </blockquote>
             <blockquote>

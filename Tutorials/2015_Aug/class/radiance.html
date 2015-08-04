@@ -58,17 +58,24 @@ a:active {
                                        cd /kumquat/users/${USER}/DA/radiance</p>
               </blockquote></blockquote>
               <p><span class="bodyh1">Input files</span> </p>
-              <blockquote>
-                <p>For radiance assimilation practice, we will be using a different case than the day 1 exercises, which can be found in /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case. This is a case from late December, 2013, when a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">major extratropical cyclone</a> impacted northwestern Europe.</p>
-                <p>Keep in mind that if you <a href="compile.html">compiled WRFDA yourself</a>, additional settings (specifically, environment variables for BUFR and one or both radiative transfer models) must be specified at compile time to utilize radiance data. This has been done for you in the pre-compiled code.</p>
-                <p>Radiance assimilation for 3DVAR is much the same procedure as <a href="3dvar.html">Running WRFDA-3DVAR with conventional observations</a>. To begin this exercise, link/copy the basic input files above that you should have been familiar with by now:</p>
-                <blockquote>
-                  <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL<br>
-                                       ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/obs_gts_2013-12-23_00:00:00.3DVAR ./ob.ascii<br>
-                                       ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/be/be.dat ./be.dat<br>
-                                       cp -p /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/rc/2013122300/wrfinput_d01 ./fg</p>
-                </blockquote>
-                <p>In addition, the following extra files are required for radiance assimilation:</p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                    <blockquote>
+                      <p>For radiance assimilation practice, we will be using a different case than the day 1 exercises, which can be found in /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case. This is a case from late December, 2013, when a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">major extratropical cyclone</a> impacted northwestern Europe. The domain for this case is plotted at right.</p>
+                      <p>Keep in mind that if you <a href="compile.html">compiled WRFDA yourself</a>, additional settings (specifically, environment variables for BUFR and one or both radiative transfer models) must be specified at compile time to utilize radiance data. This has been done for you in the pre-compiled code.</p>
+                      <p>Radiance assimilation for 3DVAR is much the same procedure as <a href="3dvar.html">Running WRFDA-3DVAR with conventional observations</a>. To begin this exercise, link/copy the basic input files above that you should have been familiar with by now:</p>
+                      <blockquote>
+                        <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL<br>
+                                             ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/obs_gts_2013-12-23_00:00:00.3DVAR ./ob.ascii<br>
+                                             ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/be/be.dat ./be.dat<br>
+                                             cp -p /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/rc/2013122300/wrfinput_d01 ./fg</p>
+                      </blockquote>
+                      <p>In addition, the following extra files are required for radiance assimilation:</p>
+                    </td>
+                    <td class="bodytext"><a href="images/arctic.png"><img src="images/arctic.png" height="300"></a></td>
+                  </tr>
+                </table>
               </blockquote>
               <ul>
                 <li>Radiance data in NCEP BUFR format</li>
@@ -107,7 +114,7 @@ a:active {
               <p><span class="bodyh1">Edit namelist.input</span> </p>
               <blockquote>
                 <p>A sample namelist.input is provided here: <a href="namelist.input.radiance">namelist.input</a></p>
-                <p>If you'd like a challenge, try creating the namelist yourself from scratch. The important settings for this case are listed below:</p>
+                <p>If you'd like a challenge, try creating the namelist yourself from scratch. The important settings for this case are listed below. Otherwise you can copy it from /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/namelist.input.radiance</p>
                 <blockquote>
                   <p><span class="stylecode">vi namelist.input </span>(pay special attention to the following radiance-related settings)</p>
                   <p><span class="stylecode">&amp;wrfvar1<br>
@@ -180,7 +187,7 @@ a:active {
                     /<br>
                     &amp;fdda<br>
                     /<br>
-                    &amp;domain<br>
+                    &amp;domains<br>
                     e_we &nbsp; = 181,<br>
                     e_sn &nbsp; = 181,<br>
                     e_vert = 41,<br>
@@ -192,6 +199,7 @@ a:active {
                     &amp;tc<br>
                     /<br>
                     &amp;physics<br>
+                    sf_surface_physics = 2,<br>
                     /<br>
                     &amp;scm<br>
                     /<br>
@@ -228,6 +236,9 @@ a:active {
               </blockquote>
               <span class="bodyh1">Graphics</span>
               <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
                 <p>The script <em>WRFDA/var/scripts/da_rad_diags.ksh</em> can be used to generate a number of helpful plots and graphs for visualizing radiance assimilation statistics.</p>
                 <p class="stylecode">WRFDA/var/scripts/da_rad_diags.ksh<br>
                   export START_DATE=2013122300<br>
@@ -248,8 +259,12 @@ a:active {
                   set -A INSTIDS noaa-16-amsua noaa-16-amsub</p>
                 <p>Also change the following line (around line 150):
                   ln -sf $VAR_RUN_DIR1/$DATE/$FILE_PREFIX* .  --&gt;  ln -sf $VAR_RUN_DIR1/$FILE_PREFIX* .
-                <p>A number of plots with the file extention ".ncgm" will be created in the "diag" directory. Use the command "idt" to view these .ncgm files.</p>
-                <p>You have now completed the basic radiance tutorial! You can either <a href="wrfda_sessions.html#session_2">move on to the next exercise</a>, or try the additional practice below:</p>
+                <p>A number of plots with the file extention ".ncgm" will be created in the "diag" directory. Use the command "idt" to view these .ncgm files. The plot at right shows the observed values for AMSU-A Channel 5 on NOAA-16 (after thinning was applied); you should see many plots just like this for other channels and instruments.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/noaa-16-amsua_2013122300-0.png"><img src="images/noaa-16-amsua_2013122300-0.png" height="300"></a></td>
+                  </tr>
+                </table>
+                <p class="body"><br>You have now completed the basic radiance tutorial! You can either <a href="wrfda_sessions.html#session_2">move on to the next exercise</a>, or try the additional practice below:</p>
               </blockquote>
               <p class="bodyh2"><a name="advanced">Additional</a></p>
               <ul>
