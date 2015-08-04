@@ -154,7 +154,9 @@ a:active {
             </blockquote>
 <span class="bodyh1">Graphics</span>
             <blockquote>
-              <p>You can use an NCL script, provided at <em>WRFDA/var/graphics/ncl/plot_ob_ascii_loc.ncl</em>, to see the locations of observations contained in <em>obs_gts_2008-02-05_12:00:00.3DVAR</em></p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>You can use an NCL script, provided at <em>WRFDA/var/graphics/ncl/plot_ob_ascii_loc.ncl</em>, to see the locations of observations contained in <em>obs_gts_2008-02-05_12:00:00.3DVAR</em><br><br>
               <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_ob_ascii_loc.ncl .</p></blockquote>
               <p>Edit plot_ob_ascii_loc.ncl to provide the date, filenames and options of your case.</p>
               <blockquote>
@@ -169,7 +171,10 @@ a:active {
               <p>Run the NCL script</p>
                 <blockquote><p class="stylecode">ncl plot_ob_ascii_loc.ncl</p></blockquote>
               <p>View the plot using <span class="stylecode">display</span>. Use spacebar to scroll through the plots of different observation types.</p>
-                <blockquote><p class="stylecode">display obsloc2008020512.pdf</p></blockquote>
+                <blockquote><p class="stylecode">display obsloc2008020512.pdf</p></blockquote></td>
+                    <td class="bodytext"><a href="images/obsloc2008020512.png"><img src="images/obsloc2008020512.png" alt="Locations of METAR observations for tutorial case" height="300"></a></td>
+                  </tr>
+                </table>
             </blockquote>
             <p class="style2">If you were successful, then congratulations, you are done with the basic OBSPROC exercise! <b>You can now move on to <a href="wrfda_sessions.html#session_1">the next exercise for this practice session</a>.</b></p>
             <p class="style2">You can return here later for the advanced practice on observation preprocessing below.</p>

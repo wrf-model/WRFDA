@@ -123,19 +123,19 @@ a:active {
               <p><span class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/4dvar/namelist.input .</span></p>
               <p class="stylecode">vi namelist.input</p>
               <p>Pay special attention to the following namelist variables.</p>
-                <p><span class="stylecode">&amp;wrfvar1<br>
-                  var4d=true,<br>
-                  var4d_lbc=true,<br>
-                  var4d_bin=3600,<br>
-                  /<br>
-                  &amp;wrfvar18<br>
-                  analysis_date='2005-07-16_00:00:00&quot;,<br>
-                  /<br>
-                  &amp;wrfvar21<br>
-                  time_window_min=&quot;2005-07-16_00:00:00&quot;,<br>
-                  /<br>
-                  &amp;wrfvar22</span><br>
-                  <span class="stylecode">time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
+              <p><span class="stylecode">&amp;wrfvar1<br>
+                var4d=true,<br>
+                var4d_lbc=true,<br>
+                var4d_bin=3600,<br>
+                /<br>
+                &amp;wrfvar18<br>
+                analysis_date='2005-07-16_00:00:00&quot;,<br>
+                /<br>
+                &amp;wrfvar21<br>
+                time_window_min=&quot;2005-07-16_00:00:00&quot;,<br>
+                /<br>
+                &amp;wrfvar22</span><br>
+                <span class="stylecode">time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
                 /<br>
                 &amp;time_control<br>
                 run_hours=6,<br>
@@ -208,7 +208,7 @@ a:active {
                 time_window_min=&quot;2008-02-05_12:00:00&quot;,<br>
                 /<br>
                 &amp;wrfvar22<br>
-                time_window_max=&quot;2005-07-16_06:00:00&quot;,<br>
+                time_window_max=&quot;2008-02-05_18:00:00&quot;,<br>
                 /<br>
                 &amp;time_control<br>
                 run_hours=6,<br>
@@ -223,7 +223,7 @@ a:active {
                 interval_seconds=21600,<br>
                 /<br>
                 &amp;domains<br>
-                time_step=600,<br>
+                time_step=300,<br>
                 e_we=90,<br>
                 e_sn=60,<br>
                 e_vert=41,<br>
@@ -263,7 +263,7 @@ a:active {
               </li>
             </ul>
             <br>
-            <p><b>NOTE: The CONUS60 case will take more than 15 minutes to complete on the classroom computers, even with a low value of ntmax=4.</b> 4DVAR is very computationally expensive! This is why a much smaller, simplified case is provided for the basic tutorial above.</p>
+            <p><b>NOTE: The CONUS60 case will take more than 15 minutes to complete on the classroom computers, even with a low value of ntmax=4.</b> This is why a much smaller, simplified case is provided for the basic tutorial above.</p>
               <p>&nbsp;</p>
 </blockquote>
           <!-- InstanceEndEditable --><br>

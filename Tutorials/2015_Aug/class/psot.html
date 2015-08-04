@@ -94,11 +94,16 @@ a:active {
               <blockquote>
                 <p>As with every run of WRFDA, you should first make sure that the <span class="stylecode">rsl.out.0000</span> file ends with "<span class="stylecode">***&nbsp;WRF-Var&nbsp;completed&nbsp;successfully&nbsp;***</span>".</p>
                 <p>Check the <span class="stylecode">statistics</span> file to view diagnostics related to your pseudo-obs run.</p>
-                <p>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.</p>
-                <blockquote>
-                  <p class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
-                                       ncview increment.nc</p>
-              </blockquote></blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.<br><br>
+                      <span class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
+                                              ncview increment.nc</span><br><br>
+                      To the right you can see what your pressure perturbation should look like with the above settings (click the image for a larger version). Try using "v" instead of "u" as your test variable. How would you expect the pressure perturbation to change? (<a href="images/psot_ncview_v.P.png">click here to see</a>)</td>
+                    <td class="bodytext"><a href="images/psot_ncview_u.P.png"><img src="images/psot_ncview_u.P.png" alt="Pressure perturbation from PSOT with the above settings." height="300"></a></td>
+                  </tr>
+                </table>
+              </blockquote>
               <span class="bodyh1">Graphics</span>
               <blockquote>
                 <p>Some useful NCL scripts for this exercise are:<br>
