@@ -153,6 +153,11 @@
                    <li>PGI version 14+: 4DVAR compilation fails</li></ul></blockquote>
             <p class="bodytext"><strong>No solution available at this time; use another compiler if possible</strong></p>
             <a name="V3_7_run"><p class="pagetitle">Run-time Errors</p>
+            <h1> Errors and bad results with the "rttov_emis_atlas_ir" option (posted 2015-08-12) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               For 4DVAR radiance assimilation with RTTOV, using the <kbd>rttov_emis_atlas_ir=1</kbd> option can cause WRFDA to crash, and even if it does not crash the results are likely bad.</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the file <code>WRFDA/var/da/da_radiance/da_get_innov_vector_rttov.inc</code> with this copy: (<a href="fixes/v37/da_get_innov_vector_rttov.inc">da_get_innov_vector_rttov.inc</a>). Then recompile WRFDA.</p>
             <h1> Bad results with new "use_radar_rqv" option (posted 2015-05-19) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                In certain weather regimes (especially tropical), radar assimilation with <kbd>use_radar_rqv=.true.</kbd> will incorrectly result in no clouds.</p>
