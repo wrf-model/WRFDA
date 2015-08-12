@@ -46,8 +46,9 @@ a:active {
             <p><span class="body">Reference: <a href="http://www2.mmm.ucar.edu/wrf/users/docs/user_guide_V3/users_guide_chap6.htm#precipitation">Precipitation Data Assimilation in the WRFDA Users' Guide</a></span></p>
 <p>              <span class="bodyh1">Source code</span>            </p>
             <blockquote>
-                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so.</p>
-                <p><em>WRFDA/var/build/da_wrfvar_4dvar.exe</em> (this is renamed from da_wrfvar.exe) is the executable that will be used in this 4D-VAR session. Rainfall can <em>only</em> be assimilated with 4D-VAR.</p>
+                <p>Get the <a href="wrfda_code.html#4dvar">pre-compiled 4dvar code</a>, if you have not done so.</p>
+                <p class="body">Rainfall can <em>only</em> be assimilated with 4DVAR, so be sure that is the code you are using for this exercise.</p>
+                <p><em>WRFDA/var/build/da_wrfvar.exe</em> is the executable that will be used in this practice session.</p>
             </blockquote>
             <p><span class="bodyh1">Working directory</span></p>
               <blockquote>
@@ -94,7 +95,7 @@ a:active {
                 </blockquote>
                 <p><span class="bodyh1">Run 4D-VAR with Accumulated Rainfall Observations</span></p> 
                 <blockquote>
-                  <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar_4dvar.exe </p>
+                  <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe </p>
                   <p> <span style="color:red">Note!</span> In the provided namelist, we haven't set a small limit for ntmax (maximum number of iterations of the cost function minimization) like we did for the original practice 4DVAR case. Therefore, on the classroom computers this case will take some time, probably more than 10 minutes. If you would rather move on quickly and do not care about reaching the full minimization, set ntmax=5; this will still not be instantaneous, but will only take a few minutes.</p>
                 </blockquote>
               </blockquote>

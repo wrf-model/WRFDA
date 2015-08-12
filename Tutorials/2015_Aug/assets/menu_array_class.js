@@ -305,8 +305,8 @@ PlainStyle2,
 ,
 ,"OBSPROC ","../class/obsproc.html",,,1
 ,"3DVAR-realdata","../class/3dvar.html",,,1
-,"3DVAR-PSOT ","../class/psot.html",,,1
-,"GEN_BE ","../class/genbe.html",,,0
+,"GEN_BE ","../class/genbe.html",,,1
+,"3DVAR-PSOT ","../class/psot.html",,,0
 ])
 
 addmenu(menu=[

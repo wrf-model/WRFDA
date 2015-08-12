@@ -133,7 +133,7 @@ a:active {
               <p>Pay special attention to the following namelist variables.</p>
               <p><span class="stylecode">&amp;wrfvar1<br>
                 var4d=true,<br>
-                var4d_lbc=true,<br>
+                var4d_lbc=false,<br>
                 var4d_bin=3600,<br>
                 /<br>
                 &amp;wrfvar18<br>
@@ -178,19 +178,19 @@ a:active {
             <span class="bodyh1">Running 4D-VAR</span>
             <blockquote>
               <p><span class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe &gt;&amp; var4d.log &amp;</span></p>
-<p class="stylecode">&nbsp; </p>
-              <p><span style="color:red">Helpful tip!</span>, after submitting an MPI job like this, you don't have to sit around without being able to see the progress of your run. After submitting the job, hit control+z on your keyboard to suspend the job, then type "bg" and enter to continue running the job in the background. Now, you can use the "tail" command to see the log files in real time!</p>
+              <p class="stylecode">The "&amp;" at the end of the above command tells WRFDA to run in the background. Because the command line is now usable even as WRFDA runs, you can use the "tail" command to follow the progress of WRFDA as it writes the log files: </p>
               <p class="stylecode">tail -f rsl.out.0000</span>
+              <p><span style="color:red">Helpful tip!</span> If you didn't include the "&amp;" at the end of your run command, you can still tell the program to run in the background. After submitting an MPI job like this, if you decide you don't want to sit around without being able to see the progress of your run hit control+z on your keyboard. This will suspend the job; to run it in the background, type "bg" and enter. Now, you can use the "tail" command to see the log files in real time!</p>
               <p>Press control+c at any time to quit "tail"</p>
             </blockquote>
             <span class="bodyh1">Using lateral boundary control variables</span>
             <blockquote>
               <p>WRFDA 4DVAR has the option to add an additional cost function term based on the lateral boundary conditions. You can activate it by setting <em>var4d_lbc=true</em> in <em>&amp;wrfvar1</em>, and linking the following files.</p>
               <blockquote>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfavn_d01 ./fg02</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071606/wrfinput_d01 ./fg02</span></p>
                 <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
               </blockquote>
-              <p>"fg02" and "ana02" are the same file, and are the "first guess" field for the same domain at the <b>end</b> of the 4DVAR assimilation window (in this case, the analysis at 2005-07-16 06Z.</p>
+              <p>"fg02" and "ana02" are the same file, and are the "first guess" field for the same domain at the <b>end</b> of the 4DVAR assimilation window (in this case, the analysis at 2005-07-16 06Z).</p>
               <p class="body"><br>You are now done with the basic 4DVAR practice case. If you still have time, you can go back to the <a href="radiance.html#advanced">radiance practice case</a> to try some of the additional exercises (if you have not already done so), or try the additional 4DVAR exercises below:<br><br></p>
             </blockquote>
             <p class="bodyh2"><a name="advanced">Additional practice</a></p>

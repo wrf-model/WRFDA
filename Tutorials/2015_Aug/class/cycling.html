@@ -44,28 +44,35 @@ a:active {
             <span class="pagetitle">Running WRFDA and WRF cycling system</span>
             <blockquote>
               <p><span class="bodyh1">Source code</span></p>
-                <p>Get the <a href="wrfda_code.html">WRFDA pre-compiled code</a> and <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class/source_code.php">WRF pre-compiled code</a>, if you have not done so. <span class="stylecode">WRFDA/var/build/da_wrfvar.exe</span>, <span class="stylecode">WRFDA/var/build/da_update_bc.exe</span>, and <span class="stylecode">WRFV3/main/wrf.exe</span> are the three executables that will be used in this session.</p>
+                <p>Get the <a href="wrfda_code.html">WRFDA pre-compiled code</a> and <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class_July2015/source_code.php">WRF pre-compiled code</a>, if you have not done so. <span class="stylecode">WRFDA/var/build/da_wrfvar.exe</span>, <span class="stylecode">WRFDA/var/build/da_update_bc.exe</span>, and <span class="stylecode">WRFV3/main/wrf.exe</span> are the three executables that will be used in this session.</p>
                 <p>Three scripts for running the cycling system are also provided for this practice session:</p>
-                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong><a href="run_wrf_from_real_csh.html">run_wrf_from_real.csh</a></strong><br>
-                  /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong><a href="run_wrfda_csh.html">run_wrfda.csh</a></strong><br>
-                  /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong><a href="run_wrf_from_wrfda_csh.html">run_wrf_from_wrfda.csh</a></strong></p>
+                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/cycling/<strong><a href="run_wrf_from_real_csh.html">run_wrf_from_real.csh</a></strong><br>
+                  /kumquat/wrfhelp/DATA/WRFDA/cycling/<strong><a href="run_wrfda_csh.html">run_wrfda.csh</a></strong><br>
+                  /kumquat/wrfhelp/DATA/WRFDA/cycling/<strong><a href="run_wrf_from_wrfda_csh.html">run_wrf_from_wrfda.csh</a></strong></p>
               <p><span class="bodyh1">Input data</span></p>
-                <p>wrfbdy, wrfinput and observations for 10 initial times are provided in <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case</span></p>
-                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong>rc</strong></span> contains wrfbdy and wrfinput from WPS/real program.</p>
-                <p> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong>ob</strong></span> contains observations (including radiance data, NCEP PREPBUFR file, ob.ascii processed by OBSPROC). You can set up your WRFDA runs with the observations you are interested in.</p>
-                <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/<strong>be</strong></span> contains the background error statistics file for cv_options=5.</p>
-                <p>This test forecast will follow the life cycle of a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">powerful cyclone that impacted western Europe</a> in late-December, 2013.</p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>wrfbdy, wrfinput and observations for 11 initial times (2013-12-23 00z to 2013-12-25 12z)  are provided in <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/cycling</span>, though you should probably only run a cycle or two due to time constraints; each WRF forecast step takes several minutes.</p>
+                      <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/cycling/<strong>rc</strong></span> contains wrfbdy and wrfinput from WPS/real program.</p>
+                      <p> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/cycling/<strong>ob</strong></span> contains observations (including radiance data, NCEP PREPBUFR file, ob.ascii processed by OBSPROC). You can set up your WRFDA runs with the observations you are interested in.</p>
+                      <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/cycling/<strong>be</strong></span> contains the background error statistics file for cv_options=5.</p>
+                      <p>This test forecast will follow the life cycle of a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">powerful cyclone that impacted western Europe</a> in late-December, 2013. This is the same storm as the radiance and verification exercises, but the domain is smaller to allow for easier running on classroom computers. In addition to the 60-km outer domain, there is a 30-km inner domain for practicing multi-domain cycling below.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/cycling.png"><img src="images/cycling.png" height="300"></a></td>
+                  </tr>
+                </table>
               <span class="bodyh1">Procedures</span>
               <p>&nbsp;</p>
               <blockquote>
-                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/run_*.csh ${your_script_dir}</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/cycling/run_*.csh ${your_script_dir}</p>
               </blockquote>
               <p>Edit the run*csh files to set the proper paths.</p>
               <p>It is recommended that you read through all the scripts to understand what files are created and used for cycling runs.</p>
               <p><strong>For 1-domain configuration</strong></p>
               <blockquote>
-                <p>For the first cycle, run <span class="stylecode">run_wrf_from_real.csh</span> with "DATE = 2013010100" to get 6-hour forecast valid at 2013122306. This forecast should take about 5 minutes to complete on the classroom machines.</p>
-                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013120106 with the 6-hour forecast as the first guess. The assimlation process should take less than a minute on the classroom machines.</p>
+                <p>For the first cycle, run <span class="stylecode">run_wrf_from_real.csh</span> with "DATE = 2013122300" to get 6-hour forecast valid at 2013122306. This forecast should take about 5 minutes to complete on the classroom machines.</p>
+                <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122306 with the 6-hour forecast as the first guess. The assimlation process should take less than a minute on the classroom machines.</p>
                 <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122306.</p>
                 <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122312</p>
                 <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122312</p>
@@ -74,6 +81,7 @@ a:active {
               <p>&nbsp;</p>
               <p><strong>For 2-domain configuration</strong></p>
               <blockquote>
+                <p class="body">Be sure you have plenty of time for this part; the WRF forecast step for 2 domains takes about 10 minutes on the classroom computers.</p>
                 <p>For the first cycle, run run_wrf_from_real.csh with DATE = 2013122300,  MAX_DOM     = 2</p>
                 <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122306, DOMAIN_ID    = 01</p>
                 <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122306, DOMAIN_ID    = 02</p>

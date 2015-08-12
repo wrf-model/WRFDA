@@ -43,21 +43,20 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <p class="pagetitle">Forecast Sensitivity to Observations</p>
             <p>&nbsp;</p>
-            <p><span class="body">Reference: <a href="../docs/WRFDA_sensitivity.pdf">Download the tutorial presentation</a> and the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2012_July/docs/README_FSO_v3.3.pdf">README file</a></span></p>
+            <p><span class="body">References: <li><a href="../docs/WRFDA_Verification_Tools.pdf#23">This year's brief introduction</a></li><li><a href="../../2014_July/docs/WRFDA_sensitivity.pdf">Last year's more comprehensive presentation</a></li><li><a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2012_July/docs/README_FSO_v3.3.pdf">FSO documentation</a> (a bit dated, but contains a lot of extra, useful information)</li></span></p>
 <p>              <span class="bodyh1">Source code</span>            </p>
             <blockquote>
                 <p>WRFDA and WRFPLUS are needed for this practice.</p>
-                <p>The pre-compiled WRFDA and WRFPLUS can be accessed from</p>
-                <p>/kumquat/wrfhelp/SOURCE_CODE/WRFDA</p>
+                <p><a href="wrfda_code.html">Get the pre-compiled WRFDA <b>and WRFPLUS</b></a> from <em>/kumquat/wrfhelp/PRE_COMPILED/WRFDA</em>. <b>This is the only exercise where WRFPLUS is directly needed, so make sure you copy that pre-compiled code to your working directory as well</b>.</p>
                 <p>The FSO data, including the main script, can be found in /kumquat/wrfhelp/DATA/WRFDA/FSO</p>
                 <p><strong><em>wrapper_run_fso.ksh</em></strong> is the main script that will be used in this practice.</p>
-<p>The <strong><em>wrapper_run_fso.ksh</em></strong> calls other several scripts that are in the /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/scripts and /kumquat/wrfhelp/SOURCE_CODE/WRFDA/var/graphics/ncl directories.</p>
+<p>The <strong><em>wrapper_run_fso.ksh</em></strong> calls several other scripts that are in the /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts and /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl directories. This scripts are part of the WRFDA TOOLS package, which is not part of the main WRFDA source code; if you are working from home, you will have to <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">download the TOOLS package</a> separately.</p>
 <p>For example,<br>
-&nbsp;&nbsp;var/scripts/da_run_sensitivity.ksh<br>
-&nbsp;&nbsp;var/scripts/da_run_wrf.ksh<br>
-&nbsp;&nbsp;var/scripts/da_run_wrfvar.ksh<br>
-&nbsp;&nbsp;var/graphics/ncl/adj_forcing.ncl<br>
-&nbsp;&nbsp;var/graphics/ncl/adj_diagnostic.ncl<br>
+&nbsp;&nbsp;scripts/da_run_sensitivity.ksh<br>
+&nbsp;&nbsp;scripts/da_run_wrf.ksh<br>
+&nbsp;&nbsp;scripts/da_run_wrfvar.ksh<br>
+&nbsp;&nbsp;graphics/ncl/adj_forcing.ncl<br>
+&nbsp;&nbsp;graphics/ncl/adj_diagnostic.ncl<br>
 are some of the scripts involved in the FSO procedures.
 </p>
 <p>The whole scripting suite is quite complicated and might take some time for first users to get familiar with and to be able to apply to their own applications.</p>
@@ -76,6 +75,8 @@ are some of the scripts involved in the FSO procedures.
                   export RUN_WRFVAR=<strong>true</strong><br>
                   export RUN_UPDATE_BC=<strong>true</strong></p>
                 <p>And ensure the following lines are commented (with a "#" at the beginning of the line):</p>
+export INITIAL_DATE=2007010100
+export FINAL_DATE=2007010112
                 <p>#export RUN_ADJ_SENS=false<br>
                   #export RUN_OBS_IMPACT=false<br>
                   #export NL_USE_LANCZOS=true<br>
@@ -84,12 +85,15 @@ are some of the scripts involved in the FSO procedures.
                 <p>                ......<br>
                   export NUM_PROCS=6</p>
                 <p>                ......<br>
+                  export INITIAL_DATE=2007010100<br>
+                  export FINAL_DATE=2007010112<br>
+                <p>                ......<br>
                   export REL_DIR=/kumquat/users/$USER/DA/<br>
                   export DAT_DIR=$REL_DIR/FSO<br>
                   export WRFPLUS_DIR=$REL_DIR/WRFPLUSV3<br>
                   export WRFVAR_DIR=$REL_DIR/WRFDA<br>
                   export WRFNL_DIR=$WRFPLUS_DIR<br>
-                  export TOOLS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/
+                  export TOOLS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/<br>
                   export SCRIPTS_DIR=$TOOLS_DIR/scripts<br>
                   export GRAPHICS_DIR=$TOOLS_DIR/graphics/ncl<br>
                   export BUILD_DIR=$WRFVAR_DIR/var/build<br>
@@ -118,9 +122,21 @@ export RUN_OBS_IMPACT=<span style="color:red">true</span></p>
               <p>  <br>
                 <span class="bodyh1">Check Output </span></p>
               <blockquote>
-                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. You can quickly view this file using ncview to ensure there is nothing strange going on. plot_adj_sensitivity.ncl, which can be found in the TOOLS package, can be used to make some plots.</p>
+                <p class="body">NOTE: The error trapping in FSO is not very good, so for certain problems the system may still report "SUCCESS". Make sure all the files below were created, or else you may have set some variables incorrectly.</p>
+                <p>/kumquat/users/$USER/DA/FSO/expt/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. You can quickly view this file using ncview to ensure there is nothing strange going on (the TL/A variables should look <a href="images/ncview.TL_U.png">like this</a>, while the NL variables should look <a href="images/ncview.NL_U.png">like this</a>. <!--plot_adj_sensitivity.ncl, which can be found in the TOOLS package, can be used to make some plots. CANT GET THIS TO WORK BECAUSE OF STUPID XLAT PROBLEM--></p>
                 <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/index.html contains the text output from running var/graphics/ncl/adj_diagnostics.ncl to get the <strong>diagnostics of error reduction in the forecasts from Xb (background) to Xa (analysis)</strong>.</p>
                 <p>/kumquat/users/$USER/DA/FSO/run/2007010100/obsimpact/rsl.out.0000 contains the <strong>cumulated impact of each observation type on the forecast errors</strong>.</p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                <p>There are some ncl scripts provided in FSO/plot. Try modifying the initial values to get the plots to work for yourself: 
+                  <li><em>plot_gts_omb_oma.ncl</em> will output plots of the observations used for the experiment by type and pressure level.</li>
+                  <li><em>plot_impact_by_obsnum_time_average.ncl</em> will create the file "impact_by_obs2007010100-2007010112.pdf". Use "display" to view this file, which will show the observation impact on the forecast by observation type. If all has gone well, your plot should look like the one at right:</li>
+                  <li><em>plot_levs_impact.ncl</em> will create the file "multi_levs_sound_2007010100.pdf". Use "display" to view this file, which will show the observation impact on the forecast by observation type at each vertical level.</li>
+                    </td>
+                    <td class="bodytext"><a href="images/impact_by_obs2007010100-2007010112-0.png"><img src="images/impact_by_obs2007010100-2007010112-0.png" height="300"></a></td>
+                  </tr>
+                </table>
               </blockquote>
 <!-- InstanceEndEditable --><br>
             
