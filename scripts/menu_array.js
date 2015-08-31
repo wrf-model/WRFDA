@@ -183,6 +183,7 @@ PlainStyle,
 ,"Publications & Documentation","show-menu=Pub",,,1
 ,"<div style='margin-top:6px'>Links</div>","show-menu=Links",,,1
 ,"<div style='margin-top:6px'>Internal</div>","http://www2.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
+,"WRFDA Testbeds","show-menu=Testbeds",,,1
 ])
 
 
@@ -398,6 +399,32 @@ PlainStyle2,
 ,"NCAR website","http://www.ncar.ucar.edu/",,,0
 ,"UCAR website","http://www.ucar.edu/ucar/",,,0
 ])
+
+addmenu(menu=[
+"Testbeds",
+,
+,
+200,
+1,
+,
+PlainStyle2,
+0,
+,
+"Fade(duration=0.5);Shadow(color=777777, Direction=135, Strength=5)",
+0,
+0,
+0,
+,
+,
+0,
+0,
+,
+,
+0,
+,
+,"WRFDA realtime forecast","http://www2.mmm.ucar.edu/wrf/users/wrfda/rt_wrfda/conus15km",,,1
+])
+
 
 addmenu(menu=[
 "Download",
