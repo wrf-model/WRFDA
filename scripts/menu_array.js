@@ -280,10 +280,7 @@ PlainStyle2,
 ,
 0,
 ,
-,"WRFDA community support","http://www2.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
-,"Known problems","http://www2.mmm.ucar.edu/wrf/users/wrfda/known-problems.html",,,0
-,"System requirements","http://www2.mmm.ucar.edu/wrf/users/wrfda/requirements.html",,,0
-,"wrfhelp","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
+,"WRFDA community support","show-menu=support_sub",,,0
 ,"wrf-news","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfnews.html",,,0
 ,"wrf-users","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfusers.html",,,0
 ,"Become a registered user","http://www2.mmm.ucar.edu/wrf/users/wrfda/regist.html",,,1
@@ -295,6 +292,34 @@ PlainStyle2,
 //,"Users information","http://www2.mmm.ucar.edu/mm5/institutes.html",,,0
 ])
 
+addmenu(menu=[
+"support_sub",
+,
+,
+120,
+1,
+,
+PlainStyle2,
+0,
+,
+"Fade(duration=0.5);Shadow(color=777777, Direction=135, Strength=5)",
+0,
+0,
+0,
+,
+,
+0,
+0,
+,
+,
+0,
+,
+,"Support overview","http://www2.mmm.ucar.edu/wrf/users/wrfda/support.html",,,0
+,"Frequently asked questions","http://www2.mmm.ucar.edu/wrf/users/wrfda/faq.html",,,0
+,"Known problems","http://www2.mmm.ucar.edu/wrf/users/wrfda/known-problems.html",,,0
+,"System requirements","http://www2.mmm.ucar.edu/wrf/users/wrfda/requirements.html",,,0
+,"wrfhelp","http://www2.mmm.ucar.edu/wrf/users/wrfda/wrfhelp.html",,,0
+])
 
 addmenu(menu=[
 "Pub",
