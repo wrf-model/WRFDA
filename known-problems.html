@@ -478,10 +478,16 @@
             <blockquote>
               <p class="bodytext">The following compilers have bugs that will cause some or all versions WRFDA and/or WRFPLUS to fail. If no solution is listed, you must update/downgrade to a different compiler version, or use a different compiler.</p>
             <p class="bodytext">Be sure your compiler meets the <a href="requirements.html#compilers">minimum requirements</a>. <br></p>
-              <ul class="bodytext"><li>Intel (ifort) version 14.0.3 (<a href="https://software.intel.com/en-us/forums/topic/506826">details</a>).
+            <h1>Intel (ifort)</h1>
+              <ul class="bodytext">
+                <li>Intel (ifort) version 15.0.0 
+                  <ul><li><em>No solution at this time</em></li></ul></li>
+                <li>Intel (ifort) version 14.0.2 (<a href="https://software.intel.com/en-us/forums/topic/506826">details</a>).
                   <ul><li>Reducing the optimization in the <code>configure.wrf</code> file may solve this problem. Change the line "<code>FCOPTIM &nbsp; &nbsp; &nbsp; &nbsp; = &nbsp; &nbsp; &nbsp; -O3</code>" so that it instead reads "-O2" or "-O1" (note that this is a capital letter "O", not a zero)</li></ul></li>
                 <li>Intel (ifort) version 11.1 (<a href="https://software.intel.com/en-us/forums/topic/269937">details</a>).
-                  <ul><li><em>No solution at this time</em></li></ul></li>
+                  <ul><li><em>No solution at this time</em></li></ul></li></ul>
+            <h1>PGI (pgf90)</h1>
+              <ul class="bodytext">
                 <li>PGI (pgf90) versions 13.3 &ndash; 13.6
                   <ul><li> Replace the file "WRFDA/var/external/crtm_2.1.3/libsrc/NLTECoeff_Define.f90" with this copy: (<a href="fixes/v36/NLTECoeff_Define.f90">NLTECoeff_Define.f90</a>). Then run "<code>./clean -a</code>" and recompile.</li></ul></li>
                 <li>PGI (pgf90) versions 12.5, 13.9
