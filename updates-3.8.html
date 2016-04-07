@@ -1,0 +1,197 @@
+<html>
+
+<head>
+
+<title>WRFDA Updates for 3.8</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2016 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="./scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="./scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="./images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="./images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="./images/goldrule.jpg"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td width="100%" height="838" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+        <td height="842" bgcolor="#009933"><p align="right">&nbsp;</p>
+           <p align="center"><a href="system.html" class="leftnavlink">System Overview</a></p>
+           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFDA V3.8</p>
+           <p align="center"><a href="updates-3.7.1.html" class="leftnavlink">WRFDA V3.7.1</a></p>
+           <p align="center"><a href="updates-3.7.html" class="leftnavlink">WRFDA V3.7</a></p>
+           <p align="center"><a href="updates-3.6.1.html" class="leftnavlink">WRFDA V3.6.1</a></p>
+           <p align="center"><a href="updates-3.6.html" class="leftnavlink">WRFDA V3.6</a></p>
+           <p align="center"><a href="updates-3.5.1.html" class="leftnavlink">WRFDA V3.5.1</a></p>
+           <p align="center"><a href="updates-3.5.0.1.html" class="leftnavlink">WRFDA V3.5.0.1</a></p>
+           <p align="center"><a href="updates-3.5.html" class="leftnavlink">WRFDA V3.5</a></p>
+           <p align="center"><a href="updates-3.4.1.html" class="leftnavlink">WRFDA V3.4.1</a></p>
+           <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
+           <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
+           <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
+           <p align="center"><a href="updates-3.2.1.html" class="leftnavlink">WRFDA V3.2.1</a></p>
+           <p align="center"><a href="updates-3.2.html" class="leftnavlink">WRFDA V3.2</a></p>
+           <p align="center"><a href="updates-older.html" class="leftnavlink">Older versions</a></p>
+           <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
+           <p align="center"><a href="download/tools.html" class="leftnavlink">Tools</a></p>
+           <p align="center"><a href="known-problems.html" class="leftnavlink">Known Problems and Fixes</a></p></td>
+        <td width="663" bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle">WRFDA Version 3.8 update summary</p>
+            <blockquote>
+              <h2>WRFDA Version 3.8 was released on April 8, 2016. </h2>
+              <h3><big>New features:</big></h3>
+              <ul class="bodytext"><li><a href="#wpec">A new dynamic constraint</a> for 3DVAR and Hybrid assimilation has been added.</li>
+                <li>New observations can be assimilated:</li>
+                <ul class="bodytext"><li><a href="#seviri">GCOM-W1 AMSR2 radiance</a></li></ul></ul>
+
+              <h3><big>Updated features:</big></h3>
+              <ul class="bodytext"><li>The CV7 Background error option has undergone a major update, including major bug fixes. <b>Users of this capability should upgrate to WRFDA 3.8, since the older release code produces incorrect results.</b></li>
+                <li>Updated libraries:</li>
+                  <ul class="bodytext"><li>RTTOV interface now supports RTTOV Version 11.1, 11.2, or 11.3</li>
+                  <li>WRFDA can now be compiled with HDF5 support to read HDF5 format files (for AMSR2 assimilation)</li></ul>
+                <li>Bug fixes and performance improvements:</li>
+                  <ul class="bodytext"><li>Fixed crashes due to incorrect entries for IASI in VARBC.in file</li>
+                  <li>Fixed segmentation fault within executable gen_be_vertloc.exe for hybrid assimilation</li>
+                  <li>Fixed WRFPLUS/4DVAR compilation errors for some AIX systems</li>
+                  <li>Fixed runtime errors in dial-resolution hybrid assimilation</li>
+                  <li>Fixed problems with excessive noise in moisture field for some radar options (use_radar_rhv, use_radar_rqv)</li>
+                  <li>Fixed OBSPROC crashes for certain duplicate and bad observation inputs</li>
+                  <li>Fixed 4DVAR crashes for some RTTOV runs</li>
+                  <li>Improved assimilation of surface pressure obs for sfc_assi_options=1</li>
+                  <li>Improved consistency of surface diagnostics (T2, Q2, U10, and V10) between WRFDA and WRF</li></ul>
+                <li><a href="download/wrfplus.html">WRFPLUS</a> (WRF adjoint and tangent linear model) has been upgraded to V3.8 and is consistent with the released WRF version 3.8.</li></ul>
+              <p class="bodytext">For instructions on compiling and running the latest version of WRFDA, please refer to the updated <a href="Docs/user_guide_V3.8/WRFDA_Users_Guide.html">User's Guide</a></p>
+
+            </blockquote>
+            <p class="pagetitle">Version 3.8 update details</p>
+            <blockquote>
+              <a name="wpec"></a>
+              <h1>Weak Penalty Constraint (WPEC) option</h1>
+              <p class="bodytext">For Version 3.8, a new "weak penalty constraint" (WPEC) option has been added to WRFDA which aims to enforce quasi-gradient balance on a WRFDA analysis. It was designed with the specific aim of improving assimilation of radar data within tropical cyclones, but may be useful for other weather phenomena of similar scales. It can be used with 3DVAR or hybrid 3DVAR (4DVAR is not compatible with this new capability). Further details about this method can be found in <a href="Docs/user_guide_V3.8/users_guide_chap6.htm#WPEC">the relevant section of the User's Guide</a> and in the following publication by the developers of this capability:</p>
+            <p class="citetext">Li, Xin, Jie Ming, Ming Xue, Yuan Wang, and Kun Zhao, 2015: <a href="http://onlinelibrary.wiley.com/doi/10.1002/2014JD022706/full">Implementation of a dynamic equation constraint based on the steady state momentum equations within the WRF hybrid ensemble&ndash;3DVar data assimilation system and test with radar T-TREC wind assimilation for tropical Cyclone Chanthu (2010)</a>. <i>J. Geophys. Res. Atmos.</i>, <b>120</b>, 4017&ndash;4039, doi:10.1002/2014JD022706.</p>
+
+              <a name="amsr2"></a>
+              <h1>AMSR2 radiance assimilation</h1>
+              <p class="bodytext">The GCOM-W1 satellite carries the Advanced Microwave Scanning Radiometer 2 (AMSR2) instrument. WRFDA can now assimilate radiance observations from this instrument, which are available in HDF5 format from the Japanese Aerospace Exploration Agency (JAXA). The relevent namelist options are as follows:</p>
+              <p class="bodytext">&wrfvar4<br>
+                &nbsp; use_amsr2obs: &nbsp; (logical) Switch for reading AMSR2 observations.<br>
+                &nbsp; &nbsp; true:  WRFDA will read AMSR2 data<br>
+                &nbsp; &nbsp; false: no AMSR2 data will be read (default)</p>
+              <p class="bodytext">&wrfvar14<br>
+                &nbsp; rtminit_platform = 29, (GCOM-W)<br>
+                &nbsp; rtminit_satid = 1 (for GCOM-W1)<br>
+                &nbsp; rtminit_sensor = 63, (AMSR2)</p>
+              <p class="bodytext">More information on this capability (including file naming conventions) can be found <a href="Docs/user_guide_V3.8/users_guide_chap6.htm#_Other_data_formats">in the relevant section of the User's Guide</a>. The AMSR2 data is made available in HDF5 format, which requires compilation of WRFDA with HDF5 libraries. This procedure is described <a href="Docs/user_guide_V3.8/users_guide_chap6.htm#_Compile_WRFDA_and">in the User's Guide as well</a>.
+
+              <p>&nbsp;</p>
+
+            </blockquote>
+            <p class="pagetitle">Helpful links</p>
+            <blockquote>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.8/users_guide_chap6.htm#_Installing_WRF-Var">Compiling WRFDA</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.8/users_guide_chap6.htm#_Running_WRF-Var_1">Running WRFDA</a></big></li>
+              <li class="bodytext"><big><a href="./Docs/user_guide_V3.8/users_guide_chap6.htm#_Description_of_Namelist_2">List and description of namelist variables</a></big></li>
+
+              <p class="bodytext"><br></p>
+              <p align="center" class="detailtextRed"><br>
+                <script language="JavaScript"><!--  ;;;;;;;;;;;-->
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script><br><br>&nbsp;
+              </p>
+              <p>&nbsp;</p>
+          </blockquote>            </td>
+        </tr>
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+

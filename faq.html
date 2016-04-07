@@ -199,6 +199,14 @@
                 <td style="color:#900"><strong>A1</strong></td>
                 <td style="color:#900">This error indicates that WRFDA had a problem reading one or more sections of your <code>namelist.input</code> file. Typically this is because an invalid namelist option was specified, or the option name was misspelled. Usually the error message will also state which namelist section had a problem (for example, "ERROR while reading namelist wrfvar4"), so check every namelist option in that section to make sure it is valid. See the <a href="usersguide.html">User's Guide</a> specific to your version; there is a section at the end listing valid namelist options.</td>
               </tr>
+              <tr>
+                <td width="5%"><strong>Q2</strong></td>
+                <td class="font11"><strong>When I try to run WRFDA I get an error: "Missing or invalid AS1 ~ AS5 value for IT =        2". How can I fix this?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A2</strong></td>
+                <td style="color:#900">This error is encountered when you attempt to use multiple outer loops in your minimization with the CV3 background error option. By default, WRFDA only has CV3 length and variance scaling parameters set for a single outer loop; for multiple outer loops you need to set these parameters manually in the namelist. See the section in the user's guide on "<a href="usersguide.html">Modifying CV3 length scales and variance FIX THIS LINK</a>" for information on how to do this.</td>
+              </tr>
             </table></p>
 
 
