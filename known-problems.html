@@ -147,6 +147,11 @@
                 <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
             <a name="V3_7_1"></a><p class="pagetitle">WRFDA Version 3.7.1 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> Failure to compile with RTTOV 11.3 (posted 2016-04-06) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Code crashes when using Variational Bias Correction for IASI instrument<br>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to incorrect entries in the default VARBC.in file; use this version instead: (<a href="fixes/v371/VARBC.in">VARBC.in</a>)</p>
             <h1> Failure to compile with RTTOV 11.3 (posted 2015-10-14) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                When using RTTOV 11.3, WRFDA fails to compile with an error message beginning with:<br><br>
