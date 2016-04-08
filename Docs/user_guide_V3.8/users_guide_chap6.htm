@@ -2466,7 +2466,7 @@ executable (named <span class=viChar><span lang=X-NONE>wrf.exe</span></span>):</
 
 <p class=MsoNormal style='margin-top:14.0pt;margin-right:0in;margin-bottom:
 14.0pt;margin-left:0in'><span style='font-size:8.0pt;font-family:Courier'>53292
--rwxr-xr-x 1 kavulich man 54513254 Apr  6 22:43 main/wrf.exe</span></p>
+-rwxr-xr-x 1 user man 54513254 Apr  6 22:43 main/wrf.exe</span></p>
 
 <p class=MsoNormal style='margin-top:14.0pt;margin-right:0in;margin-bottom:
 14.0pt;margin-left:0in'>Finally, set the environment variable <span
@@ -2623,7 +2623,7 @@ marine observations over the US Great Lakes (<span class=viChar><span
 lang=X-NONE>msfc.tbl</span></span>)</p>
 
 <p>The files <span class=viChar><span lang=X-NONE>obserr.txt</span></span> and <span
-class=viChar><span lang=X-NONE>msfc.table</span></span> are included in the
+class=viChar><span lang=X-NONE>msfc.tbl</span></span> are included in the
 source code under <span style='font-size:10.0pt;font-family:Courier'>var/obsproc</span>.
 To create the required namelist file, we have provided an example file (<span
 style='font-size:10.0pt;font-family:Courier'>namelist_obsproc.3dvar.wrfvar-tut</span>)
@@ -2639,13 +2639,13 @@ style='font-size:10.0pt;font-family:Courier'>namelist.obsproc</span>,<span
 style='font-family:"Courier New"'> </span>to accommodate your experiments. You
 will likely only need to change variables listed under records 1, 2, 6, 7, and
 8. See <span style='font-size:10.0pt;font-family:Courier'>$WRFDA_DIR/var/obsproc/README.namelist</span>,
-or the section <a href="#_Description_of_Namelist_2">Description of Namelist Variables</a>
-for details. You should pay special attention to the record 7 and record 8 variables:
-these will determine the domain for which observations will be written to the
-output observation file. Alternatively, if you do not wish to filter the
-observations spatially, you can set <span style='font-size:10.0pt;font-family:
-Courier'>domain_check_h = .false.</span> under <span style='font-size:10.0pt;
-font-family:Courier'>&amp;record4</span>.</p>
+or the section <a href="#_Description_of_Namelist_2">Description of Namelist
+Variables</a> for details. You should pay special attention to the record 7 and
+record 8 variables: these will determine the domain for which observations will
+be written to the output observation file. Alternatively, if you do not wish to
+filter the observations spatially, you can set <span style='font-size:10.0pt;
+font-family:Courier'>domain_check_h = .false.</span> under <span
+style='font-size:10.0pt;font-family:Courier'>&amp;record4</span>.</p>
 
 <p style='text-align:justify'>If you are running the tutorial case, you should
 copy or link the sample observation file (<span style='font-size:10.0pt;
@@ -2678,7 +2678,7 @@ file are described in the last six lines of the header section.</p>
 =     86, </span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>AMDAR
-=     19, AIREP =    205, TAMDAR=      0, PILOT =     85, SATEM =    106, SATOB
+=     19, AIREP =    205, TAMDAR=      0, PILOT =     85, SATEM =    106, SATOB
 =   2556, </span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>GPSPW =   
@@ -2697,7 +2697,7 @@ file are described in the last six lines of the header section.</p>
 20000., base_strat_temp=   215.,</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>IXC  
-=     60, JXC   =     90, IPROJ =      1, IDD   =      1, MAXNES=      1,</span></p>
+=     60, JXC   =     90, IPROJ =      1, IDD   =      1, MAXNES=      1,</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>NESTIX=    
 60, </span></p>
@@ -2723,8 +2723,8 @@ PLATFORM, DATE, NAME, LEVELS, LATITUDE, LONGITUDE, ELEVATION, ID.</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>SRFC  =
 SLP, PW (DATA,QC,ERROR).</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>EACH  = PRES,
-SPEED, DIR, HEIGHT, TEMP, DEW PT, HUMID (DATA,QC,ERROR)*LEVELS.</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>EACH  =
+PRES, SPEED, DIR, HEIGHT, TEMP, DEW PT, HUMID (DATA,QC,ERROR)*LEVELS.</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>INFO_FMT =
 (A12,1X,A19,1X,A40,1X,I6,3(F12.3,11X),6X,A40)</span></p>
@@ -2779,18 +2779,19 @@ cd $WRFDA_DIR/var/obsproc<br>
 &gt; cp namelist.obsproc.4dvar.wrfvar-tut namelist.obsproc</span></p>
 
 <p>In the namelist file, you need to change the following variables to
-accommodate your experiments. In this tutorial case, the actual analysis time is
-<span style='font-size:10.0pt;font-family:Courier'>2008-02-05_12:00:00, </span><b>but
+accommodate your experiments. In this tutorial case, the actual analysis time
+is <span style='font-size:10.0pt;font-family:Courier'>2008-02-05_12:00:00, </span><b>but
 in the namelist, </b><b><span style='font-size:10.0pt;font-family:Courier'>time_analysis
 </span>should be set to 3 hours later</b>. The different values of <span
 style='font-size:10.0pt;font-family:Courier'>time_analysis</span>, <span
 style='font-size:10.0pt;font-family:"Courier New"'>num_slots_past</span>, and <span
 style='font-size:10.0pt;font-family:"Courier New"'>time_slots_ahead</span>
 contribute to the actual times analyzed. For example, if you set <span
-style='font-size:10.0pt;font-family:Courier'>time_analysis</span> = 2008-02-05_16:00:00,
-and set the <span style='font-size:10.0pt;font-family:Courier'>num_slots_past</span>
-= 4 and <span style='font-size:10.0pt;font-family:Courier'>time_slots_ahead</span>=2,
-the final results will be the same as before.</p>
+style='font-size:10.0pt;font-family:Courier'>time_analysis</span> =
+2008-02-05_16:00:00, and set the <span style='font-size:10.0pt;font-family:
+Courier'>num_slots_past</span> = 4 and <span style='font-size:10.0pt;
+font-family:Courier'>time_slots_ahead</span>=2, the final results will be the
+same as before.</p>
 
 <p>Edit all the domain settings according to your own experiment; a full list
 of namelist options and descriptions can be found in the<span style='font-size:
@@ -3396,7 +3397,7 @@ alloc_space_field: domain            1 ,             419050728  bytes allocated<
 Strategy is not specified. Assuming 1D-Y</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>WRF TILE  
-1 IS      1 IE     89 JS      1 JE     59</span></p>
+1 IS      1 IE     89 JS      1 JE     59</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>WRF NUMBER
 OF TILES =   1</span></p>
@@ -3423,8 +3424,8 @@ sound                 86 global,      86 local</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>     
 synop                750 global,     750 local</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>      pilot                
-85 global,      85 local</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>     
+pilot                 85 global,      85 local</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>     
 satem                105 global,     105 local</span></p>
@@ -3438,8 +3439,8 @@ airep                216 global,     216 local</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>     
 gpspw                187 global,     187 local</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>     
-gpsrf                  3 global,       3 local</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>      gpsrf                 
+3 global,       3 local</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>     
 metar               2408 global,    2408 local</span></p>
@@ -3514,8 +3515,8 @@ Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  
 Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>   Scaling:
-var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  
+Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  
 Scaling: var, len, ds:   0.100000E+01   0.100000E+01   0.600000E+05</span></p>
@@ -3544,8 +3545,8 @@ outer iteration gradient target is:        4.257569431368675D+00</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>Iter   
 Cost Function         Gradient             Step</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  1      2.771806953835228D+04     
-3.839443040010825D+02      1.404189554585295D-02</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  1     
+2.771806953835228D+04      3.839443040010825D+02      1.404189554585295D-02</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  2     
 2.607328843808729D+04      3.776030549295726D+02      2.231524424457818D-02</span></p>
@@ -3553,8 +3554,8 @@ Cost Function         Gradient             Step</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  3     
 2.472259943260248D+04      3.222689578709167D+02      1.894586166646225D-02</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  4      2.386086652415530D+04     
-2.434640871750135D+02      1.659455934972616D-02</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  4     
+2.386086652415530D+04      2.434640871750135D+02      1.659455934972616D-02</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  5     
 2.327265820675138D+04      2.263256490947211D+02      1.984683869146577D-02</span></p>
@@ -3562,8 +3563,8 @@ Cost Function         Gradient             Step</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  6     
 2.288387097811670D+04      1.972809202546574D+02      1.518009315679554D-02</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  7      2.253852621449510D+04     
-1.766242834719637D+02      1.774649948213140D-02</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  7     
+2.253852621449510D+04      1.766242834719637D+02      1.774649948213140D-02</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  8     
 2.219417744229300D+04      1.618922878245313D+02      2.207637224768432D-02</span></p>
@@ -3571,8 +3572,8 @@ Cost Function         Gradient             Step</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>  9     
 2.192368221682242D+04      1.229826464959493D+02      2.064131105434926D-02</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 10      2.177234151876604D+04     
-1.098452932230578D+02      2.001234860476772D-02</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 10     
+2.177234151876604D+04      1.098452932230578D+02      2.001234860476772D-02</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 11     
 2.165515456004121D+04      9.038821333939826D+01      1.942434459905811D-02</span></p>
@@ -3580,8 +3581,8 @@ Cost Function         Gradient             Step</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 12     
 2.154905449070163D+04      6.171712290037125D+01      2.597299664471773D-02</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 13      2.148634583759935D+04     
-5.900027652146414D+01      3.292654210894269D-02</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 13     
+2.148634583759935D+04      5.900027652146414D+01      3.292654210894269D-02</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 14     
 2.144348889336520D+04      5.558586880547042D+01      2.462312123702110D-02</span></p>
@@ -3589,8 +3590,8 @@ Cost Function         Gradient             Step</span></p>
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 15     
 2.141094656736842D+04      4.328574339190531D+01      2.106443384244755D-02</span></p>
 
-<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 16      2.138841979319319D+04     
-4.623858932948649D+01      2.404580052377259D-02</span></p>
+<p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 16     
+2.138841979319319D+04      4.623858932948649D+01      2.404580052377259D-02</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'> 17     
 2.137137039364308D+04      2.944845359103514D+01      1.594887052142258D-02</span></p>
@@ -3691,7 +3692,7 @@ factor used(3)           =         1.00000</span></p>
 factor used(4)           =         1.00000</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>   Jb
-factor used(5)           =         1.00000</span></p>
+factor used(5)           =         1.00000</span></p>
 
 <p class=MsoNormal><span style='font-size:8.0pt;font-family:Courier'>   Jb
 factor used              =         1.00000</span></p>
@@ -4967,12 +4968,12 @@ enough observations are present to keep the Coldstart values (i.e. bias
 predictor statistics and bias parameter values) for the next cycle. In this
 case, the next cycle will do another Coldstart.</span></p>
 
-<h5><span lang=X-NONE>Background </span>c<span lang=X-NONE>onstraint for bias
+<h5><span lang=X-NONE>Background </span>constraint <span lang=X-NONE>for bias
 parameters</span></h5>
 
 <p class=MsoNormal><span style='color:black'>The background constraint controls
-the inertia you want to impose on the predictors (i.e. the smoothing in the predictor
-time series). It corresponds to an extra term in the WRFDA cost function.</span></p>
+the inertia you want to impose on the predictors (i.e. the smoothing in the
+predictor time series). It corresponds to an extra term in the WRFDA cost function.</span></p>
 
 <p class=MsoNormal><span style='color:black'>&nbsp;</span></p>
 
@@ -5043,10 +5044,10 @@ color:black'>&nbsp;</span></b></p>
 <p class=MsoNormal><span style='color:black'>Some observations are useful for
 preprocessing (e.g. Quality Control, Cloud detection) but you might not want to
 assimilate them. If you still need to estimate their bias correction, these observations
-need to go through the VarBC code in the minimization. For this purpose, the
-VarBC uses a separate threshold on the QC values, called
-&quot;qc_varbc_bad&quot;. This threshold is currently set to the same value as
-&quot;qc_bad&quot;, but can easily be changed to any ad hoc value.</span></p>
+need to go through the VarBC code in the minimization. For this purpose, the VarBC
+uses a separate threshold on the QC values, called &quot;qc_varbc_bad&quot;.
+This threshold is currently set to the same value as &quot;qc_bad&quot;, but
+can easily be changed to any ad hoc value.</span></p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>f.<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
@@ -5161,7 +5162,7 @@ radiance.</span></p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='color:black'>Logical,
 controls whether using the observation brightness temperature for AIRS Window
-channel #914 as criterium for GSI thinning.</span></p>
+channel #914 as criterion for GSI thinning.</span></p>
 
 <p class=MsoNormal style='margin-left:.5in;text-align:justify'><span
 style='color:black'>&nbsp;</span></p>
@@ -5685,9 +5686,8 @@ lang=X-NONE>Running WRFDA 4D-Var with precipitation observations</span></h4>
 
 <p class=MsoNormal>WRFDA 4D-Var is able to assimilate hourly, 3-hourly and
 6-hourly precipitation data. According to experiments and related scientific
-papers, 6-hour precipitation accumulations are the ideal observations to be
-assimilated, as this leads to better results than directly assimilating hourly
-data.</p>
+papers, 6-hour precipitation accumulations are the ideal observations to be assimilated,
+as this leads to better results than directly assimilating hourly data.</p>
 
 <p class=MsoNormal>&nbsp;</p>
 
@@ -5784,7 +5784,7 @@ parallel mode,</span></p>
 Courier'>&nbsp;</span></p>
 
 <p class=MsoFootnoteText><span lang=X-NONE style='font-size:9.0pt;font-family:
-Courier'>            </span><span lang=X-NONE style='font-size:10.0pt;
+Courier'>            </span><span lang=X-NONE style='font-size:10.0pt;
 font-family:Courier'>&gt;./da_wrfvar.exe &gt;&amp; wrfda.log</span></p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'>c.<span style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
@@ -7012,7 +7012,7 @@ lang=X-NONE>Utilizing wind speed/direction assimilation:</span></h4>
 
 <p>If observations containing wind speed/direction information are provided to WRFDA,
 you can assimilate these observations directly, rather than converting the wind
-to its u- and v-componants prior to assimilation. </p>
+to its u- and v-components prior to assimilation. </p>
 
 <p>Wind speed/direction assimilation is controlled by the following namelist
 options:</p>
@@ -7335,7 +7335,7 @@ href="#_Updating_WRF_Boundary">Updating WRF boundary conditions</a>).</p>
 
 <p>An NCL script, <span style='font-size:10.0pt;font-family:Courier'>$TOOLS_DIR/var/graphics/ncl/WRF-Var_plot.ncl</span>,
 is provided in the tools package for plotting. You need to specify the <span
-style='font-size:10.0pt;font-family:Courier'>analsyis_file</span> name, its
+style='font-size:10.0pt;font-family:Courier'>analysis_file</span> name, its
 full path, etc. Please see the in-line comments in the script for details.</p>
 
 <p>As an example, if you are aiming to display the U-component of the analysis
@@ -7408,7 +7408,7 @@ and the name of the variable to display by setting <span style='font-size:10.0pt
 font-family:Courier'>var</span>. Further details are given in this script. </p>
 
 <p>If you are aiming to display the increment of potential temperature at level
-18, after modifying <span style='font-size:10.0pt;font-family:Courier'>$WRFDA_DIR/var/graphcs/ncl/WRF-Var_plot.ncl</span>,
+18, after modifying <span style='font-size:10.0pt;font-family:Courier'>$WRFDA_DIR/var/graphics/ncl/WRF-Var_plot.ncl</span>,
 make sure the following pieces of code are uncommented:</p>
 
 <p class=MsoNormal style='margin-left:.5in'><span style='font-size:10.0pt;
@@ -7613,8 +7613,7 @@ font-family:"Courier New"'>da_wrfvar.exe</span> will run in the hybrid mode.</p>
 
 <h4 style='margin-left:.5in;text-indent:-.25in'><span lang=X-NONE>c.<span
 style='font:7.0pt "Times New Roman"'>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; </span></span><span
-lang=X-NONE>Running </span>t<span lang=X-NONE>he </span>h<span lang=X-NONE>ybrid
-</span>s<span lang=X-NONE>ystem</span></h4>
+lang=X-NONE>Running </span>t<span lang=X-NONE>he </span>hybrid system</h4>
 
 <p class=MsoNormal>The procedure is the same as running 3D-Var/4D-Var, with the
 exception of some extra input files and namelist settings. The basic input
@@ -7863,7 +7862,7 @@ je_factor = 2.0<br>
 ensdim_alpha = 10 <br>
 alphacv_method = 2<br>
 alpha_corr_type=3<br>
-alpha_corr_scale = 1500.0<br>
+alpha_corr_scale = 200.0<br>
 alpha_std_dev=1.000<br>
 alpha_vertloc = .true.</span><span style='font-family:"Times","serif"'><br>
 / </span></p>
@@ -7920,7 +7919,7 @@ function. 1=Exponential; 2=SOAR; 3=Gaussian.</span></p>
 
 <p class=stylecode style='margin-top:.1pt;margin-right:0in;margin-bottom:.1pt;
 margin-left:.5in'><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>hybrid
-covariance localization scale in km unit. Default value is 1500. </span></p>
+covariance localization scale in km unit. Default value is 200. </span></p>
 
 <p class=MsoNormal><b><span style='font-family:Courier'>alpha_std_dev </span></b></p>
 
@@ -7979,7 +7978,7 @@ file</span> <span lang=X-NONE>gen_be_etkf.exe</span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'> is used to
 update the ensemble perturbations, while </span><span lang=X-NONE>gen_be_addmean.exe</span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'> is
-used to combine the emsemble mean and the ensemble perturbations. As with
+used to combine the ensemble mean and the ensemble perturbations. As with
 3D-Var/4D-Var, </span><span lang=X-NONE>da_wrfvar.exe</span><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'> is the main
 WRFDA program. However, in this case</span><span lang=X-NONE>, da_wrfvar.exe</span><span
@@ -8018,7 +8017,7 @@ the steps below:</span></p>
 <p class=MsoBodyText><span lang=X-NONE>&nbsp;</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
-"Times New Roman","serif"'>1)   Set </span><span style='font-size:12.0pt;
+"Times New Roman","serif"'>1)   Set </span><span style='font-size:12.0pt;
 font-family:"Times New Roman","serif"'>environment variables for convenience</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
@@ -8619,7 +8618,7 @@ $WRFDA_DIR/var/build/gen_be_etkf.exe . </span></p>
 
 <p class=MsoBodyText style='text-indent:6.0pt'><span lang=X-NONE
 style='font-size:12.0pt;font-family:"Times New Roman","serif"'>Check the output
-files. etkf_output.* files are updated ensemble pertubations.</span></p>
+files. etkf_output.* files are updated ensemble perturbations.</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
@@ -8633,7 +8632,7 @@ style='font-size:12.0pt;font-family:"Times New Roman","serif"'>the </span><span
 lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>ensemble
 mean </span><span style='font-size:12.0pt;font-family:"Times New Roman","serif"'>to
 </span><span lang=X-NONE style='font-size:12.0pt;font-family:"Times New Roman","serif"'>get
-new emsemble members</span></p>
+new ensemble members</span></p>
 
 <p class=MsoBodyText><span lang=X-NONE style='font-size:12.0pt;font-family:
 "Times New Roman","serif"'>&nbsp;</span></p>
@@ -10101,130 +10100,6 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
  <tr>
   <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>psi_chi_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
-  function in defining balanced part of velocity potential. For cv_options=6
-  only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>psi_t_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
-  function in defining balanced part of temperature. For cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>psi_ps_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
-  function in defining balanced part of surface pressure. For cv_options=6
-  only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>psi_rh_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
-  function in defining balanced part of moisture. For cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>chi_u_t_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
-  unbalanced part of velocity potential in defining balanced part of
-  temperature. For cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>chi_u_ps_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
-  unbalanced part of velocity potential in defining balanced part of surface
-  pressure. For cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>chi_u_rh_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
-  unbalanced part of velocity potential in defining balanced part of moisture.
-  For cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>t_u_rh_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
-  unbalanced part of temperature in defining balanced part of moisture. For
-  cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
-  style='font-size:10.0pt;font-family:"Courier New"'>ps_u_rh_factor</span></p>
-  </td>
-  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
-  </td>
-  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
-  unbalanced part of surface pressure in defining balanced part of moisture.
-  For cv_options=6 only.</p>
-  </td>
- </tr>
- <tr>
-  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'><span
   style='font-size:10.0pt;font-family:"Courier New"'>je_factor</span></p>
   </td>
   <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
@@ -10435,8 +10310,8 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>true</p>
   </td>
   <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>.true.: tracing and error reporting
-  routines will include HTML tags.</p>
+  <p class=MsoNormal style='layout-grid-mode:char'>.true.: tracing and error
+  reporting routines will include HTML tags.</p>
   </td>
  </tr>
  <tr>
@@ -10468,7 +10343,8 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>false</p>
   </td>
   <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>.true.: perform adjoint tests</p>
+  <p class=MsoNormal style='layout-grid-mode:char'>.true.: perform adjoint
+  tests</p>
   </td>
  </tr>
  <tr>
@@ -10682,9 +10558,9 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>99.0</p>
   </td>
   <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>specify the maximum truncation
-  value (percentage) to explain the  variance of unbalanced potential velocity
-  in eigenvector decomposition</p>
+  <p class=MsoNormal style='layout-grid-mode:char'>specify the maximum
+  truncation value (percentage) to explain the  variance of unbalanced
+  potential velocity in eigenvector decomposition</p>
   </td>
  </tr>
  <tr>
@@ -10696,9 +10572,9 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>99.0</p>
   </td>
   <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>specify the maximum
-  truncation value (percentage) to explain the variance of the unbalanced
-  temperature in eigenvector decomposition</p>
+  <p class=MsoNormal style='layout-grid-mode:char'>specify the maximum truncation
+  value (percentage) to explain the variance of the unbalanced temperature in
+  eigenvector decomposition</p>
   </td>
  </tr>
  <tr>
@@ -10730,6 +10606,130 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='layout-grid-mode:char'>for unbalanced surface
   pressure, it should be a non-zero positive number.</p>
   <p class=MsoNormal>set max_vert_var5=0.0 only for offline VarBC applications.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>psi_chi_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
+  function in defining balanced part of velocity potential. For cv_options=6
+  only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>psi_t_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
+  function in defining balanced part of temperature. For cv_options=6 only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>psi_ps_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
+  function in defining balanced part of surface pressure. For cv_options=6
+  only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>psi_rh_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of stream
+  function in defining balanced part of moisture. For cv_options=6 only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>chi_u_t_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
+  unbalanced part of velocity potential in defining balanced part of
+  temperature. For cv_options=6 only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>chi_u_ps_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
+  unbalanced part of velocity potential in defining balanced part of surface
+  pressure. For cv_options=6 only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>chi_u_rh_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
+  unbalanced part of velocity potential in defining balanced part of moisture.
+  For cv_options=6 only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>t_u_rh_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
+  unbalanced part of temperature in defining balanced part of moisture. For
+  cv_options=6 only.</p>
+  </td>
+ </tr>
+ <tr>
+  <td width=178 colspan=2 valign=top style='width:133.7pt;padding:0in 0in 0in 0in'>
+  <p style='margin:0in;margin-bottom:.0001pt;layout-grid-mode:char'><span
+  style='font-size:10.0pt;font-family:"Courier New"'>ps_u_rh_factor</span></p>
+  </td>
+  <td width=102 colspan=3 valign=top style='width:76.3pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>1.0</p>
+  </td>
+  <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
+  <p class=MsoNormal style='layout-grid-mode:char'>Contribution of the
+  unbalanced part of surface pressure in defining balanced part of moisture.
+  For cv_options=6 only.</p>
   </td>
  </tr>
  <tr style='height:17.5pt'>
@@ -11121,9 +11121,9 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='layout-grid-mode:char'>true</p>
   </td>
   <td width=314 colspan=2 valign=top style='width:235.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>true.: switch off the
-  assimiliation of known problematic channels (up to year 2012) that are
-  hard-coded in var/da/da_radiance/da_blacklist_rad.inc.</p>
+  <p class=MsoNormal style='layout-grid-mode:char'>true.: switch off the assimilation
+  of known problematic channels (up to year 2012) that are hard-coded in
+  var/da/da_radiance/da_blacklist_rad.inc.</p>
   <p class=MsoNormal style='layout-grid-mode:char'>false.: users need to
   specify proper channel selections in the radiance_info files.</p>
   </td>
@@ -11143,8 +11143,8 @@ lang=X-NONE>WRFDA namelist variables</span></h4>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>0</p>
   </td>
   <td width=338 colspan=3 valign=top style='width:253.5pt;padding:0in 0in 0in 0in'>
-  <p class=MsoNormal style='layout-grid-mode:char'>Set the number of pseudo observations,
-  either 0 or 1 (single ob)</p>
+  <p class=MsoNormal style='layout-grid-mode:char'>Set the number of pseudo
+  observations, either 0 or 1 (single ob)</p>
   </td>
  </tr>
  <tr>
@@ -12112,8 +12112,8 @@ lang=X-NONE>OBSPROC namelist variables</span></h4>
   style='font-size:10.0pt;font-family:"Courier New"'>IDD</span></p>
   </td>
   <td width=435 valign=top style='width:326.55pt;padding:0in 5.4pt 0in 5.4pt'>
-  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Domain ID
-  (1=&lt; ID =&lt; MAXNES), Only the observations geographically located on
+  <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>Domain
+  ID (1=&lt; ID =&lt; MAXNES), Only the observations geographically located on
   that domain will be processed. For WRF application with XLONC /=
   STANDARD_LON, set IDD=2, otherwise set 1.</p>
   </td>
@@ -12229,7 +12229,7 @@ lang=X-NONE>OBSPROC namelist variables</span></h4>
   <td width=435 valign=top style='width:326.55pt;padding:0in 5.4pt 0in 5.4pt'>
   <p class=MsoNormal style='margin-right:-.05in;layout-grid-mode:char'>output
   1, PREPBUFR OBS file only;</p>
-  <p class=MsoNormal style='margin-right:-.05in'>           2, ASCII OBS file
+  <p class=MsoNormal style='margin-right:-.05in'>           2, ASCII OBS file
   only;</p>
   <p class=MsoNormal style='margin-right:-.05in'>           3, Both PREPBUFR
   and ASCII OBS files.</p>
