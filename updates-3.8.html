@@ -116,7 +116,7 @@
               <h3><big>New features:</big></h3>
               <ul class="bodytext"><li><a href="#wpec">A new dynamic constraint</a> for 3DVAR and Hybrid assimilation has been added.</li>
                 <li>New observations can be assimilated:</li>
-                <ul class="bodytext"><li><a href="#seviri">GCOM-W1 AMSR2 radiance</a></li></ul></ul>
+                <ul class="bodytext"><li><a href="#amsr2">GCOM-W1 AMSR2 radiance</a></li></ul></ul>
 
               <h3><big>Updated features:</big></h3>
               <ul class="bodytext"><li>The CV7 Background error option has undergone a major update, including major bug fixes. <b>Users of this capability should upgrate to WRFDA 3.8, since the older release code produces incorrect results.</b></li>
@@ -126,8 +126,8 @@
                 <li>Bug fixes and performance improvements:</li>
                   <ul class="bodytext"><li>Fixed crashes due to incorrect entries for IASI in VARBC.in file</li>
                   <li>Fixed segmentation fault within executable gen_be_vertloc.exe for hybrid assimilation</li>
-                  <li>Fixed WRFPLUS/4DVAR compilation errors for some AIX systems</li>
-                  <li>Fixed runtime errors in dial-resolution hybrid assimilation</li>
+                  <li>Fixed WRFPLUS/4DVAR compilation errors for some AIX systems (Thanks to Zhou Lilong from National Meterological Center of CMA).</li>
+                  <li>Fixed runtime errors in dual-resolution hybrid assimilation</li>
                   <li>Fixed problems with excessive noise in moisture field for some radar options (use_radar_rhv, use_radar_rqv)</li>
                   <li>Fixed OBSPROC crashes for certain duplicate and bad observation inputs</li>
                   <li>Fixed 4DVAR crashes for some RTTOV runs</li>
@@ -147,10 +147,10 @@
               <a name="amsr2"></a>
               <h1>AMSR2 radiance assimilation</h1>
               <p class="bodytext">The GCOM-W1 satellite carries the Advanced Microwave Scanning Radiometer 2 (AMSR2) instrument. WRFDA can now assimilate radiance observations from this instrument, which are available in HDF5 format from the Japanese Aerospace Exploration Agency (JAXA). The relevent namelist options are as follows:</p>
-              <p class="bodytext">&wrfvar4<br>
-                &nbsp; use_amsr2obs: &nbsp; (logical) Switch for reading AMSR2 observations.<br>
-                &nbsp; &nbsp; true:  WRFDA will read AMSR2 data<br>
-                &nbsp; &nbsp; false: no AMSR2 data will be read (default)</p>
+              <p class="code">&wrfvar4<br>
+                use_amsr2obs (logical) Switch for reading AMSR2 observations.<br>
+                &nbsp; true:  WRFDA will read AMSR2 data<br>
+                &nbsp; false: no AMSR2 data will be read (default)</p>
               <p class="bodytext">&wrfvar14<br>
                 &nbsp; rtminit_platform = 29, (GCOM-W)<br>
                 &nbsp; rtminit_satid = 1 (for GCOM-W1)<br>
