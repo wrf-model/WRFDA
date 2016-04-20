@@ -2,7 +2,7 @@
 
 <head>
 
-<title>WRFDA Updates prior to version 3.2</title>
+<title>WRFDA Updates prior to version 3.3</title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2015 by UCAR">
+<meta name="copyright" content="Copyright (c) 2016 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -108,8 +108,6 @@
            <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
            <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
            <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
-           <p align="center"><a href="updates-3.2.1.html" class="leftnavlink">WRFDA V3.2.1</a></p>
-           <p align="center"><a href="updates-3.2.html" class="leftnavlink">WRFDA V3.2</a></p>
            <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color:
 #CBFFCD;font-family: Arial; line-height: 10pt;font-size:15.5;font-weight: bold;">Older versions</p>
            <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
@@ -120,11 +118,34 @@
             <p class="pagetitle">Older WRFDA version details</p>
             <p class="bodytext">This page contains information on older versions of WRFDA. Limited support is available for these releases: we strongly recommend using the most recent version if possible.</p>
             <ul class="toc">
+              <li><a href="#V3.2.1">Version 3.2.1</a></li>
+              <li><a href="#V3.2">Version 3.2</a></li>
               <li><a href="#V3.1.1">Version 3.1.1</a></li>
               <li><a href="#V3.1">Version 3.1</a></li>
               <li><a href="#V3.0.1.1">Version 3.0.1.1</a></li>
               <li><a href="#V3.0.1">Version 3.0.1</a></li>
               <li><a href="#V3.0">Version 3.0</a></li>
+
+            <a name="V3.2.1"><p class="pagetitle">WRFDA Version 3.2.1: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">The WRFDA tar file was been updated to Version 3.2.1 on August 18, 2010.</p>
+              <p class="bodytext">In this release, the following new features and updates are provided:</p>
+              <p class="bodytext">- CRTM interface for radiance assimilation has been upgraded to version 2.0.2. CRTM V2.0.2 has been included as an internal library in the WRFDA codes. Setting environmental variable CRTM to ANY VALUE will activate the CRTM installation during WRFDA compilation. </p>
+              <p class="bodytext">- Multivariate gen_be method which considers the correlations between moisture and other variables is included, but the support for the new capability will be very limited.</p>
+              <p class="bodytext">- Lots of bug fixes </p>
+              <p class="bodytext">For instructions on using this version, see the <a href="Docs/user_guide_V3.2.1/users_guide_chap6.htm">User's Guide</a></p>
+            </blockquote>
+            <a name="V3.2"><p class="pagetitle">WRFDA Version 3.2: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">The WRFDA tar file was updated to Version 3.2 on April 2, 2010.</p>
+              <p class="bodytext">In this release, the following new features and updates are provided:</p>
+              <p class="bodytext">- Improvement on multiple outer loop minimization </p>
+              <p class="bodytext">- Adjoint sensitivity tools</p>
+              <p class="bodytext">- Improved efficiency for WRF adjoint code</p>
+              <p class="bodytext">- PREPBUFR data for 4D-Var</p>
+              <p class="bodytext">- Software improvement (compile time, memory usage, etc.)</p>
+              <p class="bodytext">For instructions on using this version, see the <a href="Docs/user_guide_V3.2/users_guide_chap6.htm">User's Guide</a></p>
+            </blockquote>
             <a name="V3.1.1"><p class="pagetitle">WRF Var Version 3.1.1: UPDATES</p>
             <blockquote>
               <p class="bodytext">The WRF-Var tar file was updated to Version 3.1.1 on July 31, 2009. </p>
@@ -133,6 +154,7 @@
               <p class="bodytext">- Improved software portability; if only LITTLE_R formatted conventional observations are to be assimilated, the NETCDF library is the only mandatory library. To use PREPBUFR observational files, set environmental variable BUFR equal to 1. To use radiance BUFR format data, CRTM or RTTOV is needed.</p>
               <p class="bodytext">- Most of the scripts under WRFDA/var/scripts were removed from the main source<br>
                 code tar file. They can still be downloaded separately. See <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">WRFDA Tools</a>.</p>
+              <p class="bodytext">For instructions on using this version, see the <a href="Docs/user_guide_V3.1.1/users_guide_chap6.htm">User's Guide</a></p>
             </blockquote>
             <a name="V3.1"><p class="pagetitle">WRF Var Version 3.1: UPDATES</p>
             <blockquote>
@@ -156,6 +178,7 @@
                 * qcstat_conv_01 (01 indicates outer loop index) contains observation <br>
                 number counts</p>
               <p class="bodytext">- Most of the scripts under WRFDA/var/scripts are removed from the main source code tar file. They can still be downloaded separately. See <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html">WRFDA Tools</a>.</p>
+              <p class="bodytext">For instructions on using this version, see the <a href="Docs/user_guide_V3.1/users_guide_chap6.htm">User's Guide</a></p>
             </blockquote>
             <a name="V3.0.1.1"><p class="pagetitle">WRF Var Version 3.0.1.1: UPDATES</p>
             <blockquote>
