@@ -169,7 +169,7 @@
                <li>4DVAR</li>
                <li>Ensemble DA</li>
                <li>Hybrid 3DVAR/Ensemble</li></ul>
-            <p class="bodytext">Using these assimilation methods, WRFDA is capable of ingesting a wide variety of observation types. Most data types can be assimilated in LITTLE_R (ASCII text) or PREPBUFR (binary) format, but satellite radiances are assimilated in BUFR format.</p>
+            <p class="bodytext">Using these assimilation methods, WRFDA is capable of ingesting a wide variety of observation types. Most data types can be assimilated in LITTLE_R (ASCII text) or PREPBUFR (binary) format, but satellite radiances are assimilated in BUFR format unless otherwise noted.</p>
              <ul class="bodytext"><li><b>In-situ</b>
                  <ul class="bodytext"><li>Surface (SYNOP, METAR, SHIP, BUOY)</li>
                  <li>Upper air (TEMP, PIBAL, AIREP, ACARS, TAMDAR)</li></ul></ul>
@@ -192,8 +192,10 @@
                  <li>SSMIS (DMSP 16&ndash;18)</li>
                  <li>IASI (METOP A)</li>
                  <li>ATMS (Suomi-NPP)</li>
-                 <li>MWTS (FY-3)</li>
-                 <li>MWHS (FY-3)</li></ul></ul>
+                 <li>MWTS (FY-3) <em>Binary format</em></li>
+                 <li>MWHS (FY-3) <em>Binary format</em></li>
+                 <li>SEVIRI (Meteosat 8&ndash;10)</li>
+                 <li>AMSR2 (GCOM-W1) <em>HDF5 format</em></li></ul></ul>
             <p class="bodytext">Satellite radiance assimilation requires the use of a radiative transfer model. WRFDA supports the use of CRTM (included) and RTTOV (must be downloaded separately).</p>
             <p><br></p>
             </blockquote>
