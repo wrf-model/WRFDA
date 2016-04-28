@@ -1,11 +1,9 @@
 ;============================================================
-;  Authori: Syed RH Rizvi    NCAR/MMM    
+;  Author : Syed RH Rizvi    NCAR/MMM
 ;  Purpose:
-;           NCL script for ploting "cost_fn" & "grad_fn"
-;           written by WRF-Var  
-;  
-;   Note: Make sure that you removed first two lines in 
-;         cost_fn" & grad_fn" files
+;           NCL script for plotting "cost_fn" & "grad_fn"
+;           written by WRFDA
+;
 ;============================================================
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_code.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/csm/gsn_csm.ncl"
@@ -19,10 +17,16 @@ begin
 
 ;============================================================
 ; Input file directory
- dir = "/karri/users/xinzhang/support/con200/run_cpu1/2007010200/wrfvar"
-; Number of inner iterations WRF-Var took to stop the minimization
+ dir = "/kumquat/users/${USER}/DA/3dvar/"
+; Name of this domain, can be set to any string
+ domain_name="CONUS60"
+; Preserve old behavior: manually specify number of iterations
+;                        if true
+specify_iter = False
+
+; Number of inner iterations WRFDA took to stop the minimization
+; Only necessary if you set "specify_iter=True"
  iter = 22
- domain_name="con200"          
 
 ;============================================================
 ;
@@ -30,9 +34,32 @@ begin
 ;============================================================
 ; read in data
 ;************************************************
- nrow = iter+1
  ncol = 10
  Fill_ValueF = -999.
+ filename_cost=dir+"/cost_fn"
+ filename_grad=dir+"/grad_fn"
+
+ if ( specify_iter ) then
+    nrow = iter+1
+    data_cost=asciiread(filename_cost,(/nrow,ncol/),"float")
+    data_grad=asciiread(filename_grad,(/nrow,ncol-1/),"float")
+ 
+ else
+
+    read_cost=asciiread(filename_cost,-1,"float")
+    read_grad=asciiread(filename_grad,-1,"float")
+
+    ; Find the number of iterations to plot; reshape data accordingly
+    ndata_cost = dimsizes(read_cost)
+    ndata_grad = dimsizes(read_grad)
+    nrow = ndata_cost/11 
+
+
+    data_cost = reshape(read_cost,(/nrow,11/))
+    data_grad = reshape(read_grad,(/nrow,10/))
+
+ end if
+
  x    = new((/2,nrow/),float)
  cost = new((/2,nrow/),float)
  grad = new((/2,nrow/),float)
@@ -40,11 +67,7 @@ begin
  cost@_FillValue = Fill_ValueF
  grad@_FillValue = Fill_ValueF
 
- filename_cost=dir+"/cost_fn"
- filename_grad=dir+"/grad_fn"
 
- data_cost=asciiread(filename_cost,(/nrow,ncol/),"float")
- data_grad=asciiread(filename_grad,(/nrow,ncol-1/),"float")
  do i=0,nrow-1
  x(0,i)    = data_cost(i,2)
  cost(0,i) = data_cost(i,3)

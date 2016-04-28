@@ -61,7 +61,7 @@ export JEND=${JEND:-10000}
 
 #--------------------------------------------------------------------------------------
 #=========================================================
-# BELOW THIS LINE NO CHABGES ARE REQUIRED                 
+# BELOW THIS LINE NO CHANGES ARE REQUIRED                 
 #=========================================================
 export WORK_DIR=${RUN_DIR}/working
 mkdir -p ${WORK_DIR}

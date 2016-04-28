@@ -4,6 +4,7 @@
 #
 # Purpose: Run wrfvar
 #########################################################################
+#set -x
 
 export REL_DIR=${REL_DIR:-$HOME/trunk}
 export WRFVAR_DIR=${WRFVAR_DIR:-$REL_DIR/WRFDA}
@@ -618,8 +619,8 @@ EOF
       cp $WORK_DIR/namelist_wrfvar.output $RUN_DIR/namelist_wrfvar.output
       echo '<A HREF="namelist_wrfvar.output">WRFVAR namelist.output</a>'
    else
-      cp $WORK_DIR/namelist.output $RUN_DIR
-      echo '<A HREF="namelist.output">Namelist.output</a>'
+      cp $WORK_DIR/namelist.output.da $RUN_DIR
+      echo '<A HREF="namelist.output.da">namelist.output.da</a>'
    fi
 
    if [[ -f rsl.out.0000 ]]; then
