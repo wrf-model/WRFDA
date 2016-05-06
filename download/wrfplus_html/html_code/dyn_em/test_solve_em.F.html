@@ -96,7 +96,7 @@
    INTEGER :: l,kte,kk<a name='96'>
 <a name='97'>
 <font color=#447700>! These are used if -DDEREF_KLUDGE is compiled<a name='98'></font>
-<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='99'></font>
+<font color=#447700>!  see http://www2.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='99'></font>
    INTEGER     :: sm31  , em31  , sm32  , em32  , sm33  , em33<a name='100'>
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x<a name='101'>
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y<a name='102'>
@@ -270,7 +270,7 @@ real      ,DIMENSION(grid%sm31:grid%em31,grid%sm32:grid%em32,grid%sm33:grid%em33
 <font color=#447700>! indices to array arguments in the CALL statements in this routine.<a name='270'></font>
 <font color=#447700>! It has the effect of passing only the first element of the array, rather<a name='271'></font>
 <font color=#447700>! than the entire array.  See:<a name='272'></font>
-<font color=#447700>! http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='273'></font>
+<font color=#447700>! http://www2.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='273'></font>
 #include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_5"><A href='../../html_code/dyn_em/test_solve_em.F.html#TEST_SOLVE_EM' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='274'>
 <font color=#447700>! Limit the number of arguments if compiled with -DLIMIT_ARGS by copying<a name='275'></font>
 <font color=#447700>! scalar (non-array) arguments out of the grid data structure into locally<a name='276'></font>

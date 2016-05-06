@@ -80,7 +80,7 @@
    INTEGER :: l,kte,kk<a name='80'>
 <a name='81'>
 <font color=#447700>! These are used if -DDEREF_KLUDGE is compiled<a name='82'></font>
-<font color=#447700>!  see http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='83'></font>
+<font color=#447700>!  see http://www2.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='83'></font>
    INTEGER     :: sm31  , em31  , sm32  , em32  , sm33  , em33<a name='84'>
    INTEGER     :: sm31x , em31x , sm32x , em32x , sm33x , em33x<a name='85'>
    INTEGER     :: sm31y , em31y , sm32y , em32y , sm33y , em33y<a name='86'>
@@ -96,7 +96,7 @@
 <font color=#447700>! indices to array arguments in the CALL statements in this routine.<a name='96'></font>
 <font color=#447700>! It has the effect of passing only the first element of the array, rather <a name='97'></font>
 <font color=#447700>! than the entire array.  See:  <a name='98'></font>
-<font color=#447700>! http://www.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='99'></font>
+<font color=#447700>! http://www2.mmm.ucar.edu/wrf/WG2/topics/deref_kludge.htm<a name='99'></font>
 #include "<A href='../../html_code/include/deref_kludge.h.html'>deref_kludge.h</A>"<A NAME="deref_kludge.h_5"><A href='../../html_code/dyn_em/solve_em_tst.F.html#SOLVE_EM_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><a name='100'>
 <a name='101'>
 <font color=#447700>! Limit the number of arguments if compiled with -DLIMIT_ARGS by copying <a name='102'></font>
@@ -177,7 +177,7 @@
   num_3d_c        = num_chem<a name='177'>
 <a name='178'>
 <font color=#447700>!  Compute these starting and stopping locations for each tile and number of tiles.<a name='179'></font>
-<font color=#447700>!  See: http://www.mmm.ucar.edu/wrf/WG2/topics/settiles<a name='180'></font>
+<font color=#447700>!  See: http://www2.mmm.ucar.edu/wrf/WG2/topics/settiles<a name='180'></font>
   CALL <A href='../../html_code/frame/module_tiles.F.html#SET_TILES'>set_tiles</A><A href='../../html_code/dyn_em/solve_em_tst.F.html#SOLVE_EM_TST' TARGET='bottom_target'><IMG SRC="../../gif/cyan.gif" border=0></a><A NAME="SET_TILES_4"> ( grid , ids , ide , jds , jde , ips , ipe , jps , jpe )<a name='181'>
 <a name='182'>
   itimestep = itimestep + 1<a name='183'>
