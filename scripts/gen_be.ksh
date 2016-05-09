@@ -24,6 +24,7 @@ export GEN_BE_DIR=${GEN_BE_DIR:-$REL_DIR/gen_be}
 export SCRIPTS_DIR=${SCRIPTS_DIR:-$GEN_BE_DIR/scripts}
 
 . ${SCRIPTS_DIR}/gen_be_set_defaults.ksh
+echo "${SCRIPTS_DIR}/gen_be_set_defaults.ksh"
 
 if [[ ! -d $RUN_DIR ]]; then mkdir -p $RUN_DIR; fi
 if [[ ! -d $STAGE0_DIR ]]; then mkdir -p $STAGE0_DIR; fi
@@ -31,24 +32,40 @@ if [[ ! -d $STAGE0_DIR ]]; then mkdir -p $STAGE0_DIR; fi
 mkdir -p $WORK_DIR
 cd $WORK_DIR
 
-# List of standard variables:
-if [[ $MASSCV == "temp" ]]; then
-    STANDARD_VARIABLES="fullflds psi chi t rh ps"
+#-----------------------------------------------------------------------
+# Prerequies, create namelist 
+#-----------------------------------------------------------------------
+
+if [[ -e $WORK_DIR/namelist.input ]]; then
+
+  echo "$WORK_DIR/namelist.input exists, will not create the namelist"
+
 else
-    if [[ $BALPRES == "purestats" ]]; then
-        STANDARD_VARIABLES="fullflds psi chi p rh"
-    else
-        STANDARD_VARIABLES="fullflds psi chi p lbp rh"
-    fi
+
+  echo "create the namelist "
+
+  if [[ -e ${SCRIPTS_DIR}/namelist.template ]]; then
+      echo "using namelist.template ..." 
+      rm -f namelist.input
+      sed -e s/_INTERVAL_/$INTERVAL/g ${SCRIPTS_DIR}/namelist.template > namelist.input
+      sed -e s/_NE_/$NE/g namelist.input > namelist.temp
+      sed -e s/_BE_METHOD_/$BE_METHOD/g namelist.temp > namelist.input
+      cp namelist.input namelist.template
+      rm -f namelist.temp
+
+      #sed -e s/_END_DATE_/_START_DATE_/g namelist.input > namelist.temp
+      #sed -e s/_START_DATE_/$START_DATE/g namelist.temp > namelist.input
+
+      sed -e s/_START_DATE_/$START_DATE/g namelist.input > namelist.temp
+      sed -e s/_END_DATE_/$END_DATE/g namelist.temp > namelist.input
+      rm -f namelist.temp
+
+  else
+      echo "no template file namelist.template available ${SCRIPTS_DIR}/namelist.template"
+      exit -1
+  fi
+
 fi
-for SV in $STANDARD_VARIABLES; do mkdir -p $SV; done
-
-# List of control variables:
-
-for CV in $CONTROL_VARIABLES; do mkdir -p $CV; done
-
-# quick add !--ym--!
-for CV in raincl qcloud qrain qsnow qice rh_psu rhm qcondm qcond vor div; do mkdir -p $CV; done
 
 #------------------------------------------------------------------------
 # Run Stage 0: Calculate ensemble perturbations from model forecasts.
@@ -59,6 +76,7 @@ echo $(date) "Start"
 echo "GEN_BE_DIR is" $GEN_BE_DIR $(svnversion $GEN_BE_DIR)
 
 if $RUN_GEN_BE_STAGE0; then
+
    echo "---------------------------------------------------------------"
    echo "Run Stage 0: Calculate ensemble perturbations from model forecasts."
    echo "---------------------------------------------------------------"
@@ -66,14 +84,14 @@ if $RUN_GEN_BE_STAGE0; then
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
-   if [ $MODEL = "WRF" ]; then
-       $SCRIPTS_DIR/gen_be_stage0_wrf.ksh
-   elif [ $MODEL = "UM" ]; then
-       $SCRIPTS_DIR/gen_be_stage0_um.ksh
-   else
-       echo "Error in the model name" > $RUN_DIR/FAIL
-       exit 1
-   fi
+   filename='standard_variables.txt'
+   if [[  -e ${WORK_DIR}/${filename}  ]] ; then rm -f ${WORK_DIR}/${filename}; fi
+   filename='control_variables.txt'
+   if [[  -e ${WORK_DIR}/${filename}  ]] ; then rm -f ${WORK_DIR}/${filename}; fi
+
+
+#   $SCRIPTS_DIR/gen_be_stage0_wrf.ksh #> gen_be_stage0.log 2>&1
+   $SCRIPTS_DIR/gen_be_stage0.ksh #> gen_be_stage0.log 2>&1
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -84,7 +102,56 @@ if $RUN_GEN_BE_STAGE0; then
 
    export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
+
 fi
+
+#------------------------------------------------------
+# step needed after stage0
+#------------------------------------------------------
+nCV=0
+STANDARD_VARIABLES=""
+CONTROL_VARIABLES=""
+
+# initilize standard variables
+if [[ -e  $WORK_DIR/standard_variables.txt ]] ; then
+   nb_var=`sed '1q' standard_variables.txt`
+   nb_var=$(($nb_var+1))
+   var=`sed ${nb_var}'q' standard_variables.txt`
+   nvar=-1
+   for CV in $var; do
+      if [[ $nvar != -1 ]]; then
+         STANDARD_VARIABLES="$STANDARD_VARIABLES $CV"
+      fi
+      nvar=$(($nvar+1))
+   done
+   echo "$nvar STANDARD_VARIABLES $STANDARD_VARIABLES"
+else
+      echo "$WORK_DIR/standard_variables.txt is missing"
+      exit
+fi
+
+# initilize control variables
+if [[ -e  $WORK_DIR/standard_variables.txt ]] ; then
+   nb_var=`sed '1q' control_variables.txt`
+   nb_var=$(($nb_var+1))
+   var=`sed ${nb_var}'q' control_variables.txt`
+   nvar=-1
+   for CV in $var; do
+      if [[ $nvar = -1 ]]; then
+         nCV=$CV
+      else
+         CONTROL_VARIABLES="$CONTROL_VARIABLES $CV"
+      fi
+      nvar=$(($nvar+1))
+   done
+   echo "$nvar CONTROL_VARIABLES $CONTROL_VARIABLES"
+else
+      echo "$WORK_DIR/control_variables.txt is missing"
+      exit
+fi
+
+for SV in $STANDARD_VARIABLES; do mkdir -p $SV; done
+for SV in $CONTROL_VARIABLES; do mkdir -p ${SV}; done
 
 #------------------------------------------------------------------------
 #  Run Stage 1: Read "standard fields", and remove time/ensemble/area mean.
@@ -98,30 +165,8 @@ if $RUN_GEN_BE_STAGE1; then
    export BEGIN_CPU=$(date)
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
+   
    ln -sf ${BUILD_DIR}/gen_be_stage1.exe .
-
-   cat > gen_be_stage1_nl.nl << EOF
-&gen_be_stage1_nl
-    start_date = '${START_DATE}',
-    end_date = '${END_DATE}',
-    interval = ${INTERVAL},
-    be_method = '${BE_METHOD}',
-    ne = ${NE},
-    bin_type = ${BIN_TYPE},
-    lat_min = ${LAT_MIN},
-    lat_max = ${LAT_MAX},
-    binwidth_lat = ${BINWIDTH_LAT},
-    hgt_min = ${HGT_MIN},
-    hgt_max = ${HGT_MAX},
-    binwidth_hgt = ${BINWIDTH_HGT},
-    dat_dir = '${STAGE0_DIR}',
-    masscv = '${MASSCV}',
-    balpres = '${BALPRES}',
-    vertical_ip =  ${VERTICAL_IP},
-    model = '${MODEL}',
-    N_holm_bins = ${N_HOLM_BINS}/
-EOF
-
    ./gen_be_stage1.exe > gen_be_stage1.log 2>&1
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -147,72 +192,26 @@ if $RUN_GEN_BE_STAGE2; then
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage2.exe .
-
-   cat > gen_be_stage2_nl.nl << EOF
-&gen_be_stage2_nl
-    start_date = '${START_DATE}',
-    end_date = '${END_DATE}', 
-    interval = ${INTERVAL},
-    ne = ${NE},
-    masscv = '${MASSCV}',
-    balpres = '${BALPRES}',
-    nobaldiv = ${NOBALDIV},
-    testing_eofs = ${TESTING_EOFS} /
-EOF
-
    ./gen_be_stage2.exe > gen_be_stage2.log 2>&1
    RC=$?
    if [[ $RC != 0 ]]; then
       echo "Stage 2 failed with error" $RC
       echo "stage 2" > $RUN_DIR/FAIL
-      exit 1
+      #exit 1
    fi
+
+   filename="plot_regcoeff.ncl"
+   cp ${GRAPHICS_DIR}/$filename . 
+   ncl $filename > /dev/null
+   dirout="./plots/regcoeff"
+   mkdir -p $dirout
+   mv regcoeff*${GRAPHIC_WORKS} $dirout
 
    export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
+
 fi
 
-#------------------------------------------------------------------------
-#  Run Stage 2a: Calculate control variable fields.
-#------------------------------------------------------------------------
-
-if $RUN_GEN_BE_STAGE2A; then
-   echo "---------------------------------------------------------------"
-   echo "Run Stage 2a: Calculate control variable fields."
-   echo "---------------------------------------------------------------"
-
-   export BEGIN_CPU=$(date)
-   echo "Beginning CPU time: ${BEGIN_CPU}"
-
-   ln -sf ${BUILD_DIR}/gen_be_stage2a.exe .
-
-   cat > gen_be_stage2a_nl.nl << EOF
-&gen_be_stage2a_nl
-    start_date = '${START_DATE}',
-    end_date = '${END_DATE}', 
-    interval = ${INTERVAL},
-    ne = ${NE},
-    bin_type = ${BIN_TYPE},
-    cv_options = ${CV_OPTIONS},
-    num_passes = ${NUM_PASSES},
-    masscv = '${MASSCV}',
-    balpres = '${BALPRES}',
-    rf_scale = ${RF_SCALE} /
-EOF
-
-   ./gen_be_stage2a.exe > gen_be_stage2a.log 2>&1
-
-   RC=$?
-   if [[ $RC != 0 ]]; then
-      echo "Stage 2a failed with error" $RC
-      echo "stage 2a" > $RUN_DIR/FAIL
-      exit 1
-   fi
-
-   rm -rf ${DELETE_DIRS} 2> /dev/null
-   export END_CPU=$(date)
-   echo "Ending CPU time: ${END_CPU}"
-fi
 
 #------------------------------------------------------------------------
 #  Run Stage 3: Read 3D control variable fields, and calculate vertical covariances.
@@ -228,35 +227,33 @@ if $RUN_GEN_BE_STAGE3; then
    echo "Beginning CPU time: ${BEGIN_CPU}"
 
    ln -sf ${BUILD_DIR}/gen_be_stage3.exe .
+   pwd
+   echo "CV in $CONTROL_VARIABLES"
 
    for CV in $CONTROL_VARIABLES; do
-      cat > gen_be_stage3_nl.nl << EOF
-&gen_be_stage3_nl
-    start_date = '${START_DATE}',
-    end_date = '${END_DATE}', 
-    interval = ${INTERVAL},
-    variable = '${CV}',
-    ne = ${NE},
-    bin_type = ${BIN_TYPE},
-    lat_min = ${LAT_MIN},
-    lat_max = ${LAT_MAX},
-    binwidth_lat = ${BINWIDTH_LAT},
-    hgt_min = ${HGT_MIN},
-    hgt_max = ${HGT_MAX},
-    binwidth_hgt = ${BINWIDTH_HGT},
-    testing_eofs = ${TESTING_EOFS},
-    use_global_eofs = ${USE_GLOBAL_EOFS},
-    data_on_levels = ${DATA_ON_LEVELS} /
-EOF
 
-      ./gen_be_stage3.exe > gen_be_stage3.${CV}.log 2>&1
+      echo "gen_be_stage3.exe $CV"
+      pwd
+      ./gen_be_stage3.exe $CV  > gen_be_stage3.${CV}.log 2>&1
 
       RC=$?
       if [[ $RC != 0 ]]; then
          echo "Stage 3 for $CV failed with error" $RC
          echo "stage 3" > $RUN_DIR/FAIL
-         exit 1
+      #   exit 1
       fi
+      
+      #if [[ $CV = "ps_u" || $CV = "ps" ]];then
+      #   print "no auto_covar computed for variable 2d $CV"
+      #else
+      #   filename="plot_stage3_auto_covar.ncl"
+      #   m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+      #   ncl $filename > /dev/null
+      #   dirout="./plots/autocovar/$CV"
+      #   mkdir -p $dirout
+      #   mv stage3_auto_covar*${GRAPHIC_WORKS} $dirout             
+      #fi
+
    done
 
    export END_CPU=$(date)
@@ -284,7 +281,7 @@ if $RUN_GEN_BE_STAGE4; then
       echo "Run Stage 4: Calculate horizontal covariances (regional lengthscales)."
       echo "---------------------------------------------------------------"
 
-      ${SCRIPTS_DIR}/gen_be_stage4_regional.ksh > gen_be_stage4_regional.log 2>&1
+      ${SCRIPTS_DIR}/gen_be_stage4_regional.ksh #> gen_be_stage4_regional.log 2>&1
       RC=$?
       if [[ $RC != 0 ]]; then
          echo "Stage 4 failed with error" $RC
@@ -304,12 +301,6 @@ fi
 if $RUN_GEN_BE_DIAGS; then
    ln -sf ${BUILD_DIR}/gen_be_diags.exe .
 
-   cat > gen_be_diags_nl.nl << EOF
-&gen_be_diags_nl
-   uh_method = '${UH_METHOD}',
-   n_smth_sl = ${N_SMTH_SL}, /
-EOF
-
    ./gen_be_diags.exe > gen_be_diags.log 2>&1
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -327,13 +318,63 @@ fi
 #------------------------------------------------------------------------
 
 if $RUN_GEN_BE_DIAGS_READ; then
-   cat > gen_be_diags_nl.nl << EOF
-&gen_be_diags_nl
-   uh_method = '${UH_METHOD}' /
-EOF
 
    ln -sf ${BUILD_DIR}/gen_be_diags_read.exe .
    ./gen_be_diags_read.exe > gen_be_diags_read.log 2>&1
+
+   ifort_ls=300
+   ifort_ev=200
+   for CV in $CONTROL_VARIABLES; do
+
+      cp -v fort.${ifort_ls} length_scale_${CV}.dat
+      (( ifort_ls = ifort_ls + 1 ))
+      cp -v fort.${ifort_ev} global_eigenvector_${CV}.dat
+      (( ifort_ev = ifort_ev + 1 ))
+      cp -v fort.${ifort_ev} global_eigenvalues_${CV}.dat
+      (( ifort_ev = ifort_ev + 1 ))
+      cp -v fort.${ifort_ev} local_eigenvector_${CV}.dat
+      (( ifort_ev = ifort_ev + 1 ))
+      cp -v fort.${ifort_ev} local_eigenvalues_${CV}.dat
+      (( ifort_ev = ifort_ev + 1 ))
+
+      filename="gen_be_lengthscale_byvariable.ncl"
+      m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+      ncl $filename > /dev/null
+      dirout="./plots/lengthscale/"
+      mkdir -p $dirout
+      mv gen_be_lengthscale*${GRAPHIC_WORKS} $dirout
+
+   done
+
+   filename="gen_be_global_evals.ncl"
+   m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+   ncl $filename > /dev/null
+   dirout="./plots/globalevals"
+   mkdir -p $dirout
+   filename="gen_be_global_evalsbyvariable.ncl"
+   m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+   ncl $filename > /dev/null
+   mv gen_be_globalevals*${GRAPHIC_WORKS} $dirout
+
+
+   filename="gen_be_global_evecs.ncl"
+   m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+   ncl $filename > /dev/null
+   dirout="./plots/globalevecs"
+   mkdir -p $dirout
+   filename="gen_be_global_evecsbyvariable.ncl"
+   m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+   ncl $filename > /dev/null
+   mv gen_be_globalevecs*${GRAPHIC_WORKS} $dirout
+
+   
+
+   filename="gen_be_lengthscales.ncl"
+   m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+   ncl $filename > /dev/null
+   dirout="./plots/lengthscale"
+   mkdir -p $dirout
+   mv gen_be_lengthscale*${GRAPHIC_WORKS} $dirout
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -341,6 +382,7 @@ EOF
       echo "gen_be_diags_read" > $RUN_DIR/FAIL
       exit 1
    fi
+
 fi
 
 #------------------------------------------------------------------------
@@ -349,23 +391,41 @@ fi
 
 if $RUN_GEN_BE_MULTICOV; then
 
-   export VARIABLE1=t
-   export VARIABLE2=rh
-   export HREF=2
-   
-   $SCRIPTS_DIR/gen_be_cov3d.ksh
+   for CV in $STANDARD_VARIABLES ; do
 
-   RC=$?
-   if [[ $RC != 0 ]]; then
-      echo "gen_be_cov3d failed with error" $RC
-      echo "gen_be_cov3d " > $RUN_DIR/FAIL
-      exit 1
-   fi
+     if [[ $CV == "fullflds" || $CV == "ps_u" || $CV == "ps" || $CV == "psi" || $CV == "vor" ]]; then
+         echo "variable $CV can not be process by GEN_BE_MULTICOV"
+     else
+         echo "RUN_GEN_BE_MULTICOV $CV"
+         VARIABLE1=${CV}_u
+         VARIABLE2=${CV} 
+         ln -sf ${BUILD_DIR}/gen_be_cov3d.exe .
+         
+         echo "./gen_be_cov3d.exe ${VARIABLE1} ${VARIABLE2}"
+         
+         ./gen_be_cov3d.exe ${VARIABLE1} ${VARIABLE2} # > gen_be_cov3d.$VARIABLE1.$VARIABLE1.log 2>&1
+         m4 -D_VAR1_=$VARIABLE1 -D_VAR2_=$VARIABLE2 ${GRAPHICS_DIR}/gen_be_vert_3d_corr.ncl > gen_be_vert_3d_corr.ncl
+         ncl gen_be_vert_3d_corr.ncl > /dev/null
+         mkdir -p ./plots/vert3dcorr
+         mv gen_be_vertcorr*${GRAPHIC_WORKS} ./plots/vert3dcorr 
+
+         RC=$?
+         if [[ $RC != 0 ]]; then
+           echo "gen_be_cov3d failed with error" $RC
+           echo "gen_be_cov3d " > $RUN_DIR/FAIL
+         exit 1
+         fi
+     fi
+
+   done
 
 fi
+
+
 #------------------------------------------------------------------------
 #  Calculate histogram diagnostics:
 #------------------------------------------------------------------------
+#echo "RUN_GEN_BE_HISTOG $RUN_GEN_BE_HISTOG"
 if $RUN_GEN_BE_HISTOG; then
    echo "---------------------------------------------------------------"
    echo "Run Hist: Diagnose pdf for perturbations"
@@ -376,23 +436,12 @@ if $RUN_GEN_BE_HISTOG; then
 
    ln -sf ${BUILD_DIR}/gen_be_hist.exe .
 
-   for CV in t rh rhm qcond qcondm; do
-   export HREF=2
-#      for HREF in 1 2 3 4 5 6; do
-      	cat > gen_be_hist_nl.nl << EOF
-&gen_be_hist_nl
-    start_date = '${START_DATE}',
-    end_date = '${END_DATE}', 
-    interval = ${INTERVAL},
-    variable = '${CV}',
-    ne = ${NE},
-    Nstdev = 5,
-    N_dim_hist = 20,
-    holm_reference = $HREF,
-    N_holm_bins = $N_HOLM_BINS/
-EOF
+   for CV in $CONTROL_VARIABLES; do
 
-      	./gen_be_hist.exe > gen_be_hist.${CV}.log 2>&1
+        if [[ $CV = "ps_u" ]];then
+           print "no histogram for variable 2d $CV"
+        else
+      	./gen_be_hist.exe $CV #> gen_be_hist.${CV}.log 2>&1
 
       	RC=$?
       	if [[ $RC != 0 ]]; then
@@ -400,16 +449,35 @@ EOF
          	echo "Hist" > $RUN_DIR/FAIL
          	exit 1
       	fi
-      done
-#   done
+
+        filename="gen_be_hist_bylev.ncl"
+        m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+        ncl $filename > /dev/null
+        mkdir -p ./plots/hist/${CV}
+        mv hist_${CV}*${GRAPHIC_WORKS} ./plots/hist/${CV}
+
+        fi
+
+   done
 
    export END_CPU=$(date)
    echo "Ending CPU time: ${END_CPU}"
 fi
-#------------------------------------------------------------------------
-if $RUN_GEN_BE_GRAPHICS; then
 
-   $SCRIPTS_DIR/gen_be_graphics.ksh
+
+#-----------------------------------------------------------------------
+
+if $RUN_GEN_BE_VARIANCE_CONTRIB; then
+
+   echo "---------------------------------------------------------------"
+   echo " RUN_GEN_BE_VARIANCE_CONTRIB "
+   echo "---------------------------------------------------------------"
+
+   export BEGIN_CPU=$(date)
+   echo "Beginning CPU time: ${BEGIN_CPU}"
+
+   ln -sf ${BUILD_DIR}/gen_be_variance_contrib.exe .
+   ./gen_be_variance_contrib.exe > variance_contrib.log 2>&1
 
    RC=$?
    if [[ $RC != 0 ]]; then
@@ -417,7 +485,40 @@ if $RUN_GEN_BE_GRAPHICS; then
       echo "gen_be_graphics" > $RUN_DIR/FAIL
       exit 1
    fi
+
+   export END_CPU=$(date)
+   echo "Ending CPU time: ${END_CPU}"
+
+   for CV in $STANDARD_VARIABLES; do
+
+      if [[ $CV == "fullflds" || $CV == "ps" ]]; then
+         echo "no plot cross covariance for ps and fullflds"
+      else
+         filename=${CV}_variance_contrib.txt
+         if [[ -e $filename ]]; then
+
+            # plot cross covar 3d (bin,k,k)
+            filename="plot_vertcovar.ncl"
+            m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+            ncl $filename > /dev/null
+            mkdir -p ./plots/crosscovar
+            mv cross_covar_${CV}*${GRAPHIC_WORKS} ./plots/crosscovar
+
+            # plot contrib of different variance for each CV
+            filename="plot_explained_ratio.ncl"
+            m4 -D_VARIABLE_=$CV ${GRAPHICS_DIR}/$filename > $filename
+            ncl $filename > /dev/null
+            mkdir -p ./plots/variance_contrib            
+            mv explained_*${GRAPHIC_WORKS} ./plots/variance_contrib            
+
+         fi
+      fi
+
+   done
+
 fi
+
+exit
 
 # Preserve the interesting log files
 mv $WORK_DIR/*log $RUN_DIR

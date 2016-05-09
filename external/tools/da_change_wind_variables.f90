@@ -82,6 +82,7 @@ subroutine da_uv_to_div_c( dim1, dim2, ds, &
 
 end subroutine da_uv_to_div_c
 
+
 subroutine da_uv_to_vor_c( dim1, dim2, ds, &
                            mapfac_m, mapfac_u, mapfac_v, &
                            u, v, vor )

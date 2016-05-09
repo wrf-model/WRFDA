@@ -353,7 +353,7 @@ while ( <CONFIGURE_DEFAULTS> )
       { $_ =~ s/CONFIGURE_WRFIO_GRIB2/wrfio_grib2/g ;
         $_ =~ s:CONFIGURE_GRIB2_FLAG:-DGRIB2:g ;
         $_ =~ s:CONFIGURE_GRIB2_INC:-I$sw_jasperinc_path:g ;
-        $_ =~ s:CONFIGURE_GRIB2_LIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/io_grib2 -lio_grib2 -L$sw_jasperlib_path -ljasper:g ;
+        $_ =~ s:CONFIGURE_GRIB2_LIB:-L$sw_jasperlib_path -ljasper:g ;
       }
     else                   
       { $_ =~ s/CONFIGURE_WRFIO_GRIB2//g ;

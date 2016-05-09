@@ -23,11 +23,12 @@ echo "---------------------------------------------------------------"
 export BEGIN_CPU=$(date)
 echo "Beginning CPU time: ${BEGIN_CPU}"
 
-export TMP_DIR=${WORK_DIR}/gen_be_stage4_regional.${STRIDE}
+export TMP_DIR=${WORK_DIR}/gen_be_stage4_regional
 if [[ ! -d $TMP_DIR ]]; then mkdir $TMP_DIR 2> /dev/null; fi
 
+#===============================================================
 for VARIABLE in $CONTROL_VARIABLES; do
-
+#===============================================================
    # Check data exists:
    if [[ ! -d ${WORK_DIR}/$VARIABLE ]]; then
       echo "Input data directory ${WORK_DIR}/$VARIABLE is missing. Exiting"
@@ -43,42 +44,54 @@ for VARIABLE in $CONTROL_VARIABLES; do
    let VINDEX=1
    let JOB=1
 
+   #==============================================================
    while [[ $VINDEX -le $MAX_VINDEX ]]; do
+   #==============================================================
       export TMP_DIR1=${TMP_DIR}/dir.${VARIABLE}${VINDEX}
       mkdir ${TMP_DIR1} 2> /dev/null
       cd ${TMP_DIR1}
 
-      ln -sf ${BUILD_DIR}/gen_be_stage4_regional.exe .
+      ln -sf ${WORK_DIR}/namelist.input .
+      ln -sf ${WORK_DIR}/mesh_grid.nc .
+      ln -sf ${WORK_DIR}/bins.nc .
+      ln -sf ${WORK_DIR}/mask .
+      #ln -sf ${BUILD_DIR}/gen_be_stage4.exe .
+      cp ${BUILD_DIR}/gen_be_stage4.exe .
+  pwd
 
-      # Create namelist:
-      cat > gen_be_stage4_regional_nl.nl << EOF
-&gen_be_stage4_regional_nl
-    start_date = '${START_DATE}',
-    end_date = '${END_DATE}', 
-    interval = ${INTERVAL},
+  cat > gen_be_stage4_nl.nl << EOF
+&gen_be_stage4_nl
     variable = '${VARIABLE}',
-    ne = ${NE},
-    k = ${VINDEX},
-    stride = ${STRIDE},
-    nbins = ${NBINS},
-    ibin = ${IBIN},
-    sl_method = ${SL_METHOD},
-    run_dir = '${WORK_DIR}' /
+    k = ${VINDEX} /
 EOF
- 
+pwd
+
+   
+#  echo "./gen_be_stage4.exe $VARIABLE $VINDEX" 
+#  ./gen_be_stage4.exe $VARIABLE $VINDEX
       if $LOCAL; then
          echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on local machine"
          # (./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1) &
-         ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 &
+         (./gen_be_stage4.exe $VARIABLE $VINDEX  gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 &) 
+         echo "./gen_be_stage4.exe $VARIABLE $VINDEX"
+         pwd
       else
          export MACHINE=${MACHINES[$JOB]}
+         logfile=${TMP_DIR1}/file.log
          echo "Submitting job for variable $VARIABLE and vertical index $VINDEX on $MACHINE"
-   bsub -a poe -n $NUM_PROCS -o mod_reg.out -e mod_reg.err -J mod_reg -q $QUEUE -W $WALL_CLOCK -P $PROJECT mpirun.lsf ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 &
+cat > gen_be_stage4_regional.csh << EOF
+#!/bin/csh
+cd $TMP_DIR1
+./gen_be_stage4.exe
+EOF
+chmod 755 gen_be_stage4_regional.csh 
 
-#
-#         (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1") &
+#qsub -l nodes=1:ppn=4,walltime=$WALLTIME -N stage4 -j oe -o ${logfile}  ./gen_be_stage4_regional.csh > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 &
+#  (rsh -n $MACHINE "cd $TMP_DIR1; ./gen_be_stage4_regional.exe > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1") &
 
-         sleep 2 # Create small gap between submissions to avoid overwriting output.
+ ./gen_be_stage4_regional.csh ##  > gen_be_stage4_regional_${VARIABLE}_${VINDEX}.out 2>&1 
+
+      sleep 2 # Create small gap between submissions to avoid overwriting output.
       fi
 
       if [[ $SL_METHOD -le 1 ]] ; then
@@ -93,8 +106,14 @@ EOF
          let JOB=1
       fi
  
+   #==============================================================
    done  # End loop over VINDEX.
+   #==============================================================
+
+#========================================================
 done     # End loop over VARIABLE.
+#========================================================
+
 
 for VARIABLE in $CONTROL_VARIABLES; do
 
@@ -111,21 +130,20 @@ for VARIABLE in $CONTROL_VARIABLES; do
     SL_FILE=${TMP_DIR}/dir.${VARIABLE}${MAX_VINDEX}/sl_print.${VARIABLE}.${MAX_VINDEX}
     fi  
    else
-   SL_FILE=${TMP_DIR}/dir.${VARIABLE}1/sl_print.${VARIABLE}
+   SL_FILE=${TMP_DIR}/dir.${VARIABLE}1/sl_print.b001.${VARIABLE}
    fi
    
-   if [[ $SL_METHOD -le 1 ]] ; then
-      while [[ ! -s ${SL_FILE} ]] ; do
-      echo "Waiting for sl file: " ${SL_FILE}
-      sleep 60
-      done  # End loop over Waiting for lat sl
-   fi
+   while [[ ! -s ${SL_FILE} ]] ; do
+   echo "Waiting for sl file: " ${SL_FILE}
+   sleep 60
+
+   done  # End loop over Waiting for lat sl
    
    let VINDEX=1
    if [[ $SL_METHOD -le 1 ]] ; then
-   cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
+      cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_* ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
    else
-   cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_print.${VARIABLE} ${WORK_DIR}/${VARIABLE}/sl_print.${VARIABLE}
+      cp ${TMP_DIR}/dir.${VARIABLE}${VINDEX}/sl_print.b*${VARIABLE} ${WORK_DIR}/${VARIABLE}
    fi
 
    if [[ $SL_METHOD -le 1 ]] ; then

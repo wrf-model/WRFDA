@@ -53,12 +53,12 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d
    integer,        intent(out) :: bin(1:ni,1:nj,1:nk) ! Bin at each 3D point
    integer,        intent(out) :: bin2d(1:ni,1:nj)    ! Bin at each 2D point
 
-   real, optional, intent(in)  :: lat_min, lat_max    ! Used if bin_type = 2 (deg)
-   real, optional, intent(in)  :: binwidth_lat        ! Used if bin_type = 2 (deg)
-   real, optional, intent(in)  :: hgt_min, hgt_max    ! Used if bin_type = 2 (deg)
-   real, optional, intent(in)  :: binwidth_hgt        ! Used if bin_type = 2 (m).
-   real, optional, intent(in)  :: latitude(1:ni,1:nj) ! Latitude (degrees).
-   real, optional, intent(in)  :: height(1:ni,1:nj,1:nk)     ! Height (m).
+   real(kind=8), optional, intent(inout)  :: lat_min, lat_max    ! Used if bin_type = 2 (deg)
+   real(kind=8), optional, intent(inout)  :: binwidth_lat        ! Used if bin_type = 2 (deg)
+   real(kind=8), optional, intent(inout)  :: hgt_min, hgt_max    ! Used if bin_type = 2 (deg)
+   real(kind=8), optional, intent(in)  :: binwidth_hgt        ! Used if bin_type = 2 (m).
+   real(kind=8), optional, intent(in)  :: latitude(1:ni,1:nj) ! Latitude (degrees).
+   real(kind=8), optional, intent(in)  :: height(1:ni,1:nj,1:nk)     ! Height (m).
 
    integer           :: b, i, j, k                 ! Loop counters.
    integer           :: count                      ! Counter
@@ -177,18 +177,24 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d
 
    else if (bin_type == 3) then    ! Latitude/nk bins:
 
+
       ! Setup latitude bins:
+      lat_min = minval(latitude)
+      lat_max = maxval(latitude)
+      num_bins_lat = floor (abs((lat_max - lat_min) / binwidth_lat) ) + 1
+      allocate(binstart_lat(1:num_bins_lat))
+      binstart_lat(1) = lat_min
+      do i=2, num_bins_lat 
+         binstart_lat(i) = binstart_lat(1) + binwidth_lat*(i-1)
+      end do
+      if ( binstart_lat(num_bins_lat).gt.lat_max ) then
+         num_bins_lat = num_bins_lat-1
+      end if
+      write(*,*)'limit between interval ',binstart_lat(1:num_bins_lat)
       write(unit=stdout,fmt='(/a,f12.5)')'   Minimum latitude = ', lat_min
       write(unit=stdout,fmt='(a,f12.5)')'    Maximum latitude = ', lat_max
       write(unit=stdout,fmt='(a,f12.5)')'    Latitude bin width = ',binwidth_lat
-      num_bins_lat = nint((lat_max - lat_min) / binwidth_lat)
-      write(unit=stdout,fmt='(a,i8)') &
-         '    Number of latitude bins = ', num_bins_lat
-   
-      allocate(binstart_lat(1:num_bins_lat))
-      do b = 1, num_bins_lat ! Assume south to north (as in WRF).
-         binstart_lat(b) = lat_min + real(b-1) * binwidth_lat
-      end do
+      write(unit=stdout,fmt='(a,i8)') '    Number of latitude bins = ',num_bins_lat 
 
       num_bins = num_bins_lat * nk
       num_bins2d = num_bins_lat
@@ -199,6 +205,7 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d
             do k = 1, nk
                ! Select latitude bin that point falls in:
                if (k == 1) then
+                  bin_lat = 1 !! Double check GSI is needed
                   do b = 1, num_bins_lat-1
                      if (latitude(i,j) >= binstart_lat(b) .and. &
                         latitude(i,j) < binstart_lat(b+1)) then
@@ -278,6 +285,16 @@ subroutine da_create_bins(ni, nj, nk, bin_type, num_bins, num_bins2d, bin, bin2d
          bin(:,:,k) = k
       end do
       bin2d(:,:) = 1
+   
+   else if (bin_type == 8) then
+       
+      num_bins = 6*nk
+      num_bins2d = 6 
+
+      do k = 1, nk
+         bin(:,:,k) = k
+      end do
+      bin2d(:,:) = 1 
       
    end if
 
@@ -333,7 +350,7 @@ subroutine da_filter_regcoeffs(ni, nj, nk, num_bins, num_bins2d, num_passes, &
 end subroutine da_filter_regcoeffs
 
 
-subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3,k,field)
+subroutine da_get_field( input_file, var, field_dims, dim1, dim2, dim3, k, field)
 
    !-----------------------------------------------------------------------
    ! Purpose: TBD
@@ -1784,7 +1801,7 @@ subroutine da_get_height( input_file, dim1, dim2, dim3, height)
    
    character(len=200), intent(in)  :: input_file       ! 1 file nane.
    integer,            intent(in)  :: dim1, dim2, dim3          ! Dimensions.
-   real,               intent(out) :: height(1:dim1,1:dim2,1:dim3) ! Height.
+   real(kind=8),               intent(out) :: height(1:dim1,1:dim2,1:dim3) ! Height.
 
    character(len=12) :: var                            ! Variable to search for.
    integer           :: k                              ! Loop counter.
@@ -2498,10 +2515,10 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
          close(iunit)
          call da_free_unit(iunit)
 
-         write(outunit)variable
-         write(outunit)max_wavenumber, k
-         write(outunit) .false. ! preserve file format
-         write(outunit)total_power(:)
+         !write(outunit)variable
+         !write(outunit)max_wavenumber, k
+         !write(outunit) .false. ! preserve file format
+         !write(outunit)total_power(:)
 
          first_time = .false.
       end do
@@ -2517,12 +2534,16 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
       call da_get_unit(iunit)
       filename = trim(variable)//'/'//'sl_print.'//trim(variable)
       open (iunit, file = filename)
-
+      write(*,*)'after read'
       do k=1, nk
          read(iunit,'(a,2e20.8)') ck, ml, scale_length(k)
+         write(iunit,'(a,2e20.8)') ck, ml, scale_length(k)
+     
          ! If missing value is encountered, use the value from the last
          ! mode or level (YRG, 06/30/2005):
-         if (ml == 0.0 .and. scale_length(k) == 0.0) &
+         !if ( k .ge. 1 ) then
+           !write(*,*)'coucou gael ',k
+           if (ml == 0.0 .and. scale_length(k) == 0.0) &
              scale_length(k) = scale_length(k-1)
       end do
 
@@ -2544,8 +2565,8 @@ subroutine da_readwrite_be_stage4(outunit, nk, uh_method, n_smth_sl, variable)
          scale_length = sl_smth 
       end do
      
-      write(outunit) variable
-      write(outunit) scale_length
+      !write(outunit) variable
+      !write(outunit) scale_length
 
       close(iunit)
       call da_free_unit(iunit)
@@ -4015,9 +4036,9 @@ subroutine da_transform_vptovv (evec, eval, vertical_wgt, vp, vv, mz, &
    integer, intent(in)    :: its,ite, jts,jte, kts,kte  ! tile   dims
    real*8,  intent(in)    :: evec(jts:jte,kds:kde,1:mz) ! Eigenvectors.
    real*8,  intent(in)    :: eval(jts:jte,1:mz)         ! Eigenvalues.
-   real,    intent(in)    :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
-   real,    intent(inout) :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
-   real,    intent(out)   :: vv(ims:ime,jms:jme,1:mz)   ! CV in EOF space.
+   real(kind=8),    intent(in)    :: vertical_wgt(ims:ime,jms:jme,kms:kme) ! Weighting.
+   real(kind=8),    intent(inout) :: vp(ims:ime,jms:jme,kms:kme)! CV in level space.
+   real(kind=8),    intent(out)   :: vv(ims:ime,jms:jme,1:mz)   ! CV in EOF space.
    
    integer :: i, j, m                    ! Loop counters.
    real    :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)
@@ -4409,8 +4430,8 @@ subroutine da_invert_var(var_inv, var, num_bins2d, nk, testing_eofs)
    
    implicit none
 
-   real, intent(in)   :: var(1:nk,1:nk,1:num_bins2d)          ! 2D variance matrix
-   real, intent(out)  :: var_inv(1:nk,1:nk,1:num_bins2d)      ! inverse 2D variance matrix
+   real(kind=8), intent(in)   :: var(1:nk,1:nk,1:num_bins2d)          ! 2D variance matrix
+   real(kind=8), intent(out)  :: var_inv(1:nk,1:nk,1:num_bins2d)      ! inverse 2D variance matrix
 
    logical, intent(in) :: testing_eofs               ! True if testing EOF decomposition.
 
@@ -4504,6 +4525,7 @@ subroutine da_invert_var(var_inv, var, num_bins2d, nk, testing_eofs)
    deallocate( LamInvET )
 
 end subroutine da_invert_var
+
 subroutine da_transform_vptovv_bin7(evec,eval,vertical_wgt,vp,vv,nb,ni,nj,nk,bin2d)
 
    !---------------------------------------------------------------------------
@@ -4516,12 +4538,12 @@ subroutine da_transform_vptovv_bin7(evec,eval,vertical_wgt,vp,vv,nb,ni,nj,nk,bin
    implicit none
 
    integer, intent(in)    :: nb, ni, nj, nk                ! Dimensions
-   real,    intent(in)    :: evec(1:nb,1:nk,1:nk)          ! Eigenvectors.
-   real,    intent(in)    :: eval(1:nb,1:nk)               ! Eigenvalues.
-   real,    intent(in)    :: vertical_wgt(1:ni,1:nj,1:nk)  ! Weighting.
+   real(kind=8),    intent(in)    :: evec(1:nb,1:nk,1:nk)          ! Eigenvectors.
+   real(kind=8),    intent(in)    :: eval(1:nb,1:nk)               ! Eigenvalues.
+   real(kind=8),    intent(in)    :: vertical_wgt(1:ni,1:nj,1:nk)  ! Weighting.
    integer, intent(in)    :: bin2d(1:ni,1:nj)              ! Binning
-   real,    intent(inout) :: vp(1:ni,1:nj,1:nk)            ! CV in level space.
-   real,    intent(out)   :: vv(1:ni,1:nj,1:nk)            ! CV in EOF space.
+   real(kind=8),    intent(inout) :: vp(1:ni,1:nj,1:nk)            ! CV in level space.
+   real(kind=8),    intent(out)   :: vv(1:ni,1:nj,1:nk)            ! CV in EOF space.
    
    integer :: i, j, k, b                 ! Loop counters.
    real    :: ETVp                       ! E(k,m)^{T}*vp(i,j,k)

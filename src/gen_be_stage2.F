@@ -1,3 +1,5 @@
+
+
 program gen_be_stage2
 !---------------------------------------------------------------------- 
 ! Purpose: Compute regression coefficients.
@@ -12,7 +14,16 @@ program gen_be_stage2
 !          Adaptation for the UK MetO model and variational system
 ! 01/07/11 Y. Michel (Meteo France)
 !          Phasing geographical masks, combining with former stage 2a
+! 01/07/12 Gael Descombes  NCAR/ESSL/MMM (new features of gen_be)  
+!          Algorithm independent of the CV, implementation the method
+!          to compute the regression coeff, using cholesky 
 !----------------------------------------------------------------------
+   use variable_types
+   use io_output
+   use io_input
+   use io_input_model
+   use io_output_application
+
 
    use da_control, only : stdout, stderr, filename_len
    use da_tools_serial, only : da_get_unit, da_advance_cymdh
@@ -23,104 +34,124 @@ program gen_be_stage2
 
    real, parameter     :: variance_threshold = 1e-6  ! Percentage of variance discarded.
 
-   character*10        :: start_date, end_date       ! Starting and ending dates.
    character*10        :: date, new_date             ! Current date (ccyymmddhh).
    character*10        :: variable                   ! Variable name
-   character(len=filename_len)        :: filename                   ! Input filename.
-   character*3         :: ce                         ! Member index -> character.
-   character (len=3)   :: model                      ! Model name 'WRF', 'GSI' or 'UM' etc. 
-   character (len=4)   :: masscv                     ! Mass ctrl variable = pres or temp
-   character (len=10)  :: balpres                    ! Balance pressure = purestats or linestats
+   character*3         :: ce2                        ! Variable name
+   character(len=filename_len)        :: filename, varname, filename2                   ! Input filename.
+   character(len=filename_len), dimension(100) :: regcoeff_name   
 
    integer             :: ni, nj, nk, nkdum          ! Grid dimensions.
-   integer             :: i, j, k, member, k2, k3, m ! Loop counters.
-   integer             :: b                          ! Bin marker.
+   integer             :: i, j, k, member, member2, k1, k2, k3, m, ll, i1 ,j1 ! Loop counters.
+   integer             :: b, funit                          ! Bin marker.
    integer             :: sdate, cdate, edate        ! Starting, current ending dates.
-   integer             :: interval                   ! Period between dates (hours).
-   integer             :: ne                         ! Number of ensemble members.
-   integer             :: mmax                       ! Maximum mode (after variance truncation)..
-   integer             :: bin_type                   ! Type of bin to average over.
-   integer             :: num_bins                   ! Number of bins (3D fields).
-   integer             :: num_bins2d                 ! Number of bins (2D fields).
-   
-   real                :: lat_min, lat_max           ! Used if bin_type = 2 (degrees).
-   real                :: binwidth_lat               ! Used if bin_type = 2 (degrees).
-   real                :: hgt_min, hgt_max           ! Used if bin_type = 2 (m).
-   real                :: binwidth_hgt               ! Used if bin_type = 2 (m).
-   real                :: coeffa, coeffb             ! Accumulating mean coefficients.
-   real                :: total_variance             ! Total variance of <psi psi> matrix.
-   real                :: cumul_variance             ! Cumulative variance of <psi psi> matrix.
-   real                :: summ                       ! Summation dummy.
-   
-   logical             :: first_time                 ! True if first file.
-   logical             :: testing_eofs               ! True if testing EOF decomposition.
-   logical             :: nobaldiv                   ! True means chi_u = chi.
 
-   real, allocatable   :: latitude(:,:)              ! Latitude (degrees, from south).
-   real, allocatable   :: height(:,:,:)              ! Height field.
-   real, allocatable   :: psi(:,:,:)                 ! psi.
-   real, allocatable   :: chi(:,:,:)                 ! chi.
-   real, allocatable   :: temp(:,:,:)                ! Temperature.
-   real, allocatable   :: pres(:,:,:)                ! Pressure.
-   real, allocatable   :: lbpres(:,:,:)              ! linear balance pressure.
-   real, allocatable   :: ps(:,:)                    ! Surface pressure.
-   
-   integer, allocatable:: bin(:,:,:)                 ! Bin assigned to each 3D point.
-   integer, allocatable:: bin2d(:,:)                 ! Bin assigned to each 2D point.
-   integer, allocatable:: bin_pts(:)                 ! Number of points in bin (3D fields).
-   integer, allocatable:: bin_pts2d(:)               ! Number of points in bin (2D fields).
-   
-   real, allocatable   :: covar1(:)                  ! Covariance between input fields.
-   real, allocatable   :: covar2(:,:)                ! Covariance between input fields.
-   real, allocatable   :: covar3(:,:,:)              ! Covariance between input fields.
-   real, allocatable   :: covar3p(:,:,:)             ! Covariance between input fields.
-   
-   real, allocatable   :: var1(:)                    ! Autocovariance of field.
-   real, allocatable   :: var2(:,:,:)                ! Autocovariance of field.
-   real, allocatable   :: var2_inv(:,:,:)            ! Inverse Autocovariance of field.
-   real, allocatable   :: var2p(:,:,:)               ! Autocovariance of field.
-   real, allocatable   :: var2p_inv(:,:,:)           ! Inverse Autocovariance of field.
+   type (field3DReal) , pointer :: varce3d, varce3d_inv, varce3d_filt, varce3d_filt2
+   type (field3DReal) , pointer :: fld3d_tmp, fld3d_tmp2, fld3d_tmpa, fld3d_tmpb
+   type (field1DReal) , pointer :: varce1d, varce1d_bin2d,varce1d0
 
-   real, allocatable   :: work(:,:)                  ! EOF work array.
-   real, allocatable   :: evec(:,:)                  ! Gridpoint eigenvectors.
-   real, allocatable   :: eval(:)                    ! Gridpoint sqrt(eigenvalues).
-   real, allocatable   :: LamInvET(:,:)              ! ET/sqrt(Eigenvalue).
-   real, allocatable   :: regcoeff_psi_chi(:)        ! psi/chi regression cooefficient.
-   real, allocatable   :: regcoeff_psi_ps(:,:)       ! psi/ps regression cooefficient.
-   real, allocatable   :: regcoeff_psi_temp(:,:,:)   ! psi/T regression cooefficient.
-   real, allocatable   :: regcoeff_lbpb_temp(:,:,:)  ! psi/p or lbp/p regression cooefficient.
+   integer :: cc, vv2
+   type (mesh_type), pointer :: mesh
+   type (state_type), pointer :: state2, variance
+   type (bins_type), pointer :: bins
+   type (state_matrix_type), pointer :: covarce, regcoeff
+   real :: summ, summ1, summ2
 
-   namelist / gen_be_stage2_nl / start_date, end_date, interval, &
-                                 ne, testing_eofs, masscv, balpres, &
-                                 nobaldiv, model, bin_type
+   integer :: counter
 
-   integer :: ounit,iunit,namelist_unit
+   real, allocatable :: cpt_3dfilt(:), cpt_3dfilt2(:)
+   real*8 :: mask0
+
+   ! -------------------------------------------
+   type (field3dReal), pointer :: field3d, varce3d_tild, var3d_tild
+   integer :: inv_dim2d, l, kb 
+   type (field3dReal), pointer ::  biga8_bin
+   !type (field2dReal), pointer :: bigxkm, vng, vorr, tlflt
+   type (field2dReal), pointer :: func, p88_bin, vorr
+   character(len=32) :: fieldName
+   real :: mean_field
+   integer :: ierror
+   !logical :: use_chol
+   logical :: file_here = .false.
+   logical :: file_here2 = .false.
+   !----------------------------------------------
 
 
-   stderr = 0
-   stdout = 6
 
-!---------------------------------------------------------------------------------------------
+!========================================================================================
+! Allocation section
+!========================================================================================
+!----------------------------------------------------------------------------------------
    write(6,'(a)')' [1] Initialize namelist variables and other scalars.'
+!----------------------------------------------------------------------------------------
+
+   ! alloc mesh and state
+   use_chol_reg = .false.
+   call read_namelist(nVar2d,nVar3d)
+   filename = 'mesh_grid.nc'
+   call get_vardim(filename, Dim1, Dim2, Dim3)
+   call allocate_state(state2, Dim1, Dim2, Dim3, nvar, cv_list, vardim_list)
+   call check_state(state2,10,10,10)
+   call init_mesh(filename, mesh, model)
+
+   ! alloc bins
+   call init_bins('bins.nc', bins)  
+   write(*,*)'Dim3, nvar ',Dim3, nvar
+
+   ! alloc matrix
+   write(*,*)'cv_list ',cv_list
+   !write(*,*)'covar_ID  ',covar_ID
+   filename='covarce'
+   call allocate_state_matrix(covarce, bins, Dim3, nvar, covar_ID,cv_list,filename)
+   filename='regcoeff'
+   call allocate_state_matrix(regcoeff, bins, Dim3, nvar, covar_ID, cv_list,filename)
+
+   ! alloc one field for variance 1d,2d,3d
+   varname='varce_'//cv_list(1)
+   call allocate_field(varce1d, trim(varname), bins%num_bins)
+   call allocate_field(varce1d_bin2d, trim(varname), bins%num_bins2d)
+   call allocate_field(varce3d,trim(varname), Dim3, Dim3, bins%num_bins2d)
+   call allocate_field(varce3d_filt,trim(varname), Dim3, Dim3, bins%num_bins2d)
+   call allocate_field(varce3d_filt2,trim(varname), Dim3, Dim3, bins%num_bins2d)
+   varname='inv_'//trim(varname)
+   call allocate_field(varce3d_inv,trim(varname), Dim3, Dim3, bins%num_bins2d)
+   varce1d%array = 0.0
+   varce1d_bin2d%array = 0.0
+   varce3d%array = 0.0
+   allocate(cpt_3dfilt(Dim3))
+   allocate(cpt_3dfilt2(Dim3))
+                          varce3d_filt%array(:,:,:) = 0.0
+                          varce3d_filt2%array(:,:,:) = 0.0
+                          cpt_3dfilt(:)  = 0
+                          cpt_3dfilt2(:) = 0 
+
+   call allocate_field(fld3d_tmp,trim(varname), Dim1, Dim2, Dim3) 
+   call allocate_field(fld3d_tmp2,trim(varname), Dim1, Dim2, Dim3) 
+   call allocate_field(fld3d_tmpa,trim(varname), Dim1, Dim2, Dim3) 
+   call allocate_field(fld3d_tmpb,trim(varname), Dim1, Dim2, Dim3) 
+
+   vardim_list2 = vardim_list
+   !vardim_list2(1) = 1
+   where ( vardim_list2(:) .eq. 2 ) vardim_list2(:) = 1
+   do vv=1, nvar
+      tmp_list(vv)  = 'vert_varce_'//trim(cv_listu(vv))
+   end do
+   !call allocate_state_bin(variance, bins%num_bins, bins%num_bins2d, Dim3, nvar, tmp_list, vardim_list2)
+
+   
+   if ( use_chol_reg ) then
+      call allocate_field(field3d, fieldName, Dim1, Dim2, Dim3)
+      field3d%array=0.0
+      call allocate_field(varce3d_tild, fieldName, Dim3, Dim3, bins%num_bins2d)
+      call allocate_field(var3d_tild, fieldName, Dim1, Dim2, Dim3)
+      call allocate_field(vorr, fieldName, Dim3, Dim3)
+      call allocate_field(func, fieldName, Dim3, Dim3)
+      call allocate_field(biga8_bin, fieldName, Dim3, Dim3, bins%num_bins2d)
+      call allocate_field(p88_bin, fieldName, Dim3, bins%num_bins2d)
+   end if
+
 !---------------------------------------------------------------------------------------------
-
-   call da_get_unit(ounit)
-   call da_get_unit(iunit)
-   call da_get_unit(namelist_unit)
-
-   start_date = '2004030312'
-   end_date = '2004033112'
-   interval = 24
-   ne = 1
-   testing_eofs = .true.
-   masscv = ""
-   balpres = ""
-   nobaldiv = .false.
-
-   open(unit=namelist_unit, file='gen_be_stage2_nl.nl', &
-        form='formatted', status='old', action='read')
-   read(namelist_unit, gen_be_stage2_nl)
-   close(namelist_unit)
+   write(6,'(2a)')' [2] Read fields, and calculate correlations'
+!--------------------------------------------------------------------------------------------- 
 
    read(start_date(1:10), fmt='(i10)')sdate
    read(end_date(1:10), fmt='(i10)')edate
@@ -129,397 +160,567 @@ program gen_be_stage2
    write(6,'(a,i8,a)')' Interval between dates = ', interval, 'hours.'
    write(6,'(a,i8)')' Number of ensemble members at each time = ', ne
 
-   date = start_date
-   cdate = sdate
-   
-   ! Note: these flags should be set up with model choice
-   print*,"masscv  = ", masscv
-   print*,"balpres = ", balpres
+   !=====================================================================
+   do ii = 2, nvar ! loop to compute covar
+   !===================================================================== 
 
-   if (masscv.eq."temp") then
-      write(UNIT=6,FMT='(a)') " masscv = Temperature"
-   else
-      write(UNIT=6,FMT='(a)') " masscv = Pressure"
-   endif
-   if (balpres.eq."purestats") then
-      write(UNIT=6,FMT='(a)') &
-      " balpres = Purely statistical: Psi-(P or T) regression)"
-   else
-      write(UNIT=6,FMT='(a)') &
-      " balpres = linear balance and Pb-P regression"
-   endif
+   jj = ii -1 ! indice column
+   bins%bin2d_pts%array = 0
+   bins%bin_pts%array = 0
 
-   if ( .not. nobaldiv ) then
-      write(UNIT=6,FMT='(a)') &
-      " We compute the Psi-Chi regression"
-   else
-      write(UNIT=6,FMT='(a)') &
-      " No Psi-Chi regression : chi_u = chi)"
-   endif   
+   if (ncovar_row(jj).gt.0) then
 
-!---------------------------------------------------------------------------------------------
-   write(6,'(2a)')' [2] Read fields, and calculate correlations'
-!--------------------------------------------------------------------------------------------- 
+   ! for variable 3d, if there is regression for this variable in the row(jj)
+   if (( use_chol_reg ) .and. (vardim_list(jj).eq.3))  then
 
-   first_time = .true.
+      write(*,*)'=============================================================='
+      write(*,*)' preprocess for GSI regcoeff method '
+      write(*,*)'=============================================================='
 
-   do while ( cdate <= edate )
-      write(6,'(a,a)')'    Processing data for date ', date
+      date = start_date
+      cdate = sdate
+      counter = 0
+      fieldName=trim(cv_listu(jj))
+      vorr%array = 0.0
 
-      do member = 1, ne
+      do while ( cdate <= edate )
+         write(6,'(a,a)')' Processing data for date ', date
 
-         write(ce,'(i3.3)')member
+         do member = 1, ne
+            write(ce,'(i3.3)')member
+            write(*,*)'member : ',ce
 
-!        Read dimensions:
-         variable = 'psi'
-         filename = trim(variable)//'/'//date(1:10)
-         filename = trim(filename)//'.'//trim(variable)//'.e'//ce
-         open (iunit, file = filename, form='unformatted')
-         read(iunit) ni, nj, nk
-	 close(iunit)
-	 
-         if ( first_time ) then
-            write(6,'(a,3i8)')'    i, j, k dimensions are ', ni, nj, nk
-            allocate( bin(1:ni,1:nj,1:nk) )
-            allocate( bin2d(1:ni,1:nj) )
-            allocate( psi(1:ni,1:nj,1:nk) )
-            allocate( chi(1:ni,1:nj,1:nk) )
-            allocate( temp(1:ni,1:nj,1:nk) )
-            allocate( ps(1:ni,1:nj) )
-            allocate( pres(1:ni,1:nj,1:nk) )
-            allocate( lbpres(1:ni,1:nj,1:nk) )
-         end if
+            if ( vardim_list(jj).eq.3 ) then
+               ! read var 
+               filename=trim(cv_listu(jj))
+               field3d%ioinfo%fieldname = trim(filename)
+               filename=trim(filename)//'/'//trim(filename)//'.'//date(1:10)//'.e'//trim(ce)
+               file_here = .false.
+               inquire(file=trim(filename),exist=file_here)
+               if ( file_here ) then
 
-         if ( first_time ) then
-!           Read bin info:
-            filename = 'bin.data'
-            open (iunit, file = filename, form='unformatted')
-            read(iunit)bin_type
-            read(iunit)lat_min, lat_max, binwidth_lat
-            read(iunit)hgt_min, hgt_max, binwidth_hgt
-            read(iunit)num_bins, num_bins2d
-            read(iunit)bin(1:ni,1:nj,1:nk)
-            read(iunit)bin2d(1:ni,1:nj)
-            close(iunit)
-
-            allocate( bin_pts(1:num_bins) )
-            allocate( bin_pts2d(1:num_bins2d) )
-            allocate( covar1(1:num_bins) )
-            allocate( covar2(1:nk,1:num_bins2d) )
-            allocate( covar3(1:nk,1:nk,1:num_bins2d) )
-            allocate( covar3p(1:nk,1:nk,1:num_bins2d) )
-            allocate( var1(1:num_bins) )
-            allocate( var2(1:nk,1:nk,1:num_bins2d) )
-            allocate( var2p(1:nk,1:nk,1:num_bins2d) )
-            bin_pts(:) = 0
-            bin_pts2d(:) = 0
-            covar1(:) = 0.0
-            covar2(:,:) = 0.0
-            covar3(:,:,:) = 0.0
-            covar3p(:,:,:) = 0.0
-            var1(:) = 0.0
-            var2(:,:,:) = 0.0
-            var2p(:,:,:) = 0.0
-            first_time = .false.
-         end if
-
-!        Read psi:
-         variable = 'psi'
-	 call read_3d_field(variable, date, ce, iunit, ni, nj, nk, psi)
-
-         if ( .not. nobaldiv ) then
-!           Read chi:
-            variable = 'chi'
-	    call read_3d_field(variable, date, ce, iunit, ni, nj, nk, chi)
-         endif
-
-         if (masscv.eq."temp") then
-            variable = 't'
-	    call read_3d_field(variable, date, ce, iunit, ni, nj, nk, temp)
-            variable = 'ps'
-	    call read_2d_field(variable, date, ce, iunit, ni, nj, nkdum, ps)
-         else
- !       Read pres:
-	    variable = 'p'
-	    call read_3d_field(variable, date, ce, iunit, ni, nj, nk, pres)
-            if (balpres.ne."purestats") then
-!           Read linear balance pres:
-               variable = 'lbp'
-	       call read_3d_field(variable, date, ce, iunit, ni, nj, nk, lbpres)
-            endif
-         endif
-	 
-	 if (bin_type==7) then
-            call update_rain_bin(ni, nj, nk, ce, date, bin2d, bin)
-	 end if   
-	 
-         if ( .not. nobaldiv ) then
-!        Calculate psi/chi covariances:
-            do k = 1, nk
-               do j = 1, nj
-                  do i = 1, ni
-                     b = bin(i,j,k)
-                     bin_pts(b) = bin_pts(b) + 1
-                     coeffa = 1.0 / real(bin_pts(b))
-                     coeffb = real(bin_pts(b)-1) * coeffa
-                     covar1(b) = coeffb * covar1(b) + coeffa * psi(i,j,k) * chi(i,j,k)
-                     var1(b) = coeffb * var1(b) + coeffa * psi(i,j,k) * psi(i,j,k)
+               counter = counter + 1
+               write(*,*)'-->read filename ',filename
+               call read_variable(filename, field3d, 1)
+               !write(*,*)'field read ',field3d%array(10,10,10)
+               ! remove 2d spatial mean
+               do kk = 1, Dim3
+                  mean_field = sum(field3d%array(1:Dim1,1:Dim2,kk)) * inv_dim2d
+                  write(*,*)' sf(1:nx,1:ny,k) mean_field ', field3d%array(10,10,kk), mean_field 
+                  field3d%array(:,:,kk) = field3d%array(:,:,kk) ! - mean_field
+               end do
+            
+               do l=1, Dim3
+                  do k=1, Dim3
+                     do j=1, Dim2
+                           do i=1, Dim1
+                              vorr%array(l,k) = vorr%array(l,k) + field3d%array(i,j,k)*field3d%array(i,j,l)
+                           end do
+                     end do   
                   end do
                end do
-            end do
-         end if
 
-!        Calculate psi/ps, and psi/T, and psi/psi covariances:
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               bin_pts2d(b) = bin_pts2d(b) + 1
-               coeffa = 1.0 / real(bin_pts2d(b))
-               coeffb = real(bin_pts2d(b)-1) * coeffa
-               do k = 1, nk
-                  if (masscv.eq."temp") then
-!                    psi/ps:
-                     covar2(k,b) = coeffb * covar2(k,b) + coeffa * ps(i,j) * psi(i,j,k)
-!                    psi/T:
-                     do k2 = 1, nk
-                        covar3(k,k2,b) = coeffb * covar3(k,k2,b) + &
-                                         coeffa * temp(i,j,k) * psi(i,j,k2)
-                     end do
-                  else
-                     if (balpres.eq."purestats") then
-!                       psi/p:
-                        do k2 = 1, nk
-                           covar3p(k,k2,b) = coeffb * covar3p(k,k2,b) + &
-                                             coeffa * pres(i,j,k) * psi(i,j,k2)
-                        end do
-                     else
-!                       lbp/p:
-                        do k2 = 1, nk
-                           covar3p(k,k2,b) = coeffb * covar3p(k,k2,b) + &
-                                             coeffa * pres(i,j,k) * lbpres(i,j,k2)
-                        end do                      
-                     endif
-                  endif
-!                 psi/psi (symmetric):
-                  do k2 = 1, k
-                     var2(k,k2,b) = coeffb * var2(k,k2,b) + &
-                                    coeffa * psi(i,j,k) * psi(i,j,k2)
-                  end do
-                  if (balpres.ne."purestats") then
-!                    lbp/lbp (symmetric):
-                     do k2 = 1, k
-                        var2p(k,k2,b) = coeffb * var2p(k,k2,b) + &
-                                        coeffa * lbpres(i,j,k) * lbpres(i,j,k2)
-                     end do
-                  endif
-               end do
-            end do
-         end do
+               end if ! if the variable is present 
+             end if ! if variable is 3d
+
+
       end do  ! End loop over ensemble members.
 
-!     Calculate next date:
+      ! Calculate next date:
       call da_advance_cymdh( date, interval, new_date )
       date = new_date
       read(date(1:10), fmt='(i10)')cdate
-   end do     ! End loop over times.
 
-!  Fill in psi/psi covariance by symmetry:
-   do b = 1, num_bins2d
-      do k = 1, nk
-         do k2 = k+1, nk ! Symmetry.
-            var2(k,k2,b) = var2(k2,k,b)
-         end do
-      end do
+   end do ! End loop over time
+
+
+   do l=2, Dim3
+      write(*,*)'vorr%array(l,l) ',l,vorr%array(l,l),vorr%array(l-1,l)
    end do
 
-   if (balpres.ne."purestats") then
-      do b = 1, num_bins2d
-         do k = 1, nk
-            do k2 = k+1, nk     ! Symmetry.
-               var2p(k,k2,b) = var2p(k2,k,b)
-            end do
-         end do
-      end do
-   endif
-
-!---------------------------------------------------------------------------------------------
-   write(6,'(2a)')' [3] Calculate eigenvectors, eigenvalues and inverse for psi/psi covariance '
-!---------------------------------------------------------------------------------------------
-   allocate( var2_inv(1:nk,1:nk,1:num_bins2d) )
-   call da_invert_var(var2_inv, var2, num_bins2d, nk, testing_eofs)
-   if (balpres.ne."purestats") then
-      allocate( var2p_inv(1:nk,1:nk,1:num_bins2d) )
-      call da_invert_var(var2p_inv, var2p, num_bins2d, nk, testing_eofs)
-   endif
-!---------------------------------------------------------------------------------------------
-   write(6,'(2a)')' [4] Calculate regression coefficients '
-!---------------------------------------------------------------------------------------------
-
-   allocate( regcoeff_psi_chi(1:num_bins) )
-   allocate( regcoeff_psi_ps(1:nk,1:num_bins2d) )
-   allocate( regcoeff_psi_temp(1:nk,1:nk,1:num_bins2d) )
-   allocate( regcoeff_lbpb_temp(1:nk,1:nk,1:num_bins2d) )
-
-!  psi/chi:
-   if ( .not. nobaldiv ) then
-      do b = 1, num_bins
-         regcoeff_psi_chi(b) = covar1(b) / var1(b)
-      end do
-   else
-      regcoeff_psi_chi(1:num_bins) = 0.0
+   !write(*,*)' vorr%array ',vorr%array(2,:)
+   !write(*,*)' rlen%array ',rlen%array
+   if ( vardim_list(jj).eq.3 ) then
+      call vert_corr(mesh%Dim1, mesh%Dim2, mesh%Dim3, mesh%znu%array, vorr%array, func%array, ierror)
    end if
+   write(*,*)'func ',func%array
 
-   if (masscv.eq."temp") then
-!      psi/ps:
-      do b = 1, num_bins2d
-         do k = 1, nk
-            summ = 0.0
-            do k2 = 1, nk
-               summ = summ + covar2(k2,b) * var2_inv(k2,k,b)
-            end do
-            regcoeff_psi_ps(k,b) = summ
-         end do
-      end do
-!     psi/T:
-      do b = 1, num_bins2d
-         do k = 1, nk
-            do k2 = 1, nk
-               summ = 0.0
-               do k3 = 1, nk
-                  summ = summ + covar3(k,k3,b) * var2_inv(k3,k2,b)
-               end do
-               regcoeff_psi_temp(k,k2,b) = summ
-            end do
-         end do
-      end do
-   else
-!     psi/p or lbp/p:
-      do b = 1, num_bins2d
-         do k = 1, nk
-            do k2 = 1, nk
-               summ = 0.0
-               do k3 = 1, nk
-                  if (balpres.eq."purestats") then
-                     summ = summ + covar3p(k,k3,b) * var2_inv(k3,k2,b)
-                  else
-                     summ = summ + covar3p(k,k3,b) * var2p_inv(k3,k2,b)
-                  endif
-               end do
-               regcoeff_lbpb_temp(k,k2,b) = summ
-            end do
-         end do
-      end do
-   endif
 
-!  Output regression coefficients for use in 3/4D-Var:
-   filename = 'gen_be_stage2.dat'
-   open (ounit, file = filename, form='unformatted')
-   write(ounit)ni, nj, nk
-   write(ounit)num_bins, num_bins2d
-   write(ounit)regcoeff_psi_chi
-   if (masscv.eq."temp") then
-      write(ounit)regcoeff_psi_ps
-      write(ounit)regcoeff_psi_temp
-   else
-      write(ounit)regcoeff_lbpb_temp
-   endif
-   close(ounit)
+   end if ! GSI specific
 
-!---------------------------------------------------------------------------------------------
-   write(6,'(2a)')' [5] Compute unbalanced fields'
-!---------------------------------------------------------------------------------------------
+   write(*,*)'=============================================================='
+   write(*,*)' PROCESS VARIABLE ',trim(cv_list(ii))
+   write(*,*)'=============================================================='
+   ! compute the variance of the variable at jj
+   ! compute the covariance between the variable jj  
+   ! and all the variable from ii to nvar 
 
-  date = start_date
-  cdate = sdate
-
+   date = start_date
+   cdate = sdate
+   counter = 0
    do while ( cdate <= edate )
-      write(6,'(a,a)')'    Calculating unbalanced fields for date ', date
+      write(6,'(a,a)')' Processing data for date ', date
 
       do member = 1, ne
-      
+
          write(ce,'(i3.3)')member
-	 
-	 if (bin_type==7) then
-            call update_rain_bin(ni, nj, nk, ce, date, bin2d, bin)
-	 end if 
-	 
-!        Read psi predictor:
-         variable = 'psi'
-	 call read_3d_field(variable, date, ce, iunit, ni, nj, nk, psi)
-         if (balpres.ne."purestats") then
-!           Read lbp predictor:
-            variable = 'lbp'
-	    call read_3d_field(variable, date, ce, iunit, ni, nj, nk, lbpres)
-         endif
+         write(*,*)'member : ',ce
+         
+         filename=trim(cv_listu(jj))
+         filename=trim(filename)//'/'//trim(filename)//'.'//date(1:10)//'.e'//trim(ce)
+         file_here = .false.
+         inquire(file=trim(filename),exist=file_here)
+         if (file_here) then
 
-!        Calculate unbalanced chi:
-         variable = 'chi'
-	 call read_3d_field(variable, date, ce, iunit, ni, nj, nk, chi)
-	 
-         do k = 1, nk
-            do j = 1, nj
-               do i = 1, ni
-                  b = bin(i,j,k)
-                  chi(i,j,k) = chi(i,j,k) - regcoeff_psi_chi(b) * psi(i,j,k)
-               end do
-            end do
-         end do
-         variable = 'chi_u'
-	 call write_3d_field(variable, date, ce, iunit, ni, nj, nk, chi)
-	 
-!        Calculate unbalanced T:
-         if (masscv.eq."temp") then
-            variable = 't'
-	    call read_3d_field(variable, date, ce, iunit, ni, nj, nk, temp)
-            do j = 1, nj
-               do i = 1, ni
-                  b = bin2d(i,j)
-                  do k = 1, nk
-                     temp(i,j,k) = temp(i,j,k) - SUM(regcoeff_psi_temp(k,1:nk,b) * psi(i,j,1:nk))
-                  end do
-               end do
-            end do
-            variable = 't_u'
-	    call write_3d_field(variable, date, ce, iunit, ni, nj, nk, temp)
-	    
-         else
-            variable = 'p'
-	    call read_3d_field(variable, date, ce, iunit, ni, nj, nk, pres)    
-            do j = 1, nj
-               do i = 1, ni
-                  b = bin2d(i,j)
-                  do k = 1, nk
-                     if (balpres.eq."purestats") then
-	                pres(i,j,k) = pres(i,j,k) - SUM(regcoeff_lbpb_temp(k,1:nk,b) * psi(i,j,1:nk))
-                     else
-        	        pres(i,j,k) = pres(i,j,k) - SUM(regcoeff_lbpb_temp(k,1:nk,b) * lbpres(i,j,1:nk))
-                     endif
-                  end do
-               end do
-            end do
-            variable = 'p_u'
-	    call write_3d_field(variable, date, ce, iunit, ni, nj, nk, pres)
-         endif
+         counter = counter + 1
+         call update_dynamic_mask(bins, mesh, date, ce, dyn_mask)
+   
+         !-----------------------------------------------------------------------
+         ! firstly, read all the variables available from stage1
+         !-----------------------------------------------------------------------
+         write(*,*) '==========================================================='
+         write(*,*) ' Load state member : ',member
+         write(*,*) ' Date : ',date
+         write(*,*) '==========================================================='       
+         ! update the list of control variables to read
+         tmp_list(1:jj) = cv_listu(1:jj)
+         tmp_list(jj+1:nvar) = cv_list(jj+1:nvar)
+         call rename_state(state2, tmp_list)
+         call read_state_from_variable_file(state2, 1, date, ce)
+         if ( ( use_chol_reg ).and.(vardim_list(jj).eq.3) ) then
+            var3d_tild%array =  state2%num(jj)%field%field3d%array 
+            call var_tilde(Dim1, Dim2, Dim3, var3d_tild%array, func%array)
+         end if
+         call check_state(state2,10,10,10)
+     
+      
+         write(*,*) '==========================================================='
+         write(*,*) ' compute variance ', trim(cv_list(jj))
+         write(*,*) '==========================================================='
+         if  ( ( jj == 1 ).and.( ii == 2 ) ) then
+             write(*,*)'Compute variance var1d-bin3d and var3d-bin2d'
+             call compute_covar1d_bin3d(varce1d%array, state2%num(jj)%field%field3d%array,state2%num(jj)%field%field3d%array, bins, Dim1, Dim2, Dim3)  
+             call compute_varce3dbin2d_var3d(varce3d%array, state2%num(jj)%field%field3d%array, bins, Dim1, Dim2, Dim3)  
+             if ( use_chol_reg ) then
+                call compute_varce3dbin2d_var3d(varce3d_tild%array,var3d_tild%array ,bins, Dim1, Dim2, Dim3) 
+             end if
+         end if
 
-         if (masscv.eq."temp") then
-!        Calculate unbalanced ps:
-         variable = 'ps'
-	 call read_2d_field(variable, date, ce, iunit, ni, nj, nkdum, ps)
-	 
-         do j = 1, nj
-            do i = 1, ni
-               b = bin2d(i,j)
-               ps(i,j) = ps(i,j) - SUM(regcoeff_psi_ps(1:nk,b) * psi(i,j,1:nk))
-            end do
+         do vv = ii, nvar ! for the all column jj, from  var ii to nvar         
+
+            write(*,*)'================================================================'
+            write(*,*)' compute covariance for variable ',trim(cv_list(vv))
+            write(*,*)'================================================================'
+            write(*,*) ''
+            write(*,*) '   compute covariance with ',trim(cv_list(jj))
+            !write(*,*) '   covariance dimension covar_ID(vv,jj) vv jj ',covar_ID(vv,jj), vv, jj
+
+            if ( covar_ID(vv,jj) == 1 ) then
+
+                       write(*,*)'compute_covar1d_bin3d ',vv,jj
+                       call compute_covar1d_bin3d(covarce%num2d(vv,jj)%field%field1d%array, &
+                       state2%num(vv)%field%field3d%array, &
+                       state2%num(jj)%field%field3d%array, & 
+                               bins, Dim1, Dim2, Dim3)
+
+            else if ( covar_ID(vv,jj) == 2 ) then
+                    if (vardim_list(vv) == 2 ) then
+                       if ( use_chol_reg ) then
+                          call compute_covar2d_bin2d (covarce%num2d(vv,jj)%field%field2d%array, &
+                          state2%num(vv)%field%field2d%array, &
+                          var3d_tild%array, bins, Dim1, Dim2, Dim3)
+                          write(*,*)'var3d_tild%array ',var3d_tild%array(10,10,:)
+                          write(*,*)'covarce%num2d(vv,jj)%field%field2d%array ',covarce%num2d(vv,jj)%field%field2d%array
+
+                       else 
+                          call compute_covar2d_bin2d (covarce%num2d(vv,jj)%field%field2d%array, &
+                          state2%num(vv)%field%field2d%array, &
+                          state2%num(jj)%field%field3d%array, &
+                               bins, Dim1, Dim2, Dim3)
+                       end if
+                    else
+                       call compute_covar2d_bin2d (covarce%num2d(vv,jj)%field%field2d%array, &
+                       state2%num(jj)%field%field2d%array, &
+                       state2%num(vv)%field%field3d%array, &
+                               bins, Dim1, Dim2, Dim3)
+                    end if       
+            else if ( covar_ID(vv,jj) == 3 ) then
+                    if (  use_chol_reg ) then
+                       call compute_covar3d_bin2d(covarce%num2d(vv,jj)%field%field3d%array, &
+                       state2%num(vv)%field%field3d%array, &
+                       var3d_tild%array, &
+                              bins, Dim1, Dim2, Dim3)
+
+                    else 
+                       call compute_covar3d_bin2d(covarce%num2d(vv,jj)%field%field3d%array, &
+                       state2%num(vv)%field%field3d%array, &
+                       state2%num(jj)%field%field3d%array, &
+                               bins, Dim1, Dim2, Dim3)
+                    end if
+
+            end if
+
          end do
-         variable = 'ps_u'
-         call write_2d_field(variable, date, ce, iunit, ni, nj, nkdum, ps)
-         endif
+
+         call check_matrix(covarce,1,1,1)
+
+      ! Increment bins
+      call increment_bin_pts(bins, Dim1, Dim2, Dim3)
+
+      end if ! if file_here condition
+	 
+     !--------------------------------------------------------------
       end do  ! End loop over ensemble members.
-!     Calculate next date:
+     !--------------------------------------------------------------
+
+      ! Calculate next date:
       call da_advance_cymdh( date, interval, new_date )
       date = new_date
       read(date(1:10), fmt='(i10)')cdate
+
+
+!------------------------------------------------------------
    end do     ! End loop over times.
+!------------------------------------------------------------
+
+
+  if ( state2%num(jj)%IDdim .ne. 2 ) then
+
+     if ( use_chol_reg ) then
+        write(*,*)'================================================================'
+        write(*,*)'[3] Compute functional, cholesky',trim(cv_list(jj))
+        write(*,*)'================================================================'
+
+        write(*,*)'varce3d_tild%array ',varce3d_tild%array(1,:,1)
+
+        call chol_factor(biga8_bin%array, p88_bin%array, varce3d_tild%array, Dim3, bins%num_bins2d, ierror)
+        if ( ierror .ne. 0 ) then
+           write(6,*)'Error in chol_factor subroutine'
+        end if 
+
+     else
+
+        varce3d_inv%array = 0.0
+        write(*,*)'varce3d%array ',varce3d%array(1,1,1),varce3d%array(10,1,1)
+        write(*,*)'================================================================'
+        write(*,*)'[3]  Calculate eigenvectors, eigenvalues and inverse for covariance ',trim(cv_list(jj))
+        write(*,*)'================================================================'
+        testing_eofs = .true.
+        call da_invert_var(varce3d_inv%array, varce3d%array, bins%num_bins2d, Dim3, testing_eofs)
+        write(*,*)'varce3d%array ',varce3d%array(1,1,1),varce3d%array(10,1,1)
+        write(*,*)'varce3d_inv%array ',varce3d_inv%array(1,1,1),varce3d_inv%array(10,1,1)
+
+     end if
+
+  end if
+
+
+   write(6,'(2a)')' [4] Calculate regression coefficients '
+   write(*,*)'covar_ID  ',covar_ID
+   write(*,*)'covar_ID2 ',covar_ID2
+   ll = 0
+
+  !---------------------------------------------------------------------------------------------
+   do vv = ii, nvar ! for the all column jj, from  var ii to nvar
+  !---------------------------------------------------------------------------------------------
+
+      write(*,*)'covar_ID2(vv,jj) ',covar_ID2(vv,jj),vv,jj
+
+      !---------------------------------------------------------------------------------------------
+      if ( covar_ID(vv,jj) == 1 ) then
+      !---------------------------------------------------------------------------------------------
+         ll = ll + 1
+         regcoeff_name(ll) = trim(regcoeff%num2d(vv,jj)%field%field1d%ioinfo%fieldName)
+         write(*,*)'Compute Recoeff 1d: ',trim(regcoeff_name(ll))
+         do b = 1, bins%num_bins
+            if ( varce1d%array(b) .ne. 0  ) then
+               regcoeff%num2d(vv,jj)%field%field1d%array(b) = &
+                  covarce%num2d(vv,jj)%field%field1d%array(b) / varce1d%array(b)
+            end if
+         end do
+         write(*,*)'regcoeff%num2d(vv,jj)%field%field1d%array ',regcoeff%num2d(vv,jj)%field%field1d%array
+         write(*,*)'coucou'
+
+
+      !---------------------------------------------------------------------------------------------
+      else if ( covar_ID(vv,jj) == 2 ) then
+      !---------------------------------------------------------------------------------------------
+
+         ll = ll + 1
+         regcoeff_name(ll) = trim(regcoeff%num2d(vv,jj)%field%field2d%ioinfo%fieldName)
+         write(*,*)'Compute Recoeff 2d: ',trim(regcoeff_name(ll))
+
+         if ( (state2%num(jj)%IDdim .eq. 3) .and. (state2%num(vv)%IDdim .eq. 2) ) then
+             regcoeff_name(ll) = trim(regcoeff%num2d(vv,jj)%field%field2d%ioinfo%fieldName)
+
+            if ( use_chol_reg ) then
+               write(*,*)'func%array reg2d ',func%array
+               call chol_reg_coeff2d(regcoeff%num2d(vv,jj)%field%field2d%array, covarce%num2d(vv,jj)%field%field2d%array, &
+                               biga8_bin%array, p88_bin%array, func%array, Dim3, bins%num_bins2d)
+            else
+               do b = 1, bins%num_bins2d
+                  do k1 = 1, Dim3
+                     summ = 0.0
+                     do k2 = 1, Dim3
+                        if (varce3d_inv%array(k2,k1,b).ne.0) then
+                           summ = summ + covarce%num2d(vv,jj)%field%field2d%array(k2,b) * &
+                            varce3d_inv%array(k2,k1,b)
+                        end if
+                     end do
+                     regcoeff%num2d(vv,jj)%field%field2d%array(k1,b) = summ
+                  end do
+               end do
+            end if
+            write(*,*)'regcoeff 2d ',regcoeff%num2d(vv,jj)%field%field2d%array
+
+         else  ! dimension var(jj) = 2
+
+            do b = 1, bins%num_bins2d
+               do k1 = 1, Dim3
+                   if ( varce1d_bin2d%array(b) .ne. 0  ) then
+                      regcoeff%num2d(vv,jj)%field%field2d%array(k1,b) = &
+                       covarce%num2d(vv,jj)%field%field2d%array(k1,b) / varce1d_bin2d%array(b)
+                   end if
+               end do
+            end do
+
+         end if
+
+      !---------------------------------------------------------------------------------------------
+      else if ( covar_ID(vv,jj) == 3 ) then
+      !---------------------------------------------------------------------------------------------
+         ll = ll + 1
+         regcoeff_name(ll) = trim(regcoeff%num2d(vv,jj)%field%field3d%ioinfo%fieldName)
+         write(*,*)'Compute Recoeff 3d: ',trim(regcoeff_name(ll))
+
+         if ( use_chol_reg ) then
+             call chol_reg_coeff3d(regcoeff%num2d(vv,jj)%field%field3d%array, covarce%num2d(vv,jj)%field%field3d%array, &
+                                biga8_bin%array, p88_bin%array, func%array,Dim3, bins%num_bins2d)
+
+         else if ( covar_ID2(vv,jj) == 2 ) then
+            do b = 1, bins%num_bins2d
+               do k1 = 1, Dim3
+                  if ( varce3d%array(k1,k1,b) .ne. 0 ) then
+                        regcoeff%num2d(vv,jj)%field%field3d%array(k1,k1,b)  =  covarce%num2d(vv,jj)%field%field3d%array(k1,k1,b) / varce3d%array(k1,k1,b)
+                  end if
+               end do
+            end do
+
+         else
+            do b = 1, bins%num_bins2d
+               do k1 = 1, Dim3
+                  do k2 = 1, Dim3
+                     summ = 0.0
+                     do k3 = 1, Dim3
+                        if ( varce3d_inv%array(k3,k2,b) .ne. 0 ) then
+                           summ = summ + covarce%num2d(vv,jj)%field%field3d%array(k1,k3,b) * &
+                            varce3d_inv%array(k3,k2,b)
+                        end if
+                     end do
+                     regcoeff%num2d(vv,jj)%field%field3d%array(k1,k2,b) = summ
+                  end do
+               end do
+            end do
+
+         end if
+
+      !---------------------------------------------------------------------------------------------
+      end if ! conditions dimensions covarce
+      !---------------------------------------------------------------------------------------------
+
+
+
+  !---------------------------------------------------------------------------------------------
+   end do ! loop on line of the jj row
+  !---------------------------------------------------------------------------------------------
+
+
+
+   write(*,*)'variance psi   = ',varce3d%array(1,1,1),varce3d%array(10,1,1)
+   write(*,*)'varce3d_inv%array ',varce3d_inv%array(1,1,1)
+   write(*,*)'reg covar 1,1,1'
+   !call check_matrix(covarce,1,1,1)
+   write(*,*)'reg covar 10,1,1'
+   !call check_matrix(covarce,10,1,1)
+
+   write(*,*)'reg coeff'
+!   call check_matrix(regcoeff,1,1,1)
+!   write(*,*)'reg coeff 10,1,1'
+!   call check_matrix(regcoeff,10,1,1)
+
+!   write(*,*)'varce1d%array ',sqrt(varce1d%array)
+
+end if ! if there is at least one covariance [ (ncovar_row(jj).gt.0) ]
+
+!-----------------------------------------------------------------------
+! filter
+!-----------------------------------------------------------------------
+!   if ( num_passes > 0 ) then
+!      write(6,'(a,i4,a)') '[3] Apply ', &
+!      num_passes, ' pass recursive filter to regression coefficients:'
+!      call da_filter_regcoeffs( ni, nj, nk, num_bins, num_bins2d, num_passes, rf_scale, bin, &
+!      !rizvi                                regcoeff1, regcoeff2, regcoeff3, regcoeff3p )
+!                                regcoeff1, regcoeff2, regcoeff3)
+!   else
+!      write(6,'(a)') &
+!      ' [3] num_passes = 0. Bypassing recursive filtering.'
+!   end if
+!------------------------------------------------------------------------
+
+   write(*,*) '==========================================================='
+   write(*,*) ' compute variance : ',trim(cv_listu(ii))
+   write(*,*) '==========================================================='
+
+   write(*,*)'ii jj ',ii,jj
+   bins%bin2d_pts%array = 0
+   bins%bin_pts%array = 0
+   varce3d%array=0
+   varce1d%array=0
+   varce1d_bin2d%array=0
+   counter = 0  
+
+   cdate = sdate
+   date = start_date
+   do while ( cdate <= edate )
+      write(6,'(a,a)')' Processing data for date ',date
+
+      do member = 1, ne
+         
+         ! write unbalanced part
+         write(ce,'(i3.3)')member
+         filename  = trim(cv_list(ii))
+         filename  = trim(filename)//'/'//trim(filename)//'.'//date(1:10)//'.e'//ce
+         file_here = .false.
+         inquire(file=trim(filename),exist=file_here)
+         if (file_here) then
+         counter = counter + 1
+         filename  = trim(cv_listu(ii))
+         filename  = trim(filename)//'/'//trim(filename)//'.'//date(1:10)//'.e'//ce
+
+         call read_state_from_variable_file(state2, 1, date, ce)
+
+         write(*,*)'write ',filename
+
+         call update_dynamic_mask(bins, mesh, date, ce, dyn_mask)
+
+         if ( state2%num(ii)%IDdim == 3 ) then
+
+            ! compute and write unbalanced part
+            if ( ncovar(ii).gt. 0 ) then
+               write(*,*)"========================================="
+               write(*,*)'var 3d',trim(state2%num(ii)%field%field3d%ioinfo%fieldname), state2%num(ii)%field%field3d%array(10,10,10)
+               call compute_var3d_unbalanced(state2, ii, regcoeff, bins, Dim1, Dim2, Dim3)
+               ! varname to write
+               state2%num(ii)%field%field3d%ioinfo%fieldname = cv_listu(ii)
+               write(*,*)'unbalanced part var_u 3d',trim(state2%num(ii)%field%field3d%ioinfo%fieldname), state2%num(ii)%field%field3d%array(10,10,10),ne
+               write(*,*)"=========================================" 
+               call write_variable(filename, state2%num(ii)%field%field3d , mesh, 1)
+               state2%num(ii)%field%field3d%ioinfo%fieldname = cv_list(ii) 
+            end if
+
+            ! compute variance of unbalanced or full variable 
+            ! this part is needed at the begining of the program
+            if (ncovar_row(jj+1).gt.0) then
+               write(*,*)' compute variance of unbalanced part of ',trim(state2%num(ii)%field%field3d%ioinfo%fieldname) 
+               call compute_varce3dbin2d_var3d(varce3d%array, &
+                          state2%num(ii)%field%field3d%array ,bins, Dim1, Dim2, Dim3)
+
+               if ( ( use_chol_reg ) ) then
+                  var3d_tild%array =  state2%num(ii)%field%field3d%array
+                  call var_tilde(Dim1, Dim2, Dim3, var3d_tild%array, func%array)
+               end if
+            end if
+
+
+         else
+
+            ! compute and write unbalanced part
+            if ( ncovar(ii).gt. 0 ) then
+               call compute_var2d_unbalanced(state2, ii, regcoeff, bins, Dim1, Dim2, Dim3)
+                state2%num(ii)%field%field2d%ioinfo%fieldname = cv_listu(ii)
+               write(*,*)"========================================="
+               write(*,*)'var 2d',trim(state2%num(ii)%field%field2d%ioinfo%fieldname), state2%num(ii)%field%field2d%array(10,10)  
+               ! varname to write
+               write(*,*)'unbalanced part var_u 2d ',trim(state2%num(ii)%field%field2d%ioinfo%fieldname), state2%num(ii)%field%field2d%array(10,10),ne
+               write(*,*)"========================================="
+               call write_variable(filename, state2%num(ii)%field%field2d , mesh, 1)
+               state2%num(ii)%field%field2d%ioinfo%fieldname = cv_list(ii) 
+            end if
+
+            ! compute variance of unbalanced or full variable 
+            ! this part is needed at the top part of the program
+            if (ncovar_row(jj+1).gt.0) then
+               call compute_varce1dbin2d_var2d(varce1d_bin2d%array, &
+                          state2%num(ii)%field%field2d%array ,bins, Dim1, Dim2, Dim3)
+                write(*,*)'varce1d_bin2d%array ',varce1d_bin2d%array
+            end if
+
+         end if
+        
+         ! Increment bins
+         call increment_bin_pts(bins, Dim1, Dim2, Dim3)
+
+         end if ! end condition file_here
+
+      end do ! end loop on members
+
+      ! Calculate next date:
+      call da_advance_cymdh( date, interval, new_date )
+      date = new_date
+      read(date(1:10), fmt='(i10)')cdate
+
+   end do  ! end loop on time
+
+  
+!====================================================================================
+   end do ! loop over the variables (by line)
+!====================================================================================
+
+
+  write(*,*)' write output'
+
+  !----------------------------------------------
+  ! write vertical covariance
+  !---------------------------------------------- 
+  !filename = 'gen_be_stage2_vert_covarce.nc'
+  !call write_matrix_state(filename, covarce, bins, mesh)
+
+  !----------------------------------------------
+  ! write regression coefficient
+  !---------------------------------------------- 
+  filename = 'gen_be_stage2_regcoeff.nc'
+  call write_matrix_state(filename, regcoeff, bins, mesh)
+
+  !----------------------------------------------
+  ! write ascii file list for automatic ncl plot
+  !----------------------------------------------
+  filename = "regcoeff.txt"
+  call write_ascii_file(filename, regcoeff_name, ncovar_tot)
+  
+
+!====================================================================================
+! Deallocation section
+!====================================================================================
+   call deallocate_mesh(mesh)
+   call deallocate_field(varce1d)
+   call deallocate_field(varce1d_bin2d)
+   call deallocate_field(varce3d)
+   call deallocate_field(varce3d_inv)
+   call deallocate_state(state2)
+   call deallocate_state_matrix(regcoeff)
+   call deallocate_state_matrix(covarce)
+
+   if ( use_chol_reg ) then
+      call deallocate_field(field3d)
+      call deallocate_field(varce3d_tild)
+      call deallocate_field(var3d_tild)
+      call deallocate_field(vorr)
+      call deallocate_field(func)
+      call deallocate_field(biga8_bin)
+      call deallocate_field(p88_bin)
+   end if
+
+
+!====================================================================================
    
 end program gen_be_stage2
