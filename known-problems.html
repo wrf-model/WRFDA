@@ -127,7 +127,8 @@
             <p class="bodytext">Before installing WRFDA, ensure your system meets the <a href="requirements.html">minimum requirements</a>. <br></p>
             <p class="bodytext">If your issue is not found on this page, please contact <a href="wrfhelp.html">wrfhelp</a> for assistance.<br><br></p>
             <blockquote>
-              <blockquote><ul class="bodytext"><li><a href="#V3_7_1">Version 3.7.1</a></li>
+              <blockquote><ul class="bodytext"><li><a href="#V3_8">Version 3.8</a></li>
+                <li><a href="#V3_7_1">Version 3.7.1</a>
                 <li><a href="#V3_7">Version 3.7</a>
                   <ul><li><a href="#V3_7_compile">Compilation errors</a></li>
                   <li><a href="#V3_7_run">Run-time errors</a></li>
@@ -145,9 +146,27 @@
                 <li><a href="#V3_1">Version 3.1</a></li>
                 <li><a href="#V3_0">Version 3.0</a></li>
                 <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
+            <a name="V3_8"></a><p class="pagetitle">WRFDA Version 3.8 : Known Problems and Fixes</p>
+            <blockquote>
+            <h1> Compilation error in BUFR libraries (posted 2016-05-15) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               BUFR libraries (and therefore <code>da_wrfvar.exe</code>) fail to compile, potentially with the following (or similar) error message:<br><br>
+               <code>atrcpt.f:3.1:<br>C$$$  SUBPROGRAM DOCUMENTATION BLOCK<br> 1<br>
+                     Fatal Error: Invalid character '$' at (1). Use -fdollar-ok to allow it as an extension</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to a mistake in the BUFR Makefile, causing variables in the user's environment to be read incorrectly. There are two potential solutions:</p>
+               <blockquote><ul class="bodytext"><li>Unset the environment variables "<code>FCFLAGS</code>" and/or "<code>FORMAT_FIXED</code>"</li>
+                   <li>Replace the file <code>var/external/bufr/Makefile</code> with this version: (<a href="fixes/v38/bufr/Makefile">Makefile</a>)</li></ul></blockquote>
+            <p class="bodytext">After applying either above solution, run <code>./clean -a</code> and re-compile WRFDA.</p>
+            <h1> Segmentation fault when running 4DVAR with RRTMG physics (posted 2016-05-15) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               Code crashes when running WRFDA-4DVAR with <code>ra_lw_physics=4</code> and/or <code>ra_sw_physics=4</code>.<br>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the file WRFPLUSV3/phys/module_ra_cam_support.F with this copy: (<a href="fixes/v38/module_ra_cam_support.F">module_ra_cam_support.F</a>). Then re-compile WRFPLUS and WRFDA (in that order).</p>
+            </blockquote>
             <a name="V3_7_1"></a><p class="pagetitle">WRFDA Version 3.7.1 : Known Problems and Fixes</p>
             <blockquote>
-            <h1> Failure to compile with RTTOV 11.3 (posted 2016-04-06) </h1>
+            <h1> Error using VARBC for IASI (posted 2016-04-06) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                Code crashes when using Variational Bias Correction for IASI instrument<br>
             <p class="bodytext"><strong>Solution:</strong><br>
