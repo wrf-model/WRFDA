@@ -676,7 +676,7 @@ if ( .not. data_on_levels ) then
       ! filter lengthscale
       allocate(oned_len(1:nk))
       oned_len(:) = vl%array(:,b)
-      write(*,*)("oned_len : ",oned_len )
+      write(*,*)"oned_len : ",oned_len 
       call filter_lenscale(oned_len, n_smth_sl, spike_tolerance, nk)
       vl%array(:,b) = oned_len(:)
       deallocate(oned_len)

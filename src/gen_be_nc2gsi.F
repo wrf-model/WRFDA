@@ -64,7 +64,7 @@ program gen_be_nc2gsi
    !--------------------------------------------------------------------
    ! real simple
    integer :: nz
-   real*4, allocatable  :: sigl_s(:),clat_s(:), rlats(:)
+   real, allocatable  :: sigl_s(:),clat_s(:), rlats(:)
    real*4, allocatable  :: agv_s(:,:,:),wgv_s(:,:),bv_s(:,:)
    real*4, allocatable, dimension(:,:,:) :: corz3d_s, hwll3d_s, vztdq3d_s, corz3d2_s
    real*4, allocatable, dimension(:,:) :: cor2d_s, hwll2d_s
@@ -1239,7 +1239,7 @@ subroutine specific_qoption2(varq2, ne, start_date, end_date, interval, dim1, di
   implicit none
 
   integer, intent(in)                     :: dim1, dim2, dim3, bins2d0
-  real*4, intent(inout), dimension(1:bins2d0,1:dim3)   :: varq2
+  real, intent(inout), dimension(1:bins2d0,1:dim3)   :: varq2
   integer, intent(in)                     :: ne, interval
   character*10, intent(in)                :: start_date, end_date
 
