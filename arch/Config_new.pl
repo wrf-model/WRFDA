@@ -17,10 +17,6 @@ $sw_ldflags="";
 $sw_compileflags=""; 
 $sw_opt_level=""; 
 $sw_rwordsize="\$\(NATIVE_RWORDSIZE\)";
-$sw_rttov_flag = "" ;
-$sw_rttov_inc = "" ;
-$sw_crtm_flag = "" ;
-$sw_crtm_inc = "" ;
 $WRFCHEM = 0 ;
 $sw_os = "ARCH" ;           # ARCH will match any
 $sw_mach = "ARCH" ;         # ARCH will match any
@@ -157,7 +153,6 @@ while ( substr( $ARGV[0], 0, 1 ) eq "-" )
  $sw_comms_lib = "" ;
  $sw_comms_include = "" ;
  $sw_dmparallelflag = "" ;
- $sw_nest_opt = "" ; 
  $sw_comms_external = "gen_comms_serial module_dm_serial" ;
 
 
@@ -328,11 +323,6 @@ while ( <CONFIGURE_DEFAULTS> )
     }
     $_ =~ s/CONFIGURE_DMPARALLEL/$sw_dmparallelflag/g ;
     $_ =~ s/CONFIGURE_STUBMPI/$sw_stubmpi/g ;
-    $_ =~ s/CONFIGURE_NESTOPT/$sw_nest_opt/g ;
-    $_ =~ s/CONFIGURE_CRTM_FLAG/$sw_crtm_flag/g ;
-    $_ =~ s/CONFIGURE_CRTM_INC/$sw_crtm_inc/g ;
-    $_ =~ s/CONFIGURE_RTTOV_FLAG/$sw_rttov_flag/g ;
-    $_ =~ s/CONFIGURE_RTTOV_INC/$sw_rttov_inc/g ;
     if ( $sw_ifort_r8 ) {
       $_ =~ s/^PROMOTION.*=/PROMOTION       =       -r8 /g ;
     }
@@ -573,13 +563,6 @@ print CONFIGURE_WRF @preamble  ;
 close ARCH_PREAMBLE ;
 printf CONFIGURE_WRF "# Settings for %s\n", $optarray[$optchoice] ;
 print CONFIGURE_WRF @machopts  ;
-print "$ENV{WRF_MARS}" ;
-if ( $ENV{WRF_MARS} || $ENV{WRF_TITAN} || $ENV{WRF_VENUS} )
-{
-    open ARCH_PLANETAMBLE, "< arch/planetamble" or die "cannot open arch/planetamble" ;
-    while ( <ARCH_PLANETAMBLE> ) { print CONFIGURE_WRF } ;
-    close ARCH_PLANETAMBLE ;
-}
 
 close CONFIGURE_WRF ;
 

@@ -12,15 +12,13 @@ ARCHFLAGS       =    $(COREDEFS) -DIWORDSIZE=$(IWORDSIZE) -DDWORDSIZE=$(DWORDSIZ
                       CONFIGURE_PNETCDF_FLAG \
                       CONFIGURE_ESMF_FLAG \
                       CONFIGURE_GRIB2_FLAG \
-                      CONFIGURE_NESTOPT \
                       -DUSE_ALLOCATABLES \
                       -DGRIB1 \
                       -DINTIO \
                       -DLIMIT_ARGS \
                       -DCONFIG_BUF_LEN=$(CONFIG_BUF_LEN) \
                       -DMAX_DOMAINS_F=$(MAX_DOMAINS) \
-                      -DMAX_HISTORY=$(MAX_HISTORY) \
-		      -DNMM_NEST=$(WRF_NMM_NEST)
+                      -DMAX_HISTORY=$(MAX_HISTORY)
 CFLAGS          =    $(CFLAGS_LOCAL) CONFIGURE_DMPARALLEL CONFIGURE_STUBMPI \
                       -DMAX_HISTORY=$(MAX_HISTORY)
 FCFLAGS         =    $(FCOPTIM) $(FCBASEOPTS)

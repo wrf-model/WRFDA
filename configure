@@ -19,17 +19,10 @@ while [ $# -ge 1 ]; do
       -os) shift ; WRF_OS=$1 ;;
       -mach) shift ; WRF_MACH=$1 ;;
       -time) shift ; FORTRAN_COMPILER_TIMER=$1 ;;
-      chem) WRF_CHEM=1  ;;
-      kpp) WRF_KPP=1  ;;
-      radardfi) WRF_DFI_RADAR=1  ;;
-      wrfda) wrf_core=DA_CORE  ;;
       arw) wrf_core=EM_CORE  ;;
       nmm) wrf_core=NMM_CORE  ;;
       coamps) wrf_core=COAMPS_CORE  ;;
       exp) wrf_core=EXP_CORE  ;;
-      titan) WRF_TITAN=1 ; break ;;
-      mars) WRF_MARS=1 ; break ;;
-      venus) WRF_VENUS=1 ; break ;;
     esac
     shift
 done
