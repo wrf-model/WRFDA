@@ -215,32 +215,69 @@ $validresponse = 0 ;
 # Display the choices to the user and get selection
 until ( $validresponse ) {
   printf "------------------------------------------------------------------------\n" ;
-  printf "Please select from among the following supported platforms.\n\n" ;
+  printf "Please select from among the following $sw_os $sw_mach options:\n\n" ;
 
   $opt = 1 ;
   open CONFIGURE_DEFAULTS, "< ./arch/configure_new.defaults" 
       or die "Cannot open ./arch/configure_new.defaults for reading" ;
-  while ( <CONFIGURE_DEFAULTS> )
-  {
-    for $paropt ( @platforms )
-    {
-      if ( substr( $_, 0, 5 ) eq "#ARCH"
-          && ( index( $_, $sw_os ) >= 0 ) && ( index( $_, $sw_mach ) >= 0 ) 
-          && ( index($_, $paropt) >= 0 ) )
-      {
-        $optstr[$opt] = substr($_,6) ;
-        $optstr[$opt] =~ s/^[ 	]*// ;
-        $optstr[$opt] =~ s/#.*$//g ;
-        chomp($optstr[$opt]) ;
-        $optstr[$opt] = $optstr[$opt]." (".$paropt.")" ;
-        if ( substr( $optstr[$opt], 0,4 ) ne "NULL" )
-        {
-          printf "  %2d.  %s\n",$opt,$optstr[$opt] ;
-          $opt++ ;
-        }
-      }
-    }
-  }
+  while ( <CONFIGURE_DEFAULTS> ) {
+
+     $currline = $_;
+     chomp $currline;
+     # Look for our platform in the configuration option header.
+     # If we're going to list it, print parallelism options
+     if ( substr( $currline, 0, 5 ) eq "#ARCH" && ( index( $currline, $sw_os ) >= 0 )
+         && ( index( $currline, $sw_mach ) >= 0 ) ) {
+        $optstr = substr($currline,6) ;
+
+        foreach ( @platforms ) { # Check which parallelism options are valid for this configuration option
+           $paropt = $_ ;
+           if ( index($optstr, $paropt) >= 0 ) { #If parallelism option is valid, print and assign number
+              printf "%3d. (%s) ",$opt,$paropt ;
+              $pararray[$opt] = $paropt ;
+              $opttemp = $optstr ;
+              $opttemp =~ s/#.*$//g ;
+              chomp($opttemp) ;
+              $optarray[$opt] = $opttemp." (".$paropt.")" ;
+              $opt++ ;
+           } else { #If parallelism option is not valid, print spaces for formatting/readability
+              $paropt =~ s/./ /g ;
+              printf "      %s  ",$paropt ;
+           }
+         }
+        next;
+     }
+
+     next unless ( length $optstr ) ; # Don't read option lines unless it's valid for our platform
+
+     if ( substr( $currline, 0, 11 ) eq "DESCRIPTION" ) {
+        $optstr = $currline ; #Initial value of $optstr is DESCRIPTION line
+        next;
+     }
+
+     if ( substr( $currline, 0, 3 ) eq "SFC" ) {
+        $currline =~ s/^SFC\s*=\s*//g;      #remove "SFC ="
+        $currline =~ s/ (\-\S*)*$//g;       #remove trailing arguments and/or spaces
+        $optstr =~ s/\$SFC/$currline/g;     #Substitute the fortran compiler name into optstr
+        $optstr =~ s/DESCRIPTION\s*=\s*//g; #Remove "DESCRIPTION ="
+        next;
+     }
+
+     if ( substr( $currline, 0, 3 ) eq "SCC" ) {
+        $currline =~ s/^SCC\s*=\s*//g;      #remove "SCC ="
+        $currline =~ s/ (\-\S*)*$//g;       #remove trailing arguments and/or spaces
+        $optstr =~ s/\$SCC/$currline/g;     #Substitute the C compiler name into optstr
+        next;
+     }
+
+     if ( substr( $currline, 0, 4 ) eq "####" ) { #reached the end of this option's entry
+        chomp($optstr) ;
+        printf "  %s\n",$optstr ;
+        $optstr = "";
+        next;
+     }
+
+   }
   close CONFIGURE_DEFAULTS ;
 
   $opt -- ;
@@ -415,12 +452,13 @@ while ( <CONFIGURE_DEFAULTS> )
           && ( index( $_, $sw_os ) >= 0 ) && ( index( $_, $sw_mach ) >= 0 )
           && ( index($_, $paropt) >= 0 ) )
     {
+      # We are cycling through the configure_new.defaults file again.
+      # This bit tries to match the line corresponding to the option we previously selected.
       $x=substr($_,6) ;
-      $x=~s/^[     ]*// ;
       $x =~ s/#.*$//g ;
       chomp($x) ;
       $x = $x." (".$paropt.")" ;
-      if ( $x eq $optstr[$optchoice] )
+      if ( $x eq $optarray[$optchoice] )
       {
         $latchon = 1 ;
         $sw_ompparallel = "" ;
@@ -474,6 +512,15 @@ while ( <CONFIGURE_DEFAULTS> )
     }
   }
 }
+
+if ($latchon == 0) { # Never hurts to check that we actually found the option again.
+  unlink "configure.gen_be";
+  print "\nERROR ERROR ERROR ERROR\n\n";
+  print "SOMETHING TERRIBLE HAS HAPPENED: configure.gen_be not created correctly.\n";
+  print 'Check "$x" and "$optarray[$optchoice]"';
+  die   "\n\nERROR ERROR ERROR ERROR\n\n";
+}
+
 close CONFIGURE_DEFAULTS ;
 close POSTAMBLE ;
 close ARCH_NOOPT_EXCEPTIONS ;
@@ -524,7 +571,7 @@ while ( <ARCH_PREAMBLE> )
 close ARCH_PREAMBLE ;
 print CONFIGURE_WRF @preamble  ;
 close ARCH_PREAMBLE ;
-printf CONFIGURE_WRF "# Settings for %s\n", $optstr[$optchoice] ;
+printf CONFIGURE_WRF "# Settings for %s\n", $optarray[$optchoice] ;
 print CONFIGURE_WRF @machopts  ;
 print "$ENV{WRF_MARS}" ;
 if ( $ENV{WRF_MARS} || $ENV{WRF_TITAN} || $ENV{WRF_VENUS} )
@@ -536,7 +583,7 @@ if ( $ENV{WRF_MARS} || $ENV{WRF_TITAN} || $ENV{WRF_VENUS} )
 
 close CONFIGURE_WRF ;
 
-printf "Configuration successful. To build the model type compile . \n" ;
+printf "Configuration successful. To build GEN_BE type 'compile gen_be'. \n" ;
 printf "------------------------------------------------------------------------\n" ;
 
 
