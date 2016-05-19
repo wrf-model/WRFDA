@@ -410,18 +410,6 @@ while ( <CONFIGURE_DEFAULTS> )
            $_ =~ s:ESMFIOEXTLIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90 -lesmf_time:g ;
         }
       }
-     if ( $ENV{HWRF} )
-       {
-        $_ =~ s:CONFIGURE_ATMPOM_LIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/atm_pom  -latm_pom:g ;
-        $_ =~ s:CONFIGURE_ATMPOM_INC:-I\$\(GEN_BE_SRC_ROOT_DIR\)/external/atm_pom:g;
-        $_ =~ s/CONFIGURE_ATMPOM/atm_pom/g ;
-       }
-     else
-       {
-        $_ =~ s:CONFIGURE_ATMPOM_LIB::g ;
-        $_ =~ s/CONFIGURE_ATMPOM//g ;
-        $_ =~ s:CONFIGURE_ATMPOM_INC::g;
-       }
 
     if ( ! (substr( $_, 0, 5 ) eq "#ARCH") ) { @machopts = ( @machopts, $_ ) ; }
     if ( substr( $_, 0, 10 ) eq "ENVCOMPDEF" )
@@ -539,16 +527,6 @@ while ( <ARCH_PREAMBLE> )
     $_ =~ s:ESMFIOINC:-I\$\(GEN_BE_SRC_ROOT_DIR\)/external/esmf_time_f90:g ;
     $_ =~ s:ESMFIODEFS::g ;
     $_ =~ s:ESMFTARGET:esmf_time:g ;
-    }
-  if ( $ENV{HWRF} )
-    {
-    $_ =~ s:CONFIGURE_ATMPOM_LIB:-L\$\(GEN_BE_SRC_ROOT_DIR\)/external/atm_pom  -latm_pom:g ;
-    $_ =~ s/CONFIGURE_ATMPOM/atm_pom/g ;
-    }
-  else
-    {
-    $_ =~ s:CONFIGURE_ATMPOM_LIB::g ;
-    $_ =~ s/CONFIGURE_ATMPOM//g ;
     }
   $_ =~ s:CONFIGURE_EM_CORE:$sw_em_core:g ;
   $_ =~ s:CONFIGURE_DA_CORE:$sw_da_core:g ;
