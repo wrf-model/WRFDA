@@ -114,7 +114,7 @@
 
           <td><p>&nbsp;</p>
             <p class="bodytext">A number of datasets which provide observation data and/or background atmospheric estimates for WRFDA can be downloaded directly from the <a href="http://rda.ucar.edu/">CISL Research Data Archive (RDA)</a> web site. This page lists several useful datasets from that archive, as well as some other useful data sources. All data sets listed on this page are free for users to download.</p>
-            <p class="pagetitle">Background datasets</p>
+            <p class="pagetitle">CISL RDA Background datasets</p>
             <p class="bodytext">These data sets can be used with the <a href="../../docs/user_guide_V3/users_guide_chap3.htm">WRF Pre-processing System</a> to generate first guess (background) files for use in WRFDA.<br><em>The details of each dataset (domain, timespan, etc.) may change</em>, click the links to see the most up-to-date descriptions of each dataset.</p>
             <blockquote><ul class="bodytext">
               <li><a href="http://rda.ucar.edu/datasets/ds083.2">NCEP Final Analysis (FNL from GFS) (ds083.2)</a>
@@ -187,6 +187,33 @@
                 </ul>
               </li>
             </ul></blockquote>
+            <p class="pagetitle">Other radiance datasets</p>
+            <p class="bodytext">The following observation data sets are not maintained by NCAR groups, but can be assimilated directly by WRFDA without any preprocessing:</p>
+            <blockquote><ul class="bodytext"><a name="radiance">
+              <li>NCEP GDAS <a href="http://nomads.ncdc.noaa.gov/data/gdas/">HTTP</a> or <a href="ftp://nomads.ncdc.noaa.gov/GDAS/">FTP</a></li>
+                <ul>
+                  <li>A number of different observation data, including:
+                    <ul><li>Raw radiance data from several instruments:
+                      <ul><li>Atmospheric InfraRed Sounder (AIRS)</li>
+                        <li>Advanced Microwave Sounding Unit-A (AMSU-A) and Unit-B (AMSU-B)</li>
+                        <li>High resolution InfraRed Sounder-3 (HIRS-3) and 4 (HIRS-4)</li>
+                        <li>Infrared Atmospheric Sounding Interferometer (IASI)</li>
+                        <li>Microwave Humidity Sounder (MHS)</li>
+                        <li>Spinning Enhanced Visible and Infrared Imager (SEVIRI)</li>
+                      </li></ul>
+                      <li>Conventional observations are from land, ocean, and upper-air platforms</li></ul>
+                  <li>Radiance observations are in WMO BUFR format (assimilated directly into WRFDA <a href="../../docs/user_guide_V3/users_guide_chap6.htm#_Radiance_Data_Assimilations">utilizing a Radiative Transfer Model</a>), conventional observations in NCEP PREPBUFR format (also assimilated directly into WRFDA)</li>
+                  <li>Available online for one year prior to current date<!--, though some data (METOP-B instruments, SEVIRI data) were only included <a href="http://www.nws.noaa.gov/os/notification/tin13-18addobservations_gdas.htm">starting August 20, 2013</a>-->. Older data can be accessed through the <a href="http://nomads.ncdc.noaa.gov/guide/index.php?name=methods#onlineoffline">offline archive</a>.</li>
+                </ul>
+              </li>
+              <a name="amsr2"><li>JAXA GCOM-W1 AMSR2 data (free account required: <a href="https://gcom-w1.jaxa.jp/auth.html">Sign in/Sign up link</a>, <a href="http://gcom-w1.jaxa.jp/product-download.html">Download link</a>)</a>
+                <ul>
+                  <li>Observations from the JAXA GCOM-W1 AMSR2 instrument in HDF5 format.</li>
+                  <li>Products that can be used in WRFDA are brightness temperature (TBR) and cloud water (CLW)
+                  <li>From "Download link" above, click:<br>AMSR2 -> YEAR -> YYYY.MM -> L1 -> L1R -> 2 (for TBR)<br>AMSR2 -> YEAR -> YYYY.MM -> L2 -> CLW -> 2 (for CLW)</li>
+                  <li>See <a href="Docs/user_guide_V3.8/users_guide_chap6.htm#_Other_data_formats">the user's guide</a> for information on how to compile WRFDA with HDF5 support.</li>
+              </li>
+            </ul></blockquote>
             <p class="pagetitle">Other observation datasets</p>
             <p class="bodytext">The following observation data sets require some additional processing before being assimilated with WRFDA:</p>
             <blockquote><ul class="bodytext"><a name="precipitation">
@@ -199,23 +226,7 @@
                   <li>See <a href="../Docs/user_guide_V3.6.1/users_guide_chap6.htm#Precipitation">relevant section in the User's Guide</a> for instructions on how to assimilate</li>
                 </ul>
               </li>
-              <li>NCEP GDAS <a href="http://nomads.ncdc.noaa.gov/data/gdas/">HTTP</a> or <a href="ftp://nomads.ncdc.noaa.gov/GDAS/">FTP</a>
-                <ul>
-                  <li>A number of different observation data, including:
-                    <ul><li>Raw radiance data from several instruments:
-                      <ul><li>Atmospheric InfraRed Sounder (AIRS)</li>
-                        <li>Advanced Microwave Sounding Unit-A (AMSU-A) and Unit-B (AMSU-B)</li>
-                        <li>High resolution InfraRed Sounder-3 (HIRS-3) and 4 (HIRS-4)</li>
-                        <li>Infrared Atmospheric Sounding Interferometer (IASI)</li>
-                        <li>Microwave Humidity Sounder (MHS)</li>
-                        <li>Spinning Enhanced Visible and Infrared Imager (SEVIRI)</li>
-                      </ul>
-                      <li>Conventional observations from land, ocean, and upper-air platforms</li>
-                  <li>Conventional observations in NCEP PREPBUFR format (assimilated directly into WRFDA); radiance observations in WMO BUFR format (assimilated directly into WRFDA <a href="../../docs/user_guide_V3/users_guide_chap6.htm#_Radiance_Data_Assimilations">utilizing a Radiative Transfer Model</a>), conventional observations in NCEP PREPBUFR format (also assimilated directly into WRFDA)</li>
-                  <li>Available online for one year prior to current date, though some data (METOP-B instruments, SEVIRI data) were only included <a href="http://www.nws.noaa.gov/os/notification/tin13-18addobservations_gdas.htm">starting August 20, 2013</a>. <!--Older data can be accessed through the <a href="http://nomads.ncdc.noaa.gov/guide/index.php?name=methods#onlineoffline">offline archive</a>.--></li>
-                </ul>
-              </li>
-              <li>MADIS data FTP sites: <a href="ftp://madis-data.noaa.gov/point/">real-time</a> and <a href="ftp://madis-data.noaa.gov/archive/">archived observations</a>
+              <a name="madis"><li>MADIS data FTP sites: <a href="ftp://madis-data.noaa.gov/point/">real-time</a> and <a href="ftp://madis-data.noaa.gov/archive/">archived observations</a>
                 <ul>
                   <li>Surface and upper-air data as described at the <a href="http://madis.noaa.gov/">MADIS website</a></li>
                   <li>MADIS netCDF format (converted to LITTLE_R using the <a href="madis.html">MADIS2LITTLER converter</a>)</li>
