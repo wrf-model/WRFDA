@@ -18,7 +18,7 @@
 
 <meta http-equiv="expires" content="0">
 
-<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+<meta name="copyright" content="Copyright (c) 2016 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -50,8 +50,6 @@ descarray = new Array(
 
 <link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
 
-<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
-
 <style type="text/css">
 <!--
 body {
@@ -66,6 +64,16 @@ body {
 .style7 {
 	color: #990000;
 	font-style: italic;
+}
+.box    { 
+	width: 1000px; 
+	padding: 10px; 
+	float: left; 
+	margin: 0 20px 0 0;
+	clear:both; 
+}
+.clear  {
+	clear:both;
 }
 -->
 </style>
@@ -90,7 +98,7 @@ body {
 
   <tr valign="top">
 
-    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" height="56" border="0" usemap="#Map"></a></td>
 
   </tr>
 
@@ -130,8 +138,431 @@ body {
         <p class="style5" id="Font16">What is the LITTLE_R format?</p>
         <p class="bodytext">A LITTLE_R file is composed of <em>reports</em>. These reports are composed of <em>records</em>: a header (detailing the specific data reported by this type of observation), the data itself (organized in a way specified by the header values), and three tail integers. These records are composed of <em>fields</em>: these fields contain the definitions for the data indicated by this observation type (in the header record) and the individual pieces of data for each observation (in the data record).</p>
 
-      <p class="bodytext"><strong id="Font14">The header record</strong> </p>
+      <p class="bodytext"><strong id="Font14">Header record</strong> </p>
+      <p class="bodytext">The header record is a single line: the first line of each observation record which stores information about the observation type and location. Below is a table showing the description of each field, its format, and a few examples.</p>
+      <p class="bodytext">LITTLE_R was designed for applications other than WRFDA, so many fields are not used. See <a href="../../wrf/users/docs/user_guide_V3/users_guide_chap7.htm#format">Chapter 7 of the WRF User's Guide</a> for more detail about each field.</p>
+            <p class="box" style="padding-left: 45px;"><table style="background-color:#DDFFDD;overflow:scroll" width="100%" border="1" class="bodytable">
+              <tr>
+                <td style="background-color:#AAAADD;"><b>Latitude</b></td>
+                <td style="background-color:#AAAADD;"><b>Longitude</b></td>
+                <td style="background-color:#DDDD55;"><b>ID</b></td>
+                <td style="background-color:#DDDD55;"><b>Name</b></td>
+                <td style="background-color:#AAAADD;"><b>Platform</b></td>
+                <td style="background-color:#DDDD55;"><b>Source</b></td>
+                <td style="background-color:#AAAADD;"><b>Elevation</b></td>
+                <td style="background-color:#DDDD55;"><b>Valid fields</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. errors</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. warnings</b></td>
+                <td style="background-color:#DDDD55;"><b>Sequence number</b></td>
+                <td><b>Num. duplicates</b></td>
+                <td><b>Is sounding?</b></td>
+                <td style="background-color:#AAAADD;"><b>Is bogus?</b></td>
+                <td><b>Discard?</b></td>
+                <td><b>Unix time</b></td>
+                <td><b>Julian day</b></td>
+                <td style="background-color:#AAAADD;"><b>Date</b></td>
+                <td style="background-color:#AAAADD;"><b>SLP, QC</b></td>
+                <td><b>Ref Pressure, QC</b></td>
+                <td><b>Ground Temp, QC</b></td>
+                <td><b>SST, QC</b></td>
+                <td style="background-color:#DDDD55;"><b>SFC Pressure, QC</b></td>
+                <td><b>Precip, QC</b></td>
+                <td><b>Daily Max T, QC</b></td>
+                <td><b>Daily Min T, QC</b></td>
+                <td><b>Night Min T, QC</b></td>
+                <td><b>3hr Pres Change, QC</b></td>
+                <td><b>24hr Pres Change, QC</b></td>
+                <td><b>Cloud cover, QC</b></td>
+                <td><b>Ceiling, QC</b></td>
+              </tr>
+              <tr>
+                <td style="background-color:#AAAADD;">F20.5</td>
+                <td style="background-color:#AAAADD;">F20.5</td>
+                <td style="background-color:#DDDD55;">A40</td>
+                <td style="background-color:#DDDD55;">A40</td>
+                <td style="background-color:#AAAADD;">A40</td>
+                <td style="background-color:#DDDD55;">A40</td>
+                <td style="background-color:#AAAADD;">F20.5</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td>I10</td>
+                <td>L</td>
+                <td style="background-color:#AAAADD;">L</td>
+                <td>L</td>
+                <td>I10</td>
+                <td>I10</td>
+                <td style="background-color:#AAAADD;">A20</td>
+                <td style="background-color:#AAAADD;">F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td style="background-color:#DDDD55;">F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+              </tr>
+              <tr><td colspan="41";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional fields should still be filled with blanks (for text) or "missing" values.</td><tr>
+              <tr><td colspan="41";>Below are some examples of this header format in action. The first is a sounding from the Denver Airport location</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">39.78000</td>
+                <td style="background-color:#AAAADD;">-104.86000</td>
+                <td style="background-color:#DDDD55;">72469</td>
+                <td style="background-color:#DDDD55;">DENVER/STAPLETON INT., CO. / U.S.A.</td>
+                <td style="background-color:#AAAADD;">FM-35 TEMP</td>
+                <td style="background-color:#DDDD55;">GTS (ROHK) UKUS09 KWBC 051200 RRA</td>
+                <td style="background-color:#AAAADD;">1626.00000</td>
+                <td style="background-color:#DDDD55;">1</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">890</td>
+                <td>-888888</td>
+                <td>T</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205120000</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="41";>This is what it looks like on a single line. Notice that there is no separation between the fields, so sometimes they run together! Look at, for instance, the longitude and ID:<br><kbd>
+ &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;39.78000 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;-104.8600072469 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; DENVER/STAPLETON INT., CO. / U.S.A. &nbsp; &nbsp; FM-35 TEMP &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;GTS (ROHK) UKUS09 KWBC 051200 RRA &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1626.00000 &nbsp; &nbsp; &nbsp; &nbsp; 1 &nbsp; -888888 &nbsp; -888888 &nbsp; &nbsp; &nbsp; 890 &nbsp; -888888 &nbsp; &nbsp; &nbsp; &nbsp; T &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; -888888 &nbsp; -888888 &nbsp; &nbsp; &nbsp;20080205120000-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0</kbd></td><tr>
+              <tr><td colspan="41";>The next example is a buoy observation from the Antarctic Ocean, west of the Antarctic Peninsula</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">           -71.86300</td>
+                <td style="background-color:#AAAADD;">          -125.59700</td>
+                <td style="background-color:#DDDD55;">-7777</td>
+                <td style="background-color:#DDDD55;">Platform Id >>> 71656</td>
+                <td style="background-color:#AAAADD;">FM-18 BUOY</td>
+                <td style="background-color:#DDDD55;">GTS (ROHK) SSVX07 LFVW 051100</td>
+                <td style="background-color:#AAAADD;">0.00000</td>
+                <td style="background-color:#DDDD55;">6</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">564</td>
+                <td>-888888</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205110000</td>
+                <td style="background-color:#DDDD55;">97940.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">97940.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="41";>Finally, this example is a wind profiler observation from northeast of Anchorage, Alaska.</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">            36.88000</td>
+                <td style="background-color:#AAAADD;">           -89.97000</td>
+                <td style="background-color:#DDDD55;">-----</td>
+                <td style="background-color:#DDDD55;">ID   BLMM7</td>
+                <td style="background-color:#AAAADD;">FM-32 PROFILER</td>
+                <td style="background-color:#DDDD55;">MADIS NOAA Profiler Network NWS        N</td>
+                <td style="background-color:#AAAADD;">130.00000</td>
+                <td style="background-color:#DDDD55;">258</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">1</td>
+                <td>0</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205120000</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+      <p class="bodytext"><strong id="Font12">FM Codes</strong> </p>
+      <p class="bodytext">The World Meteorological Organization (WMO) specifies a list of 2-digit "FM" codes to distinguish between different observation types (described in <a href="https://www.wmo.int/pages/prog/gcos/documents/gruanmanuals/WWW_Data_Management/WMO_306_vol%20I.1_en.pdf">this presentation [WARNING: LARGE PDF]</a>. WRFDA assimilates a number of different observation types that do not have standard FM codes, so we use an extension of this system to identify different observation types. This code should appear in the "Platform" field as described above so that OBSPROC can properly identify the observation type. A list of valid FM codes for OBSPROC is listed below (codes in the same box are treated equivalently by OBSPROC and WRFDA):</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Code</b></td>
+                <td><b>Obs Type</b></td>
+                <td><b>Description</b></td>
+              </tr>
+              <tr>
+                <td>FM-12<br>FM-14</td>
+                <td>SYNOP<br>SYNOP MOBIL</td>
+                <td>Surface observation from a fixed land station<br>Surface observation from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-13</td>
+                <td>SHIP</td>
+                <td>Surface observation from a sea station</td>
+              </tr>
+              <tr>
+                <td>FM-15<br>FM-16</td>
+                <td>METAR<br>SPECI</td>
+                <td>Aerodrome routine meteorological report<br>Aerodrome special meteorological report</td>
+              </tr>
+              <tr>
+                <td>FM-18<br>FM-19</td>
+                <td>BUOY</td>
+                <td>Buoy observation</td>
+              </tr>
+              <tr>
+                <td>FM-32<br>FM-33<br>FM-34</td>
+                <td>PILOT<br>PILOT SHIP<br>PILOT MOBIL</td>
+                <td>Upper-wind report from a fixed land station<br>Upper-wind report from a sea station<br> Upper-wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-35<br>FM-36<br>FM-37<br>FM-38</td>
+                <td>TEMP<br>TEMP SHIP<br>TEMP DROP<br>TEMP MOBIL</td>
+                <td>Upper-level pressure, temperature, humidity and wind report from a fixed land station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a sea station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a sonde released by carrier balloons or aircraft<br> 
+                    Upper-level pressure, temperature, humidity and wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-42</td>
+                <td>AMDAR</td>
+                <td>Automated aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-86</td>
+                <td>SATEM</td>
+                <td> Report of satellite remote upper-air soundings of pressure, temperature and humidity</td>
+              </tr>
+              <tr>
+                <td>FM-88</td>
+                <td>SATOB</td>
+                <td> Report of satellite observations of wind, surface temperature, cloud, humidity and radiation</td>
+              </tr>
+              <tr>
+                <td>FM-96<br>FM-97</td>
+                <td>AIREP</td>
+                <td>Aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-101</td>
+                <td>TAMDAR</td>
+                <td>Automated aircraft report from <a href="https://en.wikipedia.org/wiki/TAMDAR">TAMDAR</a> system</td>
+              </tr>
+              <tr>
+                <td>FM-111</td>
+                <td>GPSPW</td>
+                <td>GPS Precipitable Water observation</td>
+              </tr>
+              <tr>
+                <td>FM-114</td>
+                <td>GPSZD</td>
+                <td>GPS Zenith Total Delay (GPSZTD) observation</td>
+              </tr>
+              <tr>
+                <td>FM-116</td>
+                <td>GPSRF</td>
+                <td>GPS Refractivity observation </td>
+              </tr>
+              <tr>
+                <td>FM-118</td>
+                <td>GPSEP</td>
+                <td>GPS Estimated Horizontal Position (GPSEPH) </td>
+              </tr>
+              <tr>
+                <td>FM-121</td>
+                <td>SSMT1</td>
+                <td>SSM/T- Atmospheric Temperature Profiler (<a href=https://web.archive.org/web/20051210073501/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-122</td>
+                <td>SSMT2</td>
+                <td>SSMT/2 Atmospheric Water Vapor Profiler (<a href=https://web.archive.org/web/20051210082729/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt2.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-125<br>FM-126</td>
+                <td>SSMI</td>
+                <td>Special Sensor Microwave Imager (SSM/I) (<a href=https://nsidc.org/data/docs/daac/ssmi_instrument.gd.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-131</td>
+                <td>TOVS</td>
+                <td>TIROS Observational Vertical Sounder (TOVS) observations (<a href=http://www.ozonelayer.noaa.gov/action/tovs.htm>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-132</td>
+                <td>QSCAT</td>
+                <td>Scatterometer observation (originally Quickscat, but new scatterometers such as Oceansat can use this code as well)</td>
+              </tr>
+              <tr>
+                <td>FM-133</td>
+                <td>AIRSRET</td>
+                <td>Atmospheric Infrared Sounder (AIRS) temperature retrievals (<a href=http://airs.jpl.nasa.gov/data/physical_retrievals>description page</a>) </td>
+              </tr>
+              <tr>
+                <td>FM-135</td>
+                <td>BOGUS</td>
+                <td>Bogus observations for TC relocation (Paper: <a href=http://nldr.library.ucar.edu/repository/assets/osgc/OSGC-000-000-002-702.pdf>Xiao et al., 2008</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-</td>
+                <td></td>
+                <td></td>
+              </tr>
+            </table></p>
+
+      <p class="bodytext"><strong id="Font14">Data record</strong> </p>
+      <p class="bodytext">After the header record, there can be one or more data records. Multiple data records usually correspond to multiple vertical levels of data for a single observation site, and only certain observation types support more than one data record (for example, vertical soundings, FM-35). </p>
+            <p class=box style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td style="background-color:#AAAADD;"><b>Latitude</b></td>
+                <td style="background-color:#AAAADD;"><b>Longitude</b></td>
+                <td style="background-color:#DDDD55;"><b>ID</b></td>
+                <td style="background-color:#DDDD55;"><b>Name</b></td>
+                <td style="background-color:#AAAADD;"><b>Platform</b></td>
+                <td style="background-color:#DDDD55;"><b>Source</b></td>
+                <td style="background-color:#AAAADD;"><b>Elevation</b></td>
+                <td style="background-color:#DDDD55;"><b>Valid fields</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. errors</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. warnings</b></td>
+                <td style="background-color:#DDDD55;"><b>Sequence number</b></td>
+                <td><b>Num. duplicates</b></td>
+                <td><b>Is sounding?</b></td>
+                <td style="background-color:#AAAADD;"><b>Is bogus?</b></td>
+                <td><b>Discard?</b></td>
+                <td><b>Unix time</b></td>
+                <td><b>Julian day</b></td>
+                <td style="background-color:#AAAADD;"><b>Date</b></td>
+                <td style="background-color:#AAAADD;"><b>SLP, QC</b></td>
+                <td><b>Ref Pressure, QC</b></td>
+                <td><b>Ground Temp, QC</b></td>
+                <td><b>SST, QC</b></td>
+                <td style="background-color:#DDDD55;"><b>SFC Pressure, QC</b></td>
+                <td><b>Precip, QC</b></td>
+                <td><b>Daily Max T, QC</b></td>
+                <td><b>Daily Min T, QC</b></td>
+                <td><b>Night Min T, QC</b></td>
+                <td><b>3hr Pres Change, QC</b></td>
+                <td><b>24hr Pres Change, QC</b></td>
+                <td><b>Cloud cover, QC</b></td>
+                <td><b>Ceiling, QC</b></td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+
+
+      <p class="bodytext"><strong id="Font14">Observation formats</strong> </p>
+
       <p class="bodytext"></p>
+
+<h1>Special cases</h1>
+      <p class="bodytext">Because LITTLE_R is a legacy format that was developed several decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
+
+      <p class="bodytext"><strong id="Font14">GPS PW and ZTD</strong> </p>
+      <p class="bodytext">GPS Precipitable Water (GPSPW) and Zenith Total Delay (GPSZTD) observations are stored in similar formats.</p>
+            <p class=box style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr><td colspan="41";>Finally, this example is a wind profiler observation from northeast of Anchorage, Alaska.</td><tr>
+              <tr>
+                <td style="background-color:#DDDDDD;">Lat.</td>
+                <td style="background-color:#DDDDDD;">Lon.</td>
+                <td style="background-color:#DDDD55;"><b>ID</b></td>
+                <td style="background-color:#DDDD55;"><b>Name</b></td>
+                <td style="background-color:#AAAADD;"><b>Platform</b></td>
+                <td style="background-color:#DDDD55;"><b>Source</b></td>
+                <td style="background-color:#AAAADD;"><b>Elevation</b></td>
+                <td style="background-color:#DDDD55;"><b>Valid fields</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. errors</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. warnings</b></td>
+                <td style="background-color:#DDDD55;"><b>Sequence number</b></td>
+                <td><b>Num. duplicates</b></td>
+                <td><b>Is sounding?</b></td>
+                <td style="background-color:#AAAADD;"><b>Is bogus?</b></td>
+                <td><b>Discard?</b></td>
+                <td><b>Unix time</b></td>
+                <td><b>Julian day</b></td>
+                <td style="background-color:#AAAADD;"><b>Date</b></td>
+                <td style="background-color:#AAAADD;"><b>SLP, QC</b></td>
+                <td><b>Ref Pressure, QC</b></td>
+                <td><b>Ground Temp, QC</b></td>
+                <td><b>SST, QC</b></td>
+                <td style="background-color:#DDDD55;"><b>SFC Pressure, QC</b></td>
+                <td><b>Precip, QC</b></td>
+                <td><b>Daily Max T, QC</b></td>
+                <td><b>Daily Min T, QC</b></td>
+                <td><b>Night Min T, QC</b></td>
+                <td><b>3hr Pres Change, QC</b></td>
+                <td><b>24hr Pres Change, QC</b></td>
+                <td><b>Cloud cover, QC</b></td>
+                <td><b>Ceiling, QC</b></td>
+              </tr>
+              <tr>
+                <td style="background-color:#AAAADD;">            36.88000</td>
+                <td style="background-color:#AAAADD;">           -89.97000</td>
+                <td style="background-color:#DDDD55;">-----</td>
+                <td style="background-color:#DDDD55;">ID   BLMM7</td>
+                <td style="background-color:#AAAADD;">FM-32 PROFILER</td>
+                <td style="background-color:#DDDD55;">MADIS NOAA Profiler Network NWS        N</td>
+                <td style="background-color:#AAAADD;">130.00000</td>
+                <td style="background-color:#DDDD55;">258</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">1</td>
+                <td>0</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205120000</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+
 
 <!-- 
 
