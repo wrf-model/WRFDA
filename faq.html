@@ -88,7 +88,7 @@
 
   <tr>
 
-    <td height="863" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+    <td height="863" valign="top" bgcolor="#CBFFCD"><table width="100%" border="0" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
 
@@ -205,7 +205,36 @@
               </tr>
               <tr>
                 <td style="color:#900"><strong>A2</strong></td>
-                <td style="color:#900">This error is encountered when you attempt to use multiple outer loops in your minimization with the CV3 background error option. By default, WRFDA only has CV3 length and variance scaling parameters set for a single outer loop; for multiple outer loops you need to set these parameters manually in the namelist. See the section in the user's guide on "<a href="usersguide.html">Modifying CV3 length scales and variance FIX THIS LINK</a>" for information on how to do this.</td>
+                <td style="color:#900">This error is encountered when you attempt to use multiple outer loops in your minimization with the CV3 background error option. By default, WRFDA only has CV3 length and variance scaling parameters set for a single outer loop; for multiple outer loops you need to set these parameters manually in the namelist. See the section in the user's guide on "<a href="Docs/user_guide_V3.8/users_guide_chap6.htm#CV3">Modifying CV3 length scales and variance</a>" for information on how to do this.</td>
+              </tr>
+              <tr>
+                <td width="5%"><strong>Q3</strong></td>
+                <td class="font11"><strong>My WRFDA-4DVAR runs fail with a segmentation fault, "signal 9" error, or no error at all. What is the problem?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A3</strong></td>
+                <td style="color:#900">The most common cause of failure for 4DVAR runs is running out of memory. This is because WRFDA must store the entire run of the nonlinear WRF model in memory (the first step of the minimization). The solution is to either add more nodes (if on a cluster), or if that is not possible, to reduce your memory footprint in one or more of the following ways:<br>
+                <ul><li>Use a smaller domain</li>
+                  <li>Use the same domain but a lower resolution (which would allow for less gridpoints and a larger time step)</li>
+                  <li>Use a smaller assimilation window</li>
+                  <li>Use a simple microphysics option for your WRFNL run, set by the namelist option "mp_physics". You can use a different microphysics option than you plan to use with WRF</li>
+                </ul></td>
+              </tr>
+            </table></p>
+
+            <blockquote>
+              <h1><a name="running_GENBE">Running GENBE</h1>
+            </blockquote>
+            <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
+              <tr>
+                <td width="5%"><strong>Q1</strong></td>
+                <td class="font11"><strong>When running GEN_BE, it fails with the message "Stage gen_be_diags failed with error 24". How can I fix this?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A1</strong></td>
+                <td style="color:#900">While this error message states that the failure was in "Stage gen_be_diags", this is almost always due to an error at an earlier stage. Look in the log files for stages 0&ndash;4 for more information.<br>The most common errors are as follows:
+                  <ul><li><b>
+                </td>
               </tr>
             </table></p>
 
@@ -235,11 +264,14 @@ document.write("updated " + document.lastModified);
 
 
     </table></td>
+
+    <td width="117" height="900" bgcolor="#CBFFCD"><p>&nbsp;</p>
+
   </tr>
 
   <tr>
 
-    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+    <td colspan=2 height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
   </tr>
 </table>
 
