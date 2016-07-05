@@ -18,7 +18,7 @@
 
 <meta http-equiv="expires" content="0">
 
-<meta name="copyright" content="Copyright (c) 2012 by UCAR">
+<meta name="copyright" content="Copyright (c) 2016 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -50,8 +50,6 @@ descarray = new Array(
 
 <link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
 
-<link href="../images/wrfstyle.css" rel="stylesheet" type="text/css">
-
 <style type="text/css">
 <!--
 body {
@@ -66,6 +64,26 @@ body {
 .style7 {
 	color: #990000;
 	font-style: italic;
+}
+.box    { 
+	width: 1000px; 
+	padding: 10px; 
+	float: left; 
+	margin: 0 20px 0 0;
+	clear:both; 
+}
+.boxnw  {
+	white-space:nowrap;
+	float: left;
+	clear:both;
+}
+.scrollbox  {
+	float: left;
+        overflow:scroll;
+        width: 1200px;
+}
+.clear  {
+	clear:both;
 }
 -->
 </style>
@@ -90,7 +108,7 @@ body {
 
   <tr valign="top">
 
-    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" width="1000" height="56" border="0" usemap="#Map"></a></td>
+    <td height="10" bgcolor="#DDFFDD"><a href="../menu.html"><img src="../images/MainImage.svg" height="56" border="0" usemap="#Map"></a></td>
 
   </tr>
 
@@ -122,16 +140,822 @@ body {
     <td width="1%" valign="top">&nbsp;</td>
     <td width="94%" valign="top"><p>&nbsp;</p>
       <p class="headingtext" id="Font20">LITTLE_R Help</p>
+      <p class="bodytext"><strong id="Font14">Index</strong> </p>
+         <blockquote><ul class="bodybullet"><b><li><a href="#format">What is the LITTLE_R format?</a></li>
+            <ul><li><a href="#header">Header record</a></li>
+               <li><a href="#data">Data record</a></li>
+            </ul>
+            <li><a href="#special">Special cases</a></li>
+            <ul><li><a href="#gpspw">GPSPW and GPSZTD</a></li>
+               <li><a href="#data">Data record</a></li>
+            </ul>
+         </ul></blockquote></b>
       <blockquote>
-        <p class="style5" id="Font16">What the heck is LITTLE_R?</p>
+        <p class="style5" id="Font16">LITTLE_R than what??</p>
 
         <p class="bodytext"><b>LITTLE_R</b> is an ASCII-based observation file format, in use since the MM5 era. Because raw observation data files have many possible formats (such as ASCII, BUFR, PREPBUFR, MADIS, and HDF) LITTLE_R is designed to be an intermediate format so that WRFDA might be able to assimilate as many observation types as possible in a universal manner. It is a report-based file format, so all manner of observation types can easily be "cat-ted" together into an easy-to-read and -edit text file.</p>
         <p class="bodytext"><b>It is the user's responsibility to develop an interface to convert their own observations to LITTLE_R format</b> so they may be read by OBSPROC. We do not support any existing tools which do this. However, on this help page, we hope to describe the format as thoroughly as possible to aid the user in the conversion process.</p>
         <p class="style5" id="Font16">What is the LITTLE_R format?</p>
         <p class="bodytext">A LITTLE_R file is composed of <em>reports</em>. These reports are composed of <em>records</em>: a header (detailing the specific data reported by this type of observation), the data itself (organized in a way specified by the header values), and three tail integers. These records are composed of <em>fields</em>: these fields contain the definitions for the data indicated by this observation type (in the header record) and the individual pieces of data for each observation (in the data record).</p>
 
-      <p class="bodytext"><strong id="Font14">The header record</strong> </p>
+      <p class="bodytext"><strong id="Font14">Header record</strong> </p>
+      <p class="bodytext">The header record is a single line: the first line of each observation record which stores information about the observation type and location. Below is a table showing the description of each field, its format, and a few examples.</p>
+      <p class="bodytext">LITTLE_R was designed for applications other than WRFDA, so many fields are not used. See <a href="../../wrf/users/docs/user_guide_V3/users_guide_chap7.htm#format">Chapter 7 of the WRF User's Guide</a> for more detail about each field.</p>
+            <p class="box" style="padding-left: 45px;"><table style="background-color:#DDFFDD;overflow:scroll" width="100%" border="1" class="bodytable">
+              <tr>
+                <td style="background-color:#AAAADD;"><b>Latitude</b></td>
+                <td style="background-color:#AAAADD;"><b>Longitude</b></td>
+                <td style="background-color:#DDDD55;"><b>ID</b></td>
+                <td style="background-color:#DDDD55;"><b>Name</b></td>
+                <td style="background-color:#AAAADD;"><b>Platform (<a href="#FM">FM-Code</a>)</b></td>
+                <td style="background-color:#DDDD55;"><b>Source</b></td>
+                <td style="background-color:#AAAADD;"><b>Elevation</b></td>
+                <td style="background-color:#DDDD55;"><b>Valid fields</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. errors</b></td>
+                <td style="background-color:#DDDD55;"><b>Num. warnings</b></td>
+                <td style="background-color:#DDDD55;"><b>Sequence number</b></td>
+                <td><b>Num. duplicates</b></td>
+                <td><b>Is sounding?</b></td>
+                <td style="background-color:#AAAADD;"><b>Is bogus?</b></td>
+                <td><b>Discard?</b></td>
+                <td><b>Unix time</b></td>
+                <td><b>Julian day</b></td>
+                <td style="background-color:#AAAADD;"><b>Date</b></td>
+                <td style="background-color:#DDDD55;"><b>SLP, QC</b></td>
+                <td><b>Ref Pressure, QC</b></td>
+                <td><b>Ground Temp, QC</b></td>
+                <td><b>SST, QC</b></td>
+                <td style="background-color:#DDDD55;"><b>SFC Pressure, QC</b></td>
+                <td><b>Precip, QC</b></td>
+                <td><b>Daily Max T, QC</b></td>
+                <td><b>Daily Min T, QC</b></td>
+                <td><b>Night Min T, QC</b></td>
+                <td><b>3hr Pres Change, QC</b></td>
+                <td><b>24hr Pres Change, QC</b></td>
+                <td><b>Cloud cover, QC</b></td>
+                <td><b>Ceiling, QC</b></td>
+                <td style="background-color:#DDDD55"><b>Precipitable water, QC</b> <sup>(<a href="#gpspw">see note</a>)</sup></td>
+              </tr>
+              <tr>
+                <td style="background-color:#AAAADD;">F20.5</td>
+                <td style="background-color:#AAAADD;">F20.5</td>
+                <td style="background-color:#DDDD55;">A40</td>
+                <td style="background-color:#DDDD55;">A40</td>
+                <td style="background-color:#AAAADD;">A40</td>
+                <td style="background-color:#DDDD55;">A40</td>
+                <td style="background-color:#AAAADD;">F20.5</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td style="background-color:#DDDD55;">I10</td>
+                <td>I10</td>
+                <td>L</td>
+                <td style="background-color:#AAAADD;">L</td>
+                <td>L</td>
+                <td>I10</td>
+                <td>I10</td>
+                <td style="background-color:#AAAADD;">A20</td>
+                <td style="background-color:#DDDD55;">F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td style="background-color:#DDDD55;">F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td>F13.5, I7</td>
+                <td style="background-color:#DDDD55;">F13.5, I7</td>
+              </tr>
+              <tr><td colspan="32";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional/unused fields should still be filled with blanks (for text) or "missing" values.</td><tr>
+              <tr><td colspan="32";>Below are some examples of this header format in action. The first is a sounding from the Denver Airport location</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">39.78000</td>
+                <td style="background-color:#AAAADD;">-104.86000</td>
+                <td style="background-color:#DDDD55;">72469</td>
+                <td style="background-color:#DDDD55;">DENVER/STAPLETON INT., CO. / U.S.A.</td>
+                <td style="background-color:#AAAADD;">FM-35 TEMP</td>
+                <td style="background-color:#DDDD55;">GTS (ROHK) UKUS09 KWBC 051200 RRA</td>
+                <td style="background-color:#AAAADD;">1626.00000</td>
+                <td style="background-color:#DDDD55;">1</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">890</td>
+                <td>-888888</td>
+                <td>T</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205120000</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="32";>This is what it looks like on a single line. Notice that there is no separation between the fields, so sometimes they run together! Look at, for instance, the longitude and ID:<br><kbd>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;39.78000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-104.8600072469&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DENVER/STAPLETON INT., CO. / U.S.A.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FM-35 TEMP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GTS (ROHK) UKUS09 KWBC 051200 RRA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1626.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;890&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;20080205120000-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</kbd></td><tr>
+              <tr><td colspan="32";>The next example is a buoy observation from the Antarctic Ocean, west of the Antarctic Peninsula</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">           -71.86300</td>
+                <td style="background-color:#AAAADD;">          -125.59700</td>
+                <td style="background-color:#DDDD55;">-7777</td>
+                <td style="background-color:#DDDD55;">Platform Id >>> 71656</td>
+                <td style="background-color:#AAAADD;">FM-18 BUOY</td>
+                <td style="background-color:#DDDD55;">GTS (ROHK) SSVX07 LFVW 051100</td>
+                <td style="background-color:#AAAADD;">0.00000</td>
+                <td style="background-color:#DDDD55;">6</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">564</td>
+                <td>-888888</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205110000</td>
+                <td style="background-color:#DDDD55;">97940.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">97940.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="41";>This example is a wind profiler observation from northeast of Anchorage, Alaska.</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">            36.88000</td>
+                <td style="background-color:#AAAADD;">           -89.97000</td>
+                <td style="background-color:#DDDD55;">-----</td>
+                <td style="background-color:#DDDD55;">ID   BLMM7</td>
+                <td style="background-color:#AAAADD;">FM-32 PROFILER</td>
+                <td style="background-color:#DDDD55;">MADIS NOAA Profiler Network NWS        N</td>
+                <td style="background-color:#AAAADD;">130.00000</td>
+                <td style="background-color:#DDDD55;">258</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">1</td>
+                <td>0</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205120000</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="41";>This example is a satellite retrieval observation from the northern Atlantic Ocean, about 2000km east of Bermuda.</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">31.00000</td>
+                <td style="background-color:#AAAADD;">-43.00000</td>
+                <td style="background-color:#DDDD55;">US unknown ### <20413> instrument not sp</td>
+                <td style="background-color:#DDDD55;"></td>
+                <td style="background-color:#AAAADD;">FM-86 SATEM</td>
+                <td style="background-color:#DDDD55;">GTS (ROHK) THAA01 KWBC 051300</td>
+                <td style="background-color:#AAAADD;">-888888.00000</td>
+                <td style="background-color:#DDDD55;">3</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">-888888</td>
+                <td style="background-color:#DDDD55;">560</td>
+                <td>-888888</td>
+                <td>T</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>-888888</td>
+                <td>-888888</td>
+                <td style="background-color:#AAAADD;">20080205130000</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>1000.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="41";>Finally, this example is a ground-based GPSPW observation from Louisiana State University in Baton Rouge, Louisiana. <b>NOTE: GPSPW observations <a href=#gpspw>have some differences in how their data is stored</a>.</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">30.40742</td>
+                <td style="background-color:#AAAADD;">-91.18026</td>
+                <td style="background-color:#DDDD55;">00001</td>
+                <td style="background-color:#DDDD55;">1LSU</td>
+                <td style="background-color:#AAAADD;">FM-111 GPSPW</td>
+                <td style="background-color:#DDDD55;">HOURLY_PWV.LLH</td>
+                <td style="background-color:#AAAADD;">20.91000</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td>0</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>0</td>
+                <td>36</td>
+                <td style="background-color:#AAAADD;">20080205114500</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">3.04000<br>0</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+      <a name="FM"><p class="bodytext"><strong id="Font12">FM Codes</strong> </p>
+      <p class="bodytext">The World Meteorological Organization (WMO) specifies a list of 2-digit "FM" codes to distinguish between different observation types (described in <a href="https://www.wmo.int/pages/prog/gcos/documents/gruanmanuals/WWW_Data_Management/WMO_306_vol%20I.1_en.pdf">this presentation [WARNING: LARGE PDF]</a>. WRFDA assimilates a number of different observation types that do not have standard FM codes, so we use an extension of this system to identify different observation types. This code should appear in the "Platform" field as described above so that OBSPROC can properly identify the observation type. A list of valid FM codes for OBSPROC is listed below (codes in the same box are treated equivalently by OBSPROC and WRFDA):</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr>
+                <td><b>Code</b></td>
+                <td><b>Obs Type</b></td>
+                <td><b>Description</b></td>
+              </tr>
+              <tr>
+                <td>FM-12<br>FM-14</td>
+                <td>SYNOP<br>SYNOP MOBIL</td>
+                <td>Surface observation from a fixed land station<br>Surface observation from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-13</td>
+                <td>SHIP</td>
+                <td>Surface observation from a sea station</td>
+              </tr>
+              <tr>
+                <td>FM-15<br>FM-16</td>
+                <td>METAR<br>SPECI</td>
+                <td>Aerodrome routine meteorological report<br>Aerodrome special meteorological report</td>
+              </tr>
+              <tr>
+                <td>FM-18<br>FM-19</td>
+                <td>BUOY</td>
+                <td>Buoy observation</td>
+              </tr>
+              <tr>
+                <td>FM-32<br>FM-33<br>FM-34</td>
+                <td>PILOT<br>PILOT SHIP<br>PILOT MOBIL</td>
+                <td>Upper-wind report from a fixed land station<br>Upper-wind report from a sea station<br> Upper-wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-35<br>FM-36<br>FM-37<br>FM-38</td>
+                <td>TEMP<br>TEMP SHIP<br>TEMP DROP<br>TEMP MOBIL</td>
+                <td>Upper-level pressure, temperature, humidity and wind report from a fixed land station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a sea station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a sonde released by carrier balloons or aircraft<br> 
+                    Upper-level pressure, temperature, humidity and wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-42</td>
+                <td>AMDAR</td>
+                <td>Automated aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-86</td>
+                <td>SATEM</td>
+                <td> Report of satellite remote upper-air soundings of pressure, temperature, humidity, and thickness</td>
+              </tr>
+              <tr>
+                <td>FM-88</td>
+                <td>SATOB</td>
+                <td> Report of satellite observations of wind, surface temperature, cloud, humidity and radiation</td>
+              </tr>
+              <tr>
+                <td>FM-96<br>FM-97</td>
+                <td>AIREP</td>
+                <td>Aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-101</td>
+                <td>TAMDAR</td>
+                <td>Automated aircraft report from <a href="https://en.wikipedia.org/wiki/TAMDAR">TAMDAR</a> system</td>
+              </tr>
+              <tr>
+                <td>FM-111</td>
+                <td>GPSPW</td>
+                <td>Ground-based GPS Precipitable Water observation</td>
+              </tr>
+              <tr>
+                <td>FM-114</td>
+                <td>GPSZD</td>
+                <td>Ground-based GPS Zenith Total Delay (GPSZTD) observation</td>
+              </tr>
+              <tr>
+                <td>FM-116</td>
+                <td>GPSRF</td>
+                <td>Space-based GPS Refractivity observation </td>
+              </tr>
+              <tr>
+                <td>FM-118</td>
+                <td>GPSEP</td>
+                <td>Space-based GPS Excess Phase observation (GPSEPH) </td>
+              </tr>
+              <tr>
+                <td>FM-121</td>
+                <td>SSMT1</td>
+                <td>SSM/T- Atmospheric Temperature Profiler (<a href=https://web.archive.org/web/20051210073501/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-122</td>
+                <td>SSMT2</td>
+                <td>SSMT/2 Atmospheric Water Vapor Profiler (<a href=https://web.archive.org/web/20051210082729/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt2.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-125<br>FM-126</td>
+                <td>SSMI</td>
+                <td>Special Sensor Microwave Imager (SSM/I) (<a href=https://nsidc.org/data/docs/daac/ssmi_instrument.gd.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-131</td>
+                <td>TOVS</td>
+                <td>TIROS Observational Vertical Sounder (TOVS) observations (<a href=http://www.ozonelayer.noaa.gov/action/tovs.htm>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-132</td>
+                <td>PROFILER</td>
+                <td>Profiler observation</td>
+              </tr>
+              <tr>
+                <td>FM-133</td>
+                <td>AIRSRET</td>
+                <td>Atmospheric Infrared Sounder (AIRS) temperature retrievals (<a href=http://airs.jpl.nasa.gov/data/physical_retrievals>description page</a>) </td>
+              </tr>
+              <tr>
+                <td>FM-135</td>
+                <td>BOGUS</td>
+                <td>Bogus observations for TC relocation (Paper: <a href=http://nldr.library.ucar.edu/repository/assets/osgc/OSGC-000-000-002-702.pdf>Xiao et al., 2008</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-281</td>
+                <td>QSCAT</td>
+                <td>Scatterometer observation (originally Quickscat, but new scatterometers such as Oceansat can use this code as well)</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+
+      <p class="bodytext"><strong id="Font14">Data record</strong> </p>
+      <p class="bodytext">After the header record, there can be one or more data records. Multiple data records usually correspond to multiple vertical levels of data for a single observation site, and only certain observation types support more than one data record (for example, vertical soundings, FM-35). Unlike the header record, all fields here can be utilized (depending on the observation type), and all are optional, though some observations will be discarded if they are missing certain fields.</p>
+            <p class=boxnw style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
+              <tr>
+                <td><b>Pressure&nbsp;(Pa)</b></td> <td><b>QC</b></td>
+                <td><b>Height&nbsp;(m)</b></td> <td><b>QC</b></td>
+                <td><b>Temperature&nbsp;(K)</b></td> <td><b>QC</b></td>
+                <td><b>Dew point&nbsp;(K)</b></td> <td><b>QC</b></td>
+                <td><b>Wind speed&nbsp;(m/s)</b></td> <td><b>QC</b></td>
+                <td><b>Wind direction&nbsp;(deg)</b></td> <td><b>QC</b></td>
+                <td><b>Wind U&nbsp;(m/s)</b></td> <td><b>QC</b></td>
+                <td><b>Wind V&nbsp;(m/s)</b></td> <td><b>QC</b></td>
+                <td><b>Relative humidity&nbsp;(%)</b></td> <td><b>QC</b></td>
+                <td><b>Thickness&nbsp;(m)</b></td> <td><b>QC</b></td>
+              </tr>
+              <tr>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+                <td>F13.5</td> <td>I7</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+      <p class="bodytext">Below are the data records from the same examples used above</p>
+      <p class="bodytext">Denver, CO FM-35 (sounding, 12 levels):</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               &nbsp;&nbsp;83500.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;264.44998&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0&nbsp;&nbsp;&nbsp;&nbsp;263.35001&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0<br>
+               &nbsp; 72100.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;257.85001 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;256.14999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 59100.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;252.45000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;250.34999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 46600.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;241.84999 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;239.34999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 40000.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;232.84999 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;229.75000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 37200.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;229.84999 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;223.84999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 33900.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;228.04999 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;214.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 25400.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;226.45000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;202.45000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 23300.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;229.45000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;201.45000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 14100.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;220.64999 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;195.64999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; 10000.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;218.64999 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;194.64999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br></kbd></td>
+         </tr>
+      </table></p>
+<div class=clear></div>
+
+      <p class="bodytext">Antarctic Ocean FM-18 (buoy, 1 level):</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               &nbsp; 97940.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;0.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;272.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0
+         </tr>
+      </table></p>
+<div class=clear></div>
+
+      <p class="bodytext">Anchorage, AK FM-32 (profiler, 58 levels):</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 14.01016 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;215.37839 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 19.01526 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;216.73862 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 1130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 22.00500 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;220.97760 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 1380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 25.44868 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;223.79138 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 1630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 25.42033 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;226.01888 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 1880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 23.25927 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;226.11497 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 2130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 21.96522 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;225.03618 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 2380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 21.06418 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;226.26228 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 2630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 21.71216 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;223.60741 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 2880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 22.40598 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;223.67085 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 3130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 23.04185 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;222.75717 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 3380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 24.06991 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;218.36322 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 3630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 26.94840 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;216.29131 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 3880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 28.16071 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;217.39850 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 4130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 29.77958 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;219.93613 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 4380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 31.44435 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;220.65549 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 4630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 32.97610 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;220.66956 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 4880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 33.97931 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;220.64391 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 5130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 33.48464 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;220.67572 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 5380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 33.33040 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;223.21815 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 5630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 35.24951 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;225.62820 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 5880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 36.06856 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;227.08728 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 6130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 37.07462 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;230.85640 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 6380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 39.35279 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;232.50116 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 6630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 38.77264 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;232.32939 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 6880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 38.22520 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;233.85529 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 7130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 36.11802 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;233.31396 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 7380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 35.34917 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;235.33400 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 7630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 35.84606 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;234.85262 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 7880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 36.40825 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;236.02185 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 8130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 36.68332 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;237.23056 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 8380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 37.58710 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;238.01053 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 8630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 38.73447 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;238.93161 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 8880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 41.07801 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;237.99295 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 9130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 42.27852 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;237.72690 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 9380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 43.83525 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;236.73672 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 9630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 45.34130 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;235.77557 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 9880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 46.45245 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;235.05881 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;10130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 47.20798 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;235.34401 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;10380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 47.64291 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;236.46423 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;10630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 46.91370 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;237.69711 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;10880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 44.50612 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;239.37671 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;11130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 43.90522 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;242.24957 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;11380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 45.36367 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;243.62344 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;11630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 47.13397 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;244.09201 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;11880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 49.01556 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;243.94174 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;12130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 51.54340 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;243.71536 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;12380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 51.31867 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;243.19965 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;13880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 60.96596 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;243.23419 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;14380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 50.52311 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;246.05542 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;14630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 45.43076 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;247.17447 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;14880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 43.46430 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;252.21545 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;15130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 43.86338 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;251.92825 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;15380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 41.74652 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;254.03870 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;15630.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 42.68912 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;251.73486 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;15880.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 38.02165 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;249.62634 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;16130.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 34.22643 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;246.33746 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;16380.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0-999999.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 32.20525 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;244.85468 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+         </tr>
+      </table></p>
+<div class=clear></div>
+
+      <p class="bodytext">North Atlantic Ocean FM-86 (SATEM, 4 levels):</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               &nbsp; &nbsp; 700.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 2360.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; &nbsp; 300.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; 8300.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; &nbsp; 100.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0 &nbsp;16680.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+         </tr>
+      </table></p>
+<div class=clear></div>
+
+
+      <p class="bodytext">Louisiana State University FM-114 (GPSPW, 1 level). Note that the PW information itself was stored in the "header" record, so only other observations from this station (such as surface pressure) can be found in the data record:</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               &nbsp;101180.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 20.91000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;295.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0
+         </tr>
+      </table></p>
+<div class=clear></div>
+
+      <p class="bodytext"><strong id="Font14">Observation formats</strong> </p>
+
       <p class="bodytext"></p>
+
+   <a name=special><h1>Special cases</h1>
+      <p class="bodytext">Because LITTLE_R is a legacy format that was developed several decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
+
+      <a name=gpspw><a name=gpsztd><p class="bodytext"><strong id="Font14">GPS PW and ZTD</strong> </p>
+      <p class="bodytext">GPS Precipitable Water (GPSPW) and Zenith Total Delay (GPSZTD) observations are stored in similar formats. For these observation types, the observation of interest is actually in the header record, rather than the data record.</p>
+      <p class="bodytext">For the GPSPW data, the "Precipitable Water" field contains the observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of tenths of millimeters. So an observation error of 1.5 mm should be stored as "15", an error of 3.0 mm should be "30", etc.</p>
+            <p class=scrollbox width=100px style="padding-left: 45px">Scroll right to see the entire header.<table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr><td colspan="41";>Here is an example GPSPW observation (the same shown earlier). Important fields are bolded, unused fields have a gray background. The observation is for 3.04 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
+              <tr>
+                <td><b>Lat.</b></td>
+                <td><b>Lon.</b></td>
+                <td>ID</td>
+                <td>Name</td>
+                <td><b>Platform</b></td>
+                <td>Source</td>
+                <td><b>Elevation</b></td>
+                <td style="background-color:#DDDDDD;">Valid fields</td>
+                <td style="background-color:#DDDDDD;">Num. errors</td>
+                <td style="background-color:#DDDDDD;">Num. warn.</td>
+                <td style="background-color:#DDDDDD;">Seq. number</td>
+                <td style="background-color:#DDDDDD;">Num. dup.</td>
+                <td style="background-color:#DDDDDD;">sound</td>
+                <td style="background-color:#DDDDDD;">bogus</td>
+                <td style="background-color:#DDDDDD;">Discard?</td>
+                <td style="background-color:#DDDDDD;">Unix time</td>
+                <td style="background-color:#DDDDDD;">Jul. day</td>
+                <td><b>Date</b></td>
+                <td style="background-color:#DDDDDD;">SLP, QC</td>
+                <td style="background-color:#DDDDDD;">Ref Pres., QC</td>
+                <td style="background-color:#DDDDDD;">Ground Temp, QC</td>
+                <td style="background-color:#DDDDDD;">SST, QC</td>
+                <td style="background-color:#DDDDDD;">SFC Pres, QC</td>
+                <td style="background-color:#DDDDDD;">Precip, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Max T, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Min T, QC</td>
+                <td style="background-color:#DDDDDD;">Ngt Min T, QC</td>
+                <td style="background-color:#DDDDDD;">3hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">24hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">Cld cvr, QC</td>
+                <td style="background-color:#DDDDDD;">Ceil, QC</td>
+                <td><b>Precipitable Water, QC</b></td>
+              </tr>
+              <tr>
+                <td>30.40742</td>
+                <td>-91.18026</td>
+                <td>00001</td>
+                <td>1LSU</td>
+                <td>FM-111 GPSPW</td>
+                <td>HOURLY_PWV.LLH</td>
+                <td>20.91000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">36</td>
+                <td>20080205114500</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td>3.04000<br>0</td>
+              </tr>
+              <tr>
+                <td>Pressure&nbsp;(Pa)</td> 
+                <td style="background-color:#DDDDDD;">QC</td>
+                <td>Height&nbsp;(m)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td>Temperature&nbsp;(K)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Dew point&nbsp;(K)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind speed&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind direction&nbsp;(deg)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind U&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind V&nbsp;(m/s)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Relative humidity&nbsp;(%)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Thickness&nbsp;(m)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+              </tr>
+              <tr>
+                <td>101180.00000</td> 
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>20.91000</td> 
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>295.04999</td> 
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+
+
+      <p class=bodytext>And here is the entire observation as it should appear in LITTLE_R format:</p>
+      <table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td><kbd>
+               &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 30.40742 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -91.1802600001 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1LSU &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;FM-111 GPSPW &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;HOURLY_PWV.LLH &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;20.91000 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp;36 &nbsp; &nbsp; &nbsp;20080205114500-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888 &nbsp; &nbsp; &nbsp;3.04000 &nbsp; &nbsp; &nbsp;0-888888.00000-888888<br>
+               &nbsp;101180.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 20.91000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;295.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -777777.00000 &nbsp; &nbsp; &nbsp;0-777777.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;1.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; &nbsp; &nbsp; 1 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;0<br>
+         </tr>
+      </table>
+<div class=clear></div>
+
+      <p class="bodytext">For the GPSZTD data, the "Precipitable Water" field contains the ZTD observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of millimeters. So an observation error of 15 mm should be stored as "15", an error of 30 mm should be "30", etc.</p>
+            <p class=scrollbox width=100px style="padding-left: 45px">Scroll right to see the entire header.<table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr><td colspan="41";>Here is an example GPSPW observation (the same shown earlier). Important fields are bolded, unused fields have a gray background. The observation is for 3.04 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
+              <tr>
+                <td><b>Lat.</b></td>
+                <td><b>Lon.</b></td>
+                <td>ID</td>
+                <td>Name</td>
+                <td><b>Platform</b></td>
+                <td>Source</td>
+                <td><b>Elevation</b></td>
+                <td style="background-color:#DDDDDD;">Valid fields</td>
+                <td style="background-color:#DDDDDD;">Num. errors</td>
+                <td style="background-color:#DDDDDD;">Num. warn.</td>
+                <td style="background-color:#DDDDDD;">Seq. number</td>
+                <td style="background-color:#DDDDDD;">Num. dup.</td>
+                <td style="background-color:#DDDDDD;">sound</td>
+                <td style="background-color:#DDDDDD;">bogus</td>
+                <td style="background-color:#DDDDDD;">Discard?</td>
+                <td style="background-color:#DDDDDD;">Unix time</td>
+                <td style="background-color:#DDDDDD;">Jul. day</td>
+                <td><b>Date</b></td>
+                <td style="background-color:#DDDDDD;">SLP, QC</td>
+                <td style="background-color:#DDDDDD;">Ref Pres., QC</td>
+                <td style="background-color:#DDDDDD;">Ground Temp, QC</td>
+                <td style="background-color:#DDDDDD;">SST, QC</td>
+                <td style="background-color:#DDDDDD;">SFC Pres, QC</td>
+                <td style="background-color:#DDDDDD;">Precip, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Max T, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Min T, QC</td>
+                <td style="background-color:#DDDDDD;">Ngt Min T, QC</td>
+                <td style="background-color:#DDDDDD;">3hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">24hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">Cld cvr, QC</td>
+                <td style="background-color:#DDDDDD;">Ceil, QC</td>
+                <td><b>Zenith Total Delay, QC</b></td>
+              </tr>
+              <tr>
+                <td>30.40742</td>
+                <td>-91.18026</td>
+                <td>Fake observation for GPSZTD test</td>
+                <td>Fake observation for GPSZTD test</td>
+                <td>FM-111 GPSZTD	</td>
+                <td>Fake observation for GPSZTD test</td>
+                <td>20.91000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">36</td>
+                <td>20080205114500</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td>250.20600<br>0</td>
+              </tr>
+              <tr>
+                <td>Pressure&nbsp;(Pa)</td>
+                <td style="background-color:#DDDDDD;">QC</td>
+                <td>Height&nbsp;(m)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td>Temperature&nbsp;(K)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Dew point&nbsp;(K)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind speed&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind direction&nbsp;(deg)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind U&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind V&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Relative humidity&nbsp;(%)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Thickness&nbsp;(m)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+              </tr>
+              <tr>
+                <td>101180.00000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>20.91000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>295.04999</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+
+
+      <p class=bodytext>And here is the entire observation as it should appear in LITTLE_R format:</p>
+      <table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td><kbd>
+               &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 30.40742 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -91.18026Fake observation for GPSZTD test &nbsp; &nbsp; &nbsp; &nbsp;Fake observation for GPSZTD test &nbsp; &nbsp; &nbsp;&nbsp; FM-114 GPSZTD &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Fake observation for GPSZTD test &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;20.91000 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp;36 &nbsp; &nbsp; &nbsp;20080205111500-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888 &nbsp; &nbsp;250.20600 &nbsp; &nbsp; &nbsp;0-888888.00000-888888<br>
+               &nbsp;101180.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 20.91000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;295.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -777777.00000 &nbsp; &nbsp; &nbsp;0-777777.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;1.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; &nbsp; &nbsp; 1 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;0<br>
+         </tr>
+      </table>
+<div class=clear></div>
+
 
 <!-- 
 
