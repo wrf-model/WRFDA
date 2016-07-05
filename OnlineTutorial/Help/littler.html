@@ -77,6 +77,11 @@ body {
 	float: left;
 	clear:both;
 }
+.scrollbox  {
+	float: left;
+        overflow:scroll;
+        width: 1200px;
+}
 .clear  {
 	clear:both;
 }
@@ -135,6 +140,16 @@ body {
     <td width="1%" valign="top">&nbsp;</td>
     <td width="94%" valign="top"><p>&nbsp;</p>
       <p class="headingtext" id="Font20">LITTLE_R Help</p>
+      <p class="bodytext"><strong id="Font14">Index</strong> </p>
+         <blockquote><ul class="bodybullet"><b><li><a href="#format">What is the LITTLE_R format?</a></li>
+            <ul><li><a href="#header">Header record</a></li>
+               <li><a href="#data">Data record</a></li>
+            </ul>
+            <li><a href="#special">Special cases</a></li>
+            <ul><li><a href="#gpspw">GPSPW and GPSZTD</a></li>
+               <li><a href="#data">Data record</a></li>
+            </ul>
+         </ul></blockquote></b>
       <blockquote>
         <p class="style5" id="Font16">LITTLE_R than what??</p>
 
@@ -166,7 +181,7 @@ body {
                 <td><b>Unix time</b></td>
                 <td><b>Julian day</b></td>
                 <td style="background-color:#AAAADD;"><b>Date</b></td>
-                <td style="background-color:#AAAADD;"><b>SLP, QC</b></td>
+                <td style="background-color:#DDDD55;"><b>SLP, QC</b></td>
                 <td><b>Ref Pressure, QC</b></td>
                 <td><b>Ground Temp, QC</b></td>
                 <td><b>SST, QC</b></td>
@@ -179,6 +194,7 @@ body {
                 <td><b>24hr Pres Change, QC</b></td>
                 <td><b>Cloud cover, QC</b></td>
                 <td><b>Ceiling, QC</b></td>
+                <td style="background-color:#DDDD55"><b>Precipitable water, QC</b> <sup>(<a href="#gpspw">see note</a>)</sup></td>
               </tr>
               <tr>
                 <td style="background-color:#AAAADD;">F20.5</td>
@@ -199,7 +215,7 @@ body {
                 <td>I10</td>
                 <td>I10</td>
                 <td style="background-color:#AAAADD;">A20</td>
-                <td style="background-color:#AAAADD;">F13.5, I7</td>
+                <td style="background-color:#DDDD55;">F13.5, I7</td>
                 <td>F13.5, I7</td>
                 <td>F13.5, I7</td>
                 <td>F13.5, I7</td>
@@ -212,9 +228,10 @@ body {
                 <td>F13.5, I7</td>
                 <td>F13.5, I7</td>
                 <td>F13.5, I7</td>
+                <td style="background-color:#DDDD55;">F13.5, I7</td>
               </tr>
-              <tr><td colspan="41";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional fields should still be filled with blanks (for text) or "missing" values.</td><tr>
-              <tr><td colspan="41";>Below are some examples of this header format in action. The first is a sounding from the Denver Airport location</td><tr>
+              <tr><td colspan="32";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional/unused fields should still be filled with blanks (for text) or "missing" values.</td><tr>
+              <tr><td colspan="32";>Below are some examples of this header format in action. The first is a sounding from the Denver Airport location</td><tr>
               <tr>
                 <td style="background-color:#AAAADD;">39.78000</td>
                 <td style="background-color:#AAAADD;">-104.86000</td>
@@ -247,10 +264,11 @@ body {
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
               </tr>
-              <tr><td colspan="41";>This is what it looks like on a single line. Notice that there is no separation between the fields, so sometimes they run together! Look at, for instance, the longitude and ID:<br><kbd>
+              <tr><td colspan="32";>This is what it looks like on a single line. Notice that there is no separation between the fields, so sometimes they run together! Look at, for instance, the longitude and ID:<br><kbd>
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;39.78000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;-104.8600072469&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;DENVER/STAPLETON INT., CO. / U.S.A.&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;FM-35 TEMP&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GTS (ROHK) UKUS09 KWBC 051200 RRA&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1626.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;1&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;890&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;T&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;F&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;-888888&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;20080205120000-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0-888888.00000&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0</kbd></td><tr>
-              <tr><td colspan="41";>The next example is a buoy observation from the Antarctic Ocean, west of the Antarctic Peninsula</td><tr>
+              <tr><td colspan="32";>The next example is a buoy observation from the Antarctic Ocean, west of the Antarctic Peninsula</td><tr>
               <tr>
                 <td style="background-color:#AAAADD;">           -71.86300</td>
                 <td style="background-color:#AAAADD;">          -125.59700</td>
@@ -283,6 +301,7 @@ body {
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
               </tr>
               <tr><td colspan="41";>This example is a wind profiler observation from northeast of Anchorage, Alaska.</td><tr>
               <tr>
@@ -317,8 +336,9 @@ body {
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
               </tr>
-              <tr><td colspan="41";>Finally, this example is a satellite retrieval observation from the northern Atlantic Ocean, about 2000km east of Bermuda.</td><tr>
+              <tr><td colspan="41";>This example is a satellite retrieval observation from the northern Atlantic Ocean, about 2000km east of Bermuda.</td><tr>
               <tr>
                 <td style="background-color:#AAAADD;">31.00000</td>
                 <td style="background-color:#AAAADD;">-43.00000</td>
@@ -351,6 +371,42 @@ body {
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
                 <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">-888888.00000<br>0</td>
+              </tr>
+              <tr><td colspan="41";>Finally, this example is a ground-based GPSPW observation from Louisiana State University in Baton Rouge, Louisiana. <b>NOTE: GPSPW observations <a href=#gpspw>have some differences in how their data is stored</a>.</td><tr>
+              <tr>
+                <td style="background-color:#AAAADD;">30.40742</td>
+                <td style="background-color:#AAAADD;">-91.18026</td>
+                <td style="background-color:#DDDD55;">00001</td>
+                <td style="background-color:#DDDD55;">1LSU</td>
+                <td style="background-color:#AAAADD;">FM-111 GPSPW</td>
+                <td style="background-color:#DDDD55;">HOURLY_PWV.LLH</td>
+                <td style="background-color:#AAAADD;">20.91000</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td style="background-color:#DDDD55;">0</td>
+                <td>0</td>
+                <td>F</td>
+                <td style="background-color:#AAAADD;">F</td>
+                <td>F</td>
+                <td>0</td>
+                <td>36</td>
+                <td style="background-color:#AAAADD;">20080205114500</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55;">-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td>-888888.00000<br>0</td>
+                <td style="background-color:#DDDD55">3.04000<br>0</td>
               </tr>
             </table></p>
 <div class=clear></div>
@@ -423,22 +479,22 @@ body {
               <tr>
                 <td>FM-111</td>
                 <td>GPSPW</td>
-                <td>GPS Precipitable Water observation</td>
+                <td>Ground-based GPS Precipitable Water observation</td>
               </tr>
               <tr>
                 <td>FM-114</td>
                 <td>GPSZD</td>
-                <td>GPS Zenith Total Delay (GPSZTD) observation</td>
+                <td>Ground-based GPS Zenith Total Delay (GPSZTD) observation</td>
               </tr>
               <tr>
                 <td>FM-116</td>
                 <td>GPSRF</td>
-                <td>GPS Refractivity observation </td>
+                <td>Space-based GPS Refractivity observation </td>
               </tr>
               <tr>
                 <td>FM-118</td>
                 <td>GPSEP</td>
-                <td>GPS Estimated Horizontal Position (GPSEPH) </td>
+                <td>Space-based GPS Excess Phase observation (GPSEPH) </td>
               </tr>
               <tr>
                 <td>FM-121</td>
@@ -619,84 +675,285 @@ body {
       </table></p>
 <div class=clear></div>
 
+
+      <p class="bodytext">Louisiana State University FM-114 (GPSPW, 1 level). Note that the PW information itself was stored in the "header" record, so only other observations from this station (such as surface pressure) can be found in the data record:</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               &nbsp;101180.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 20.91000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;295.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0
+         </tr>
+      </table></p>
+<div class=clear></div>
+
       <p class="bodytext"><strong id="Font14">Observation formats</strong> </p>
 
       <p class="bodytext"></p>
 
-<h1>Special cases</h1>
+   <a name=special><h1>Special cases</h1>
       <p class="bodytext">Because LITTLE_R is a legacy format that was developed several decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
 
-      <p class="bodytext"><strong id="Font14">GPS PW and ZTD</strong> </p>
-      <p class="bodytext">GPS Precipitable Water (GPSPW) and Zenith Total Delay (GPSZTD) observations are stored in similar formats.</p>
-            <p class=box style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
-              <tr><td colspan="41";>Finally, this example is a wind profiler observation from northeast of Anchorage, Alaska.</td><tr>
+      <a name=gpspw><a name=gpsztd><p class="bodytext"><strong id="Font14">GPS PW and ZTD</strong> </p>
+      <p class="bodytext">GPS Precipitable Water (GPSPW) and Zenith Total Delay (GPSZTD) observations are stored in similar formats. For these observation types, the observation of interest is actually in the header record, rather than the data record.</p>
+      <p class="bodytext">For the GPSPW data, the "Precipitable Water" field contains the observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of tenths of millimeters. So an observation error of 1.5 mm should be stored as "15", an error of 3.0 mm should be "30", etc.</p>
+            <p class=scrollbox width=100px style="padding-left: 45px">Scroll right to see the entire header.<table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr><td colspan="41";>Here is an example GPSPW observation (the same shown earlier). Important fields are bolded, unused fields have a gray background. The observation is for 3.04 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
               <tr>
-                <td style="background-color:#DDDDDD;">Lat.</td>
-                <td style="background-color:#DDDDDD;">Lon.</td>
-                <td style="background-color:#DDDD55;"><b>ID</b></td>
-                <td style="background-color:#DDDD55;"><b>Name</b></td>
-                <td style="background-color:#AAAADD;"><b>Platform</b></td>
-                <td style="background-color:#DDDD55;"><b>Source</b></td>
-                <td style="background-color:#AAAADD;"><b>Elevation</b></td>
-                <td style="background-color:#DDDD55;"><b>Valid fields</b></td>
-                <td style="background-color:#DDDD55;"><b>Num. errors</b></td>
-                <td style="background-color:#DDDD55;"><b>Num. warnings</b></td>
-                <td style="background-color:#DDDD55;"><b>Sequence number</b></td>
-                <td><b>Num. duplicates</b></td>
-                <td><b>Is sounding?</b></td>
-                <td style="background-color:#AAAADD;"><b>Is bogus?</b></td>
-                <td><b>Discard?</b></td>
-                <td><b>Unix time</b></td>
-                <td><b>Julian day</b></td>
-                <td style="background-color:#AAAADD;"><b>Date</b></td>
-                <td style="background-color:#AAAADD;"><b>SLP, QC</b></td>
-                <td><b>Ref Pressure, QC</b></td>
-                <td><b>Ground Temp, QC</b></td>
-                <td><b>SST, QC</b></td>
-                <td style="background-color:#DDDD55;"><b>SFC Pressure, QC</b></td>
-                <td><b>Precip, QC</b></td>
-                <td><b>Daily Max T, QC</b></td>
-                <td><b>Daily Min T, QC</b></td>
-                <td><b>Night Min T, QC</b></td>
-                <td><b>3hr Pres Change, QC</b></td>
-                <td><b>24hr Pres Change, QC</b></td>
-                <td><b>Cloud cover, QC</b></td>
-                <td><b>Ceiling, QC</b></td>
+                <td><b>Lat.</b></td>
+                <td><b>Lon.</b></td>
+                <td>ID</td>
+                <td>Name</td>
+                <td><b>Platform</b></td>
+                <td>Source</td>
+                <td><b>Elevation</b></td>
+                <td style="background-color:#DDDDDD;">Valid fields</td>
+                <td style="background-color:#DDDDDD;">Num. errors</td>
+                <td style="background-color:#DDDDDD;">Num. warn.</td>
+                <td style="background-color:#DDDDDD;">Seq. number</td>
+                <td style="background-color:#DDDDDD;">Num. dup.</td>
+                <td style="background-color:#DDDDDD;">sound</td>
+                <td style="background-color:#DDDDDD;">bogus</td>
+                <td style="background-color:#DDDDDD;">Discard?</td>
+                <td style="background-color:#DDDDDD;">Unix time</td>
+                <td style="background-color:#DDDDDD;">Jul. day</td>
+                <td><b>Date</b></td>
+                <td style="background-color:#DDDDDD;">SLP, QC</td>
+                <td style="background-color:#DDDDDD;">Ref Pres., QC</td>
+                <td style="background-color:#DDDDDD;">Ground Temp, QC</td>
+                <td style="background-color:#DDDDDD;">SST, QC</td>
+                <td style="background-color:#DDDDDD;">SFC Pres, QC</td>
+                <td style="background-color:#DDDDDD;">Precip, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Max T, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Min T, QC</td>
+                <td style="background-color:#DDDDDD;">Ngt Min T, QC</td>
+                <td style="background-color:#DDDDDD;">3hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">24hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">Cld cvr, QC</td>
+                <td style="background-color:#DDDDDD;">Ceil, QC</td>
+                <td><b>Precipitable Water, QC</b></td>
               </tr>
               <tr>
-                <td style="background-color:#AAAADD;">            36.88000</td>
-                <td style="background-color:#AAAADD;">           -89.97000</td>
-                <td style="background-color:#DDDD55;">-----</td>
-                <td style="background-color:#DDDD55;">ID   BLMM7</td>
-                <td style="background-color:#AAAADD;">FM-32 PROFILER</td>
-                <td style="background-color:#DDDD55;">MADIS NOAA Profiler Network NWS        N</td>
-                <td style="background-color:#AAAADD;">130.00000</td>
-                <td style="background-color:#DDDD55;">258</td>
-                <td style="background-color:#DDDD55;">0</td>
-                <td style="background-color:#DDDD55;">0</td>
-                <td style="background-color:#DDDD55;">1</td>
-                <td>0</td>
-                <td>F</td>
-                <td style="background-color:#AAAADD;">F</td>
-                <td>F</td>
-                <td>-888888</td>
-                <td>-888888</td>
-                <td style="background-color:#AAAADD;">20080205120000</td>
-                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td style="background-color:#DDDD55;">-999999.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
-                <td>-888888.00000<br>0</td>
+                <td>30.40742</td>
+                <td>-91.18026</td>
+                <td>00001</td>
+                <td>1LSU</td>
+                <td>FM-111 GPSPW</td>
+                <td>HOURLY_PWV.LLH</td>
+                <td>20.91000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">36</td>
+                <td>20080205114500</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td>3.04000<br>0</td>
+              </tr>
+              <tr>
+                <td>Pressure&nbsp;(Pa)</td> 
+                <td style="background-color:#DDDDDD;">QC</td>
+                <td>Height&nbsp;(m)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td>Temperature&nbsp;(K)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Dew point&nbsp;(K)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind speed&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind direction&nbsp;(deg)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind U&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind V&nbsp;(m/s)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Relative humidity&nbsp;(%)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Thickness&nbsp;(m)</b></td> 
+                <td style="background-color:#DDDDDD;">QC</b></td>
+              </tr>
+              <tr>
+                <td>101180.00000</td> 
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>20.91000</td> 
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>295.04999</td> 
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td> 
+                <td style="background-color:#DDDDDD;">-888888</td>
               </tr>
             </table></p>
+<div class=clear></div>
+
+
+      <p class=bodytext>And here is the entire observation as it should appear in LITTLE_R format:</p>
+      <table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td><kbd>
+               &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 30.40742 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -91.1802600001 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;  &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 1LSU &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;FM-111 GPSPW &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;HOURLY_PWV.LLH &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;20.91000 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp;36 &nbsp; &nbsp; &nbsp;20080205114500-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888 &nbsp; &nbsp; &nbsp;3.04000 &nbsp; &nbsp; &nbsp;0-888888.00000-888888<br>
+               &nbsp;101180.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 20.91000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;295.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -777777.00000 &nbsp; &nbsp; &nbsp;0-777777.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;1.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; &nbsp; &nbsp; 1 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;0<br>
+         </tr>
+      </table>
+<div class=clear></div>
+
+      <p class="bodytext">For the GPSZTD data, the "Precipitable Water" field contains the ZTD observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of millimeters. So an observation error of 15 mm should be stored as "15", an error of 30 mm should be "30", etc.</p>
+            <p class=scrollbox width=100px style="padding-left: 45px">Scroll right to see the entire header.<table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr><td colspan="41";>Here is an example GPSPW observation (the same shown earlier). Important fields are bolded, unused fields have a gray background. The observation is for 3.04 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
+              <tr>
+                <td><b>Lat.</b></td>
+                <td><b>Lon.</b></td>
+                <td>ID</td>
+                <td>Name</td>
+                <td><b>Platform</b></td>
+                <td>Source</td>
+                <td><b>Elevation</b></td>
+                <td style="background-color:#DDDDDD;">Valid fields</td>
+                <td style="background-color:#DDDDDD;">Num. errors</td>
+                <td style="background-color:#DDDDDD;">Num. warn.</td>
+                <td style="background-color:#DDDDDD;">Seq. number</td>
+                <td style="background-color:#DDDDDD;">Num. dup.</td>
+                <td style="background-color:#DDDDDD;">sound</td>
+                <td style="background-color:#DDDDDD;">bogus</td>
+                <td style="background-color:#DDDDDD;">Discard?</td>
+                <td style="background-color:#DDDDDD;">Unix time</td>
+                <td style="background-color:#DDDDDD;">Jul. day</td>
+                <td><b>Date</b></td>
+                <td style="background-color:#DDDDDD;">SLP, QC</td>
+                <td style="background-color:#DDDDDD;">Ref Pres., QC</td>
+                <td style="background-color:#DDDDDD;">Ground Temp, QC</td>
+                <td style="background-color:#DDDDDD;">SST, QC</td>
+                <td style="background-color:#DDDDDD;">SFC Pres, QC</td>
+                <td style="background-color:#DDDDDD;">Precip, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Max T, QC</td>
+                <td style="background-color:#DDDDDD;">Dly Min T, QC</td>
+                <td style="background-color:#DDDDDD;">Ngt Min T, QC</td>
+                <td style="background-color:#DDDDDD;">3hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">24hr Pres Chg, QC</td>
+                <td style="background-color:#DDDDDD;">Cld cvr, QC</td>
+                <td style="background-color:#DDDDDD;">Ceil, QC</td>
+                <td><b>Zenith Total Delay, QC</b></td>
+              </tr>
+              <tr>
+                <td>30.40742</td>
+                <td>-91.18026</td>
+                <td>Fake observation for GPSZTD test</td>
+                <td>Fake observation for GPSZTD test</td>
+                <td>FM-111 GPSZTD	</td>
+                <td>Fake observation for GPSZTD test</td>
+                <td>20.91000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">F</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">36</td>
+                <td>20080205114500</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
+                <td>250.20600<br>0</td>
+              </tr>
+              <tr>
+                <td>Pressure&nbsp;(Pa)</td>
+                <td style="background-color:#DDDDDD;">QC</td>
+                <td>Height&nbsp;(m)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td>Temperature&nbsp;(K)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Dew point&nbsp;(K)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind speed&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind direction&nbsp;(deg)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind U&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Wind V&nbsp;(m/s)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Relative humidity&nbsp;(%)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+                <td style="background-color:#DDDDDD;">Thickness&nbsp;(m)</b></td>
+                <td style="background-color:#DDDDDD;">QC</b></td>
+              </tr>
+              <tr>
+                <td>101180.00000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>20.91000</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td>295.04999</td>
+                <td style="background-color:#DDDDDD;">0</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+                <td style="background-color:#DDDDDD;">-888888.00000</td>
+                <td style="background-color:#DDDDDD;">-888888</td>
+              </tr>
+            </table></p>
+<div class=clear></div>
+
+
+      <p class=bodytext>And here is the entire observation as it should appear in LITTLE_R format:</p>
+      <table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td><kbd>
+               &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; 30.40742 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; -91.18026Fake observation for GPSZTD test &nbsp; &nbsp; &nbsp; &nbsp;Fake observation for GPSZTD test &nbsp; &nbsp; &nbsp;&nbsp; FM-114 GPSZTD &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; Fake observation for GPSZTD test &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;20.91000 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; F &nbsp; &nbsp; &nbsp; &nbsp; 0 &nbsp; &nbsp; &nbsp; &nbsp;36 &nbsp; &nbsp; &nbsp;20080205111500-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888-888888.00000-888888 &nbsp; &nbsp;250.20600 &nbsp; &nbsp; &nbsp;0-888888.00000-888888<br>
+               &nbsp;101180.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; 20.91000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp;295.04999 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               -777777.00000 &nbsp; &nbsp; &nbsp;0-777777.00000 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;1.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0<br>
+               &nbsp; &nbsp; &nbsp; 1 &nbsp; &nbsp; &nbsp;0 &nbsp; &nbsp; &nbsp;0<br>
+         </tr>
+      </table>
 <div class=clear></div>
 
 
