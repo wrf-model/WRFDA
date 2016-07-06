@@ -450,6 +450,7 @@ PlainStyle2,
 0,
 ,
 ,"WRFDA realtime forecast","http://www2.mmm.ucar.edu/wrf/users/wrfda/rt_wrfda/conus15km",,,1
+,"WRFDA beta releases","http://www2.mmm.ucar.edu/wrf/users/wrfda/beta.html",,,1
 ])
 
 
