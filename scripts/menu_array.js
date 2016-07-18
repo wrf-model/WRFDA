@@ -180,10 +180,10 @@ PlainStyle,
 ,"<div style='margin-top:6px'>System</div>","show-menu=Analysis",,,1
 ,"<div style='margin-top:6px'>User Support</div>","show-menu=Support",,,1
 ,"<div style='margin-top:6px'>Download</div>","show-menu=Download",,,1
-,"Publications & Documentation","show-menu=Pub",,,1
+,"Publications &<br>Documentation","show-menu=Pub",,,1
 ,"<div style='margin-top:6px'>Links</div>","show-menu=Links",,,1
 ,"<div style='margin-top:6px'>Internal</div>","http://www2.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
-,"WRFDA Testbeds","show-menu=Testbeds",,,1
+,"WRFDA<br>Testbeds","show-menu=Testbeds",,,1
 ])
 
 
