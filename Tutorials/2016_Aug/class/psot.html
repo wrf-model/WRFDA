@@ -1,0 +1,193 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Running WRFDA - pseudo single ob test</span>
+            <blockquote>
+              <p>The pseudo single ob test is usually the first step to try out WRFDA after you have generated your own be.dat. It is a very useful tool, which can be used to investigate your choice of background error and its impact on your analysis. See <a href="../docs/WRFDA_BE.pdf#22">the Background Error presentation</a> for more information (starting on slide 22).</p>
+              <span class="bodyh1">Source code</span>
+              <blockquote>
+                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
+                <p><span class="stylecode">WRFDA/var/build/da_wrfvar.exe</span> is the executable that will be used in this session.</p>
+              </blockquote>
+              <p><span class="bodyh1">Choose your working directory</span> </p>
+              <blockquote>
+                <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/singleob</span> and use this as your working directory for this session.</p>
+                <blockquote>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/singleob<br>
+                                     cd /kumquat/users/${USER}/DA/singleob</p>
+              </blockquote></blockquote>
+              <span class="bodyh1">Input files</span>
+              <blockquote>
+                <p>The setup for a pseduo-observation test is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
+                <blockquote>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL <br>
+                  ln -fs /kumquat/users/${USER}/DA/gen_be/workdir/be.dat ./be.dat <br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg <br>
+                </blockquote>
+              </blockquote>
+              <span class="bodyh1">Edit namelist.input</span>
+              <blockquote>
+                <p>Change and add the following <span class="stylecode">namelist.input</span> settings to activate the pseudo single ob test. You can do so by modifying the namelist.input used in the previous WRFDA-3DVAR tutorial case:</p>
+                <blockquote>
+                  <p class="stylecode">cp ../3dvar/namelist.input namelist.input</p>
+                  <p class="stylecode">vi namelist.input</p>
+                  <p class="stylecode">&amp;wrfvar15<br>
+                    num_pseudo = 1,<br>
+                    pseudo_x = 23.0, <br>
+                    pseudo_y = 23.0, <br>
+                    pseudo_z = 14.0, <br>
+                    pseudo_err = 1.0,<br>
+                    pseudo_val = 1.0,<br>
+                    /<br>
+                    &amp;wrfvar19<br>
+                    pseudo_var = 'u'<br>
+                    /</p>
+                </blockquote>
+                <p>Note: pseudo_var can be u, v, t, p, q. If pseudo_var is q, then reasonable values of pseudo_err and pseudo_val are 0.001 rather than 1.0.</p>
+                <p>By setting <span class="stylecode">num_pseudo = 1</span>, WRFDA will ignore real data and simply assimilate the pseudo-observation</p>
+              </blockquote>
+              <p><span class="bodyh1">Run WRFDA (da_wrfvar.exe)</span> </p>
+              <blockquote>
+                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+              </blockquote>
+              <p><span class="bodyh1">Check output</span>          </p>
+              <blockquote>
+                <p>As with every run of WRFDA, you should first make sure that the <span class="stylecode">rsl.out.0000</span> file ends with "<span class="stylecode">***&nbsp;WRF-Var&nbsp;completed&nbsp;successfully&nbsp;***</span>".</p>
+                <p>Check the <span class="stylecode">statistics</span> file to view diagnostics related to your pseudo-obs run.</p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.<br><br>
+                      <span class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
+                                              ncview increment.nc</span><br><br>
+                      To the right you can see what your pressure perturbation should look like with the above settings (click the image for a larger version). Try using "v" instead of "u" as your test variable. How would you expect the pressure perturbation to change? (<a href="images/psot_ncview_v.P.png">click here to see</a>)</td>
+                    <td class="bodytext"><a href="images/psot_ncview_u.P.png"><img src="images/psot_ncview_u.P.png" alt="Pressure perturbation from PSOT with the above settings." height="300"></a></td>
+                  </tr>
+                </table>
+              </blockquote>
+              <span class="bodyh1">Graphics</span>
+              <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.<br><br>
+                <p>Some useful NCL scripts for this exercise are:<br>
+                  <br>
+                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF-Var_plot.ncl<br>
+                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF_contributed.ncl.test<br>
+                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_xy_auto.ncl<br>
+                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_xz_auto.ncl<br>
+                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_yz_auto.ncl<br>
+                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_h.ncl
+                </p>
+                <p>The plot at right was generated using psot_h.ncl using the following settings:</p>
+                <blockquote>
+                  <p class="stylecode">   works = "pdf"<br>
+                    expt = ""<br>
+                    directory = "/kumquat/users/$USER/DA/singleob/"<br>
+                    first_guess     = addfile(directory+"fg.nc", "r")<br>
+                    analysis        = addfile(directory+"wrfvar_output.nc", "r")<br>
+                    kl=12
+                  </p>
+                </blockquote>
+                <p>Using these settings as a guide, try out the other scripts listed above.</p>
+                    <td class="bodytext"><a href="images/psot_h.png"><img src="images/psot_h.png" height="300"></a></td>
+                  </tr>
+                </table>
+              </blockquote>
+            </blockquote>
+            <blockquote>
+              <span class="bodyh1">Other practice</span>
+              <ul>
+                <li>Response of BE length scaling parameters
+                  <blockquote>
+                    <p>Run single ob test with the following additional parameters</p>
+                    <p><span class="stylecode">vi namelist.input</span> (reduce length scale by 50%)</p>
+                    <p class="stylecode">&amp;wrfvar7<br>
+                      len_scaling1 = 0.5<br>
+                      len_scaling2 = 0.5<br>
+                      len_scaling3 = 0.5<br>
+                      len_scaling4 = 0.5<br>
+                      len_scaling5 = 0.5<br>
+                      /</p>
+                  </blockquote>
+                </li>
+                <li>Response of changing BE variances
+                  <blockquote>
+                    <p>                Run single ob test with the following additional parameters</p>
+                    <p><span class="stylecode">vi namelist.input</span> (reduce variance by 75%)</p>
+                    <p class="stylecode">&amp;wrfvar7<br>
+                      var_scaling1 = 0.25<br>
+                      var_scaling2 = 0.25<br>
+                      var_scaling3 = 0.25<br>
+                      var_scaling4 = 0.25<br>
+                      var_scaling5 = 0.25<br>
+                      / </p>
+                </li>
+                <p>If this was successful, you have reached the end of the basic day 1 exercises! If you have extra time remaining, there are some more exercises you can try:</p>
+                <blockquote>
+                  <li>Try the additional exercises from <a href="wrfda_sessions.html#session_1">the day 1 practice session</a>; they can be found at the bottom of each page<br><br></li>
+                  <li>Try <a href="compile.html">compiling WRFDA yourself</a></li>
+                </blockquote>
+              </ul>
+            </blockquote>
+            <span class="bodyh1"><a name="advanced">Additional practice</span>
+            <blockquote>
+              <p>After you have run the <a href="hybrid.html">hybrid tutorial case</a>, try running PSOT with hybrid assimilation. This exercise can be found at that page.</p>
+            </blockquote>
+<p>&nbsp;</p>
+            <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

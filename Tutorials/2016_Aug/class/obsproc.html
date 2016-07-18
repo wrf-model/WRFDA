@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <p><span class="pagetitle">Observation Preprocessing</span></p>
+              <p>The goal of this session is to generate the observation input (i.e. the <em>y</em><sup>0</sup> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.</p>
+              <p class="body">Reference: <a href="../docs/WRFDA_Observations.pdf">Download the tutorial presentation</a><p><br>
+              <span class="bodyh1">Source code</span>
+            <blockquote>
+              <p>
+                Copy the <a href="wrfda_code.html">pre-compiled code</a> to your main working directory (<em>/kumquat/users/${USER}/DA</em>), if you have not done so. </p>
+              <p><span class="stylecode">WRFDA/var/obsproc/obsproc.exe</span> is the executable that will be used in this session.</p>
+            </blockquote>
+            <span class="bodyh1">Create your working directory </span>
+            <blockquote>
+              <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.            
+              </p>
+              <p>For this exercise you should create <em>/kumquat/users/${USER}/DA/obsproc</em> and use this as your working directory for this session.</p>
+              <blockquote>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/obsproc<br>
+                                     cd /kumquat/users/${USER}/DA/obsproc</p>
+              </blockquote>
+            </blockquote>
+            <p>
+              
+              <span class="bodyh1">Input data</span></p>
+            <ul>
+              <li>observations in little_r format
+                <blockquote>
+                  <p>The first step of observation preprocessing is to prepare observations in little_r format.<br>
+                    For this tutorial, an observation file in little_r format is provided.</p>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512/obs.2008020512 .</p>
+                  <p><span class="stylecode">obs.2008020512</span> is the observation file for this exercise in little_r format. It is a text file; you can use <span class="stylecode">emacs</span>, <span class="stylecode">vi</span>, or another text editor to see its contents. <strong>For your own applications, you will have to prepare your own observation file.</strong></p>
+                </blockquote>
+              </li>
+              <li>observation error table
+                <blockquote>
+                  <p>The observation error file (<em>obserr.txt</em>) is provided with the WRFDA package under the var/obsproc directory.<br>
+                  Make sure it is present in your obsproc working directory.</p>
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/var/obsproc/obserr.txt ./obserr.txt</p>
+                </blockquote>
+              </li>
+            
+              <li>namelist.obsproc
+                <blockquote>
+                  <p>For your reference, an example namelist (namelist.obsproc.3dvar.wrfvar-tut) has been included in the WRFDA package under var/obsproc directory.<br>
+                  Copy and rename the namelist to "namelist.obsproc" under your working directory.</p>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/obsproc/namelist.obsproc.3dvar.wrfvar-tut ./namelist.obsproc</p>
+                  <p><span class="stylecode">namelist.obsproc</span> contains options to configure the little_r observation file location, domain, time window, etc.<br>
+                  For this tutorial case, you shouldn't need to change any settings in the namelist, but you should check the important settings to gain familiarity with the setup of OBSPROC. &amp;record1 specifies information about your input file names, &amp;record2 specifies date/time information, and &amp;record7 and &amp;record8 specify information about your domain.</p>
+                  <p class="stylecode">&gt; vi namelist.obsproc</p>
+                  <p class="stylecode">&amp;record1<br>
+                   obs_gts_filename = 'obs.2008020512',<br>
+                   obs_err_filename = 'obserr.txt',<br>
+                  /<br>
+                  <br>
+                  &amp;record2<br>
+                   time_window_min  = '2008-02-05_11:00:00',<br>
+                   time_analysis    = '2008-02-05_12:00:00',<br>
+                   time_window_max  = '2008-02-05_13:00:00',<br>
+                  /<br>
+                  <br>
+                  ...<br>
+                  <br>
+                  &amp;record7<br>
+                   IPROJ = 1,<br>
+                   PHIC  = 40.00001,<br>
+                   XLONC = -95.0,<br>
+                   TRUELAT1= 30.0,<br>
+                   TRUELAT2= 60.0,<br>
+                   MOAD_CEN_LAT = 40.00001,<br>
+                   STANDARD_LON = -95.00,<br>
+                  /<br>
+                  <br>
+                  &amp;record8<br>
+                   IDD    =   1,<br>
+                   MAXNES =   1,<br>
+                   NESTIX =  60,  200,  136,  181,  211,<br>
+                   NESTJX =  90,  200,  181,  196,  211,<br>
+                   DIS    =  60,  10.,  3.3,  1.1,  1.1,<br>
+                   NUMC   =    1,    1,   2,     3,    4,<br>
+                   NESTI  =    1,   40,  28,    35,   45,<br>
+                   NESTJ  =    1,   60,  25,    65,   55,<br>
+                   /<br>
+                  <br>
+                  ...</p>
+                  <p>Alternatively, rather than copying the observation file to your working directory, you can set <span class="stylecode">obs_gts_filename</span> to the full path of the file's location.</p>
+                </blockquote>
+              </li>
+            </ul>
+            <span class="bodyh1">Run obsproc (obsproc.exe)</span>
+            <blockquote>
+              <p>It is convenient to link the executable to your current working directory.</p>
+              <blockquote>
+                <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/var/obsproc/obsproc.exe .</p>
+                <p class="stylecode">./obsproc.exe</p>
+              </blockquote>
+              <p>On the classroom computers, running this exercise should take about a minute.</p>
+            </blockquote>
+            <span class="bodyh1">Check output</span>
+            <blockquote>
+              <p>A successful run of obsproc should result in lines similar to these near the end of the output on screen:</p>
+              <blockquote>
+                <p class="stylecode">Write 3DVAR GTS observations in file obs_gts_2008-02-05_12:00:00.3DVAR (WRFDA V3.8      )<br><br>Wrote   31140 lines of data in file: obs_gts_2008-02-05_12:00:00.3DVAR<br><br>No SSMI observations available.</p>
+              </blockquote>
+              <table align=center width="90%" border="1" cellpadding="10">
+                <tr>
+                  <td class="style8"><p><b>NOTE:</b> If you see a message stating "The following floating-point exceptions are signalling" or similar, this is normal and can be safely ignored.</p></td>
+                </tr>
+              </table>
+              <p><br>Look for<em> obs_gts_2008-02-05_12:00:00.3DVAR</em> in your working directory. That is the main output from obsproc. You can open it using a text editor to check its content; <a href="obs_gts_2008-02-05_12:00:00.3DVAR.txt">it should look similar to this</a>.</p>
+              <p><span class="stylecode">*.diag</span> are diagnostic files. The writing of these files are controlled by the namelist settings under &amp;record5.</p>
+              <p>HEIGHT.txt, PRES.txt, RH.txt, SPD.txt, TEMP.txt, and UV.txt are observation errors in plain-text format for easy reference. Most names are self-explanatory. However, since some wind observations are of wind speed/direction while others are of the wind's U- and V-components, there are multiple files for wind errors. DIR.txt and SPD.txt are used for wind direction and speed errors respectively, while UV.txt is for U- and V-wind component errors.
+              </p>
+            </blockquote>
+<span class="bodyh1">Graphics</span>
+            <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>You can use an NCL script, provided at <em>/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_ob_ascii_loc.ncl</em>, to see the locations of observations contained in <em>obs_gts_2008-02-05_12:00:00.3DVAR</em><br><br>
+              <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_ob_ascii_loc.ncl .</p></blockquote>
+              <p>Edit plot_ob_ascii_loc.ncl to provide the date, filenames and options of your case.</p>
+              <blockquote>
+                <p class="stylecode">......<br>
+                date = &quot;2008020512&quot;<br>
+                obfile = &quot;obs_gts_2008-02-05_12:00:00.3DVAR&quot;<br>
+                fgfile = &quot;/kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01&quot;   ; for retrieving mapping info<br>
+                out_type = &quot;pdf&quot;<br>
+                plotname = &quot;./obsloc&quot;+date<br>
+                ......              </p>
+              </blockquote>
+              <p>Run the NCL script</p>
+                <blockquote><p class="stylecode">ncl plot_ob_ascii_loc.ncl</p></blockquote>
+              <p>View the plot using <span class="stylecode">display</span>. Use spacebar to scroll through the plots of different observation types.</p>
+                <blockquote><p class="stylecode">display obsloc2008020512.pdf</p></blockquote></td>
+                    <td class="bodytext"><a href="images/obsloc2008020512.png"><img src="images/obsloc2008020512.png" alt="Locations of METAR observations for tutorial case" height="300"></a></td>
+                  </tr>
+                </table>
+            </blockquote>
+            <p class="body">If you were successful, then congratulations, you are done with the basic OBSPROC exercise! <b>You can now move on to <a href="wrfda_sessions.html#session_1">the next exercise for this practice session</a>.</b></p>
+            <p class="style2">You can return here later for additional practice on observation preprocessing below:</p>
+            <p class="bodyh2"><a name="advanced">Additional practice</a></p>
+            <p>Reference the <a href="../docs/WRFDA_Observations.pdf">tutorial presentation</a> and the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/usersguide.html">User's Guide</a> for instructions on the exercises below:</p>
+            <ul>
+              <li>Try preparing observation data for FGAT.</li>
+            </ul>
+            <ul>
+              <li>Try preparing observation data for 4D-VAR.</li>
+            </ul>
+            <ul>
+              <li>Set up any other domain of your interest, or some domains you have used for <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class_July2015/wps_arw.php">WRF practice</a>. Use the command "ncdump -h" on any WRF file to find out the appropriate domain settings.<br>
+                <strong>Take a look at WRFDA/var/obsproc/README.namelist to get some ideas on the options available for setting up your own domain.</strong></li>
+            </ul>
+            <p>&nbsp;</p>
+            <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

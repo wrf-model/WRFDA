@@ -1,0 +1,98 @@
+&wrfvar1
+/
+&wrfvar2
+/
+&wrfvar3
+/
+&wrfvar4
+ use_amsuaobs = .true.
+ use_amsubobs = .true.
+/
+&wrfvar5
+/
+&wrfvar6
+/
+&wrfvar7
+/
+&wrfvar8
+/
+&wrfvar9
+/
+&wrfvar10
+/
+&wrfvar11
+/
+&wrfvar12
+/
+&wrfvar13
+/
+&wrfvar14
+ rtminit_nsensor = 3,
+ rtminit_platform = 1,1,1
+ rtminit_satid = 16,16,19
+ rtminit_sensor = 3,4,3
+ thinning_mesh = 120.0,120.0,120.0
+ thinning = .true.
+ qc_rad = .true.
+ write_iv_rad_ascii = .false.
+ write_oa_rad_ascii = .true.
+ rtm_option = 2
+ only_sea_rad = .false.
+ use_varbc = .true.
+ use_crtm_kmatrix = .true.
+ varbc_nbgerr = 5000
+/
+&wrfvar15
+/
+&wrfvar16
+/
+&wrfvar17
+/
+&wrfvar18
+ analysis_date="2013-12-23_00:00:00.0000",
+/
+&wrfvar19
+/
+&wrfvar20
+/
+&wrfvar21
+ time_window_min = "2013-12-22_23:00:00"
+/
+&wrfvar22
+ time_window_max = "2013-12-23_01:00:00"
+/
+&wrfvar23
+/
+&time_control
+/
+&fdda
+/
+&domains
+ e_we = 181,
+ e_sn = 181,
+ e_vert = 41,
+ dx  = 60000,
+ dy = 60000,
+/
+&dfi_control
+/
+&tc
+/
+&physics
+ sf_surface_physics = 2,
+/
+&scm
+/
+&dynamics
+/
+&bdy_control
+/
+&grib2
+/
+&fire
+/
+&namelist_quilt
+/
+&perturbation
+/
+
