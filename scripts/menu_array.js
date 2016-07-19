@@ -346,6 +346,7 @@ PlainStyle2,
 ,
 ,"WRFDA Publications","http://www2.mmm.ucar.edu/wrf/users/wrfda/publications.html",,,1
 ,"Technical Notes","http://www2.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,1
+,"WRFDA Code Browser","http://www2.mmm.ucar.edu/wrf/users/wrfda/code_viewer/index.html",,,1
 ,"WRFDA User's Guide","show-menu=userguide",,,0
 ,"WRFDA Online Tutorial","http://www2.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/index.html",,,1
 ,"How to compile WRFDA","http://www2.mmm.ucar.edu/wrf/users/wrfda/how_to_compile.html",,,1
