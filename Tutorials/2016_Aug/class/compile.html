@@ -90,7 +90,11 @@ a:active {
               <blockquote>
                 <p class="stylecode">ls var/build/*exe var/obsproc/src/obsproc.exe</p>
               </blockquote>
-              <p>You should see 44 executables: 43 in the <span class="stylecode">var/build/</span> directory, plus <span class="stylecode">var/obsproc/src/obsproc.exe</span>. The most important of these is <span class="stylecode">var/build/da_wrfvar.exe</span>; this is the main WRFDA executable.</p>
+              <p>You should see 44 executables: 43 in the <span class="stylecode">var/build/</span> directory, plus <span class="stylecode">var/obsproc/src/obsproc.exe</span>. You can count them using the <span class=stylecode>wc</span> command:</p>
+              <blockquote>
+                <p class="stylecode">ls var/build/*exe var/obsproc/src/obsproc.exe | wc -l</p>
+              </blockquote>
+              <p>The most important of these executables is <span class="stylecode">var/build/da_wrfvar.exe</span>; this is the main WRFDA executable.</p>
             </blockquote>
             <p class="pagetitle"><a name="compile_wrfplus"></a>Compiling WRFPLUS</p>
             <blockquote>
@@ -99,15 +103,15 @@ a:active {
               <blockquote>
                 <p class="stylecode">cd /kumquat/users/$USER/DA</p>
                 <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFPLUS_V3.8.tar.gz .</p>
-                <p class="stylecode">cd  /kumquat/users/$USER/DA/WRFPLUSV3 </p>
               </blockquote>
               <p>Set "J" to compile in parallel</p>
               <blockquote>
                 <p class="stylecode">setenv J "-j 6"</p>
               </blockquote>
-              <p>Unzip and untar the file</p>
+              <p>Unzip and untar the file, then enter the directory</p>
               <blockquote>
                 <p class="stylecode">tar -zxf WRFPLUS_V3.8.tar.gz</p>
+                <p class="stylecode">cd /kumquat/users/$USER/DA/WRFPLUSV3 </p>
               </blockquote>
               <p>Configure and compile the WRFPLUS code. WRFPLUS does not need to be built with any external libraries except for netCDF, which should already be set in the classroom environment under the environment variable <span class="stylecode">$NETCDF</span></p>
               <blockquote>
@@ -119,7 +123,7 @@ a:active {
               <blockquote>
                 <p class="stylecode">tail -f compile_wrfplus.log</p>
               </blockquote>
-              <p>When compilation is completed, at the end of the log file you will see "                  Executables successfully built                  " if the build was successful, in addition to some timing information.</p>
+              <p>When compilation is completed, check to ensure wrf.exe was created in the WRFPLUSV3/main/ directory.</p>
             </blockquote>
             <p class="pagetitle"><a name="compile_4dvar"></a>Compiling WRFDA for 4DVAR</p>
             <blockquote>
@@ -169,11 +173,25 @@ a:active {
               </blockquote>
               <p>You should see 44 executables: 43 in the var/build/ directory, plus var/obsproc/src/obsproc.exe. The most important of these is var/build/da_wrfvar.exe; this is the main WRFDA executable.</p>
               </blockquote>
-            <p class="pagetitle"><a name="compile_4dvar"></a>Compiling for CLOUD_CV options</p>
+            <p class="pagetitle"><a name="CLOUDCV"><a name="cloudy_radiance"></a>Cloudy radiance code</p>
             <blockquote>
-                <p>If you want to compile for CLOUD_CV, set the environment variable "CLOUD_CV" equal to 1 before running the configure script.</p>
+                <p>The code for the <a href="cloudy_rad.html">cloudy radiance exercise</a> is not yet available in the latest release version of WRFDA (version 3.8, which is used for most classroom exercises). However, we currently have a separate beta release of the code with the cloudy radiance capabilities included. This section will instruct you on how to download and install that code</p>
+              <p>Get the zipped tar file from /kumquat/wrfhelp/SOURCE_CODE, or download it from <a href=http://www2.mmm.ucar.edu/wrf/users/wrfda/beta.html>the WRFDA Users' website</a>.</p>
+              <blockquote>
+                <p class="stylecode">cd /kumquat/users/$USER/DA</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V38_cloudy_radiance_beta.tar.gz .</p>
+                <p class="stylecode">tar -zxf WRFDA_V38_cloudy_radiance_beta.tar.gz</p>
+                <p class="stylecode">cd WRFDA_CR</p>
+              </blockquote>
+              <p>Follow all the steps above prior to running the configure script. Then set the CLOUD_CV environment variable:</p>
+              <blockquote>
                 <p class="stylecode">setenv CLOUD_CV 1</p>
-                <p>This will work for either 3DVAR or 4DVAR (Setting this option will have no effect on WRFPLUS). Note that this will result in slower code even if you are not using the CLOUD_CV control variable options, so it is recommended that you only use this code for experiments that are using the CLOUD_CV moisture control variables!</p>
+              </blockquote>
+              <p>This will make the code compile with the extra moisture control variable options enabled. Note that this will result in slower code even if you are not using the CLOUD_CV control variable options, so it is recommended that you only use this code for experiments that are using the CLOUD_CV moisture control variables!</p>
+              <p> Configure and compile the code the same way you did above, and check for successful compilation before using the code.</p>
+
+
+
               <p class="stylecode">&nbsp;</p>
             </blockquote>
           <!-- InstanceEndEditable --><br>
