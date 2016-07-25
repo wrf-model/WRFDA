@@ -60,25 +60,27 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Input data</span>
               </p>
-              <blockquote>
-                <table border="0" cellpadding="0" cellspacing="0">
-                  <tr style="vertical-align: top;">
-                    <td>
-                      <p>This case utilizes a continental USA domain, 90x60 gridpoints, 41 vertical levels, and 60km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/CONUS60). The exact area of the domain is shown at right. All of today's exercises (OBSPROC, 3DVAR real and PSOT, GENBE) will use this case.</a>
+              <table border="0" cellpadding="0" cellspacing="0">
+                <tr style="vertical-align: top;">
+                  <td>
+                    <blockquote>
+                      <p>This case utilizes a continental USA domain, 90x60 gridpoints, 41 vertical levels, and 60km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/CONUS60). The exact area of the domain is shown at right. A number of the exercises in this tutorial (OBSPROC, 3DVAR real and PSOT, GENBE) will use this case.</a>
                       <p>It features a storm system which produced a <a href="https://en.wikipedia.org/wiki/2008_Super_Tuesday_tornado_outbreak">deadly tornado outbreak</a> across the Central/Southern USA on February 5, 2008.</p> 
-                      <p>A very basic namelist file for running the tutorial case is available at <span class="stylecode">WRFDA/var/test/tutorial/namelist.input</span></p>
+                      <p>A very basic namelist file for running the tutorial case is available at <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/CONUS60/namelist.input.3dvar</span></p>
                       <blockquote>
-                        <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/test/tutorial/namelist.input .</p>
+                        <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/CONUS60/namelist.input.3dvar ./namelist.input</p>
                       </blockquote>
                       <p>A land-use table is needed as well (provided in the WRFDA package)</p>
                       <blockquote>
                         <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
                       </blockquote>
                     </td>
-                    <td class="bodytext"><a href="images/CONUS60.png"><img src="images/CONUS60.png" alt="Domain of this test case" height="300"></a></td>
-                  </tr>
-                </table>
-                 <p>Besides namelist.input and LANDUSE.TBL, the other three major input files to WRFDA-3DVAR are observations (ob.ascii), background error statistics (be.dat), and first guess (fg).</p>
+                  </blockquote>
+                  <td class="bodytext"><a href="images/CONUS60.png"><img src="images/CONUS60.png" alt="Domain of this test case" height="300"></a></td>
+                </tr>
+              </table>
+              <blockquote>
+                <p>Besides namelist.input and LANDUSE.TBL, the other three major input files to WRFDA-3DVAR are observations (ob.ascii), background error statistics (be.dat), and first guess (fg).</p>
               </blockquote>
               <ul>
                 <li><strong>ob.ascii</strong> is in plain-text format and is the output from OBSPROC that you created in the previous lesson.
@@ -86,7 +88,7 @@ a:active {
                   <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/obsproc/obs_gts_2008-02-05_12:00:00.3DVAR ./ob.ascii</p>
                 </blockquote>
                 </li>
-                <li><strong>be.dat</strong> is in binary format and is the output from gen_be utility. For this lesson, just use the supplied pre-generated be.dat
+                <li><strong>be.dat</strong> is in binary format and contains background error information. For this lesson, just use the supplied pre-generated be.dat (you will learn to create your own in a later exercise)
                 <blockquote>
                   <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/be/be.dat ./be.dat</p>
                 </blockquote>
@@ -104,12 +106,14 @@ a:active {
                   &amp;wrfvar18<br>
                   analysis_date=&quot;2008-02-05_12:00:00&quot;,<br>
                   /<br>
+                  ...<br>
                   &amp;wrfvar21<br>
                   time_window_min=&quot;2008-02-05_11:00:00&quot;,<br>
                   /<br>
                   &amp;wrfvar22</span><br>
                   <span class="stylecode">time_window_max=&quot;2008-02-05_13:00:00&quot;,<br>
                 /<br>
+                ...<br>
                 &amp;domains<br>
                 e_we=90,<br>
                 e_sn=60,<br>
@@ -119,9 +123,10 @@ a:active {
                 /<br>
                 </span> </p>
               </blockquote>
+                <p>Note that many sections of the namelist (<span class="stylecode">&amp;wrfvar1</span>, <span class="stylecode">&amp;wrfvar2</span>, etc.) are blank, with no entries. They are not just there for show: most of these will be used in future exercises.</p>
               <p><span class="bodyh1">Run WRFDA-3DVAR (da_wrfvar.exe)</span></p>
               <blockquote>
-                <p>For convenience, link the executable to your current working directory. Then run the executable</p>
+                <p>For convenience, link the main WRFDA executable (da_wrfvar.exe) to your current working directory. Then run the executable</p>
                 <blockquote>
                   <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe ./da_wrfvar.exe</p>
                   <p class="stylecode">mpirun -np 6 ./da_wrfvar.exe</p>
@@ -142,10 +147,25 @@ a:active {
                   grad_fn &nbsp; &nbsp; &nbsp; &nbsp; jo &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; rej_obs_conv_01.0002 &nbsp;rsl.error.0004 &nbsp; &nbsp; &nbsp; &nbsp;statistics &nbsp; &nbsp;wrfvar_output<br>
                   gts_omb_oma_01 &nbsp;LANDUSE.TBL &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;rej_obs_conv_01.0003 &nbsp;rsl.error.0005 &nbsp; &nbsp; &nbsp; &nbsp;unpert_obs<br>
                 </blockquote>
-                <p>The most important of these output files is <span class="stylecode">wrfvar_output</span>: this is the analysis file generated by WRFDA. It is in WRF netCDF format. You can view it with the <span class="stylecode">ncview</span> command.</p>
-                <p>Since you ran in parallel with mpirun, you should have a number of files that begin with "rsl.out" and "rsl.error". These are the log files for regular output and error messages, respectively, and there should be one of each for the number of processors you ran WRFDA on. For example, rsl.out.0000 is the output from the first processor, rsl.out.0001 is the output from the second processor, etc. If your run was successful, your rsl.out.0000 (log file) should end with <span class="stylecode">*** WRF-Var completed successfully ***</span>. <a href="rsl.out.0000.txt">You can see an example rsl.out.0000 file here</a>.</p>
-                <p><span class="stylecode">statistics</span> is another diagnostic file that should be checked after each WRFDA run to make sure that the task was done correctly and successfully. It contains information about OI (the observation minus background, OMB) and AO (the observation minus analysis, OMA) for each observation type, in addition to statistics on the increment for each of the modified state variables (u, v, T, P, and q).</p>
+              </blockquote>
+              <table border="0" cellpadding="0" cellspacing="0">
+                <tr style="vertical-align: top;">
+                  <td>
+                    <blockquote>
+                      <p>The most important of these output files is <span class="stylecode">wrfvar_output</span>: this is the analysis file generated by WRFDA. It is in WRF netCDF format. You can view it with the <span class="stylecode">ncview</span> command.</p>
+                      <blockquote>
+                        <p class="stylecode">ncview wrfvar_output</p>
+                      </blockquote>
+                      <p>An example display of the ncview application can be seen at right. Use the dropdown menus to select different variables. You can also look at different vertical levels by clicking the box to the right of the label "bottom_top"</p>
+                      <p>Since you ran in parallel with mpirun, you should have a number of files that begin with "rsl.out" and "rsl.error". These are the log files for regular output and error messages, respectively, and there should be one of each for the number of processors you ran WRFDA on. For example, rsl.out.0000 is the output from the first processor, rsl.out.0001 is the output from the second processor, etc. If your run was successful, your rsl.out.0000 (log file) should end with <span class="stylecode">*** WRF-Var completed successfully ***</span>. <a href="rsl.out.0000.txt">You can see an example rsl.out.0000 file here</a>.</p>
+                      <p><span class="stylecode">statistics</span> is another diagnostic file that should be checked after each WRFDA run to make sure that the task was done correctly and successfully. It contains information about OI (the observation minus background, OMB) and AO (the observation minus analysis, OMA) for each observation type, in addition to statistics on the increment for each of the modified state variables (u, v, T, P, and q).</p>
                 <p><span class="stylecode">gts_omb_oma_01</span> contains information about observations and <em>innovation</em>, <span class="stylecode">qcstat_conv_01</span> (contains information about quality control), and <span class="stylecode">rej_obs_conv_01.####</span> (lists all conventional observations that were rejected by each processor) are other useful diagnostic files.</p>
+                    </td>
+                  </blockquote>
+                  <td class="bodytext"><a href="images/ncview_wrfvar_output.png"><img src="images/ncview_wrfvar_output.png" alt="Viewing wrfvar_output with ncview" width=287></a></td>
+                </tr>
+              </table>
+              <blockquote>
                 <p>There are several tools available for viewing the analysis increments. A netCDF file containing the analysis increment fields can be created with either <strong>ncdiff</strong> or <strong>ncbo</strong>.</p>
                 <blockquote>
                   <p class="stylecode">ncdiff fg wrfvar_output increment.nc</p>
@@ -189,12 +209,12 @@ a:active {
                     <td class="bodytext"><a href="images/WRF-VAR_U_level_18.png"><img src="images/WRF-VAR_U_level_18.png" height="300"></a></td>
                   </tr>
                 </table>
-                <p><br><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_gts_omb_oma_simple.ncl</span> can be used to plot the contents of <span class="stylecode">gts_omb_oma_01.</span> </p>
+                <p><br><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_gts_omb_oma.ncl</span> can be used to plot the contents of <span class="stylecode">gts_omb_oma_01.</span> </p>
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr style="vertical-align: top;">
                     <td>
-                      <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_gts_omb_oma_simple.ncl .</p></blockquote>
-                      <p>Edit plot_gts_omb_oma_simple.ncl to provide the date, filenames and options of your case.</p>
+                      <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_gts_omb_oma.ncl .</p></blockquote>
+                      <p>Edit plot_gts_omb_oma.ncl to provide the date, filenames and options of your case.</p>
                       <blockquote>
                         <p class="stylecode">......<br>
                         plotdir = &quot;ncl_plot/&quot; ;where plot files will be created<br>
@@ -204,15 +224,15 @@ a:active {
                         fgname = "fg"  ; for retrieving mapping info<br>
                         ......              </p>
                       </blockquote>
-                      <p>Run the NCL script</p>
-                        <blockquote><p class="stylecode">ncl plot_gts_omb_oma_simple.ncl</p></blockquote>
+                      <p>Now run the NCL script</p>
+                        <blockquote><p class="stylecode">ncl plot_gts_omb_oma.ncl</p></blockquote>
                       <p>This script may take a few minutes to complete; it will generate many plots depending on your settings. View the plots using <span class="stylecode">display</span>. An example of one of these plots, showing the OMA and OMB of sounding observations around 500 hPa, can be seen at right. Use spacebar and backspace to scroll through the different plots, showing OMB, OMA, and bias statistics for the observations at different pressure levels. There will be one output file per observation type; if you have time you can try plotting different observation types by editing the "proc_*" variables further down in the script.</p>
                     </td>
                     <td class="bodytext"><a href="images/my_plots_sound_2008020512-22.png"><img src="images/my_plots_sound_2008020512-22.png" height="300"></a></td>
                   </tr>
                 </table>
                   <blockquote><p class="stylecode">display ncl_plot/my_plots_sound_2008020512.pdf</p></blockquote>
-                <p>There will be one output file per observation type; if you have time you can try plotting different observation types. You can also edit the "plevs" variable to change the way observations are arranged by pressure level.</p>
+                <p>There will be one output file per observation type: by default only SOUND and AIREP observations are plotted. If you have time you can try plotting different observation types. You can also edit the "plevs" variable to change the way observations are arranged by pressure level.</p>
                 <p><span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_cost_grad_fn.ncl</span> can be used to plot cost function evolution.</p>
                   <blockquote><p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_cost_grad_fn.ncl .</p></blockquote>
                 <p>Edit plot_cost_grad_fn.ncl to provide the current working directory. You can also edit "domain_name" to change the plot captions.</p>
@@ -255,10 +275,12 @@ a:active {
                 <blockquote>
                   <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/da_update_bc.exe</p>
                 </blockquote>
-                <p>Finally, check the output. Use <em><strong><a href="http://www2.mmm.ucar.edu/wrf/users/utilities/diffwrf.htm">diffwrf</a></strong></em> (available in compiled WRFV3 code at WRFV3/external/io_netcdf/diffwrf), <strong><em>ncdiff</em></strong>, <em><strong>ncview</strong></em><strong></strong>, or other <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF NCL graphic tools</a> to check what fields have been updated.</p>
+                <p>Finally, check the output. Use <em><strong><a href="http://www2.mmm.ucar.edu/wrf/users/utilities/diffwrf.htm">diffwrf</a></strong></em> (available in compiled WRFV3 code at WRFV3/external/io_netcdf/diffwrf, you can find a copy in /kumquat/wrfhelp/DATA/WRFDA/diffwrf), <strong><em>ncdiff</em></strong>, <em><strong>ncview</strong></em><strong></strong>, or other <a href="http://www.mmm.ucar.edu/wrf/OnLineTutorial/Class/graphics.htm">WRF NCL graphic tools</a> to check what fields have been updated.</p>
+                <blockquote>
+                  <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/diffwrf /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfbdy_d01 wrfbdy_d01</p>
+                </blockquote>
                 <p>The <span class="stylecode"><strong>wrfvar_output</strong></span> and <span class="stylecode"><strong>wrfbdy_d01</strong></span> are the data-assimilated initial condition and tendency-updated boundary condition for your subsequent WRF model run. You will learn more about this in the cycling exercises later this week.</p>
-                <p class="body">You are now finished with the basic exercise for WRFDA-3DVAR with real data. You can now <a href="wrfda_sessions.html#session_1">continue to the next practice case</a>.</p>
-                <p>You can come back here later for additional practice running WRFDA-3DVAR with real data below:<br>
+                <p class="body">You are now finished with the basic exercise for WRFDA-3DVAR with real data. You can now try the additional practice cases below.</p>
                 </p>
               </blockquote>
               <p class="bodyh2"><a name="advanced">Additional exercises</a></p>
