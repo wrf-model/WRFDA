@@ -148,7 +148,15 @@ a:active {
                 </tr>
               </table>
               <p><br>Look for<em> obs_gts_2008-02-05_12:00:00.3DVAR</em> in your working directory. That is the main output from obsproc. You can open it using a text editor to check its content; <a href="obs_gts_2008-02-05_12:00:00.3DVAR.txt">it should look similar to this</a>.</p>
-              <p><span class="stylecode">*.diag</span> are diagnostic files. The writing of these files are controlled by the namelist settings under &amp;record5.</p>
+              <p><span class="stylecode">*.diag</span> are diagnostic files. The writing of these files are controlled by the namelist settings under &amp;record5. You should see (among other files):</p>
+              <ul>
+                <li><a class=stylecode href=obs_duplicate_loc.diag.txt>obs_duplicate_loc.diag</a>: contains info about stations with multiple observations of the same type within your specified time window. For 3DVAR, if there are multiple observations of the same type at the same location, only one will be kept.</li>
+                <li><a class=stylecode href=obs_gts_read.diag.txt>obs_gts_read.diag</a>: lists every observation read from the LITTLE_R input file, followed by a note if it was rejected due to being outside of the specified domain or outside the specified time window.
+                <li><a class=stylecode href=obs_qc1.diag.txt>obs_qc1.diag</a>: first set of quality control checks: looks for and attempts to correct temperature and wind spikes as well as super-adiabatic conditions in sounding observations</li>
+                <li><a class=stylecode href=obs_qc2.diag.txt>obs_qc2.diag</a>: second set of quality control checks: looks for obseravtions above the specified model top</li>
+                <li><a class=stylecode href=obs_recover_height.diag.txt>obs_recover_height.diag</a> and <a class=stylecode href=obs_recover_pressure.diag.txt>obs_recover_pressure.diag</a>: lists observations where missing height or pressure was recovered from other observed variables combined with the reference state</li>
+                <li><a class=stylecode href=obs_uncomplete.diag.txt>obs_uncomplete.diag</a>: remove observations that consist only of missing data</li>
+              </ul>
               <p>HEIGHT.txt, PRES.txt, RH.txt, SPD.txt, TEMP.txt, and UV.txt are observation errors in plain-text format for easy reference. Most names are self-explanatory. However, since some wind observations are of wind speed/direction while others are of the wind's U- and V-components, there are multiple files for wind errors. DIR.txt and SPD.txt are used for wind direction and speed errors respectively, while UV.txt is for U- and V-wind component errors.
               </p>
             </blockquote>

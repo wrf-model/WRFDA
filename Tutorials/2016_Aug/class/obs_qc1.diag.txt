@@ -1,0 +1,188 @@
+Failed super-adiabatic check:  ID = 72363, NAME = AMARILLO, T = 274.9 (K), P =  850.0 (hPa) I =  5 iindex=   1          
+Failed super-adiabatic check:  ID = 72582, NAME = ELKO, NV, T = 256.9 (K), P =  846.0 (hPa) I =  1 iindex=   1          
+Failed super-adiabatic check:  ID = 72582, NAME = ELKO, NV, T = 258.0 (K), P =  844.0 (hPa) I =  2 iindex=   1          
+Failed super-adiabatic check:  ID = 72251, NAME = CORPUS C, T = 294.5 (K), P =  902.0 (hPa) I =  8 iindex=   1          
+Failed super-adiabatic check:  ID = 72265, NAME = MIDLAND/, T = 279.9 (K), P =  908.0 (hPa) I =  1 iindex=   1          
+Failed super-adiabatic check:  ID = 72293, NAME = SAN DIEG, Modified T = 271.9 (K), P =  838.0 (hPa) I =  9 iindex=   2 
+Failed super-adiabatic check:  ID = 72317, NAME = GREENSBO, T = 285.5 (K), P =  857.0 (hPa) I = 14 iindex=   1          
+Failed super-adiabatic check:  ID = 72357, NAME = NORMAN N, T = 280.5 (K), P =  925.0 (hPa) I =  4 iindex=   1          
+Failed super-adiabatic check:  ID = 72659, NAME = ABERDEEN, T = 260.6 (K), P =  925.0 (hPa) I =  5 iindex=   1          
+Failed super-adiabatic check:  ID = 74455, NAME = DAVENPOR, T = 271.9 (K), P =  925.0 (hPa) I =  3 iindex=   1          
+Failed super-adiabatic check:  ID = 74560, NAME = LINCOLN,, T = 279.8 (K), P =  920.0 (hPa) I =  8 iindex=   1          
+Failed super-adiabatic check:  ID = 74560, NAME = LINCOLN,, T = 282.9 (K), P =  914.0 (hPa) I =  9 iindex=   1          
+Failed super-adiabatic check:  ID = 72202, NAME = MIAMI, F, Modified T = 271.1 (K), P =  592.0 (hPa) I = 24 iindex=   2 
+Failed super-adiabatic check:  ID = 72202, NAME = MIAMI, F, T = 294.1 (K), P = 1021.0 (hPa) I =  1 iindex=   1          
+Failed super-adiabatic check:  ID = 72327, NAME = NASHVILL, T = 278.4 (K), P =  746.0 (hPa) I = 13 iindex=   1          
+Failed super-adiabatic check:  ID = 72327, NAME = NASHVILL, T = 278.8 (K), P =  745.0 (hPa) I = 14 iindex=   1          
+Failed super-adiabatic check:  ID = 72672, NAME = RIVERTON, T = 260.0 (K), P =  827.0 (hPa) I =  1 iindex=   1          
+Failed super-adiabatic check:  ID = 72672, NAME = RIVERTON, T = 261.9 (K), P =  824.0 (hPa) I =  2 iindex=   1          
+Failed super-adiabatic check:  ID = 72786, NAME = SPOKANE,, T = 216.6 (K), P =  196.0 (hPa) I = 43 iindex=   1          
+Failed super-adiabatic check:  ID = 72403, NAME = STERLING, T = 286.8 (K), P =  960.0 (hPa) I =  8 iindex=   1          
+Failed super-adiabatic check:  ID = 72501, NAME = UPTON, N, Modified T = 274.2 (K), P =  710.0 (hPa) I = 13 iindex=   2 
+Failed super-adiabatic check:  ID = 71119, NAME = EDMONTON, T = 260.4 (K), P =  920.0 (hPa) I =  1 iindex=   1          
+Failed super-adiabatic check:  ID = 72210, NAME = TAMPA BA, Modified T = 274.6 (K), P =  596.0 (hPa) I = 22 iindex=   2 
+Failed super-adiabatic check:  ID = 72210, NAME = TAMPA BA, Modified T = 274.2 (K), P =  572.0 (hPa) I = 23 iindex=   2 
+Failed super-adiabatic check:  ID = 72248, NAME = SHREVEPO, T = 281.5 (K), P =  816.0 (hPa) I =  8 iindex=   1          
+Failed super-adiabatic check:  ID = 72248, NAME = SHREVEPO, T = 281.9 (K), P =  815.0 (hPa) I =  9 iindex=   1          
+Failed super-adiabatic check:  ID = 72248, NAME = SHREVEPO, T = 283.9 (K), P =  813.0 (hPa) I = 10 iindex=   1          
+Failed super-adiabatic check:  ID = 72248, NAME = SHREVEPO, T = 285.5 (K), P =  811.0 (hPa) I = 11 iindex=   1          
+Failed super-adiabatic check:  ID = 71811, NAME = SEPT-ILE, T = 256.6 (K), P = 1017.0 (hPa) I =  1 iindex=   1          
+Failed super-adiabatic check:  ID = 71600, NAME = SABLE IS, T = 266.2 (K), P =  925.0 (hPa) I =  5 iindex=   1          
+Failed super-adiabatic check:  ID = 71867, NAME = THE PASS, T = 249.2 (K), P =  985.0 (hPa) I =  2 iindex=   1          
+Failed super-adiabatic check:  ID = 71109, NAME = PORT HAR, Modified T = 274.2 (K), P =  925.0 (hPa) I =  3 iindex=   2 
+Failed super-adiabatic check:  ID = 71109, NAME = PORT HAR, Modified T = 273.1 (K), P =  913.0 (hPa) I =  4 iindex=   2 
+Dry convective adjustment ID: 78073, NAME: NASSAU A, from k =  2 to  3, from P =  1002. to  1000. Pa.                   
+Dry convective adjustment ID: 78073, NAME: NASSAU A, from k = 14 to 15, from P =   711. to   700. Pa.                   
+T dry conv adj:  ID = 78073, NAME = NASSAU A, T old = 283.1 (K),, T new = 283.0 (K),, P =  711.0 (hPa)                  
+T dry conv adj:  ID = 78073, NAME = NASSAU A, T old = 281.5 (K),, T new = 281.7 (K),, P =  700.0 (hPa)                  
+Dry convective adjustment ID: 72363, NAME: AMARILLO, from k =  1 to  2, from P =   881. to   874. Pa.                   
+T dry conv adj:  ID = 72363, NAME = AMARILLO, T old = 273.0 (K),, T new = 272.9 (K),, P =  881.0 (hPa)                  
+T dry conv adj:  ID = 72363, NAME = AMARILLO, T old = 272.0 (K),, T new = 272.2 (K),, P =  874.0 (hPa)                  
+Dry convective adjustment ID: 72426, NAME: WILMINGT, from k =  7 to  9, from P =   707. to   693. Pa.                   
+Dry convective adjustment ID: 72426, NAME: WILMINGT, from k = 20 to 21, from P =   250. to   244. Pa.                   
+T dry conv adj:  ID = 72426, NAME = WILMINGT, T old = 274.9 (K),, T new = 274.7 (K),, P =  707.0 (hPa)                  
+T dry conv adj:  ID = 72426, NAME = WILMINGT, T old = 273.8 (K),, T new = 274.0 (K),, P =  700.0 (hPa)                  
+Dry convective adjustment ID: 72562, NAME: NORTH PL, from k =  1 to  2, from P =   918. to   912. Pa.                   
+Dry convective adjustment ID: 72251, NAME: CORPUS C, from k =  1 to  2, from P =  1004. to  1000. Pa.                   
+Dry convective adjustment ID: 72251, NAME: CORPUS C, from k = 19 to 20, from P =   631. to   545. Pa.                   
+Dry convective adjustment ID: 72251, NAME: CORPUS C, from k = 36 to 37, from P =   250. to   249. Pa.                   
+Dry convective adjustment ID: 72265, NAME: MIDLAND/, from k = 10 to 11, from P =   726. to   700. Pa.                   
+Dry convective adjustment ID: 72293, NAME: SAN DIEG, from k =  8 to  9, from P =   850. to   838. Pa.                   
+T dry conv adj:  ID = 72293, NAME = SAN DIEG, T old = 273.8 (K),, T new = 273.4 (K),, P =  850.0 (hPa)                  
+T dry conv adj:  ID = 72293, NAME = SAN DIEG, T old = 271.9 (K),, T new = 272.3 (K),, P =  838.0 (hPa)                  
+Dry convective adjustment ID: 72317, NAME: GREENSBO, from k = 18 to 19, from P =   830. to   820. Pa.                   
+Dry convective adjustment ID: 72317, NAME: GREENSBO, from k = 33 to 34, from P =   500. to   496. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k =  1 to  2, from P =   964. to   960. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k =  8 to 10, from P =   818. to   796. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k =  9 to 10, from P =   802. to   796. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 12 to 15, from P =   712. to   696. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 13 to 14, from P =   705. to   700. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 14 to 15, from P =   700. to   696. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 17 to 19, from P =   631. to   609. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 18 to 19, from P =   616. to   609. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 23 to 24, from P =   544. to   536. Pa.                   
+Dry convective adjustment ID: 72357, NAME: NORMAN N, from k = 33 to 34, from P =   319. to   305. Pa.                   
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 279.1 (K),, T new = 279.0 (K),, P =  964.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 278.5 (K),, T new = 278.7 (K),, P =  960.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 284.4 (K),, T new = 284.2 (K),, P =  818.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 281.8 (K),, T new = 281.9 (K),, P =  796.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 275.9 (K),, T new = 275.7 (K),, P =  712.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 273.5 (K),, T new = 273.9 (K),, P =  696.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 269.4 (K),, T new = 269.2 (K),, P =  631.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 267.4 (K),, T new = 267.3 (K),, P =  616.0 (hPa)                  
+T dry conv adj:  ID = 72357, NAME = NORMAN N, T old = 266.0 (K),, T new = 266.5 (K),, P =  609.0 (hPa)                  
+Dry convective adjustment ID: 72659, NAME: ABERDEEN, from k =  1 to  2, from P =   974. to   964. Pa.                   
+T dry conv adj:  ID = 72659, NAME = ABERDEEN, T old = 259.4 (K),, T new = 259.3 (K),, P =  974.0 (hPa)                  
+T dry conv adj:  ID = 72659, NAME = ABERDEEN, T old = 258.4 (K),, T new = 258.6 (K),, P =  964.0 (hPa)                  
+Dry convective adjustment ID: 72694, NAME: SALEM/MC, from k = 20 to 21, from P =   679. to   678. Pa.                   
+Dry convective adjustment ID: 72694, NAME: SALEM/MC, from k = 31 to 32, from P =   400. to   392. Pa.                   
+Dry convective adjustment ID: 72694, NAME: SALEM/MC, from k = 76 to 77, from P =    32. to    31. Pa.                   
+Dry convective adjustment ID: 72764, NAME: BISMARCK, from k =  1 to  2, from P =   963. to   960. Pa.                   
+T dry conv adj:  ID = 72764, NAME = BISMARCK, T old = 258.6 (K),, T new = 258.5 (K),, P =  963.0 (hPa)                  
+T dry conv adj:  ID = 72764, NAME = BISMARCK, T old = 258.0 (K),, T new = 258.2 (K),, P =  960.0 (hPa)                  
+Dry convective adjustment ID: 72202, NAME: MIAMI, F, from k = 13 to 14, from P =   920. to   912. Pa.                   
+Dry convective adjustment ID: 72202, NAME: MIAMI, F, from k = 23 to 24, from P =   613. to   592. Pa.                   
+T dry conv adj:  ID = 72202, NAME = MIAMI, F, T old = 274.5 (K),, T new = 274.2 (K),, P =  613.0 (hPa)                  
+T dry conv adj:  ID = 72202, NAME = MIAMI, F, T old = 271.1 (K),, T new = 271.5 (K),, P =  592.0 (hPa)                  
+Dry convective adjustment ID: 72208, NAME: CHARLEST, from k = 20 to 21, from P =   363. to   324. Pa.                   
+Dry convective adjustment ID: 72214, NAME: TALLAHAS, from k =  6 to  7, from P =   964. to   958. Pa.                   
+Dry convective adjustment ID: 72214, NAME: TALLAHAS, from k = 14 to 16, from P =   873. to   850. Pa.                   
+Dry convective adjustment ID: 72214, NAME: TALLAHAS, from k = 15 to 16, from P =   856. to   850. Pa.                   
+Dry convective adjustment ID: 72214, NAME: TALLAHAS, from k = 37 to 38, from P =   300. to   294. Pa.                   
+T dry conv adj:  ID = 72214, NAME = TALLAHAS, T old = 287.5 (K),, T new = 287.4 (K),, P =  873.0 (hPa)                  
+Dry convective adjustment ID: 72235, NAME: JACKSON/, from k = 18 to 19, from P =   300. to   298. Pa.                   
+Dry convective adjustment ID: 72240, NAME: LAKE CHA, from k = 25 to 26, from P =   596. to   520. Pa.                   
+Dry convective adjustment ID: 72250, NAME: BROWNSVI, from k = 22 to 23, from P =   400. to   388. Pa.                   
+Dry convective adjustment ID: 72305, NAME: NEWPORT,, from k =  6 to  8, from P =   974. to   967. Pa.                   
+Dry convective adjustment ID: 72305, NAME: NEWPORT,, from k =  7 to  8, from P =   971. to   967. Pa.                   
+Dry convective adjustment ID: 72305, NAME: NEWPORT,, from k = 20 to 22, from P =   799. to   794. Pa.                   
+Dry convective adjustment ID: 72305, NAME: NEWPORT,, from k = 41 to 43, from P =   696. to   679. Pa.                   
+Dry convective adjustment ID: 72305, NAME: NEWPORT,, from k = 52 to 53, from P =   587. to   573. Pa.                   
+T dry conv adj:  ID = 72305, NAME = NEWPORT,, T old = 289.1 (K),, T new = 288.6 (K),, P =  974.0 (hPa)                  
+T dry conv adj:  ID = 72305, NAME = NEWPORT,, T old = 287.4 (K),, T new = 288.0 (K),, P =  967.0 (hPa)                  
+Dry convective adjustment ID: 72327, NAME: NASHVILL, from k = 65 to 66, from P =    71. to    70. Pa.                   
+Dry convective adjustment ID: 72364, NAME: SANTA TE, from k =  2 to  3, from P =   850. to   830. Pa.                   
+T dry conv adj:  ID = 72364, NAME = SANTA TE, T old = 274.1 (K),, T new = 274.0 (K),, P =  850.0 (hPa)                  
+T dry conv adj:  ID = 72364, NAME = SANTA TE, T old = 272.0 (K),, T new = 272.2 (K),, P =  830.0 (hPa)                  
+Dry convective adjustment ID: 72672, NAME: RIVERTON, from k =  8 to  9, from P =   713. to   700. Pa.                   
+Dry convective adjustment ID: 74494, NAME: CHATHAM,, from k = 19 to 20, from P =   511. to   500. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 14 to 15, from P =   854. to   850. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 24 to 25, from P =   707. to   700. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 27 to 28, from P =   642. to   641. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 30 to 32, from P =   637. to   633. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 27 to 32, from P =   642. to   633. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 34 to 38, from P =   630. to   623. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 34 to 41, from P =   630. to   618. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 40 to 41, from P =   621. to   618. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 42 to 43, from P =   617. to   616. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 33 to 48, from P =   632. to   603. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 45 to 46, from P =   609. to   606. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 40 to 47, from P =   621. to   605. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 56 to 57, from P =   398. to   396. Pa.                   
+Dry convective adjustment ID: 72403, NAME: STERLING, from k = 59 to 60, from P =   383. to   377. Pa.                   
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 269.2 (K),, T new = 269.1 (K),, P =  628.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 269.0 (K),, T new = 268.9 (K),, P =  626.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 266.6 (K),, T new = 266.8 (K),, P =  609.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 266.2 (K),, T new = 266.4 (K),, P =  606.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 266.0 (K),, T new = 266.3 (K),, P =  605.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 265.9 (K),, T new = 266.0 (K),, P =  603.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 242.6 (K),, T new = 242.5 (K),, P =  383.0 (hPa)                  
+T dry conv adj:  ID = 72403, NAME = STERLING, T old = 241.2 (K),, T new = 241.4 (K),, P =  377.0 (hPa)                  
+Dry convective adjustment ID: 72451, NAME: DODGE CI, from k =  8 to  9, from P =   514. to   500. Pa.                   
+Dry convective adjustment ID: 72520, NAME: PITTSBUR, from k =  5 to  6, from P =   604. to   593. Pa.                   
+Dry convective adjustment ID: 72520, NAME: PITTSBUR, from k = 13 to 14, from P =   414. to   400. Pa.                   
+Dry convective adjustment ID: 72558, NAME: VALLEY, , from k =  1 to  3, from P =   974. to   944. Pa.                   
+Dry convective adjustment ID: 72558, NAME: VALLEY, , from k =  2 to  3, from P =   973. to   944. Pa.                   
+Dry convective adjustment ID: 72558, NAME: VALLEY, , from k = 24 to 25, from P =   369. to   327. Pa.                   
+Dry convective adjustment ID: 72206, NAME: JACKSONV, from k = 11 to 12, from P =   850. to   842. Pa.                   
+Dry convective adjustment ID: 72206, NAME: JACKSONV, from k = 42 to 44, from P =   167. to   150. Pa.                   
+T dry conv adj:  ID = 72206, NAME = JACKSONV, T old = 217.6 (K),, T new = 217.5 (K),, P =  167.0 (hPa)                  
+Dry convective adjustment ID: 72210, NAME: TAMPA BA, from k = 23 to 25, from P =   572. to   500. Pa.                   
+Dry convective adjustment ID: 72210, NAME: TAMPA BA, from k = 29 to 30, from P =   300. to   298. Pa.                   
+T dry conv adj:  ID = 72210, NAME = TAMPA BA, T old = 274.2 (K),, T new = 273.8 (K),, P =  572.0 (hPa)                  
+T dry conv adj:  ID = 72210, NAME = TAMPA BA, T old = 270.6 (K),, T new = 271.0 (K),, P =  552.0 (hPa)                  
+Dry convective adjustment ID: 72215, NAME: PEACHTRE, from k = 20 to 21, from P =   327. to   318. Pa.                   
+Dry convective adjustment ID: 72233, NAME: SLIDELL/, from k = 22 to 23, from P =   300. to   293. Pa.                   
+Dry convective adjustment ID: 72248, NAME: SHREVEPO, from k =  7 to  8, from P =   817. to   816. Pa.                   
+Dry convective adjustment ID: 72248, NAME: SHREVEPO, from k = 15 to 16, from P =   772. to   761. Pa.                   
+Dry convective adjustment ID: 72248, NAME: SHREVEPO, from k = 23 to 24, from P =   606. to   589. Pa.                   
+Dry convective adjustment ID: 72248, NAME: SHREVEPO, from k = 25 to 26, from P =   572. to   565. Pa.                   
+T dry conv adj:  ID = 72248, NAME = SHREVEPO, T old = 281.9 (K),, T new = 281.8 (K),, P =  817.0 (hPa)                  
+T dry conv adj:  ID = 72248, NAME = SHREVEPO, T old = 281.5 (K),, T new = 281.7 (K),, P =  816.0 (hPa)                  
+Dry convective adjustment ID: 72249, NAME: FT WORTH, from k = 14 to 15, from P =   697. to   692. Pa.                   
+Dry convective adjustment ID: 72249, NAME: FT WORTH, from k = 19 to 20, from P =   647. to   635. Pa.                   
+Dry convective adjustment ID: 72393, NAME: VANDENBE, from k =  7 to  9, from P =   792. to   787. Pa.                   
+Dry convective adjustment ID: 72393, NAME: VANDENBE, from k =  7 to  9, from P =   792. to   787. Pa.                   
+Dry convective adjustment ID: 72634, NAME: GAYLORD,, from k =  1 to  2, from P =   954. to   950. Pa.                   
+Dry convective adjustment ID: 72649, NAME: CHANHAUS, from k = 22 to 23, from P =   505. to   500. Pa.                   
+Dry convective adjustment ID: 72649, NAME: CHANHAUS, from k = 24 to 25, from P =   484. to   459. Pa.                   
+Dry convective adjustment ID: 71845, NAME: PICKLE L, from k = 21 to 22, from P =   403. to   400. Pa.                   
+Dry convective adjustment ID: 71203, NAME: KELOWNA , from k = 26 to 27, from P =   377. to   366. Pa.                   
+Dry convective adjustment ID: 71722, NAME: MANIWAKI, from k =  2 to  3, from P =   985. to   980. Pa.                   
+Dry convective adjustment ID: 71600, NAME: SABLE IS, from k =  1 to  2, from P =  1028. to  1000. Pa.                   
+T dry conv adj:  ID = 71600, NAME = SABLE IS, T old = 270.0 (K),, T new = 269.9 (K),, P = 1028.0 (hPa)                  
+T dry conv adj:  ID = 71600, NAME = SABLE IS, T old = 267.6 (K),, T new = 267.8 (K),, P = 1000.0 (hPa)                  
+Dry convective adjustment ID: 72528, NAME: BUFFALO/, from k =  6 to  7, from P =   852. to   850. Pa.                   
+Dry convective adjustment ID: 72528, NAME: BUFFALO/, from k = 12 to 14, from P =   681. to   653. Pa.                   
+Dry convective adjustment ID: 72528, NAME: BUFFALO/, from k = 13 to 14, from P =   669. to   653. Pa.                   
+T dry conv adj:  ID = 72528, NAME = BUFFALO/, T old = 270.9 (K),, T new = 270.3 (K),, P =  681.0 (hPa)                  
+T dry conv adj:  ID = 72528, NAME = BUFFALO/, T old = 269.0 (K),, T new = 268.9 (K),, P =  669.0 (hPa)                  
+T dry conv adj:  ID = 72528, NAME = BUFFALO/, T old = 266.4 (K),, T new = 267.1 (K),, P =  653.0 (hPa)                  
+Dry convective adjustment ID: 76256, NAME: EMPALME,, from k = 24 to 25, from P =   251. to   250. Pa.                   
+Dry convective adjustment ID: 71109, NAME: PORT HAR, from k =  1 to  2, from P =  1001. to  1000. Pa.                   
+Dry convective adjustment ID: 71109, NAME: PORT HAR, from k =  3 to  4, from P =   925. to   913. Pa.                   
+Dry convective adjustment ID: 74002, NAME: ABERDEEN, from k = 25 to 26, from P =   250. to   249. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k =  5 to  6, from P =   968. to   964. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 13 to 15, from P =   921. to   889. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 13 to 15, from P =   921. to   889. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 16 to 17, from P =   850. to   848. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 18 to 19, from P =   845. to   839. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 32 to 34, from P =   366. to   319. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 33 to 34, from P =   329. to   319. Pa.                   
+Dry convective adjustment ID: 74794, NAME: CAPE KEN, from k = 45 to 46, from P =   150. to   138. Pa.                   
+T dry conv adj:  ID = 74794, NAME = CAPE KEN, T old = 291.9 (K),, T new = 291.5 (K),, P =  921.0 (hPa)                  
+T dry conv adj:  ID = 74794, NAME = CAPE KEN, T old = 288.1 (K),, T new = 288.6 (K),, P =  889.0 (hPa)                  
+T dry conv adj:  ID = 74794, NAME = CAPE KEN, T old = 234.8 (K),, T new = 235.0 (K),, P =  319.0 (hPa)                  
+Dry convective adjustment ID: 72355, NAME: FORT SIL, from k =  1 to  2, from P =   963. to   936. Pa.                   
+T dry conv adj:  ID = 72355, NAME = FORT SIL, T old = 278.8 (K),, T new = 278.3 (K),, P =  963.0 (hPa)                  
+T dry conv adj:  ID = 72355, NAME = FORT SIL, T old = 275.5 (K),, T new = 276.0 (K),, P =  936.0 (hPa)                  

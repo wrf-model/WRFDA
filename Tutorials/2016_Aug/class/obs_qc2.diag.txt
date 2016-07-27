@@ -1,0 +1,1004 @@
+obs_qc2.diag                                                       Found Name and ID = 78073 NASSAU AIRPORT / BAHAMA   25.050  -77.460
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 71603 YARMOUTH, N.S. / CANADA   43.860  -66.100
+
+Found Name and ID = 72363 AMARILLO/INTL.,TX. / U.   35.210 -101.710
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72365 ALBUQUERQUE/INT.,NM. /    35.050 -106.610
+
+Found Name and ID = 72387 MERCURY/DESERT ROCK,NV.   36.610 -116.010
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72426 WILMINGTON, OH. / U.S.A   39.410  -83.810
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72469 DENVER/STAPLETON INT.,    39.780 -104.860
+
+Found Name and ID = 72489      RENO, NV. / U.S.A.   39.560 -119.800
+
+Found Name and ID = 72562 NORTH PLATTE/LEE BIRD,    41.110 -100.660
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72572 SALT LAKE CITY/INTNLUT.   40.780 -111.960
+
+Found Name and ID = 72582      ELKO, NV. / U.S.A.   40.860 -115.730
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72201 KEY WEST/INT.,FL. KKEY    24.550  -81.780
+
+Found Name and ID = 72230 SHELBY COUNTRY AIRPORT,   33.160  -86.760
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72251 CORPUS CHRISTI/INT.,TX.   27.760  -97.500
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72261 DEL RIO/INT., TX. / U.S   29.360 -100.910
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72265 MIDLAND/MIDLAND REG.AIR   31.950 -102.180
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+
+Found Name and ID = 72293 SAN DIEGO/MIRAMAR, NAS,   32.850 -117.110
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72317 GREENSBORO/G.-HIGH PT.,   36.080  -79.950
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72318 BLACKSBURG, VA. / U.S.A   37.200  -80.410
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72357 NORMAN NWS, OK / U.S.A.   35.180  -97.430
+
+Found Name and ID = 72659 ABERDEEN/REG.,SD. / U.S   45.450  -98.430
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72662 RAPID CITY/REG., SD. /    44.080 -103.210
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+
+Found Name and ID = 72694 SALEM/MCNARY,OR. / U.S.   44.910 -123.000
+
+Found Name and ID = 72712 CARIBOU/MUN.,ME. / U.S.   46.860  -68.010
+
+Found Name and ID = 72764 BISMARCK/MUN.,ND. / U.S   46.760 -100.750
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72776 GREAT FALLS, MT. / U.S.   47.460 -111.380
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+
+Found Name and ID = 74455 DAVENPORT, IA. / U.S.A.   41.610  -90.580
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 74560   LINCOLN, IL. / U.S.A.   40.150  -89.330
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72202      MIAMI, FL / U.S.A.   25.750  -80.380
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72208 CHARLESTON/MUN.,SC. / U   32.900  -80.030
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72214 TALLAHASSEE KTAE, FL (m   30.450  -84.300
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72235 JACKSON/ALLEN C. THOMPS   32.310  -90.080
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72240 LAKE CHARLES/MUN., LA.    30.110  -93.210
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72250 BROWNSVILLE/INT.,TX / U   25.910  -97.410
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72274 TUCSON WFO, AZ KTWC / U   32.230 -110.950
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72305   NEWPORT, NC. / U.S.A.   34.780  -76.880
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72327 NASHVILLE/OLD HICKORY,    36.250  -86.560
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72340 NORTH LITTLE ROCK/ MUNI   34.830  -92.250
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 72364 SANTA TERESA, NM. / U.S   31.860 -106.700
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72632 WHITE LAKE, MI. / U.S.A   42.700  -83.460
+
+Found Name and ID = 72672  RIVERTON, WY. / U.S.A.   43.060 -108.480
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72681 BOISE/MUN.,ID. / U.S.A.   43.560 -116.210
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72747 INT.FALLS/FALLS INT.MN.   48.560  -93.380
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72768 GLASGOW/INT.,MT. / U.S.   48.210 -106.610
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72786   SPOKANE, WA. / U.S.A.   47.680 -117.630
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72797 QUILLAYUTE,WA. / U.S.A.   47.950 -124.550
+
+Found Name and ID = 74494   CHATHAM, MA. / U.S.A.   41.660  -69.960
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72402 WALLOPS ISLAND, VA. / U   37.930  -75.480
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72403  STERLING, VA. / U.S.A.   38.980  -77.460
+
+Found Name and ID = 72440 SPRINGFIELD/MUN.,MO. /    37.230  -93.380
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72451 DODGE CITY/MUN., KS. /    37.760  -99.960
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72476 GRAND JUNCTION/ WALKER    39.110 -108.530
+
+Found Name and ID = 72493 OAKLAND/METROP. OAKLAND   37.730 -122.210
+
+Found Name and ID = 72501     UPTON, NY. / U.S.A.   40.860  -72.860
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72518 ALBANY/ALBANY CO., NY.    42.750  -73.800
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72520 PITTSBURGH/MOON TOWNSHI   40.530  -80.230
+
+Found Name and ID = 72558    VALLEY, NE. / U.S.A.   41.310  -96.360
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+
+Found Name and ID = 72597 MEDFORD/MEDFORDJACKSON    42.360 -122.860
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 71119 EDMONTON STONY PLAIN AL   53.530 -114.100
+
+Found Name and ID = 71823 LA GRANDE IV,QUE. / CAN   53.750  -73.660
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 72206 JACKSONVILLE/INTNL.,FL.   30.500  -81.700
+
+Found Name and ID = 72210 TAMPA BAY AREA,FL. / U.   27.700  -82.400
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72215 PEACHTREE CITY, GA. / U   33.360  -84.560
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72233 SLIDELL/MUN. LA / U.S.A   30.330  -89.810
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72248 SHREVEPORT/REG., LA. /    32.450  -93.810
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72249  FT WORTH, TX. / U.S.A.   32.830  -97.300
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72393 VANDENBERG AFB, CA. / U   34.750 -120.560
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 72634   GAYLORD, MI. / U.S.A.   44.910  -84.710
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+
+Found Name and ID = 72645 GREEN BAY/ A.-STRAUBEL,   44.480  -88.130
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 72649 CHANHAUSSEN, MN. / U.S.   44.850  -93.560
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+
+Found Name and ID = 74389      GRAY, ME. / U.S.A.   43.900  -70.250
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+
+Found Name and ID = 71845 PICKLE LAKE,ONT. / CANA   51.450  -90.200
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 71811 SEPT-ILES UA,QUE. / CAN   50.210  -66.250
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 71203 KELOWNA APT,B.C. / CANA   49.880 -119.480
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 71722  MANIWAKI,QUE. / CANADA   46.300  -76.000
+
+Found Name and ID = 71836  MOOSONEE,ONT. / CANADA   51.260  -80.650
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 72456 TOPEKA/MUN., KS. / U.S.   39.060  -95.610
+
+Found Name and ID = 71600 SABLE ISLAND,N.S. / CAN   43.930  -60.010
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 71815 STEPHENVILLE UA,NFLD /    48.560  -58.560
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 71867 THE PASS UA,MAN / CANAD   53.960 -101.100
+Model ptop & obs pressure =    1000.00      800.00    qc =     1024
+Model ptop & obs pressure =    1000.00      600.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 72528 BUFFALO/GREATER BUFFALO   42.930  -78.730
+
+Found Name and ID = 76256   EMPALME,SON. / MEXICO   27.910 -110.900
+
+Found Name and ID = 71109 PORT HARDY UA,B.C. / CA   50.680 -127.360
+
+Found Name and ID = 74002 ABERDEEN PROVING GROUND   39.500  -76.560
+
+Found Name and ID = 74794 CAPE KENNEDY, FL. / U.S   28.460  -80.550
+Model ptop & obs pressure =    1000.00      900.00    qc =     1024
+Model ptop & obs pressure =    1000.00      700.00    qc =     1024
+Model ptop & obs pressure =    1000.00      500.00    qc =     1024
+
+Found Name and ID = 72355 FORT SILL, OK. (ARMY) /   34.600  -98.400
+
+Found Name and ID = -----              ID   BLMM7   36.880  -89.970
+
+Found Name and ID = -----              ID   BLRW3   43.220  -90.530
+
+Found Name and ID = -----              ID   CNWM7   37.520  -92.700
+
+Found Name and ID = -----              ID   DQUA4   34.110  -94.290
+
+Found Name and ID = -----              ID   FBYN1   40.080  -97.310
+
+Found Name and ID = -----              ID   HBRK1   38.310  -97.300
+
+Found Name and ID = -----              ID   HKLO2   35.680  -95.860
+
+Found Name and ID = -----              ID   HVLK1   37.650  -99.110
+
+Found Name and ID = -----              ID   JTNT2   33.010 -100.980
+
+Found Name and ID = -----              ID   LDBT2   30.090  -96.780
+
+Found Name and ID = -----              ID   LMNO2   36.680  -97.480
+
+Found Name and ID = -----              ID   LTHM7   39.580  -94.190
+
+Found Name and ID = -----              ID   MRRN1   42.900 -101.690
+
+Found Name and ID = -----              ID   NDSK1   37.300  -95.600
+
+Found Name and ID = -----              ID   OKOM6   34.080  -88.860
+
+Found Name and ID = -----              ID   PATT2   31.770  -95.710
+
+Found Name and ID = -----              ID   PLTC2   40.180 -104.730
+
+Found Name and ID = -----              ID   RWDN1   40.080 -100.650
+
+Found Name and ID = -----              ID   SLAI4   41.900  -93.690
+
+Found Name and ID = -----              ID   SYCN6   43.110  -76.080
+
+Found Name and ID = -----              ID   TCUN5   35.080 -103.600
+
+Found Name and ID = -----              ID   VCIO2   36.070  -99.210
+
+Found Name and ID = -----              ID   WDLM5   44.670  -95.440
+
+Found Name and ID = -----              ID   WNCI2   39.650  -90.480
+
+Found Name and ID = -----              ID   WSMN5   32.400 -106.340
+
+Found Name and ID = -----              ID   BLTMD   39.055  -76.879
+
+Found Name and ID = -----              ID   SIMCA   34.300 -118.800
+
+Found Name and ID = -----              ID   PNRMD   39.706  -79.012
+
+Found Name and ID = -----              ID   CHANC   35.210  -80.930
+
+Found Name and ID = -----              ID   CLETX   32.350  -97.440
+
+Found Name and ID = -----              ID   LPTTX   29.700  -95.100
+
+Found Name and ID = -----              ID   RALNC   35.590  -78.460
+
+Found Name and ID = -----              ID   SEAWA   47.690 -122.260
+
+Found Name and ID = -----              ID   CARON   44.230  -79.790
+
+Found Name and ID = -----              ID   NPSCA   36.690 -121.760
+
+Found Name and ID = -----              ID   TCYCA   37.400 -121.300
+
+Found Name and ID = -----              ID   STWMA   42.500  -71.300
+
+Found Name and ID = -----              ID   EPSTX   31.770 -106.500
+
+Found Name and ID = -----              ID   MCGQU   45.500  -73.570
+
+Found Name and ID = -----              ID   CCLCA   37.110 -120.240
+
+Found Name and ID = -----              ID   CCOCA   39.690 -121.910
+
+Found Name and ID = -----              ID   LHSCA   35.620 -119.690
+
+Found Name and ID = -----              ID   LVRCA   37.700 -121.900
+
+Found Name and ID = -----              ID   SHSCA   38.490 -121.210
+
+Found Name and ID = -----              ID   DEMNM   32.030 -107.860
+
+Found Name and ID = -----              ID   GLBCA   34.430 -119.850
+
+Found Name and ID = -----              ID   PPBCA   35.660 -121.290
+
+Found Name and ID = -----              ID   TRKCA   39.320 -120.140
+
+Found Name and ID = -----              ID   FHAAZ   31.490 -110.300
+
+Found Name and ID = -----              ID   YMAAZ   33.010 -114.250
+
+Found Name and ID = -----              ID   MFATX   30.430 -104.320
+
+Found Name and ID = -----              ID   BBYCA   38.320 -123.070
+
+Found Name and ID = -----              ID   RGCTX   26.570  -98.820
+
+Found Name and ID = -----              ID   CJKFL   24.700  -81.500
+
+Found Name and ID = -----              ID   MMRCA   32.900 -117.100
+
+Found Name and ID = -----              ID   KSCFL   28.630  -80.700
+
+Found Name and ID = -----              ID   EGPTX   28.390 -100.280
+
+Found Name and ID = -----              ID   GLAMN   47.720  -96.260
+
+Found Name and ID = -----              ID   CCDLA   29.250  -90.660
+
+Found Name and ID = -----              ID   SACCA   38.200 -121.300
+
+Found Name and ID = -----              ID   VISCA   36.310 -119.390
+
+Found Name and ID = 78073 NASSAU AIRPORT / BAHAMA   25.050  -77.460
+
+Found Name and ID = 71603 YARMOUTH, N.S. / CANADA   43.860  -66.100
+
+Found Name and ID = 72562 NORTH PLATTE/LEE BIRD,    41.110 -100.660
+
+Found Name and ID = 72572 SALT LAKE CITY/INTNLUT.   40.780 -111.960
+
+Found Name and ID = 72582      ELKO, NV. / U.S.A.   40.860 -115.730
+
+Found Name and ID = 72659 ABERDEEN/REG.,SD. / U.S   45.450  -98.430
+
+Found Name and ID = 72662 RAPID CITY/REG., SD. /    44.080 -103.210
+
+Found Name and ID = 72694 SALEM/MCNARY,OR. / U.S.   44.910 -123.000
+
+Found Name and ID = 72712 CARIBOU/MUN.,ME. / U.S.   46.860  -68.010
+
+Found Name and ID = 72764 BISMARCK/MUN.,ND. / U.S   46.760 -100.750
+
+Found Name and ID = 72776 GREAT FALLS, MT. / U.S.   47.460 -111.380
+
+Found Name and ID = 74455 DAVENPORT, IA. / U.S.A.   41.610  -90.580
+
+Found Name and ID = 74560   LINCOLN, IL. / U.S.A.   40.150  -89.330
+
+Found Name and ID = 72201 KEY WEST/INT.,FL. KKEY    24.550  -81.780
+
+Found Name and ID = 72230 SHELBY COUNTRY AIRPORT,   33.160  -86.760
+
+Found Name and ID = 72251 CORPUS CHRISTI/INT.,TX.   27.760  -97.500
+
+Found Name and ID = 72265 MIDLAND/MIDLAND REG.AIR   31.950 -102.180
+
+Found Name and ID = 72293 SAN DIEGO/MIRAMAR, NAS,   32.850 -117.110
+
+Found Name and ID = 72317 GREENSBORO/G.-HIGH PT.,   36.080  -79.950
+
+Found Name and ID = 72318 BLACKSBURG, VA. / U.S.A   37.200  -80.410
+
+Found Name and ID = 72357 NORMAN NWS, OK / U.S.A.   35.180  -97.430
+
+Found Name and ID = 72363 AMARILLO/INTL.,TX. / U.   35.210 -101.710
+
+Found Name and ID = 72387 MERCURY/DESERT ROCK,NV.   36.610 -116.010
+
+Found Name and ID = 72426 WILMINGTON, OH. / U.S.A   39.410  -83.810
+
+Found Name and ID = 72489      RENO, NV. / U.S.A.   39.560 -119.800
+
+Found Name and ID = 74494   CHATHAM, MA. / U.S.A.   41.660  -69.960
+
+Found Name and ID = 72451 DODGE CITY/MUN., KS. /    37.760  -99.960
+
+Found Name and ID = 72469 DENVER/STAPLETON INT.,    39.780 -104.860
+
+Found Name and ID = 72476 GRAND JUNCTION/ WALKER    39.110 -108.530
+
+Found Name and ID = 72493 OAKLAND/METROP. OAKLAND   37.730 -122.210
+
+Found Name and ID = 72501     UPTON, NY. / U.S.A.   40.860  -72.860
+
+Found Name and ID = 72518 ALBANY/ALBANY CO., NY.    42.750  -73.800
+
+Found Name and ID = 72520 PITTSBURGH/MOON TOWNSHI   40.530  -80.230
+
+Found Name and ID = 72558    VALLEY, NE. / U.S.A.   41.310  -96.360
+
+Found Name and ID = 72597 MEDFORD/MEDFORDJACKSON    42.360 -122.860
+
+Found Name and ID = 72632 WHITE LAKE, MI. / U.S.A   42.700  -83.460
+
+Found Name and ID = 72672  RIVERTON, WY. / U.S.A.   43.060 -108.480
+
+Found Name and ID = 72681 BOISE/MUN.,ID. / U.S.A.   43.560 -116.210
+
+Found Name and ID = 72747 INT.FALLS/FALLS INT.MN.   48.560  -93.380
+
+Found Name and ID = 72768 GLASGOW/INT.,MT. / U.S.   48.210 -106.610
+
+Found Name and ID = 72786   SPOKANE, WA. / U.S.A.   47.680 -117.630
+
+Found Name and ID = 72797 QUILLAYUTE,WA. / U.S.A.   47.950 -124.550
+
+Found Name and ID = 72202      MIAMI, FL / U.S.A.   25.750  -80.380
+
+Found Name and ID = 72208 CHARLESTON/MUN.,SC. / U   32.900  -80.030
+
+Found Name and ID = 72214 TALLAHASSEE KTAE, FL (m   30.450  -84.300
+
+Found Name and ID = 72235 JACKSON/ALLEN C. THOMPS   32.310  -90.080
+
+Found Name and ID = 72240 LAKE CHARLES/MUN., LA.    30.110  -93.210
+
+Found Name and ID = 72250 BROWNSVILLE/INT.,TX / U   25.910  -97.410
+
+Found Name and ID = 72261 DEL RIO/INT., TX. / U.S   29.360 -100.910
+
+Found Name and ID = 72274 TUCSON WFO, AZ KTWC / U   32.230 -110.950
+
+Found Name and ID = 72305   NEWPORT, NC. / U.S.A.   34.780  -76.880
+
+Found Name and ID = 72327 NASHVILLE/OLD HICKORY,    36.250  -86.560
+
+Found Name and ID = 72340 NORTH LITTLE ROCK/ MUNI   34.830  -92.250
+
+Found Name and ID = 72364 SANTA TERESA, NM. / U.S   31.860 -106.700
+
+Found Name and ID = 72365 ALBUQUERQUE/INT.,NM. /    35.050 -106.610
+
+Found Name and ID = 72402 WALLOPS ISLAND, VA. / U   37.930  -75.480
+
+Found Name and ID = 72403  STERLING, VA. / U.S.A.   38.980  -77.460
+
+Found Name and ID = 72440 SPRINGFIELD/MUN.,MO. /    37.230  -93.380
+
+Found Name and ID = 71119 EDMONTON STONY PLAIN AL   53.530 -114.100
+
+Found Name and ID = 71823 LA GRANDE IV,QUE. / CAN   53.750  -73.660
+
+Found Name and ID = 72206 JACKSONVILLE/INTNL.,FL.   30.500  -81.700
+
+Found Name and ID = 72210 TAMPA BAY AREA,FL. / U.   27.700  -82.400
+
+Found Name and ID = 72215 PEACHTREE CITY, GA. / U   33.360  -84.560
+
+Found Name and ID = 72233 SLIDELL/MUN. LA / U.S.A   30.330  -89.810
+
+Found Name and ID = 72248 SHREVEPORT/REG., LA. /    32.450  -93.810
+
+Found Name and ID = 72249  FT WORTH, TX. / U.S.A.   32.830  -97.300
+
+Found Name and ID = 72393 VANDENBERG AFB, CA. / U   34.750 -120.560
+
+Found Name and ID = 72634   GAYLORD, MI. / U.S.A.   44.910  -84.710
+
+Found Name and ID = 72645 GREEN BAY/ A.-STRAUBEL,   44.480  -88.130
+
+Found Name and ID = 72649 CHANHAUSSEN, MN. / U.S.   44.850  -93.560
+
+Found Name and ID = 74389      GRAY, ME. / U.S.A.   43.900  -70.250
+
+Found Name and ID = 71845 PICKLE LAKE,ONT. / CANA   51.450  -90.200
+
+Found Name and ID = 71811 SEPT-ILES UA,QUE. / CAN   50.210  -66.250
+
+Found Name and ID = 71203 KELOWNA APT,B.C. / CANA   49.880 -119.480
+
+Found Name and ID = 71722  MANIWAKI,QUE. / CANADA   46.300  -76.000
+
+Found Name and ID = 71836  MOOSONEE,ONT. / CANADA   51.260  -80.650
+
+Found Name and ID = 72456 TOPEKA/MUN., KS. / U.S.   39.060  -95.610
+
+Found Name and ID = 71600 SABLE ISLAND,N.S. / CAN   43.930  -60.010
+
+Found Name and ID = 71815 STEPHENVILLE UA,NFLD /    48.560  -58.560
+
+Found Name and ID = 71867 THE PASS UA,MAN / CANAD   53.960 -101.100
+
+Found Name and ID = 72528 BUFFALO/GREATER BUFFALO   42.930  -78.730
+
+Found Name and ID = 71109 PORT HARDY UA,B.C. / CA   50.680 -127.360
+
+Found Name and ID = 74002 ABERDEEN PROVING GROUND   39.500  -76.560
+
+Found Name and ID = 74794 CAPE KENNEDY, FL. / U.S   28.460  -80.550
+
+Found Name and ID = 72355 FORT SILL, OK. (ARMY) /   34.600  -98.400
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   24.300  -83.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   41.300 -124.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   44.700 -126.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   31.600  -71.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   28.000  -80.000
+
+Found Name and ID = 42002   Platform Id >>> 42002   25.200  -94.400
+
+Found Name and ID = 42003   Platform Id >>> 42003   25.700  -85.700
+
+Found Name and ID = 41048   Platform Id >>> 41048   32.000  -69.600
+
+Found Name and ID = 42364   Platform Id >>> 42364   29.100  -88.100
+
+Found Name and ID = 42035   Platform Id >>> 42035   29.200  -94.400
+
+Found Name and ID = 42039   Platform Id >>> 42039   28.800  -85.600
+
+Found Name and ID = 41025   Platform Id >>> 41025   35.000  -75.400
+
+Found Name and ID = 41047   Platform Id >>> 41047   27.500  -71.500
+
+Found Name and ID = 42020   Platform Id >>> 42020   26.900  -96.700
+
+Found Name and ID = 42040   Platform Id >>> 42040   29.200  -88.200
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   44.500 -126.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   49.900 -130.200
+
+Found Name and ID = 46022   Platform Id >>> 46022   40.800 -124.500
+
+Found Name and ID = 46012   Platform Id >>> 46012   37.400 -122.900
+
+Found Name and ID = 46013   Platform Id >>> 46013   38.200 -123.300
+
+Found Name and ID = 46015   Platform Id >>> 46015   42.800 -124.800
+
+Found Name and ID = 46088   Platform Id >>> 46088   48.300 -123.200
+
+Found Name and ID = 46087   Platform Id >>> 46087   48.500 -124.700
+
+Found Name and ID = 46025   Platform Id >>> 46025   33.700 -119.100
+
+Found Name and ID = 46086   Platform Id >>> 46086   32.500 -118.000
+
+Found Name and ID = 46063   Platform Id >>> 46063   34.300 -120.700
+
+Found Name and ID = 46011   Platform Id >>> 46011   34.900 -120.900
+
+Found Name and ID = 46028   Platform Id >>> 46028   35.700 -121.900
+
+Found Name and ID = 46089   Platform Id >>> 46089   45.900 -125.800
+
+Found Name and ID = 44027   Platform Id >>> 44027   44.300  -67.300
+
+Found Name and ID = 41013   Platform Id >>> 41013   33.400  -77.700
+
+Found Name and ID = 44018   Platform Id >>> 44018   41.300  -69.300
+
+Found Name and ID = 41008   Platform Id >>> 41008   31.400  -80.900
+
+Found Name and ID = 44008   Platform Id >>> 44008   40.500  -69.400
+
+Found Name and ID = 46069   Platform Id >>> 46069   33.600 -120.200
+
+Found Name and ID = 46042   Platform Id >>> 46042   36.800 -122.400
+
+Found Name and ID = 46053   Platform Id >>> 46053   34.200 -119.900
+
+Found Name and ID = 42036   Platform Id >>> 42036   28.500  -84.500
+
+Found Name and ID = 41035   Platform Id >>> 41035   34.500  -77.300
+
+Found Name and ID = 41009   Platform Id >>> 41009   28.500  -80.200
+
+Found Name and ID = 42007   Platform Id >>> 42007   30.100  -88.800
+
+Found Name and ID = 42001   Platform Id >>> 42001   25.900  -89.700
+
+Found Name and ID = 41010   Platform Id >>> 41010   29.000  -78.500
+
+Found Name and ID = 46026   Platform Id >>> 46026   37.800 -122.800
+
+Found Name and ID = 44014   Platform Id >>> 44014   36.600  -74.800
+
+Found Name and ID = 44013   Platform Id >>> 44013   42.300  -70.700
+
+Found Name and ID = 44017   Platform Id >>> 44017   40.700  -72.000
+
+Found Name and ID = 44007   Platform Id >>> 44007   43.500  -70.100
+
+Found Name and ID = 44025   Platform Id >>> 44025   40.300  -73.200
+
+Found Name and ID = 44009   Platform Id >>> 44009   38.500  -74.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   27.800  -79.900
+
+Found Name and ID = 41036   Platform Id >>> 41036   34.200  -77.000
+
+Found Name and ID = 41002   Platform Id >>> 41002   32.300  -75.400
+
+Found Name and ID = 42019   Platform Id >>> 42019   27.900  -95.400
+
+Found Name and ID = 46014   Platform Id >>> 46014   39.200 -124.000
+
+Found Name and ID = 46041   Platform Id >>> 46041   47.300 -124.700
+
+Found Name and ID = 46047   Platform Id >>> 46047   32.400 -119.500
+
+Found Name and ID = 46237   Platform Id >>> 46237   37.800 -122.600
+
+Found Name and ID = 46231   Platform Id >>> 46231   32.700 -117.400
+
+Found Name and ID = 46218   Platform Id >>> 46218   34.500 -120.800
+
+Found Name and ID = 42099   Platform Id >>> 42099   27.300  -84.200
+
+Found Name and ID = 41112   Platform Id >>> 41112   30.700  -81.300
+
+Found Name and ID = 42080   Platform Id >>> 42080   24.400  -81.900
+
+Found Name and ID = 42361   Platform Id >>> 42361   27.600  -92.500
+
+Found Name and ID = 42362   Platform Id >>> 42362   27.800  -90.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   51.500 -127.900
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   42.800  -68.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   25.800  -76.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   24.500  -86.800
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   33.600 -118.100
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   25.900 -116.400
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   25.300 -121.200
+
+Found Name and ID = 46005   Platform Id >>> 46005   46.000 -131.000
+
+Found Name and ID = 41004   Platform Id >>> 41004   32.500  -79.100
+
+Found Name and ID = 44070   Platform Id >>> 44070   41.400  -71.000
+
+Found Name and ID = 44039   Platform Id >>> 44039   41.100  -72.700
+
+Found Name and ID = 44060   Platform Id >>> 44060   41.300  -72.100
+
+Found Name and ID = 44022   Platform Id >>> 44022   40.900  -73.700
+
+Found Name and ID = 44040   Platform Id >>> 44040   41.000  -73.600
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   46.300  -63.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   32.200 -117.400
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   26.100  -80.100
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   25.700  -80.300
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   32.900 -117.300
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   25.800  -80.200
+
+Found Name and ID = 44004   Platform Id >>> 44004   38.500  -70.400
+
+Found Name and ID = 46023   Platform Id >>> 46023   34.700 -121.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   24.500 -112.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   49.000  -67.800
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   24.000  -74.900
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   48.700 -123.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   48.900 -123.600
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   27.200 -118.300
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   34.500  -66.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   43.800  -79.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   43.700  -81.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   43.300  -79.800
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   42.900  -82.400
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   49.700 -123.200
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   47.400  -61.900
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   46.200  -60.200
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   46.800  -71.200
+
+Found Name and ID = 41024   Platform Id >>> 41024   33.800  -78.500
+
+Found Name and ID = 46054   Platform Id >>> 46054   34.300 -120.400
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   45.500  -73.500
+
+Found Name and ID = 46236   Platform Id >>> 46236   36.800 -121.900
+
+Found Name and ID = 46235   Platform Id >>> 46235   32.600 -117.200
+
+Found Name and ID = 46229   Platform Id >>> 46229   43.800 -124.600
+
+Found Name and ID = 46212   Platform Id >>> 46212   46.800 -124.300
+
+Found Name and ID = 46216   Platform Id >>> 46216   34.300 -119.800
+
+Found Name and ID = 46225   Platform Id >>> 46225   32.900 -117.400
+
+Found Name and ID = 46222   Platform Id >>> 46222   33.600 -118.300
+
+Found Name and ID = 46213   Platform Id >>> 46213   40.300 -124.700
+
+Found Name and ID = 46215   Platform Id >>> 46215   35.200 -120.900
+
+Found Name and ID = 41114   Platform Id >>> 41114   27.600  -80.200
+
+Found Name and ID = 44029   Platform Id >>> 44029   42.500  -70.600
+
+Found Name and ID = 44030   Platform Id >>> 44030   43.200  -70.400
+
+Found Name and ID = 44031   Platform Id >>> 44031   43.600  -70.100
+
+Found Name and ID = 44032   Platform Id >>> 44032   43.700  -69.400
+
+Found Name and ID = 44033   Platform Id >>> 44033   44.100  -69.000
+
+Found Name and ID = 44034   Platform Id >>> 44034   44.100  -68.100
+
+Found Name and ID = 44035   Platform Id >>> 44035   44.900  -67.000
+
+Found Name and ID = 42363   Platform Id >>> 42363   28.200  -89.200
+
+Found Name and ID = 46221   Platform Id >>> 46221   33.900 -118.600
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   23.500 -116.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   32.000  -71.100
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   37.900 -123.900
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   37.400 -123.900
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   37.900  -73.600
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   48.600 -128.600
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   25.100  -84.300
+
+Found Name and ID = 44053   Platform Id >>> 44053   37.200  -76.500
+
+Found Name and ID = 46206   Platform Id >>> 46206   48.800 -126.000
+
+Found Name and ID = 44150   Platform Id >>> 44150   42.500  -64.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   26.000  -80.100
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   33.000 -117.900
+
+Found Name and ID = 44041   Platform Id >>> 44041   37.200  -76.800
+
+Found Name and ID = 44042   Platform Id >>> 44042   38.000  -76.300
+
+Found Name and ID = 41030   Platform Id >>> 41030   32.500  -79.300
+
+Found Name and ID = 41033   Platform Id >>> 41033   32.300  -80.400
+
+Found Name and ID = 46091   Platform Id >>> 46091   36.800 -121.900
+
+Found Name and ID = 46092   Platform Id >>> 46092   36.800 -122.000
+
+Found Name and ID = 46093   Platform Id >>> 46093   36.700 -122.400
+
+Found Name and ID = 44255   Platform Id >>> 44255   47.300  -57.300
+
+Found Name and ID = 46207   Platform Id >>> 46207   50.900 -129.900
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   33.000 -117.900
+
+Found Name and ID = 46131   Platform Id >>> 46131   49.900 -125.000
+
+Found Name and ID = 46132   Platform Id >>> 46132   49.700 -127.900
+
+Found Name and ID = 46204   Platform Id >>> 46204   51.400 -128.800
+
+Found Name and ID = 46146   Platform Id >>> 46146   49.300 -123.700
+
+Found Name and ID = 44258   Platform Id >>> 44258   44.500  -63.400
+
+Found Name and ID = 46036   Platform Id >>> 46036   48.400 -133.900
+
+Found Name and ID = 44137   Platform Id >>> 44137   42.200  -62.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   45.800  -84.700
+
+Found Name and ID = 46232   Platform Id >>> 46232   32.600 -117.400
+
+Found Name and ID = 46234   Platform Id >>> 46234   34.100 -119.200
+
+Found Name and ID = 44038   Platform Id >>> 44038   43.600  -66.600
+
+Found Name and ID = 44037   Platform Id >>> 44037   43.500  -67.900
+
+Found Name and ID = 44024   Platform Id >>> 44024   42.300  -65.900
+
+Found Name and ID = 44021   Platform Id >>> 44021   43.800  -69.900
+
+Found Name and ID = 46224   Platform Id >>> 46224   33.200 -117.500
+
+Found Name and ID = 46211   Platform Id >>> 46211   46.900 -124.200
+
+Found Name and ID = 46214   Platform Id >>> 46214   37.900 -123.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   24.700  -84.300
+
+Found Name and ID = 46217   Platform Id >>> 46217   34.200 -119.400
+
+Found Name and ID = 46223   Platform Id >>> 46223   33.500 -117.800
+
+Found Name and ID = 44052   Platform Id >>> 44052   37.200  -76.400
+
+Found Name and ID = 44054   Platform Id >>> 44054   38.900  -75.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   43.900  -60.200
+
+Found Name and ID = 42023   Platform Id >>> 42023   26.100  -83.100
+
+Found Name and ID = 42021   Platform Id >>> 42021   28.300  -83.300
+
+Found Name and ID = 3FOB5   Platform Id >>> 3FOB5   33.100 -118.200
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   41.000 -124.700
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   23.500  -85.500
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   32.700  -77.000
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   29.200  -67.300
+
+Found Name and ID = 44011   Platform Id >>> 44011   41.100  -66.600
+
+Found Name and ID = -7777 SHIP or TEMP MOBIL Id >   40.600 -124.600
+
+Found Name and ID = 41038   Platform Id >>> 41038   34.100  -77.700
+
+Found Name and ID = 78073 NASSAU AIRPORT / BAHAMA   25.050  -77.460
+
+Found Name and ID = 76256   EMPALME,SON. / MEXICO   27.910 -110.900
+
+Found Name and ID = 76342 MONCLOVA,COAH. / MEXICO   26.880 -101.410
+
+Found Name and ID = 76390 SALTILLO,COAH. / MEXICO   25.450 -100.980
+
+Found Name and ID = 78062 FREEPORT,GRAND BAHAMA /   26.550  -78.700
+
+Found Name and ID = 71397 GREENWOOD,N.S. / CANADA   44.980  -64.910
+
+Found Name and ID = 71400    BADGER,NFLD / CANADA   48.960  -56.060
+
+Found Name and ID = 71411 WESTERN HEAD, N.S. / CA   43.980  -64.660
+
+Found Name and ID = 71430 POINT PETRE, ONT. / CAN   43.830  -77.150
+
+Found Name and ID = 71431  COBOURG, ONT. / CANADA   43.950  -78.160
+
+Found Name and ID = 71435    UPSALA,ONT. / CANADA   49.030  -90.460
+
+Found Name and ID = 71441    GRETNA,MAN. / CANADA   49.030  -97.560
+
+Found Name and ID = 71444 WASAGAMING, MAN. / CANA   50.650  -99.930
+
+Found Name and ID = 71474  CLINTON, B.C. / CANADA   51.150 -121.500
+
+Found Name and ID = 71510 ROSETOWN EAST,SASK / CA   51.560 -107.910
+
+Found Name and ID = 71538  WINDSOR, ONT. / CANADA   42.260  -82.960
+
+Found Name and ID = 71600 SABLE ISLAND,N.S. / CAN   43.930  -60.010
+
+Found Name and ID = 71821 MATAGAMI, QUE. / CANADA   49.760  -77.810
+
+Found Name and ID = 71822 CHIBOUGAMAU-CHAPAIS, QU   49.760  -74.530
+
+...
+... 17,500 more lines...
+...
