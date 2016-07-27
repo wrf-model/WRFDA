@@ -173,7 +173,7 @@ a:active {
               </blockquote>
               <p>You should see 44 executables: 43 in the var/build/ directory, plus var/obsproc/src/obsproc.exe. The most important of these is var/build/da_wrfvar.exe; this is the main WRFDA executable.</p>
               </blockquote>
-            <p class="pagetitle"><a name="CLOUDCV"><a name="cloudy_radiance"></a>Cloudy radiance code</p>
+            <p class="pagetitle"><a name="cloudy_radiance"></a>Cloudy radiance code</p>
             <blockquote>
                 <p>The code for the <a href="cloudy_rad.html">cloudy radiance exercise</a> is not yet available in the latest release version of WRFDA (version 3.8, which is used for most classroom exercises). However, we currently have a separate beta release of the code with the cloudy radiance capabilities included. This section will instruct you on how to download and install that code</p>
               <p>Get the zipped tar file from /kumquat/wrfhelp/SOURCE_CODE, or download it from <a href=http://www2.mmm.ucar.edu/wrf/users/wrfda/beta.html>the WRFDA Users' website</a>.</p>
@@ -183,13 +183,29 @@ a:active {
                 <p class="stylecode">tar -zxf WRFDA_V38_cloudy_radiance_beta.tar.gz</p>
                 <p class="stylecode">cd WRFDA_CR</p>
               </blockquote>
+              <p> Configure and compile the code the same way you did above, and check for successful compilation before using the code.</p>
+
+            </blockquote>
+            <p class="pagetitle"><a name="CLOUDCV"></a>The CLOUD_CV option</p>
+            <blockquote>
+              <p>For some exercises, you will need additional control variables to properly handle moisture variables. For these exercises you'll have to compile the code  
+              <p>Get the WRFDA zipped tar file from <em>/kumquat/wrfhelp/SOURCE_CODE</em> if you haven't already</p>
+              <blockquote>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.8.tar.gz .</p>
+              </blockquote>
+              <p>Since a directory named WRFDA already exists, create a new one and extract the WRFDA <a href=https://en.wikipedia.org/wiki/Tar_%28computing%29>tarball</a> there</p>
+              <blockquote>
+                <p class="stylecode">mkdir -p WRFDA_CLOUDCV</p>
+                <p class="stylecode">tar -zxf WRFDA_V3.8.tar.gz -C WRFDA_CLOUDCV --strip-components=1</p>
+                <p class="stylecode">cd WRFDA_CLOUDCV</p>
+              </blockquote>
               <p>Follow all the steps above prior to running the configure script. Then set the CLOUD_CV environment variable:</p>
               <blockquote>
                 <p class="stylecode">setenv CLOUD_CV 1</p>
               </blockquote>
               <p>This will make the code compile with the extra moisture control variable options enabled. Note that this will result in slower code even if you are not using the CLOUD_CV control variable options, so it is recommended that you only use this code for experiments that are using the CLOUD_CV moisture control variables!</p>
               <p> Configure and compile the code the same way you did above, and check for successful compilation before using the code.</p>
-
 
 
               <p class="stylecode">&nbsp;</p>
