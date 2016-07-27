@@ -54,11 +54,8 @@ a:active {
               <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA</span>&nbsp;&nbsp;&nbsp; (your main working directory)<br>
                 <span class="stylecode">cd /kumquat/users/${USER}/DA</span><br>
                 <span class="stylecode">cp /kumquat/wrfhelp/PRE_COMPILED/WRFDA/WRFDA_compiled.tar.gz . </span><br>
-                <span class="stylecode">tar -xzf WRFDA_3DVAR_compiled.tar.gz</span></p>
+                <span class="stylecode">tar -xzf WRFDA_compiled.tar.gz</span></p>
               <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA code. This WRFDA package is pre-compiled to run in parallel (dmpar) mode using the GNU compiler (gfortran/gcc 4.9.2). It was compiled with the 4DVAR capability, and so can be run for both 3DVAR and 4DVAR exercises</p>
-              <p>The command for running dmpar jobs on the classroom machines is</p>
-              <p class="stylecode">mpirun -np 6 ${your_exe_file}</p>
-              <p>Note: In the pre-compiled tar file, the WRFDA TOOLS scripts (can be downloaded separately from <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html" target="_blank">http://www.mmm.ucar.edu/wrf/users/wrfda/download/tools.html</a>) are already included.<br>
               </p>
             </blockquote>
 <!--            <span class="bodyh1"><a name="4dvar">Pre-compiled code for 4DVAR</span>
