@@ -42,7 +42,7 @@ a:active {
         <tr> 
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <p><span class="pagetitle">Observation Preprocessing</span></p>
-              <p>The goal of this session is to generate the observation input (i.e. the <em>y</em><sup>0</sup> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.</p>
+              <p>The goal of this session is to generate the observation input (i.e. the <em>y</em><sup>0</sup> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA with conventional observations.</p>
               <p class="body">Reference: <a href="../docs/WRFDA_Observations.pdf">Download the tutorial presentation</a><p><br>
             <p class="bodyh2"><a name="advanced">OBSPROC for 3DVAR</a></p>
               <span class="bodyh1">Source code</span>
@@ -181,7 +181,7 @@ a:active {
                 <blockquote><p class="stylecode">ncl plot_ob_ascii_loc.ncl</p></blockquote>
               <p>View the plot using <span class="stylecode">display</span>. Use spacebar to scroll through the plots of different observation types.</p>
                 <blockquote><p class="stylecode">display obsloc2008020512.pdf</p></blockquote></td>
-                    <td class="bodytext"><a href="images/obsloc2008020512.png"><img src="images/obsloc2008020512.png" alt="Locations of METAR observations for tutorial case" height="300"></a></td>
+                    <td class="bodytext"><a href="images/obsloc2008020512.png"><img src="images/obsloc2008020512.png" alt="Locations of METAR observations for tutorial case"></a></td>
                   </tr>
                 </table>
             </blockquote>
@@ -285,16 +285,22 @@ a:active {
                   <p class="stylecode">./obsproc.exe</p>
                 </blockquote>
               <p>On the classroom computers, running this exercise should take about a minute.</p>
-              <p>This time, you should see several observation files in your working directory:. That is the main output from obsproc. You can open it using a text editor to check its content; <a href="obs_gts_2008-02-05_12:00:00.3DVAR.txt">it should look similar to this</a>.</p>
-              <p>You will also see the same <span class="stylecode">*.diag</span> diagnostic files. The only difference is there will now be 7 duplicate time log files rather than one.</p>
-            <blockquote>
+              <p>This time, you should see several observation files in your working directory:</p>
+                <blockquote>
+                  <p class="stylecode">> ls *4DVAR</p>
+                  <p class="stylecode">obs_gts_2005-07-16_00:00:00.4DVAR &nbsp;obs_gts_2005-07-16_03:00:00.4DVAR &nbsp;obs_gts_2005-07-16_06:00:00.4DVAR<br>
+                  obs_gts_2005-07-16_01:00:00.4DVAR &nbsp;obs_gts_2005-07-16_04:00:00.4DVAR<br>
+                  obs_gts_2005-07-16_02:00:00.4DVAR &nbsp;obs_gts_2005-07-16_05:00:00.4DVAR</p>
+                </blockquote>
+              <p>These are the output observation files from obsproc, one for each time window. You can open them using a text editor; <a href="obs_gts_2005-07-16_00:00:00.4DVAR.txt">they should look similar to this</a>. Note that the off-hour observation files (<em>i.e.</em>, not 00z, 06z, 12z, or 18z) have fewer observations, since many regular observations are only taken at those times.</p>
+              <p>You will also see the same <span class="stylecode">*.diag</span> diagnostic files as with the 3DVAR case. The only difference is there will now be 7 duplicate time log files rather than one.</p>
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr style="vertical-align: top;">
                     <td>You can use the same NCL script as above (<em>/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/plot_ob_ascii_loc.ncl</em>), to see the locations of observations contained in each of your observation files. Copy plot_ob_ascii_loc.ncl to your working directory, then edit it to provide the date, filenames and options for this case.</p>
               <blockquote>
                 <p class="stylecode">......<br>
                 date = &quot;2005071600&quot;<br>
-                obfile = &quot;obs_gts_2005-07-16_00:00:00.4DVAR&quot;; (or obs_gts_2005-07-16_01:00:00.4DVAR, obs_gts_2005-07-16_02:00:00.4DVAR, etc.<br>
+                obfile = &quot;obs_gts_2005-07-16_00:00:00.4DVAR&quot;; (or obs_gts_2005-07-16_01:00:00.4DVAR, obs_gts_2005-07-16_02:00:00.4DVAR, etc.)<br>
                 fgfile = &quot;/kumquat/wrfhelp/DATA/WRFDA/4dvar/rc/2005071600/wrfinput_d01&quot;   ; for retrieving mapping info<br>
                 out_type = &quot;pdf&quot;<br>
                 plotname = &quot;./obsloc&quot;+date<br>
@@ -302,10 +308,9 @@ a:active {
               </blockquote>
               <p>Run the NCL script, then view it using <span class="stylecode">display</span>. You should see plots similar to the one seen at right.</p>
                 </blockquote></td>
-                    <td class="bodytext"><a href="images/obsloc2005071600-0.png"><img src="images/obsloc2005071600-0.png" alt="Locations of METAR observations for tutorial case" height="300"></a></td>
+                    <td class="bodytext"><a href="images/obsloc2005071600-2.png"><img src="images/obsloc2005071600-2.png" alt="Locations of METAR observations for tutorial case"></a></td>
                   </tr>
                 </table>
-            </blockquote>
 
 
 
@@ -313,7 +318,7 @@ a:active {
             <p class="bodyh2"><a name="advanced">Additional practice</a></p>
             <p>Reference the <a href="../docs/WRFDA_Observations.pdf">tutorial presentation</a> and the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/usersguide.html">User's Guide</a> for instructions on the exercises below:</p>
             <ul>
-              <li>Try preparing observation data for FGAT.</li>
+              <li>Try preparing observation data for FGAT for either domain.</li>
             </ul>
             <ul>
               <li>Set up any other domain of your interest, or some domains you have used for <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class_July2015/wps_arw.php">WRF practice</a>. Use the command "ncdump -h" on any WRF file to find out the appropriate domain settings.<br>
