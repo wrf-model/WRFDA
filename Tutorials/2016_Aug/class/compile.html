@@ -43,16 +43,18 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
               <table align=center width="90%" border="1" cellpadding="10">
                 <tr>
-                  <td class="body">NOTE: The pre-compiled code provided for you has the WRFDA TOOLS package already loaded under var/scripts and var/graphics. The source code does not contain these files, so you should get them from /kumquat/wrfhelp/DATA/WRFDA/WRFDA_tools.tar.gz</td>
-                </tr>
+<!--                  <td class="body">NOTE: The pre-compiled code provided for you has the WRFDA TOOLS package already loaded under var/scripts and var/graphics. The source code does not contain these files, so you should get them from /kumquat/wrfhelp/DATA/WRFDA/WRFDA_tools.tar.gz</td>-->
+              <td class="body">This page contains directions on how to compile the code, so you'll be ready to try it yourself when you get home. <b>We don't recommend using code you've compiled yourself for the classroom exercises; use <a href=wrfda_code.html>pre-compiled code</a> instead.</b> </td>
+              </tr>
               </table>
             <p>&nbsp;</p>
             <p class="pagetitle"><a name="compile_3dvar"></a>Compiling WRFDA for 3DVAR</p>
             <p class="body">Reference: <a href="../docs/WRFDA_Software_Compilation.pdf">Download the tutorial presentation</a><p>
             <blockquote>
-              <p>Get the WRFDA zipped tar file from <em>/kumquat/wrfhelp/SOURCE_CODE</em></p>
+              <p>Create a new directory for practicing compilation, then get the WRFDA zipped tar file from <em>/kumquat/wrfhelp/SOURCE_CODE</em></p>
               <blockquote>
-                <p class="stylecode">cd /kumquat/users/${USER}/DA</p>
+                <p class="stylecode">mkdir -p /kumquat/users/${USER}/DA/compile</p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/compile</p>
                 <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.8.tar.gz .</p>
               </blockquote>
               <p>Unzip and untar the file:</p>
@@ -61,7 +63,7 @@ a:active {
               </blockquote>
               <p>Using <span class="stylecode">ls</span>, you should now see the directory <em>WRFDA</em>, which contains the WRFDA source code. Enter that directory</p>
               <blockquote>
-                <p class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</p>
+                <p class="stylecode">cd WRFDA</p>
               </blockquote>
               <p>To reduce compilation time you can compile in parallel (this is a separate process from deciding to <b>run</b> WRFDA in serial or parallel mode). You can do this by setting the environment variable J="-j #", where "#" is the number of processors.</p>
               <blockquote>
@@ -101,7 +103,7 @@ a:active {
               <p>WRFPLUS contains both the non-linear and the tangent-linear/adjoint WRF code. It is needed for 4DVAR and Forecast Sensitivity to Observations (FSO).</p>
               <p>Get the WRFPLUS zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
-                <p class="stylecode">cd /kumquat/users/$USER/DA</p>
+                <p class="stylecode">cd /kumquat/users/$USER/DA/compile</p>
                 <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFPLUS_V3.8.tar.gz .</p>
               </blockquote>
               <p>Set "J" to compile in parallel</p>
@@ -111,7 +113,7 @@ a:active {
               <p>Unzip and untar the file, then enter the directory</p>
               <blockquote>
                 <p class="stylecode">tar -zxf WRFPLUS_V3.8.tar.gz</p>
-                <p class="stylecode">cd /kumquat/users/$USER/DA/WRFPLUSV3 </p>
+                <p class="stylecode">cd WRFPLUSV3 </p>
               </blockquote>
               <p>Configure and compile the WRFPLUS code. WRFPLUS does not need to be built with any external libraries except for netCDF, which should already be set in the classroom environment under the environment variable <span class="stylecode">$NETCDF</span></p>
               <blockquote>
@@ -130,15 +132,15 @@ a:active {
               <p>To compile WRFDA for 4DVAR, you should have already compiled WRFPLUS (see <a href=#compile_wrfplus>above</a>).</p>
               <p>Get the WRFDA zipped tar file from /kumquat/wrfhelp/SOURCE_CODE</p>
               <blockquote>
-                <p class="stylecode">cd /kumquat/users/$USER/DA</p>
+                <p class="stylecode">cd /kumquat/users/$USER/DA/compile</p>
                 <p class="stylecode">cp /kumquat/wrfhelp/SOURCE_CODE/WRFDA_V3.8.tar.gz .</p>
                 <p><i>If you have already built WRFDA in this directory for 3DVAR, be sure to rename that directory first.</i></p>
-                <p class="stylecode">mv /kumquat/users/$USER/DA/WRFDA /kumquat/users/$USER/DA/WRFDA_3DVAR</p>
+                <p class="stylecode">mv WRFDA WRFDA_3DVAR</p>
               </blockquote>
               <p>Unzip and untar the file, then enter the <span class="stylecode">WRFDA</span> directory</p>
               <blockquote>
                 <p class="stylecode">tar -zxf WRFDA_V3.8.tar.gz </p>
-                <p class="stylecode">cd /kumquat/users/${USER}/DA/WRFDA</p>
+                <p class="stylecode">cd WRFDA</p>
               </blockquote>
               <p>As with 3DVAR and WRFPLUS, to reduce compilation time you can compile in parallel.</p>
               <blockquote>
@@ -155,7 +157,7 @@ a:active {
               </blockquote>
               <p>Finally, to compile WRFDA for 4DVAR, you'll have to specify the location of the WRFPLUS code. Set the environment variable WRFPLUS_DIR to point to the WRFPLUS build you just installed.</p>
               <blockquote>
-                <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/WRFPLUSV3</p>
+                <p class="stylecode">setenv WRFPLUS_DIR /kumquat/users/$USER/DA/compile/WRFPLUSV3</p>
               </blockquote>
               <p>Configure and Compile for 4DVAR (note the different "configure" command):</p>
               <blockquote>
