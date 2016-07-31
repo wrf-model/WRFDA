@@ -160,7 +160,7 @@ PlainStyle,
 ,"Exercises","show-menu=Exercises",,,0
 ,"Data&Code","show-menu=Data&Code",,,0
 ,"Feedback ","../survey.html",,,0
-,"WRF Basic","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class_July2015/index.php",,,0
+,"WRF Basic","http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class_July2016/index.php",,,0
 ])
 
 
