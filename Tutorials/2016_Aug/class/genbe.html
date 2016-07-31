@@ -90,27 +90,35 @@ a:active {
                     export END_DATE=2008020912 &nbsp; # the last perturbation valid date<br>
                     export NUM_LEVELS=40 &nbsp; &nbsp; &nbsp; &nbsp; # e_vert -1<br>
                     export BE_METHOD=NMC<br>
+                    export FCST_RANGE=12<br>
                     export FC_DIR=/kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc<br>
-                    export RUN_DIR=/kumquat/users/${USER}/DA/gen_be/workdir<br>
+                    export RUN_DIR=`pwd`/gen_be${BIN_TYPE}_cv${NL_CV_OPTIONS}<br>
                     export DOMAIN=01<br>
                     export FCST_RANGE1=24<br>
+                    export FCST_RANGE2=12<br>
                     export INTERVAL=12<br>
                     export STRIDE=1</p>
+                    export NOCOLONS=false</p>
                 </blockquote>
                 <p>FC_DIR specifies the directory where the WRF forecast files (wrfout*) reside. Observe the directory structure and how the wrfout files are stored. To generate your own BE file for your own case and domain in the future, you will need to prepare and arrange your wrfout files in the same way (for example, 2008020512/wrfout_d01_2008-02-06_12:00:00; 2008020512 is the initial time, wrfout_d01_2008-02-06_12:00:00 is the 24-hour forecast valid at 2008020612).</p>
-                <p>NL_CV_OPTIONS specifies the control variable option. 5 is for the default wind control variables (psi and chi_u). 7 is for the new option in WRFDA 3.7, which uses u and v as the wind control variables.</p> 
+                <p>NL_CV_OPTIONS specifies the control variable option. 5 is for the default wind control variables (psi and chi_u). 7 is for the new CV7 option, which uses u and v as the wind control variables.</p> 
               </blockquote>
               <p><span class="bodyh1">Run gen_be_wrapper.ksh</span></p>
               <blockquote>
                 <blockquote>
-                  <p class="stylecode">./gen_be_wrapper.ksh &gt;&amp; gen_be.log</p>
+                  <p class="stylecode">./gen_be_wrapper.ksh</p>
                 </blockquote>
                 <p>With these settings, the script should run in about 2 minutes on classroom computers.</p>
               </blockquote>
               <p><span class="bodyh1">Check output</span>
               </p>
+              <table align=center width="90%" border="1" cellpadding="10">
+                <tr>
+                  <td class="style8"><p><b>NOTE:</b> If you see this error message while the script is running <br><kbd><br>/kumquat/users/class103/DA/WRFDA/var/scripts/gen_be/gen_be_stage0_wrf.ksh[59]: .false.: not found [No such file or directory]<br></kbd><br>it can be safely ignored. This is due to a bug that does not affect results and will be fixed in the next release.</p></td>
+                </tr>
+              </table>
               <blockquote>
-                <p>View the log file (gen_be.log) to ensure that all stages (stage0_wrf, stage1, stage2, stage2a, stage3, stage4, gen_be_cov2d) have been run successfully.</p>
+                <p>You should see the following messages as the script runs:</p>
                 <table width="100%" border="1" cellpadding="10">
                   <tr>
                     <td><p class="stylecode">Thu Jul 30 20:02:32 MDT 2015 Start<br>
@@ -205,10 +213,14 @@ a:active {
                   export NUM_LEVELS=40 # 1 point less than stagger points 41<br>
                   export RESOLUTION=60.0  # km<br>
                   export REGION=tutorial     # only for naming output purpose<br>
-                  export BE_DIR=/kumquat/users/${USER}/DA/gen_be/workdir/working<br>
+                  export BE_DIR=/kumquat/users/${USER}/DA/gen_be/gen_be5_cv5/working<br>
                   export BE_NROW=$NUM_LEVELS</p>
+                </blockquote>
+                <p>then run the script</p>
+                <blockquote>
                 <p class="stylecode">./gen_be_plot_wrapper.ksh </p>
-                <p>This wrapper script will create 6 plot files (the "tutorial" part of the name is what you specified for "REGION" in the wrapper script):</p>
+                </blockquote>
+                <p>This wrapper script will create 6 plot files (the "tutorial" part of each file name is what you specified for "REGION" in the wrapper script):</p>
                 <ul>
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr style="vertical-align: top;">
@@ -255,7 +267,7 @@ a:active {
                   </tr>
                 </table>
               </blockquote>
-              <p>If this was successful, you can <a href="wrfda_sessions.html#session_1">continue to the next practice case</a>.</p>
+              <p>If this was successful, you can <a href="wrfda_sessions.html#session_3">continue to the next practice case</a>.</p>
             </blockquote>
             <span class="bodyh1"><a name="advanced">Additional practice</span>
             <blockquote>

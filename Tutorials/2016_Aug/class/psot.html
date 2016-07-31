@@ -61,7 +61,7 @@ a:active {
                 <p>The setup for a pseduo-observation test is the same as <a href="3dvar.html">running WRFDA-3DVAR with real data</a> (except that the observation file ob.ascii is not required):</p>
                 <blockquote>
                   <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL <br>
-                  ln -fs /kumquat/users/${USER}/DA/gen_be/workdir/be.dat ./be.dat <br>
+                  ln -fs /kumquat/users/${USER}/DA/gen_be/gen_be5_cv5/be.dat ./be.dat <br>
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/CONUS60/rc/2008020512/wrfinput_d01 ./fg <br>
                 </blockquote>
               </blockquote>
@@ -88,7 +88,10 @@ a:active {
               </blockquote>
               <p><span class="bodyh1">Run WRFDA (da_wrfvar.exe)</span> </p>
               <blockquote>
-                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+                <p>The pseudo-single ob test takes very little memory to run compared to a real-data assimilation run, so we can just run it on a single processor:
+                <blockquote>
+                <p class="stylecode">mpirun -np 1 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+                </blockquote>
               </blockquote>
               <p><span class="bodyh1">Check output</span>          </p>
               <blockquote>
@@ -104,42 +107,39 @@ a:active {
                   </tr>
                 </table>
               </blockquote>
-              <span class="bodyh1">Graphics</span>
-              <blockquote>
+              <p><span class="bodyh1">Graphics</span></p>
                 <table border="0" cellpadding="0" cellspacing="0">
                   <tr style="vertical-align: top;">
-                    <td>Use <span class="stylecode">ncdiff</span> and <span class="stylecode">ncview</span> to generate and view the analysis increment file.<br><br>
-                <p>Some useful NCL scripts for this exercise are:<br>
-                  <br>
-                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF-Var_plot.ncl<br>
-                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF_contributed.ncl.test<br>
-                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_xy_auto.ncl<br>
-                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_xz_auto.ncl<br>
-                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_yz_auto.ncl<br>
-                  /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_h.ncl
-                </p>
-                <p>The plot at right was generated using psot_h.ncl using the following settings:</p>
-                <blockquote>
-                  <p class="stylecode">   works = "pdf"<br>
-                    expt = ""<br>
-                    directory = "/kumquat/users/$USER/DA/singleob/"<br>
-                    first_guess     = addfile(directory+"fg.nc", "r")<br>
-                    analysis        = addfile(directory+"wrfvar_output.nc", "r")<br>
-                    kl=12
-                  </p>
-                </blockquote>
-                <p>Using these settings as a guide, try out the other scripts listed above.</p>
+                    <td><blockquote><p>Some useful NCL scripts for this exercise are:<br>
+                      <br>
+                      /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF-Var_plot.ncl<br>
+                      /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/WRF_contributed.ncl.test<br>
+                      /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_xy_auto.ncl<br>
+                      /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_xz_auto.ncl<br>
+                      /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_yz_auto.ncl<br>
+                      /kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl/psot_h.ncl
+                    </p>
+                    <p>The plot at right was generated using psot_h.ncl using the following settings:</p>
+                    <blockquote>
+                      <p class="stylecode">   works = "pdf"<br>
+                        expt = ""<br>
+                        directory = "/kumquat/users/$USER/DA/singleob/"<br>
+                        first_guess     = addfile(directory+"fg.nc", "r")<br>
+                        analysis        = addfile(directory+"wrfvar_output.nc", "r")<br>
+                        kl=12
+                      </p>
+                    </blockquote>
+                    <p>Using these settings as a guide, try out the other scripts listed above.</p>
+                    </blockquote></td>
                     <td class="bodytext"><a href="images/psot_h.png"><img src="images/psot_h.png" height="300"></a></td>
                   </tr>
                 </table>
-              </blockquote>
-            </blockquote>
-            <blockquote>
-              <span class="bodyh1">Other practice</span>
+              <p><span class="bodyh1">Other practice</span></p>
+                    <p>Run single ob test with the following additional parameters. All of these can be used on real data runs as well, but it's easier to see their exact effects in the single-ob test.</p>
               <ul>
                 <li>Response of BE length scaling parameters
                   <blockquote>
-                    <p>Run single ob test with the following additional parameters</p>
+                    <p>The following settings reduce the background error length scale by 50%. How would you expect the plots above to change?</p>
                     <p><span class="stylecode">vi namelist.input</span> (reduce length scale by 50%)</p>
                     <p class="stylecode">&amp;wrfvar7<br>
                       len_scaling1 = 0.5<br>
@@ -148,6 +148,7 @@ a:active {
                       len_scaling4 = 0.5<br>
                       len_scaling5 = 0.5<br>
                       /</p>
+                    <p><a href="images/psot_ncview.P.length50.png">Here is the plot of the pressure perturbation with these settings and 'u' as the test variable</a>. Is this the impact you expected?</p>
                   </blockquote>
                 </li>
                 <li>Response of changing BE variances
@@ -161,12 +162,9 @@ a:active {
                       var_scaling4 = 0.25<br>
                       var_scaling5 = 0.25<br>
                       / </p>
+                    <p><a href="images/psot_ncview.P.length50.var25.png">Here is the plot of the pressure perturbation with these settings and 'u' as the test variable</a>. Is this the impact you expected? (hint: check the range of P in the legend)</p>
                 </li>
-                <p>If this was successful, you have reached the end of the basic day 1 exercises! If you have extra time remaining, there are some more exercises you can try:</p>
-                <blockquote>
-                  <li>Try the additional exercises from <a href="wrfda_sessions.html#session_1">the day 1 practice session</a>; they can be found at the bottom of each page<br><br></li>
-                  <li>Try <a href="compile.html">compiling WRFDA yourself</a></li>
-                </blockquote>
+              <p>If this was successful, you can <a href="wrfda_sessions.html#session_3">continue to the next practice case</a>. </p>
               </ul>
             </blockquote>
             <span class="bodyh1"><a name="advanced">Additional practice</span>
