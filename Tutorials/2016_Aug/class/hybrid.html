@@ -71,18 +71,18 @@ a:active {
                     <p>Usually, the first step of hybrid data assimilation is to prepare a set of ensembles.<br>
                       For this practice, a set of 10-member ensemble forecasts is provided under /kumquat/wrfhelp/DATA/WRFDA/Hybrid/fc directory.</p>
                     <p>Hybrid/fc/2006102712/<br>
-                      -rw-r--r-- 1 wrfhelp cbet 30091104 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e001<br>
-                      -rw-r--r-- 1 wrfhelp cbet 36580804 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e002<br>
-                      -rw-r--r-- 1 wrfhelp cbet 29932828 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e003<br>
-                      -rw-r--r-- 1 wrfhelp cbet 36422528 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e004<br>
-                      -rw-r--r-- 1 wrfhelp cbet 34259292 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e005<br>
-                      -rw-r--r-- 1 wrfhelp cbet 34259292 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e006<br>
-                      -rw-r--r-- 1 wrfhelp cbet 36739080 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e007<br>
-                      -rw-r--r-- 1 wrfhelp cbet 38902324 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e008<br>
-                      -rw-r--r-- 1 wrfhelp cbet 38902324 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e009<br>
-                      -rw-r--r-- 1 wrfhelp cbet 38902320 Oct 14  2008 wrfout_d01_2006-10-28_00:00:00.e010<br>
-                      -rw-r--r-- 1 wrfhelp cbet 30091104 Jan 20  2009 wrfout_d01_2006-10-28_00:00:00.mean<br>
-                    -rw-r--r-- 1 wrfhelp cbet 30091104 Jan 20  2009 wrfout_d01_2006-10-28_00:00:00.vari</p>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e001<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e002<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e003<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e004<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e005<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e006<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e007<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e008<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e009<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.e010<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.mean<br>
+                      -rw-r--r-- 1 wrfhelp nobody 36059392 Aug 11  2015 wrfout_d01_2006-10-28_00:00:00.vari</p>
                     <p>2006102712/wrfout_d01_2006-10-28_00:00:00.e* are ensemble forecasts valid at 2006102800 initialized at 2006102712.</p>
                     <p>wrfout_d01_2006-10-28_00:00:00.mean and wrfout_d01_2006-10-28_00:00:00.vari are two template files that will be overwritten by a program that calculates ensemble mean from ensemble forecasts.</p>
                   </blockquote>
@@ -136,10 +136,8 @@ a:active {
                   </blockquote>
                   <p>This script displays the mean and standard deviation for the ensemble at a single level for a single variable. You can change the level and variable by changing these lines a bit further down in the script:</p>
                   <blockquote>
-                    <p class="stylecode">kl = 24<br>
-                    <br>
-                    f1 = file1-&gt;U    ; ens_mean<br>
-                    f2 = file2-&gt;U    ; variance from the file</p>
+                    <p class="stylecode">var = "U"<br>
+                    kl = 24</p>
                   </blockquote>
                   <p>V, W, T, P, and QVAPOR are some other interesting fields to look at.</p>
                 </blockquote>
@@ -182,6 +180,12 @@ a:active {
                     <p class="stylecode">ncl ens_perturbations.ncl<br>
                       display ens_perturbations.pdf </p>
                   </blockquote>
+                  <p>Again, you can modify the script to look at different vertical levels and variables by changing these settings:</p>
+                  <blockquote>
+                    <p class="stylecode">var = "U"<br>
+                    kl = 32</p>
+                  </blockquote>
+                  <p>Depending on what variable you display, you may have to change the color contour settings "cont_min", "cont_max", and "cont_spacing" as well to get a nice-looking plot.</p>
                 </blockquote>
               </blockquote>
               <span class="bodyh1">Run WRFDA in hybrid mode</span>
@@ -227,7 +231,7 @@ a:active {
                           &amp;wrfvar19<br>
                           pseudo_var = 'u'<br>
                           /</p>
-                      <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+                      <p class="stylecode">mpirun -np 1 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
                       <p class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
                         ncview increment.nc</p>
                       </blockquote>
@@ -236,28 +240,11 @@ a:active {
                     <td class="bodytext"><a href="images/hybrid_psot_u.P.png"><img src="images/hybrid_psot_u.P.png" alt="Pressure perturbation from PSOT with the above settings." height="300"></a></td>
                   </tr>
                 </table>
-                <p>Do a pseudo-single obs test (PSOT) like we learned in <a href="psot.html">a previous exercise</a>. Edit the following namelist options to run the test:</p>
-                <blockquote>
-                  <p class="stylecode">&amp;wrfvar15<br>
-                    num_pseudo = 1,<br>
-                    pseudo_x = 50.0,<br>
-                    pseudo_y = 50.0,<br>
-                    pseudo_z = 10.0,<br>
-                    pseudo_err = 1.0,<br>
-                    pseudo_val = 1.0,<br>
-                    /<br>
-                    . . .<br>
-                    &amp;wrfvar19<br>
-                    pseudo_var = 'u'<br>
-                    /</p>
-                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
-                <p class="stylecode">ncdiff -v U,V,T,QVAPOR,MU,P,PSFC wrfvar_output fg increment.nc<br>
-                  ncview increment.nc</p>
-                </blockquote>
+                <p>&nbsp;</p>
                 <p>Try different settings like the ones below, then run a PSOT to see how they influence the background error statistics.</p>
                 <blockquote>
                   <p>                    Ensemble covariance weighting factor (je): try<br>
-                    <span class="stylecode">je_factor = 10.0</span> (note that jb = je_factor/(je_factor - 1), and hence jb = 1.11)<br>
+                    <span class="stylecode">je_factor = 10.0</span> (jb = je_factor/(je_factor - 1), so jb = 1.11 in this example)<br>
                     <span class="stylecode">je_factor = 1.25</span> (jb = 5)<br>
                     <span class="stylecode">je_factor = 1.1</span> (jb = 11)</p>
                   <p>Hybrid covariance localization scale (alpha_corr_scale): try<br>
@@ -265,7 +252,7 @@ a:active {
                     <span class="stylecode">alpha_corr_scale = 1500.0</span></p>
                 </blockquote>
                 <p>Try setting ensdim_alpha = 0, and compare the results.</p>
-                <p class=body>You have now completed the WRFDA hybrid assimilation tutorial. You can now <a href="wrfda_sessions.html#session_3">move on to the next exercise</a>.</p>
+                <p class=body>You have now completed the WRFDA hybrid assimilation tutorial. You can now <a href="wrfda_sessions.html#session_4">move on to the next exercise</a>.</p>
                 <p>&nbsp;</p>
               </blockquote>
             </blockquote>
