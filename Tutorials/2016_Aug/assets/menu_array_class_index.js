@@ -385,7 +385,8 @@ PlainStyle2,
 0,
 ,
 ,"4DVAR ","class/4dvar.html",,,1
-,"Hybrid DA ","class/hybrid.html",,,0
+,"Hybrid DA ","class/hybrid.html",,,1
+,"Tools/Verification ","class/tools.html",,,0
 ])
 
 addmenu(menu=[
@@ -410,7 +411,6 @@ PlainStyle2,
 ,
 0,
 ,
-,"Tools/Verification ","class/tools.html",,,1
 ,"WRFDA/WRF Cycling ","class/cycling.html",,,1
 ,"FSO ","class/fso.html",,,0
 ])
