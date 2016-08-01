@@ -200,6 +200,7 @@ a:active {
                     /<br>
                     &amp;physics<br>
                     sf_surface_physics = 2,<br>
+                    num_land_cat = 24,<br>
                     /<br>
                     &amp;scm<br>
                     /<br>
@@ -240,7 +241,8 @@ a:active {
                   <tr style="vertical-align: top;">
                     <td>
                 <p>The script <em>/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh</em> can be used to generate a number of helpful plots and graphs for visualizing radiance assimilation statistics.</p>
-                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh<br>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh .</p>
+                <p class="stylecode">vi da_rad_diags.ksh<br>
                   export START_DATE=2013122300<br>
                   export END_DATE=2013122300<br>
                   export CYCLE_PERIOD=12<br>
@@ -248,6 +250,7 @@ a:active {
                   export NUM_PROCS=6  # number of processors used in running WRFDA<br>
                   export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
                   export BUILD_DIR=${WRFVAR_DIR}/var/build<br>
+                  export TOOLS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS<br>
                   export EXP_DIR=/kumquat/users/${USER}/DA/radiance<br>
                   export VAR_RUN_DIR1=$EXP_DIR<br>
                   export VAR_RUN_DIR2=none<br>
@@ -256,17 +259,18 @@ a:active {
                   export FGFILE=$VAR_RUN_DIR1/fg<br>
                   ...<br>
                   export FILE_PREFIX=01_oma<br>
-                  set -A INSTIDS noaa-16-amsua noaa-16-amsub</p>
-                <p>Also change the following line (around line 150):
-                  ln -sf $VAR_RUN_DIR1/$DATE/$FILE_PREFIX* .  --&gt;  ln -sf $VAR_RUN_DIR1/$FILE_PREFIX* .
-                <p>A number of plots with the file extention ".ncgm" will be created in the "diag" directory. Use the command "idt" to view these .ncgm files. The plot at right shows the observed values for AMSU-A Channel 5 on NOAA-16 (after thinning was applied); you should see many plots just like this for other channels and instruments.</p>
+                  set -A INSTIDS noaa-19-amsua<br>
+                  ...<br>
+                  export $FULL_FILE_PREFIX=$VAR_RUN_DIR1/$FILE_PREFIX</p>
+
+                <p>After changing all the above settings, run the script. A number of plots with the file extention ".ncgm" will be created in the "diag" directory. Use the command "idt" to view these .ncgm files. The plot at right shows the observed values for AMSU-A Channel 5 on NOAA-16 (after thinning was applied); you should see many plots just like this for other channels and instruments.</p>
                     </td>
                     <td class="bodytext"><a href="images/noaa-16-amsua_2013122300-0.png"><img src="images/noaa-16-amsua_2013122300-0.png" height="300"></a></td>
                   </tr>
                 </table>
-                <p class="body"><br>You have now completed the basic radiance tutorial! You can either <a href="wrfda_sessions.html#session_2">move on to the next exercise</a>, or try the additional practice below:</p>
+                <p class="body"><br>You have now completed the basic radiance tutorial! If you still have time, you can try the additional practice below:</p>
               </blockquote>
-              <p class="bodyh2"><a name="advanced">Additional</a></p>
+              <p class="bodyh2"><a name="advanced">Additional practice</a></p>
               <ul>
                 <li>Try assimilating more radiance data for this case. The radiance data for the HIRS3, HIRS4, and MHS instruments, respectively, can be found below:<br><br>
                 <span class="stylecode">ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/gdas.1bhrs3.t00z.20131223.bufr ./hirs3.bufr<br>
@@ -285,7 +289,7 @@ a:active {
                     rtminit_sensor = 0,0,15,15<br><br>
                 </span>
 </li>
-                <li>Try adding radiance assimilation to the <a href="3dvar.html">3dvar case</a> you tested in the first practice session. The radiance data for that case can be found in <em>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512</em><br><br></li>
+                <li>Try adding radiance assimilation to the <a href="3dvar.html">3dvar case</a> you tested in an earlier practice session. The radiance data for that case can be found in <em>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512</em><br><br></li>
                 <li>Try changing some of the namelist.input settings (for example, different thinning mesh, different Radiative Transfer Model) and compare the results. </li>
               </ul>
             </blockquote>

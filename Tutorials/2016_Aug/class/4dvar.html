@@ -48,11 +48,16 @@ a:active {
             <p><span class="bodyh1">source code</span>
             </p>
             <blockquote>
-              <p>Get the <a href="wrfda_code.html">pre-compiled 4DVAR code</a>, if you have not done so.</p>
+              <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so.</p>
               <p class="stylecode">WRFDA/var/build/da_wrfvar.exe</p>
-              <p>is the executable that will be used in the 4D-VAR session. Make sure this executable was compiled for 4DVAR, or 4DVAR assimilation will not work!</p>
+              <p>is the executable that will be used in the 4D-VAR session. The pre-compiled code was compiled for 4DVAR, so if you are using code you compiled code, make sure this executable was compiled for 4DVAR, or 4DVAR assimilation will not work!</p>
             </blockquote>
-            <span class="bodyh1">Choice of your working directory</span>
+            <table align=center width="90%" border="1" cellpadding="10">
+              <tr>
+                <td class="body">The pre-compiled code was compiled for 4DVAR, so if you are using code you compiled yourself, <b>make sure this executable was compiled for 4DVAR, or 4DVAR assimilation will not work!</b> <a href=compile.html#compile_4dvar>Click here</a> to compile the code for 4DVAR, otherwise follow the above link to get the pre-compiled code.</td>
+              </tr>
+            </table>
+            <p><br><span class="bodyh1">Choice of your working directory</span></p>
             <blockquote>
               <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
               <p>We recommend you create<em> /kumquat/users/${USER}/DA/4dvar</em> and cd there to be your working directory for this session.</p>
@@ -75,13 +80,7 @@ a:active {
             <ul>
               <li>Observations
                 <blockquote>
-                  <p>/kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/ob.ascii+<br>
-                    /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071601/ob.ascii<br>
-                    /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071602/ob.ascii<br>
-                    /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071603/ob.ascii            <br>
-                    /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071604/ob.ascii<br>
-                    /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071605/ob.ascii<br>
-                    /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/ob.ascii-</p>
+                  <p>You should already have created observation files for this case in the obsproc practice; if you haven't, <a href=obsproc.html#4dvar</a>go back and finish the exercise</a>.</p>
                 </blockquote>
               </li>
               <li>First guess
@@ -98,7 +97,6 @@ a:active {
             </ul>
             <span class="bodyh1">Linking files</span>
             <blockquote>
-              <p class="stylecode">cd /kumquat/users/${USER}/DA/4dvar</p>
               <p>A few additional constant files are needed for 4DVAR runs. These are necessary for running the nonlinear model as part of the 4DVAR assimilation.</p>
               <blockquote>
                 
@@ -113,13 +111,13 @@ a:active {
               </blockquote>
               <p>link observation files</p>
               <blockquote>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071600/ob.ascii+ ./ob01.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071601/ob.ascii ./ob02.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071602/ob.ascii ./ob03.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071603/ob.ascii ./ob04.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071604/ob.ascii ./ob05.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071605/ob.ascii ./ob06.ascii</span></p>
-                <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/ob/2005071606/ob.ascii ./ob07.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_00:00:00.4DVAR ./ob01.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_01:00:00.4DVAR ./ob02.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_02:00:00.4DVAR ./ob03.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_03:00:00.4DVAR ./ob04.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_04:00:00.4DVAR ./ob05.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_05:00:00.4DVAR ./ob06.ascii</span></p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/class103/DA/obsproc_4dvar/obs_gts_2005-07-16_06:00:00.4DVAR ./ob07.ascii</span></p>
               </blockquote>              <p>link background error file</p>
               <blockquote>
                 <p> <span class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/4dvar/be/be.dat .</span></p>
@@ -180,7 +178,14 @@ a:active {
               <p><span class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe &gt;&amp; var4d.log &amp;</span></p>
               <p class="stylecode">The "&amp;" at the end of the above command tells WRFDA to run in the background. Because the command line is now usable even as WRFDA runs, you can use the "tail" command to follow the progress of WRFDA as it writes the log files: </p>
               <p class="stylecode">tail -f rsl.out.0000</span>
-              <p><span style="color:red">Helpful tip!</span> If you didn't include the "&amp;" at the end of your run command, you can still tell the program to run in the background. After submitting an MPI job like this, if you decide you don't want to sit around without being able to see the progress of your run hit control+z on your keyboard. This will suspend the job; to run it in the background, type "bg" and enter. Now, you can use the "tail" command to see the log files in real time!</p>
+            </blockquote>
+            <table align=center width="90%" border="1" cellpadding="10">
+              <tr>
+                <td class="body"><span style="color:red">Helpful tip!</span><br>
+                  If you didn't include the "&amp;" at the end of your run command, you can still tell the program to run in the background. After submitting an MPI job like this, if you decide you don't want to sit around without being able to see the progress of your run hit control+z on your keyboard. This will suspend the job; to run it in the background, type "bg" and enter. Now, you can use the "tail" command to see the log files in real time!</td>
+              </tr>
+            </table>
+            <blockquote>
               <p>Press control+c at any time to quit "tail"</p>
             </blockquote>
             <span class="bodyh1">Using lateral boundary control variables</span>
@@ -191,7 +196,7 @@ a:active {
                 <p> <span class="stylecode" style="color:red">cp ./fg02 ./ana02</span></p>
               </blockquote>
               <p>"fg02" and "ana02" are the same file, and are the "first guess" field for the same domain at the <b>end</b> of the 4DVAR assimilation window (in this case, the analysis at 2005-07-16 06Z).</p>
-              <p class="body"><br>You are now done with the basic 4DVAR practice case. If you still have time, you can go back to the <a href="radiance.html#advanced">radiance practice case</a> to try some of the additional exercises (if you have not already done so), or try the additional 4DVAR exercises below:<br><br></p>
+              <p class="body"><br>You are now done with the basic 4DVAR practice case. You can move on to <a href=/wrfda_sessions.html#session_4>the next practice case</a>. Once you are done with all of today's practice, you can try some additional exercises below:<br><br></p>
             </blockquote>
             <p class="bodyh2"><a name="advanced">Additional practice</a></p>
             <blockquote>

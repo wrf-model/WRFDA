@@ -97,7 +97,7 @@ a:active {
                     export FCST_RANGE1=24<br>
                     export FCST_RANGE2=12<br>
                     export INTERVAL=12<br>
-                    export STRIDE=1</p>
+                    export STRIDE=1<br>
                     export NOCOLONS=false</p>
                 </blockquote>
                 <p>FC_DIR specifies the directory where the WRF forecast files (wrfout*) reside. Observe the directory structure and how the wrfout files are stored. To generate your own BE file for your own case and domain in the future, you will need to prepare and arrange your wrfout files in the same way (for example, 2008020512/wrfout_d01_2008-02-06_12:00:00; 2008020512 is the initial time, wrfout_d01_2008-02-06_12:00:00 is the 24-hour forecast valid at 2008020612).</p>
@@ -271,8 +271,10 @@ a:active {
             </blockquote>
             <span class="bodyh1"><a name="advanced">Additional practice</span>
             <blockquote>
-              <p>Try using more data and see how your plots change. You can find up to 4 weeks of data in /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/.</p>
-              <p>If this was successful, view plots of the gen_be statistics with the above wrapper script, and continue to try more <a href="psot.html">single ob tests</a> using the be.dat you have created.</p>
+              <ul>
+              <li>Try using more data and see how your plots change. You can find up to 4 weeks of data in /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/.</p>
+              <li>If this was successful, view plots of the gen_be statistics with the above wrapper script, and continue to try more <a href="psot.html">single ob tests</a> using the be.dat you have created.</li>
+              </ul>
               <p>&nbsp;</p>
               </blockquote>
             </blockquote>
