@@ -43,6 +43,11 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <span class="pagetitle">Running WRFDA and WRF cycling system</span>
             <blockquote>
+              <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/cycling</span> and use this as your working directory.</p>
+              <blockquote>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/cycling<br>
+                                     cd /kumquat/users/${USER}/DA/cycling</p>
+              </blockquote>
               <p><span class="bodyh1">Source code</span></p>
                 <p>Get the <a href="wrfda_code.html">WRFDA pre-compiled code</a> and <a href="http://www2.mmm.ucar.edu/wrf/OnLineTutorial/Class_July2015/source_code.php">WRF pre-compiled code</a>, if you have not done so. <span class="stylecode">WRFDA/var/build/da_wrfvar.exe</span>, <span class="stylecode">WRFDA/var/build/da_update_bc.exe</span>, and <span class="stylecode">WRFV3/main/wrf.exe</span> are the three executables that will be used in this session.</p>
                 <p>Three scripts for running the cycling system are also provided for this practice session:</p>
@@ -65,11 +70,17 @@ a:active {
               <span class="bodyh1">Procedures</span>
               <p>&nbsp;</p>
               <blockquote>
-                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/cycling/run_*.csh ${your_script_dir}</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/cycling/run_*.csh .</p>
               </blockquote>
               <p>Edit the run*csh files to set the proper paths.</p>
               <p>It is recommended that you read through all the scripts to understand what files are created and used for cycling runs.</p>
-              <p><strong>For 1-domain configuration</strong></p>
+              <table align=center width="90%" border="1" cellpadding="10">
+                <tr>
+                  <td class="body"><span style="color:red">Helpful tip!</span><br>
+                    Since each of these steps will take several minutes to run, you can tell a script to run in the background even after it has started. After starting the script, hit control+z on your keyboard. This will suspend the job; to run it in the background, type "bg" and enter. Now, you can use the "tail -f" command to follow along with the wrf/wrfda log files in real time!</td>
+                </tr>
+              </table>
+              <p><br><strong>For 1-domain configuration</strong></p>
               <blockquote>
                 <p>For the first cycle, run <span class="stylecode">run_wrf_from_real.csh</span> with "DATE = 2013122300" to get 6-hour forecast valid at 2013122306. This forecast should take about 5 minutes to complete on the classroom machines.</p>
                 <p>Run <span class="stylecode">run_wrfda.csh</span> with DATE = 2013122306 with the 6-hour forecast as the first guess. The assimlation process should take less than a minute on the classroom machines.</p>
@@ -78,7 +89,7 @@ a:active {
                 <p>Run <span class="stylecode">run_wrf_from_wrfda.csh</span> with DATE = 2013122312</p>
                 <p>And so on. </p>
               </blockquote>
-              <p>&nbsp;</p>
+              <p class="body"><br>The 2-domain case below is optional, due to the time required to run the multi-domain case. You can either try it now, or <a href=wrfda_sessions.html#session_5>move on to the next exercise</a> and come back here later if you have time.<br></p>
               <p><strong>For 2-domain configuration</strong></p>
               <blockquote>
                 <p class="body">Be sure you have plenty of time for this part; the WRF forecast step for 2 domains takes about 10 minutes on the classroom computers.</p>

@@ -43,7 +43,7 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <p class="pagetitle">Forecast Sensitivity to Observations</p>
             <p>&nbsp;</p>
-            <p><span class="body">References: <li><a href="../docs/WRFDA_Verification_Tools.pdf#23">This year's brief introduction</a></li><li><a href="../../2014_July/docs/WRFDA_sensitivity.pdf">Last year's more comprehensive presentation</a></li><li><a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2012_July/docs/README_FSO_v3.3.pdf">FSO documentation</a> (a bit dated, but contains a lot of extra, useful information)</li></span></p>
+            <p><span class="body">References: <li><a href="../docs/WRFDA_Verification_Tools.pdf#23">This year's brief introduction</a></li><li><a href="../../2014_July/docs/WRFDA_sensitivity.pdf">A more comprehensive presentation from 2014</a></li><li><a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Tutorials/2012_July/docs/README_FSO_v3.3.pdf">FSO documentation</a> (a bit dated, but contains a lot of extra, useful information)</li></span></p>
 <p>              <span class="bodyh1">Source code</span>            </p>
             <blockquote>
                 <p>WRFDA and WRFPLUS are needed for this practice.</p>
@@ -63,12 +63,11 @@ are some of the scripts involved in the FSO procedures.
             </blockquote>
             <p><span class="bodyh1">Steps            </span></p>
               <blockquote>
-                <p>You will need to download and unpack the FSO tar package for this exercise</p>
                 <p class="stylecode">
                 <p>Create a working directory for this practice.</p>
                 <p class="stylecode">mkdir /kumquat/users/$USER/DA/FSO<br>
                 cd /kumquat/users/$USER/DA/FSO</p>
-                <p>You will need to download and unpack the FSO tar package for this exercise</p>
+                <p>You will need to copy the FSO script and test data for this exercise</p>
                 <p class="stylecode">cp -r /kumquat/wrfhelp/DATA/WRFDA/FSO/* . </p>
                 <p>Edit wrapper_run_fso.ksh to set up the options for a regular WRFDA run.                </p>
                 <p>......<br>
@@ -122,8 +121,8 @@ export RUN_OBS_IMPACT=<span style="color:red">true</span></p>
               <p>  <br>
                 <span class="bodyh1">Check Output </span></p>
               <blockquote>
-                <p class="body">NOTE: The error trapping in FSO is not very good, so for certain problems the system may still report "SUCCESS". Make sure all the files below were created, or else you may have set some variables incorrectly.</p>
-                <p>/kumquat/users/$USER/DA/FSO/expt/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. You can quickly view this file using ncview to ensure there is nothing strange going on (the TL/A variables should look <a href="images/ncview.TL_U.png">like this</a>, while the NL variables should look <a href="images/ncview.NL_U.png">like this</a>. <!--plot_adj_sensitivity.ncl, which can be found in the TOOLS package, can be used to make some plots. CANT GET THIS TO WORK BECAUSE OF STUPID XLAT PROBLEM--></p>
+                <p class="body">NOTE: The error trapping in FSO is not perfect, so for certain problems the system may still report "SUCCESS". Make sure all the files below were created, or else you may have set some variables incorrectly.</p>
+                <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/ad_d01_2007010100 is the <strong>gradient of the forecast error norm to the initial conditions</strong>. You can quickly view this file using ncview to ensure there is nothing strange going on (the TL/A variables should look <a href="images/ncview.TL_U.png">like this</a>, while the NL variables should look <a href="images/ncview.NL_U.png">like this</a>. <!--plot_adj_sensitivity.ncl, which can be found in the TOOLS package, can be used to make some plots. CANT GET THIS TO WORK BECAUSE OF STUPID XLAT PROBLEM--></p>
                 <p>/kumquat/users/$USER/DA/FSO/run/2007010100/sensitivity/index.html contains the text output from running var/graphics/ncl/adj_diagnostics.ncl to get the <strong>diagnostics of error reduction in the forecasts from Xb (background) to Xa (analysis)</strong>.</p>
                 <p>/kumquat/users/$USER/DA/FSO/run/2007010100/obsimpact/rsl.out.0000 contains the <strong>cumulated impact of each observation type on the forecast errors</strong>.</p>
                 <table border="0" cellpadding="0" cellspacing="0">
