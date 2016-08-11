@@ -254,13 +254,26 @@ a:active {
                 dx=60000,<br>
                 dy=60000,<br>
                 /<br>
+<span style="color:red">&amp;dynamics<br>
+w_damping=1,<br>
+diff_opt=1,<br>
+km_opt=4,<br>
+dampcoef=0.01,<br>
+time_step_sound=4,<br>
+base_temp=290.0,<br>
+use_baseparam_fr_nml=true,<br>
+/<br></span>
                 &amp;perturbation<br>
                 trajectory_io=true,<br>
                 enable_identity=false,<br>
                 jcdfi_use=true,<br>
                 jcdfi_diag=1,<br>
                 jcdfi_penalty=1000.0,<br>
-                / </p>
+                / <br>
+<span style="color:red">&amp;bdy_control<br>
+specified=true,<br>
+real_data_init_type=3,<br>
+/</span></p>
               </blockquote>
             <ul>
               <li>Observations

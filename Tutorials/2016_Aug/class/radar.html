@@ -43,7 +43,7 @@ a:active {
           <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
             <span class="pagetitle">Radar data assimilation</span>
             <blockquote>
-              <p><span class="body">Reference: <a href="../docs/WRFDA_Radar.pdf">Download the tutorial presentation</a></span></p>
+              <p><span class="body">References: <ul><li><a href="../docs/WRFDA_Radar.pdf">Download the presentation from last year's tutorial</a></span></li><li><a href="../docs/WRFDA_Advanced_Practice_Sessions.pdf">Brief presentation on advanced exercises</a></li></ul></p>
               <p><span class="bodyh1">Source code</span></p>
               <blockquote>
                 <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so.</p>
@@ -124,7 +124,7 @@ a:active {
                   use_radar_rf = .true. only<br>
                   both use_radar_rv = .true. and use_radar_rf = .true.</p>
               </blockquote>
-              <p class=body>You can now <a href="wrfda_sessions.html#session_3">move on to the next exercise</a>, or try the 4DVAR radar assimilation exercise below.</p>
+              <p class=body>You can now <a href="wrfda_sessions.html#session_6">move on to the next exercise</a>, or try the 4DVAR radar assimilation exercise below.</p>
             </blockquote>
             <span class="pagetitle">4DVAR radar assimilation</span>
             <blockquote>
@@ -145,6 +145,10 @@ a:active {
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob02.radar ./ob02.radar<br>
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob03.radar ./ob03.radar<br>
                   ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob04.radar ./ob04.radar</p>
+<!--                <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob01.ascii ./ob01.ascii<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob02.ascii ./ob02.ascii<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob03.ascii ./ob03.ascii<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob04.ascii ./ob04.ascii</p>-->
                 <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./wrfinput_d01<br>
                   ln -fs wrfinput_d01 ./fg<br>
                   cp /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfbdy_d01 ./wrfbdy_d01<br>
@@ -167,18 +171,22 @@ a:active {
                   use_radar_rhv   = .true.<br>
                   use_3dvar_phy   = .true.<br>
                   /<br>
+                  &amp;wrfvar6<br>
+                  max_ext_its=1,<br>
+                  ntmax=4,<br>
+                  /</p>
                   &amp;wrfvar7<br>
                   cv_options=7,<br>
                   /</p>
                 </blockquote>
               </blockquote>
               <p><span class="bodyh1">Run WRFDA</span>
-              <p>Make sure you are using the 4DVAR compiled code! Since the assimilation windows for this case are only 10 minutes, this test should take less than 5 minutes to run on the classroom computers.</p>
+              <p>Since the assimilation windows for this case are only 10 minutes, and we have set ntmax=4, this test should take less than 5 minutes to run on the classroom computers.</p>
               <blockquote>
                 <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
               </blockquote>
-              <p>Compare the output of the 3dvar test to the 4dvar test using ncdiff. Is the difference significant?</p>
-              <p class=body>You have finished the radar assimilation tutorial. You can now <a href="wrfda_sessions.html#session_3">move on to the next exercise</a>.</p>
+              <p>Compare the output of the 3dvar test to the 4dvar test using ncdiff. Is the difference significant? Remember, we only did 4 inner loop minimization steps, so we haven't reached 4DVAR's full potential!</p>
+              <p class=body>You have finished the radar assimilation tutorial. You can now <a href="wrfda_sessions.html#session_6">move on to the next exercise</a>.</p>
 <!--            <span class="pagetitle">Radar assimilation with CLOUD_CV options</span>
             <blockquote>
               <p><span class="bodyh1">Source code</span></p>
