@@ -439,7 +439,8 @@ PlainStyle2,
 ,
 ,"Radar DA ","../class/radar.html",,,1
 ,"Precipitation DA ","../class/rainfall.html",,,1
-,"Cloudy radiance ","../class/cloudy_rad.html",,,0
+,"Cloudy radiance ","../class/cloudy_rad.html",,,1
+,"Dual-res hybrid ","../class/dualres_hybrid.html",,,0
 ])
 
 
