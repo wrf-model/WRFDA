@@ -1,0 +1,291 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Dual-resolution hybrid data assimilation</span>
+            <blockquote>
+              <p><span class="body">Reference: <ul><li><a href="../docs/WRFDA_Hybrid.pdf">Download the tutorial presentation</a></li><li><a href="../docs/WRFDA_Advanced_Practice_Sessions.pdf">Brief presentation on advanced exercises</a></li></ul></span></p>
+<p><span class="bodyh1">Source code</span></p>
+              <blockquote>
+                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
+                <p><em>WRFDA/var/build/gen_be_ensmean.exe</em><br>
+                  <em>WRFDA/var/build/gen_be_ep2.exe</em><br>
+                  <em>WRFDA/var/build/gen_be_vertloc.exe</em><br>
+                  <em>WRFDA/var/build/da_wrfvar.exe</em><br> 
+                  are the four executables that will be used in this session.</p>
+              </blockquote>
+              <p><span class="bodyh1">Choice of your working directory</span>
+              </p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                    <blockquote>
+                <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
+                <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA/dualres_hybrid</span><br>
+                  <span class="stylecode">cd /kumquat/users/${USER}/DA/dualres_hybrid</span></p>
+              </blockquote>
+              <p><span class="bodyh1">Input data</span> </p>
+              <blockquote>
+                <p>The <a href="wrfda_testdata.html#testdata_dualres_hybrid">dual-resolution hybrid case</a> much the same as the <a href="hybrid.html">hybrid case</a>. Some additional namelist settings and input files are required, but otherwise the procedure is very similar.</p>
+                <p>Just as in the standard hybrid case, you will need the basic input files (LANDUSE.TBL, ob.ascii, be.dat), an ensemble, and a first guess. In this case, the first guess is a <em>nest domain</em> of the lower resolution ensemble, and we perform the analysis on this smaller, but higher-resolution domain. The two domains are plotted at right.</p>
+              </blockquote>
+                    </td>
+                    <td class="bodytext"><a href="images/dual_res_hybrid_tutorial_case_domain.png"><img src="images/dual_res_hybrid_tutorial_case_domain.png" height="300"></a></td>
+                  </tr>
+                </table>
+              <ul>
+                <li>ensemble mean
+                  <blockquote>
+                    <p>The first step of hybrid data assimilation is to prepare a set of ensembles.<br>
+                      For this practice, a set of 10-member ensemble forecasts is provided under /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/fc directory. This ensemble is the larger, lower resolution domain (45 km)</p>
+                    <p class=stylecode>ls -al /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/fc/2008091118/<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e001<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:10 wrfout_d01_2008-09-12_00:00:00.e002<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e003<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e004<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e005<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e006<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e007<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e008<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:10 wrfout_d01_2008-09-12_00:00:00.e009<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.e010<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.mean<br>
+-rw-r--r-- 1 wrfhelp  instructor 87460656 Aug  3 07:09 wrfout_d01_2008-09-12_00:00:00.vari<br>
+-rw-r--r-- 1 wrfhelp instructor 115162960 Aug  3 07:35 wrfout_d02_2008-09-12_00:00:00</p>
+                    <p>2008091118/wrfout_d01_2008-09-12_00:00:00.e* are ensemble forecasts valid at 2008091200 initialized at 2008091118.</p>
+                    <p>wrfout_d01_2008-09-12_00:00:00.mean and wrfout_d01_2008-09-12_00:00:00.vari are two template files that will be overwritten by a program that calculates ensemble mean from ensemble forecasts.</p>
+                    <p>wrfout_d02_2008-09-12_00:00:00 is the smaller, higher-resolution domain that will be used as the first guess.</p>
+                  </blockquote>
+                  <ul>
+                    <li> Copy ensemble forecasts and template files to your working directory.</li>
+                  </ul>
+                  <blockquote>
+                    <p class="stylecode">cp -r /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/fc/2008091118/ . </p>
+                  </blockquote>
+                  
+                  <ul>
+                    <li>Edit gen_be_ensmean_nl.nl (or copy it from /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/gen_be_ensmean_nl.nl)</li>
+                  </ul>
+                  <blockquote>
+                    <p class="stylecode">vi gen_be_ensmean_nl.nl</p>
+                    <p class="stylecode">&amp;gen_be_ensmean_nl<br>
+                      directory = './2008091118'<br>
+                      filename = 'wrfout_d01_2008-09-12_00:00:00'<br>
+                      num_members = 10<br>
+                      nv = 7<br>
+                      cv = 'U', 'V', 'W', 'PH', 'T', 'MU', 'QVAPOR'<br>
+                      /</p>
+                  </blockquote>
+                  <ul>
+                    <li>Run gen_be_ensmean.exe</li>
+                  </ul>
+                  <blockquote>
+                    <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/gen_be_ensmean.exe</p>
+                  </blockquote>
+                  <ul>
+                    <li>Check output</li>
+                  </ul>
+                  <blockquote>
+                    <p><em>2008091118/wrfout_d01_2008-09-12_00:00:00.mean</em> is the ensemble mean</p>
+                  </blockquote>
+                </li>
+              </ul>
+              <blockquote>
+                <blockquote>
+                  <p><em>2008091118/wrfout_d01_2008-09-12_00:00:00.vari</em> is the ensemble variance</p>
+                  <p>You may use the NCL script <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_mean_std_dev.ncl</em> to make some plots.</p>
+                  <blockquote>
+                    <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_mean_std_dev.ncl .<br>
+                      cp /kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/WRF_contributed.ncl.test .</p>
+                  </blockquote>
+                    <p>Edit <em>ens_mean_std_dev.ncl</em> to set the proper date and path path. Note that the "date" is the date and time when the forecast was initialized, while the individual "year", "month", etc. settings are for the forecast valid date/time, 6 hours later.</p>
+                  <blockquote>
+                    <p class="stylecode">  date = "2008091118"<br>
+   year = "2008"<br>
+   month = "09"<br>
+   day = "12"<br>
+   hour = "00"<br>
+                    dir = &quot;/kumquat/users/$USER/DA/dualres_hybrid/&quot; + date + &quot;/&quot;</p>
+                    <p class="stylecode">ncl ens_mean_std_dev.ncl<br>
+                    display mean_std_dev.pdf</p>
+                  </blockquote>
+                  <p>This script displays the mean and standard deviation for the ensemble at a single level for a single variable. You can change the level and variable by changing these lines a bit further down in the script:</p>
+                  <blockquote>
+                    <p class="stylecode">var = "U"<br>
+                    kl = 24</p>
+                  </blockquote>
+                  <p>V, W, T, P, and QVAPOR are some other interesting fields to look at.</p>
+                </blockquote>
+              </blockquote>
+              <ul>
+                <li>ensemble perturbations</li>
+              </ul>
+              <ul>
+                <ul>
+                  <li>This step will extract the ensemble perturbations from the existing ensemble wrfout files provided for you. Create another sub-directory where you will be working for this step.</li>
+                </ul>
+                <blockquote>
+                  <p class="stylecode">cd /kumquat/users/${USER}/DA/dualres_hybrid</p>
+                  <p class="stylecode">mkdir -p 2008091200/ep</p>
+                  <p class="stylecode">cd 2008091200/ep                </p>
+                </blockquote>
+              </ul>
+            
+              <blockquote>
+                <ul>
+                  <li>Run gen_be_ep2.exe</li>
+                </ul>
+                <blockquote>
+                  <p>gen_be_ep2.exe requires 4 command arguments (DATE, NUM_MEMBER, DIRECTORY, FILENAME) as defined below:</p>
+                  <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/gen_be_ep2.exe 2008091200 10 ../../2008091118 wrfout_d01_2008-09-12_00:00:00</p>
+                </blockquote>
+                <ul>
+                  <li>Check the output files generated by gen_be_ep2.exe</li>
+                </ul>
+                <blockquote>
+                  <p>A list of binary files will be created under 2008091200/ep directory. Among them, tmp.e* are temporary scratch files that can be removed.</p>
+<!--                  <p>You may use the NCL script <em>/kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_perturbations.ncl</em> to make some plots.</p>
+                  <blockquote>
+                    <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/ens_perturbations.ncl .<br>
+                      cp /kumquat/wrfhelp/DATA/WRFDA/Hybrid/ncl/WRF_contributed.ncl.test . </p>
+                  </blockquote>
+                  <p>Edit <em>ens_perturbations.ncl</em> to set the proper date and path.<br>
+                  <blockquote>
+                    <p class="stylecode">   date = "2008091118"<br>
+                    year = "2008"<br>
+                    month = "09"<br>
+                    day = "12"<br>
+                    hour = "00"<br>
+                    directory = &quot;/kumquat/users/$USER/DA/dualres_hybrid/&quot; + date</p>
+                    <p class="stylecode">ncl ens_perturbations.ncl<br>
+                      display ens_perturbations.pdf </p>
+                  </blockquote>
+                  <p>Again, you can modify the script to look at different vertical levels and variables by changing these settings:</p>
+                  <blockquote>
+                    <p class="stylecode">var = "U"<br>
+                    kl = 32</p>
+                  </blockquote>
+                  <p>Depending on what variable you display, you may have to change the color contour settings "cont_min", "cont_max", and "cont_spacing" as well to get a nice-looking plot.<br><br></p>-->
+                </blockquote>
+              </blockquote>
+
+              <ul>
+                <li>Run gen_be_vertloc.exe</li>
+              </ul>
+              <blockquote>
+                <blockquote>
+                  <p>gen_be_vertloc.exe generates the input file for vertical localization.  This program requires one command-line argument: the number of vertical levels of the model configuration (same value as e_vert in the namelist; for the tutorial example, this should be 45).</p>
+                  <p class="stylecode">cd /kumquat/users/${USER}/DA/dualres_hybrid</p>
+                  <p class="stylecode">/kumquat/users/${USER}/DA/WRFDA/var/build/gen_be_vertloc.exe 45</p>
+                </blockquote>
+              </blockquote>
+
+              <span class="bodyh1">Run WRFDA in hybrid mode</span>
+              <blockquote>
+                <p> <span class="stylecode">ln -fs 2008091200/ep ./ep </span> <span style="color:red"># ensemble perturbation files should be under the ep subdirectory</span></p>
+              </blockquote>
+                <p> The first guess is a wrf forecast file from the higher resolution domain</p>
+              <blockquote>
+                <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/fc/2008091118/wrfout_d02_2008-09-12_00:00:00 ./fg </p>
+              </blockquote>
+                <p> We link the mean of the low-resolution ensemble as "fg_ens". WRFDA reads this for collecting mapping info for the lower resolution domain.
+              <blockquote>
+                <p class="stylecode">ln -fs 2008091118/wrfout_d01_2008-09-12_00:00:00.mean ./fg_ens </p>
+                <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL .<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/ob/2008091200/ob.ascii ./ob.ascii<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/be/be.dat ./be.dat
+                </p>
+                <p>Edit namelist.input (a sample file is provided as /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/namelist.input)</p>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/dual_res_tutorial_case/namelist.input .<br><br>vi namelist.input</p>
+                <p>Note that, unlike every other instance of running WRFDA, we actually have <em>two</em> sets of domain information. The analysis will be performed on the second, smaller, 15-km domain.</p>
+                <p> <span class="stylecode">&amp;domains<br>
+                     e_we                                = 181,184,<br>
+                     e_sn                                = 181,196<br>
+                     e_vert                              = 45,45,<br>
+                     dx                                  = 45000,15000,<br>
+                     dy                                  = 45000,15000,<br>
+                     hypsometric_opt                     = 2<br>
+                     max_dom                             = 2,<br>
+                     grid_id                             = 1, 2, <br>
+                     parent_id                           = 0, 1,<br>
+                     i_parent_start                      = 0, 89,<br>
+                     j_parent_start                      = 0, 22,<br>
+                     parent_grid_ratio                   = 1, 3,<br>
+                     /<br>
+                </p>
+                <p>Also notice the following hybrid-related settings:</p>
+                <p> <span class="stylecode">&amp;wrfvar7<br>
+                  je_factor = 1.33<br>
+                  /<br>
+                  &amp;wrfvar16<br>
+                  ensdim_alpha = 10 </span> <span style="color:red"># hybrid mode is activated when ensdim_alpha is larger than zero.</span><br>
+                  <span class="stylecode">alphacv_method = 2<br>
+                  alpha_corr_scale = 500.0<br>
+                  hybrid_dual_res = .true. </span> <span style="color:red"># Turns on the dual-resolution hybrid option</span><br>
+                  <span class="stylecode">dual_res_upscale_opt =  3</span> <span style="color:red"># DO NOT CHANGE, other options are bad</span><br>
+                  /</span>
+                </p>
+                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+              </blockquote>
+              <p>View the different output files to see how they differ from a 3DVAR assimilation run. For example, in <em>cost_fn</em> and <em>grad_fn</em>, you will see the ensemble terms of the cost function and gradient, respectively.</p>
+                <p>Try playing around with some of the hybrid-related settings above and compare the results.</p>
+                <p class=body>You have now completed the WRFDA hybrid assimilation tutorial. You can now <a href="wrfda_sessions.html#session_6">move on to the next exercise</a>.</p>
+                <p>&nbsp;</p>
+              </blockquote>
+            </blockquote>
+            <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>
