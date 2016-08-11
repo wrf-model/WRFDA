@@ -1,0 +1,297 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Running gen_be utility</span>
+            <blockquote>
+              <p>The goal of this session is to generate the background error statistics file (i.e. the B<sub>0</sub> shown in the <a href="wrfda_flowchart.html">WRFDA flowchart</a>) for running WRFDA.</p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_BE.pdf">Download the tutorial presentation</a></span></p>
+              <span class="bodyh1">Source code</span>
+              <blockquote>
+                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
+                <p><strong><span class="stylecode">WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh</span></strong> is the main script that will be used in this practice.</p>
+                <p>GEN_BE consists of several stages. Quite a few executables and scripts are used for the process. They are listed below for reference. These executables and scripts will be called subsequently by <span class="stylecode">gen_be_wrapper.ksh</span>:</p>
+                <blockquote>
+                  <p class="stylecode">WRFDA/var/scripts/gen_be/gen_be.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_stage0_wrf.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_stage4_regional.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_cov2d.ksh<br>
+                  WRFDA/var/scripts/gen_be/gen_be_cov3d.ksh<br>
+                  WRFDA/var/build/gen_be_stage0_wrf.exe<br>
+                  WRFDA/var/build/gen_be_stage1.exe<br>
+                  WRFDA/var/build/gen_be_stage2.exe<br>
+                  WRFDA/var/build/gen_be_stage2a.exe<br>
+                  WRFDA/var/build/gen_be_stage3.exe<br>
+                  WRFDA/var/build/gen_be_stage4_regional.exe<br>
+                  WRFDA/var/build/gen_be_diags_read.exe<br>
+                  WRFDA/var/build/gen_be_diags.exe<br>
+                  WRFDA/var/build/gen_be_cov2d.exe<br>
+                  WRFDA/var/build/gen_be_cov3d.exe</p>
+              </blockquote></blockquote>
+              <p><span class="bodyh1">Choice of your working directory </span> </p>
+              <blockquote>
+                <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/gen_be</span> and use this as your working directory for this session.<br>
+                <blockquote>
+                  <p class="stylecode">mkdir /kumquat/users/${USER}/DA/gen_be<br>
+                                       cd /kumquat/users/${USER}/DA/gen_be</p>
+              </blockquote></blockquote>
+              <p><span class="bodyh1">Edit gen_be_wrapper.ksh</span>
+              </p>
+              <blockquote>
+                <p>Copy gen_be_wrapper.ksh to your working directory</p>
+                <blockquote><p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_wrapper.ksh .</p></blockquote>
+                <p>Pay special attention to the following settings and make necessary modifications for your case and directories:</p>
+                <blockquote>
+                  <p class="stylecode">vi gen_be_wrapper.ksh</p>
+                  <p class="stylecode">......<br>
+                    export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                    export NL_CV_OPTIONS=5 &nbsp; &nbsp; &nbsp; # Specify control variable options<br>
+                    export BIN_TYPE=5 &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;# How data is binned for calculating statistics<br>
+                    export START_DATE=2008020300 # the first perturbation valid date<br>
+                    export END_DATE=2008020912 &nbsp; # the last perturbation valid date<br>
+                    export NUM_LEVELS=40 &nbsp; &nbsp; &nbsp; &nbsp; # e_vert -1<br>
+                    export BE_METHOD=NMC<br>
+                    export FCST_RANGE=12<br>
+                    export FC_DIR=/kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc<br>
+                    export RUN_DIR=`pwd`/gen_be${BIN_TYPE}_cv${NL_CV_OPTIONS}<br>
+                    export DOMAIN=01<br>
+                    export FCST_RANGE1=24<br>
+                    export FCST_RANGE2=12<br>
+                    export INTERVAL=12<br>
+                    export STRIDE=1<br>
+                    export NOCOLONS=false</p>
+                </blockquote>
+                <p>FC_DIR specifies the directory where the WRF forecast files (wrfout*) reside. Observe the directory structure and how the wrfout files are stored. To generate your own BE file for your own case and domain in the future, you will need to prepare and arrange your wrfout files in the same way (for example, 2008020512/wrfout_d01_2008-02-06_12:00:00; 2008020512 is the initial time, wrfout_d01_2008-02-06_12:00:00 is the 24-hour forecast valid at 2008020612).</p>
+                <p>NL_CV_OPTIONS specifies the control variable option. 5 is for the default wind control variables (psi and chi_u). 7 is for the new CV7 option, which uses u and v as the wind control variables.</p> 
+              </blockquote>
+              <p><span class="bodyh1">Run gen_be_wrapper.ksh</span></p>
+              <blockquote>
+                <blockquote>
+                  <p class="stylecode">./gen_be_wrapper.ksh</p>
+                </blockquote>
+                <p>With these settings, the script should run in about 2 minutes on classroom computers.</p>
+              </blockquote>
+              <p><span class="bodyh1">Check output</span>
+              </p>
+              <table align=center width="90%" border="1" cellpadding="10">
+                <tr>
+                  <td class="style8"><p><b>NOTE:</b> If you see this error message while the script is running <br><kbd><br>/kumquat/users/class103/DA/WRFDA/var/scripts/gen_be/gen_be_stage0_wrf.ksh[59]: .false.: not found [No such file or directory]<br></kbd><br>it can be safely ignored. This is due to a bug that does not affect results and will be fixed in the next release.</p></td>
+                </tr>
+              </table>
+              <blockquote>
+                <p>You should see the following messages as the script runs:</p>
+                <table width="100%" border="1" cellpadding="10">
+                  <tr>
+                    <td><p class="stylecode">Thu Jul 30 20:02:32 MDT 2015 Start<br>
+                      WRFVAR_DIR is /kumquat/users/class105/DA/WRFDA exported<br>
+                      RUN_DIR is /kumquat/users/class105/DA/gen_be/workdir<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 0: Calculate ensemble perturbations from model forecasts.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 30 20:02:32 MDT 2015<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020300<br>
+                      2008020200 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020200/wrfout_d01_2008-02-03_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020212/wrfout_d01_2008-02-03_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020312<br>
+                      2008020212 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020212/wrfout_d01_2008-02-03_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020300/wrfout_d01_2008-02-03_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020400<br>
+                      2008020300 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020300/wrfout_d01_2008-02-04_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020312/wrfout_d01_2008-02-04_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020412<br>
+                      2008020312 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020312/wrfout_d01_2008-02-04_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020400/wrfout_d01_2008-02-04_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020500<br>
+                      2008020400 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020400/wrfout_d01_2008-02-05_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020412/wrfout_d01_2008-02-05_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020512<br>
+                      2008020412 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020412/wrfout_d01_2008-02-05_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020500/wrfout_d01_2008-02-05_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020600<br>
+                      2008020500 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020500/wrfout_d01_2008-02-06_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020612<br>
+                      2008020512 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020512/wrfout_d01_2008-02-06_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-06_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020700<br>
+                      2008020600 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020600/wrfout_d01_2008-02-07_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020712<br>
+                      2008020612 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020612/wrfout_d01_2008-02-07_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020700/wrfout_d01_2008-02-07_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020800<br>
+                      2008020700 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020700/wrfout_d01_2008-02-08_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020712/wrfout_d01_2008-02-08_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020812<br>
+                      2008020712 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020712/wrfout_d01_2008-02-08_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020800/wrfout_d01_2008-02-08_12:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020900<br>
+                      2008020800 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020800/wrfout_d01_2008-02-09_00:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020812/wrfout_d01_2008-02-09_00:00:00<br>
+                      gen_be_stage0_wrf: Calculating standard perturbation fields valid at time  2008020912<br>
+                      2008020812 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020812/wrfout_d01_2008-02-09_12:00:00 /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/2008020900/wrfout_d01_2008-02-09_12:00:00<br>
+                      Ending CPU time: Thu Jul 30 20:03:11 MDT 2015<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 1: Read standard fields, and remove time/ensemble/area mean.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 30 20:03:11 MDT 2015<br>
+                      Ending CPU time: Thu Jul 30 20:03:13 MDT 2015<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 2: Calculate regression coefficients.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 30 20:03:13 MDT 2015<br>
+                      Ending CPU time: Thu Jul 30 20:03:14 MDT 2015<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 2a: Calculate control variable fields.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 30 20:03:14 MDT 2015<br>
+                      Ending CPU time: Thu Jul 30 20:03:15 MDT 2015<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 3: Read 3D control variable fields, and calculate vertical covariances.<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 30 20:03:15 MDT 2015<br>
+                      Ending CPU time: Thu Jul 30 20:03:20 MDT 2015<br>
+                      ---------------------------------------------------------------<br>
+                      Run Stage 4: Calculate horizontal covariances (regional lengthscales).<br>
+                      ---------------------------------------------------------------<br>
+                      Beginning CPU time: Thu Jul 30 20:03:20 MDT 2015<br>
+                      Ending CPU time: Thu Jul 30 20:04:05 MDT 2015<br>
+                      Ending CPU time: Thu Jul 30 20:04:05 MDT 2015<br>
+                      ---------------------------------------------------------------<br>
+                      Run gen_be_cov2d.<br>
+                      ---------------------------------------------------------------</p>
+                    <p class="stylecode">Thu Jul 30 20:04:06 MDT 2015 Finished</p></td>
+                  </tr>
+                </table>
+                <p>&nbsp;</p>
+                <p>Look for <strong><span class="stylecode">be.dat</span></strong> in the ${RUN_DIR} you specified in your gen_be_wrapper.ksh. <span class="stylecode"><strong>be.dat</strong></span> is the background error file which can now be used to run WRFDA.</p>
+                <p>If <span class="stylecode">be.dat</span> has not been created, check the log files for each gen_be stage (found in ${RUN_DIR}) to find the error.</p>
+                <p>The <span class="stylecode">fort.*</span> files under the directory <span class="stylecode">$RUN_DIR/working</span> are the files to be read by the graphics tools mentioned below.</p>
+              </blockquote>
+              <p><span class="bodyh1">Graphics</span>
+              </p>
+              <blockquote>
+                <p><span class="stylecode">WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh</span> is the main plotting script which calls other NCL scripts located in WRFDA/var/graphics/ncl/gen_be.</p>
+                <blockquote>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/scripts/gen_be/gen_be_plot_wrapper.ksh .</p>
+                </blockquote>
+                <p>Edit gen_be_plot_wrapper.ksh to provide proper settings.</p>
+                <blockquote>
+                  <p class="stylecode">vi gen_be_plot_wrapper.ksh</p>
+                  <p class="stylecode">......<br>
+                    export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                    export GEN_BE_PLOT=${WRFVAR_DIR}/var/graphics/ncl/gen_be<br>
+                    export GRAPHIC_WORKS=pdf</p>
+                  <p>export NUM_WE=89 # 1 point less than stagger points  90<br>
+                  export NUM_SN=59 # 1 point less than stagger points  60<br>
+                  export NUM_LEVELS=40 # 1 point less than stagger points 41<br>
+                  export RESOLUTION=60.0  # km<br>
+                  export REGION=tutorial     # only for naming output purpose<br>
+                  export BE_DIR=/kumquat/users/${USER}/DA/gen_be/gen_be5_cv5/working<br>
+                  export BE_NROW=$NUM_LEVELS</p>
+                </blockquote>
+                <p>then run the script</p>
+                <blockquote>
+                <p class="stylecode">./gen_be_plot_wrapper.ksh </p>
+                </blockquote>
+                <p>This wrapper script will create 6 plot files (the "tutorial" part of each file name is what you specified for "REGION" in the wrapper script):</p>
+                <ul>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <li><em>gen_be_global_evecs_tutorial.pdf</em>
+                        <p>This displays the first five eigenvectors for the control variables psi (streamfunction), chi_u (unbalanced velocity potential), t_u (unbalanced temperature), and rh (pseudo-relative humidity).</p></li>
+                    </td>
+                    <td class="bodytext"><a href="images/gen_be_global_evecs_tutorial.png"><img src="images/gen_be_global_evecs_tutorial.png" height="300"></a></td>
+                  </tr>
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <li><em>gen_be_global_evals_tutorial.pdf</em>
+                        <p>This displays plots of the eigenvalues by vertical mode for the control variables.</p></li>
+                    </td>
+                    <td class="bodytext"><a href="images/gen_be_global_evals_tutorial.png"><img src="images/gen_be_global_evals_tutorial.png" height="300"></a></td>
+                  </tr>
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <li><em>gen_be_lengthscales_tutorial.pdf</em>
+                        <p>This displays plots of the lengthscale of the control variables by vertical mode.</p></li>
+                    </td>
+                    <td class="bodytext"><a href="images/gen_be_lengthscales_tutorial.png"><img src="images/gen_be_lengthscales_tutorial.png" height="300"></a></td>
+                  </tr>
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <li><em>gen_be_corr_z_tutorial.pdf</em>
+                        <p>This displays plots of the correlation between unbalanced and balanced portions of chi and t by model level.</p></li>
+                    </td>
+                    <td class="bodytext"><a href="images/gen_be_corr_z_tutorial.png"><img src="images/gen_be_corr_z_tutorial.png" height="300"></a></td>
+                  </tr>
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <li><em>gen_be_corr_yz_tutorial.pdf</em>
+                        <p>Similar to the above, this is a color-filled graph of the correlation between unbalanced and balanced portions of chi and t by model level, plotted by horizontal gridpoints. Because of the binning choice, there is no variation in the horizontal.</p></li>
+                    </td>
+                    <td class="bodytext"><a href="images/gen_be_corr_yz_tutorial.png"><img src="images/gen_be_corr_yz_tutorial.png" height="300"></a></td>
+                  </tr>
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <li><em>gen_be_corr_ps_tutorial.pdf</em>
+                        <p>Similar to the above, but for surface pressure.</p></li>
+                    </td>
+                    <td class="bodytext"><a href="images/gen_be_corr_ps_tutorial.png"><img src="images/gen_be_corr_ps_tutorial.png" height="300"></a></td>
+                  </tr>
+                </table>
+              </blockquote>
+              <p>If this was successful, you can <a href="wrfda_sessions.html#session_3">continue to the next practice case</a>.</p>
+            </blockquote>
+            <span class="bodyh1"><a name="advanced">Additional practice</span>
+            <blockquote>
+              <ul>
+              <li>Try using more data and see how your plots change. You can find up to 4 weeks of data in /kumquat/wrfhelp/DATA/WRFDA/CONUS60/fc/.</p>
+              <li>If this was successful, view plots of the gen_be statistics with the above wrapper script, and continue to try more <a href="psot.html">single ob tests</a> using the be.dat you have created.</li>
+              </ul>
+              <p>&nbsp;</p>
+              </blockquote>
+            </blockquote>
+<!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

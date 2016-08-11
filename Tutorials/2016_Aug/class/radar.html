@@ -1,0 +1,203 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Radar data assimilation</span>
+            <blockquote>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_Radar.pdf">Download the tutorial presentation</a></span></p>
+              <p><span class="bodyh1">Source code</span></p>
+              <blockquote>
+                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so.</p>
+                <p><em>WRFDA/var/build/da_wrfvar.exe</em> is the executable that will be used in this session.</p>
+              </blockquote>
+              <p><span class="bodyh1">Choice of your working directory </span>
+              </p>
+              <blockquote>
+                <p>We recommend running each session in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run. </p>
+                <p>We recommend you create <em>/kumquat/users/${USER}/DA/radar</em> and cd there to be your working directory for this session. <br>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/radar</p>
+                <p class="stylecode">cd /kumquat/users/${USER}/DA/radar</p>
+                </p>
+              </blockquote>
+              <p><span class="bodyh1">Input files</span>
+              </p>
+              <blockquote>
+              <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>The <a href="wrfda_testdata.html#testdata_radar">radar case</a> is different from the CONUS60 case you have used in obsproc, running WRFDA-3DVAR and gen_be sessions. It utilizes a high-resolution domain over Taiwan, 61x51 gridpoints, 30 vertical levels, and 15km resolution (it can be found at /kumquat/wrfhelp/DATA/WRFDA/Radar).</a>
+                      <p>It features <a href="https://en.wikipedia.org/wiki/Typhoon_Fanapi">Typhoon Fanapi</a> striking the island on September 19, 2010.</p>
+                      <p>&nbsp;</p>
+                      <p>The procedure is the same as <a href="3dvar.html">Running WRFDA-3DVAR</a> except for an extra radar input file and adding and changing some namelist.input settings.</p>
+                      <p><strong><em>ob.radar</em></strong> is in plain text format. Open it with a text editor to see the content. Its format is simple, but the radar data preprocessing is not trivial and it is user's responsibility.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/radar.png"><img src="images/radar.png" alt="Domain of this test case" height="300"></a></td>
+                  </tr>
+                </table>
+                <blockquote>
+                  <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.radar ./ob.radar</p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob.ascii ./ob.ascii<br>
+                    ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./fg<br>
+                    ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat<br>
+                    ln -fs /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL</p>
+                  </blockquote>
+                <p>In this exercise, be.dat was created for cv_options=7.</p>
+              </blockquote>
+              <p><span class="bodyh1">Edit namelist.input</span>
+              </p>
+              <blockquote>
+                <p>A sample namelist for this test case is provided in <em>/kumquat/wrfhelp/DATA/WRFDA/Radar/namelist.input</em></p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/namelist.input ./namelist.input</p>
+                <p class="stylecode">vi namelist.input</p>
+                <p class="stylecode">&amp;wrfvar2<br>
+                  calc_w_increment = .true.<br>
+                  /<br>
+                  &amp;wrfvar4<br>
+                  use_radarobs    = .true.<br>
+                  use_radar_rv    = .true.<br>
+                  use_radar_rf    = .true.<br>
+                  use_radar_rqv   = .false.<br>
+                  use_radar_rhv   = .false.<br>
+                  use_3dvar_phy   = .true.<br>
+                  /<br>
+                  &amp;wrfvar7<br>
+                  cv_options=7,<br>
+                  /</p>
+   
+                <p>Note that in this exercise, be.dat was created for cv_options=7. It is important that if you use cv_options=7, you are sure to specify that option when you create the be.dat file with GEN_BE</p>
+              </blockquote>
+              <p><span class="bodyh1">Run WRFDA</span>
+              <blockquote>
+                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+              </blockquote>
+              <p><span class="bodyh1">Check output</span>
+              </p>
+              <blockquote>
+                <p>Use ncdiff and the ncl scripts introduced in previous exercises to analyze the output.</p>
+                <p>Check analysis increments of moisture fields.</p>
+                <p>Check the <em><strong>statistics</strong></em> file.</p>
+              </blockquote>
+              <p><span class="bodyh1">Other practice</span>
+              </p>
+              <blockquote>
+                <p>Compare the results using different settings:<br>
+                  use_radar_rv = .true. only<br>
+                  use_radar_rf = .true. only<br>
+                  both use_radar_rv = .true. and use_radar_rf = .true.</p>
+              </blockquote>
+              <p class=body>You can now <a href="wrfda_sessions.html#session_3">move on to the next exercise</a>, or try the 4DVAR radar assimilation exercise below.</p>
+            </blockquote>
+            <span class="pagetitle">4DVAR radar assimilation</span>
+            <blockquote>
+              <p><span class="bodyh1">Source code</span></p>
+              <blockquote>
+                <p><em>WRFDA/var/build/da_wrfvar_4dvar.exe</em> (this is renamed from da_wrfvar.exe)<br>
+                  is the executable that will be used in the 4D-VAR session.              </p>
+                <p>You should create a separate working directory <em> /kumquat/users/${USER}/DA/radar_4dvar</em> so that you can compare the two methods.</p>
+                <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA/radar_4dvar</span><br>
+                <span class="stylecode">cd /kumquat/users/${USER}/DA/radar_4dvar</span></p>
+            </blockquote>
+            <span class="bodyh1">Input data</span>
+            <blockquote>
+              <p>As in the regular 4DVAR case with conventional obs, more files are needed than just for 3DVAR. Observations need to be processed into multiple time-slot files. The naming convention for different time slots is also the same as for conventional obs (ob01.radar, ob02.radar, etc.)</p>
+              <p>Test data for this case are in the same directory as the 3dvar case, /kumquat/wrfhelp/DATA/WRFDA/Radar.</p>
+            <blockquote>
+                <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob01.radar ./ob01.radar<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob02.radar ./ob02.radar<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob03.radar ./ob03.radar<br>
+                  ln -fs /kumquat/wrfhelp/DATA/WRFDA/Radar/ob04.radar ./ob04.radar</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfinput_d01 ./wrfinput_d01<br>
+                  ln -fs wrfinput_d01 ./fg<br>
+                  cp /kumquat/wrfhelp/DATA/WRFDA/Radar/wrfbdy_d01 ./wrfbdy_d01<br>
+                  cp /kumquat/wrfhelp/DATA/WRFDA/Radar/be.dat ./be.dat</p>
+                <p> <span class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/run/RRTM_DATA_DBL ./RRTM_DATA </span></p>
+                <p> <span class="stylecode">ln -fs  /kumquat/users/${USER}/DA/WRFDA/run/*.TBL .</span></p>
+              </blockquote>
+              <p>A sample namelist for this test case is provided in <em>/kumquat/wrfhelp/DATA/WRFDA/Radar/namelist.input.4dvar</em></p>
+              <blockquote>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/Radar/namelist.input.4dvar ./namelist.input</p>
+                <p class="stylecode">&amp;wrfvar1<br>
+                  var4d=true,<br>
+                  var4d_bin=600,<br>
+                  /<br>
+                  &amp;wrfvar4<br>
+                  use_radarobs    = .true.<br>
+                  use_radar_rv    = .true.<br>
+                  use_radar_rf    = .false.<br>
+                  use_radar_rqv   = .false.<br>
+                  use_radar_rhv   = .true.<br>
+                  use_3dvar_phy   = .true.<br>
+                  /<br>
+                  &amp;wrfvar7<br>
+                  cv_options=7,<br>
+                  /</p>
+                </blockquote>
+              </blockquote>
+              <p><span class="bodyh1">Run WRFDA</span>
+              <p>Make sure you are using the 4DVAR compiled code! Since the assimilation windows for this case are only 10 minutes, this test should take less than 5 minutes to run on the classroom computers.</p>
+              <blockquote>
+                <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+              </blockquote>
+              <p>Compare the output of the 3dvar test to the 4dvar test using ncdiff. Is the difference significant?</p>
+              <p class=body>You have finished the radar assimilation tutorial. You can now <a href="wrfda_sessions.html#session_3">move on to the next exercise</a>.</p>
+<!--            <span class="pagetitle">Radar assimilation with CLOUD_CV options</span>
+            <blockquote>
+              <p><span class="bodyh1">Source code</span></p>
+            </blockquote>-->
+            <p>&nbsp;</p>
+            <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

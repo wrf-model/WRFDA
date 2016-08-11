@@ -1,0 +1,98 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <p><span class="pagetitle">Get pre-compiled code</span><br>
+              <br>
+              To save time and avoid unnecessary errors, <strong>we recommend using the provided pre-compiled code to run the exercises</strong>.<br>
+              If you are interested in compiling the code yourself, you can do that as a <a href="compile.html">separate exercise</a>.
+              <br>
+            </p>
+            <p>The pre-compiled WRFDA code can be accessed from <span class="stylecode">/kumquat/wrfhelp/PRE_COMPILED/WRFDA</span>.</p>
+              <p>You should copy the pre-compiled code into your local working directory. Follow the steps below:</p>
+            <span class="bodyh1">Pre-compiled code for 3DVAR and 4DVAR</span>
+            <blockquote>
+              <p><span class="stylecode">mkdir /kumquat/users/${USER}/DA</span>&nbsp;&nbsp;&nbsp; (your main working directory)<br>
+                <span class="stylecode">cd /kumquat/users/${USER}/DA</span><br>
+                <span class="stylecode">cp /kumquat/wrfhelp/PRE_COMPILED/WRFDA/WRFDA_compiled.tar.gz . </span><br>
+                <span class="stylecode">tar -xzf WRFDA_compiled.tar.gz</span></p>
+              <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA code. This WRFDA package is pre-compiled to run in parallel (dmpar) mode using the GNU compiler (gfortran/gcc 4.9.2). It was compiled with the 4DVAR capability, and so can be run for both 3DVAR and 4DVAR exercises</p>
+              </p>
+            </blockquote>
+<!--            <span class="bodyh1"><a name="4dvar">Pre-compiled code for 4DVAR</span>
+            <blockquote>
+              <p><b>NOTE: if you already have a "WRFDA" directory in your main working directory <em>/kumquat/users/${USER}/DA</em>, be sure to rename it before extracting the new code.</b></p>
+                <span class="stylecode">cd /kumquat/users/${USER}/DA</span><br>
+                <span class="stylecode">mv WRFDA WRFDA_3DVAR </span><br>
+                <span class="stylecode">cp /kumquat/wrfhelp/PRE_COMPILED/WRFDA/WRFDA_4DVAR_compiled.tar.gz . </span><br>
+                <span class="stylecode">tar -xzf WRFDA_4DVAR_compiled.tar.gz</span></p>
+              <p>This will generate the <span class="stylecode">WRFDA</span> directory containing the compiled WRFDA-4DVAR package. The WRFDA code is pre-compiled to run in parallel (dmpar) mode using the GNU compiler (gfortran/gcc 4.9.2). It is not necessary to copy over the WRFPLUS code unless you will be running it directly, like with the <a href="fso.html">FSO exercise</a>.</p>
+              </p>
+            </blockquote>-->
+            <a name=WRFPLUS><span class="bodyh1">Pre-compiled code for WRFPLUS</span>
+            <blockquote>
+              <p>The pre-compiled WRFPLUS package can be accessed from the same directory. It is not necessary to copy over the WRFPLUS code unless you will be running it directly, like with the <a href="fso.html">FSO exercise</a>.</p>
+              <p class="stylecode">cd /kumquat/users/${USER}/DA<br>
+                cp /kumquat/wrfhelp/PRE_COMPILED/WRFDA/WRFPLUSV3_compiled.tar.gz .<br>
+                tar -xzf WRFPLUSV3_compiled.tar.gz</p>
+            </blockquote>
+            
+            <a name=cloudy><span class="bodyh1">Code for cloudy radiance</span>
+            <blockquote>
+              <p>The code for the <a href="cloudy_rad.html">cloudy radiance exercise</a> is not yet available in the latest release version of WRFDA (version 3.8, which is used for the rest of the classroom exercises). Therefore you'll need to <a href=compile.html#CLOUDCV>download and compile the beta-release code yourself</a>.</p>
+            </blockquote>
+
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

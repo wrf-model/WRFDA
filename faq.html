@@ -123,12 +123,14 @@
               <li><a href="#running">Running WRFDA</a></li></ul><br></blockquote>
 
 
-            <h1><a name="links">Quick links</h1>
-              <b><ul class="bodytext"><br><li><a href="downloads.html">Download WRFDA</a></li>
-              <li><a href="known-problems.html">Known problems and solutions</a></li>
-              <li><a href="usersguide.html">User's Guide</a></ul></b><br>
+            <blockquote>
+              <h1><a name="links">Quick links</h1>
+                <b><ul class="bodytext"><br><li><a href="downloads.html">Download WRFDA</a></li>
+                <li><a href="known-problems.html">Known problems and solutions</a></li>
+                <li><a href="usersguide.html">User's Guide</a></ul></b><br>
 
-            <h1><a name="general">General WRFDA questions</h1>
+              <h1><a name="general">General WRFDA questions</h1>
+            </blockquote>
 
             <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
               <tr>
@@ -188,7 +190,9 @@
             </table></p> -->
 
 
-            <h1><a name="running">Running WRFDA</h1>
+            <blockquote>
+              <h1><a name="running">Running WRFDA</h1>
+            </blockquote>
 
             <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
               <tr>
@@ -220,6 +224,18 @@
                   <li>Use a simple microphysics option for your WRFNL run, set by the namelist option "mp_physics". You can use a different microphysics option than you plan to use with WRF</li>
                 </ul></td>
               </tr>
+              <tr>
+                <td width="5%"><strong>Q4</strong></td>
+                <td class="font11"><strong>I see one or more warning messages like this in my output, should I be worried?</strong><br>
+                <code>--------------------------- WARNING ---------------------------<br>
+                      WARNING FROM FILE: <A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk/da_scan_obs_ascii.html">da_scan_obs_ascii.inc</a>  LINE:      61<br>
+                      Error   29 opening gts obs file ob01.ascii</code></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A4</strong></td>
+                <td style="color:#900">WRFDA will always look for a conventional observation file, either "ob.ascii" (if ob_format=2 in your namelist) or "ob.bufr" (ob_format=1). For 4DVAR, there will be multiple files: one for each timeslot for ob_format=2 (ob01.ascii, ob02.ascii, ob03.ascii, etc.) or as many consecutive 6-hour-spanning files as are needed for ob_format=1 PREPBUFR files (ob01.bufr, ob02.bufr, etc.). All of these files are optional, so if you are aware that these files are missing, you can ignore the above-mentioned warning.</td>
+              </tr>
+
             </table></p>
 
             <blockquote>

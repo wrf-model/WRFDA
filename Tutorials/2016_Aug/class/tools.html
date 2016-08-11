@@ -1,0 +1,224 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Case description</span>
+            <blockquote>
+              <p>In this exercise you will be running verification scripts on pre-generated WRF-WRFDA cycling forecasts. This is a case from late December, 2013, when a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">major extratropical cyclone</a> impacted northwestern Europe. It is the same domain as was used for the <a href="radiance.html">radiance practice</a>. There are 3 series of 6-hour forecasts you will use in this practice session:</p>
+              <blockquote>
+                <ul><li> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/verification/no_da</span> contains a control case: 6-hour WRF forecasts initialized every 6 hours from 2013-12-23 00z to 2013-12-25 12z</li>
+                  <li> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/verification/conv_only</span> contains a cycling experiment: 6-hour forecasts every 6 hours, with the output of the previous forecast used to initialize the next forecast after assimilating conventional obs.</li>
+                  <li> <span class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/verification/conv_and_rad</span> contains another cycling experiment: 6-hour forecasts every 6 hours, with the output of the previous forecast used to initialize the next forecast after assimilating conventional <em>and</em> AMSU-A radiance obs.</li>
+              </blockquote>
+            </blockquote>
+            <span class="pagetitle">WRFDA Tools: Observation-based verification</span>
+            <blockquote>
+              <p>This exercise will teach you how to run WRFDA verification tools for observation-based verification.</p>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_Verification_Tools.pdf">Download the tutorial presentation</a></span></p>
+            </blockquote>
+            <span class="bodyh1">Source code</span>
+            <blockquote>
+              <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
+              <p><span class="stylecode">WRFDA/var/build/da_verif_obs.exe</span> is the executable that will be used in this session. It will be called directly by scripts, so there is no need to have it in your working directory.</p>
+            </blockquote>
+            <p><span class="bodyh1">Choose your working directory</span> </p>
+            <blockquote>
+              <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/verif_obs</span> and use this as your working directory.</p>
+              <blockquote>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/verif_obs<br>
+                                     cd /kumquat/users/${USER}/DA/verif_obs</p>
+              </blockquote>
+              <p>You will need two scripts from the WRFDA TOOLS package: da_run_suite_verif_obs.ksh and da_verif_obs_plot.ksh. Copy them into your working directory.</p>
+              <blockquote>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_run_suite_verif_obs.ksh .<br>
+                                     cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_verif_obs_plot.ksh .</p>
+              </blockquote>
+              <p>The observation files which will be used for this observation verification exercise have been pre-generated (using the "QC-OBS" procedure mentioned in the talk); they can be found in <em>/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/filt_ob/</em></p>
+              <p>The easiest way to control these scripts is by creating a "wrapper" script that sets the appropriate environment variables, then calls the scripts in order. Open a new file "verif_obs_wrapper.ksh" in vi (or your preferred text editor), and type the following:</p>
+              <blockquote>
+                <p class="stylecode">&gt; vi verif_obs_wrapper.ksh<br>
+                  #!/bin/ksh -aeu<br>
+                  <br>
+                  # Wrapper script for running WRFDA obs verification package<br>
+                  <br>
+                  # Settings for ./da_run_suite_verif_obs.ksh<br>
+                  <br>
+                  export CLEAN=false<br>
+                  export INITIAL_DATE=2013122312<br>
+                  export FINAL_DATE=2013122512<br>
+                  export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                  export SCRIPTS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts<br>
+                  export EXP_DIR=`pwd`/conv_only<br>
+                  export OB_DIR=/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/<br>
+                  export FILTERED_OBS_DIR=/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/filt_ob/<br>
+                  export BE_DIR=/kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/be/<br>
+                  export FC_DIR=/kumquat/wrfhelp/DATA/WRFDA/verification/conv_only/fc<br>
+                  export WINDOW_START=-3<br>
+                  export WINDOW_END=3<br>
+                  export CYCLE_PERIOD=6<br>
+                  export NUM_PROCS=4<br>
+                  export VERIFY_HOUR=6<br>
+                  export RUN_CMD="mpirun -np $NUM_PROCS"<br>
+                  export VERIFICATION_FILE_STRING=wrfout<br>
+                  # Here is where you set the appropriate namelist variables that the script will use to run WRFDA<br>
+                  export NL_ANALYSIS_TYPE=verify<br>
+                  export NL_E_WE=181<br>
+                  export NL_E_SN=181<br>
+                  export NL_E_VERT=41<br>
+                  export NL_DX=60000<br>
+                  export NL_DY=60000<br>
+                  export NL_SF_SURFACE_PHYSICS=2<br>
+                  export NL_NUM_LAND_CAT=24<br>
+                  <br>
+                  ./da_run_suite_verif_obs.ksh<br>
+                  # Settings for da_verif_obs_plot.ksh<br>
+                  <br>
+                  export START_DATE=2013122312<br>
+                  export END_DATE=2013122512<br>
+                  export RUN_DIR="`pwd`/conv_only/plots"<br>
+                  export NUM_EXPT=1<br>
+                  export EXP_NAMES='conv_only'<br>
+                  export EXP_LEGENDS='(/"conv_only"/)'<br>
+                  export EXP_DIRS="$EXP_DIR"<br>
+                  export INTERVAL=6<br>
+                  export NUM_PROCS=4<br>
+                  export VERIFY_HOUR=00<br>
+                  export GRAPHICS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl<br>
+                  export WRF_FILE="/kumquat/wrfhelp/DATA/WRFDA/cycling/run/2013122300/wrfout_d01_2013-12-23_00:00:00"<br>
+                  export Verify_Date_Range="12z 23 Dec - 12z 25 Dec, 2015 (${INTERVAL} hour Cycle)"<br>
+                  export OBS_TYPES='synop sound'<br>
+                  export NUM_OBS_TYPES=2<br>
+                  export PLOT_WKS=pdf #"pdf" will save plots in pdf format; "x11" will display the plots and not save them<br>
+                  <br>
+                  ./da_verif_obs_plot.ksh</p>
+
+                </blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>Now make the script you just made executable using "chmod", then run it.</p>
+                      <blockquote>
+                        <p class="stylecode">&gt; chmod +x verif_obs_wrapper.ksh</p>
+                        <p class="stylecode">./verif_obs_wrapper.ksh</p>
+                      </blockquote>
+                    <p>Use "display" to view the plots that have been created (you can find them as .pdf files in the directory you set as "RUN_DIR"). You should see plots similar to the one at right.</p>
+                    <p>Try running observation-based verification for the "conv_and_rad" case as well.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/Profile_ABIAS.png"><img src="images/Profile_ABIAS.png" height="300"></a></td>
+                  </tr>
+                </table>
+              </blockquote>
+            </blockquote>
+            <span class="pagetitle">WRFDA Tools: Analysis-based verification</span>
+            <blockquote>
+              <p>This exercise will teach you how to run WRFDA verification tools for observation-based verification. We will be verifying the two assimilation experiments against the "control" experiment with no data assimilation.</p>
+              <p><span class="stylecode">WRFDA/var/build/da_verif_grid.exe</span> is the executable that will be used in this session. It will be called directly by scripts, so there is no need to have it in your working directory.</p>
+              </blockquote>
+              <p><span class="bodyh1">Choose your working directory</span> </p>
+              <blockquote>
+                <p>For this exercise you should create<span class="stylecode"> /kumquat/users/${USER}/DA/verif_grid</span> and use this as your working directory.</p>
+                <blockquote>
+                <p class="stylecode">mkdir /kumquat/users/${USER}/DA/verif_grid<br>
+                                     cd /kumquat/users/${USER}/DA/verif_grid</p>
+                </blockquote>
+                <p>You will need a script from the WRFDA TOOLS package: da_verif_grid.ksh. Copy it into your working directory.</p>
+                <blockquote>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_verif_grid.ksh .</p>
+                </blockquote>
+                <p>The easiest way to control this script is by creating a "wrapper" script that sets the appropriate environment variables, then calls the script. Open a new file "verif_grid_wrapper.ksh" in vi (or your preferred text editor), and type the following:</p>
+                <blockquote>
+                <p class="stylecode">&gt; vi verif_grid_wrapper.ksh<br>
+                  #!/bin/ksh -aeu<br>
+                  <br>
+                  # Wrapper script for running WRFDA grid verification package<br>
+                  <br>
+                  export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                  export SCRIPTS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts<br>
+                  export GRAPHICS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS/graphics/ncl<br>
+                  export NUM_EXPT=2<br>
+                  export CONTROL_EXP_DIR=/kumquat/wrfhelp/DATA/WRFDA/cycling/no_da<br>
+                  export EXP_DIRS='/kumquat/wrfhelp/DATA/WRFDA/verification/conv_and_rad /kumquat/wrfhelp/DATA/WRFDA/verification/conv_only'<br>
+                  export EXP_NAMES='CONV_RAD CONV_ONLY'<br>
+                  export VERIFICATION_FILE_STRING='wrfout'<br>
+                  export EXP_LEGENDS='(/"Conv and rad obs","Conventional obs"/)'<br>
+                  export START_DATE=2013122312<br>
+                  export END_DATE=2013122512<br>
+                  export INTERVAL=06<br>
+                  export VERIFY_HOUR=06<br>
+                  <br>
+                  ./da_verif_grid.ksh</p>
+              </blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                      <p>Now make the script you just made executable using "chmod", then run it.</p>
+                      <blockquote>
+                        <p class="stylecode">&gt; chmod +x verif_grid_wrapper.ksh</p>
+                        <p class="stylecode">./verif_grid_wrapper.ksh</p>
+                      </blockquote>
+                      <p>Use "display" to view the plots that have been created in .pdf format. To the right is one example of the plots you should see. In this example we have specified the input information for both experiments in the wrapper script, so the two experiments are plotted together.
+                      <p class="body">NOTE: Some of the plots will come out rotated 90 degrees. You can click on the images within the "display" program to see a menu which has a "Transform --&gt; Rotate Left" option.</p>
+                      <p class="body">SECOND NOTE: These experiments are very simplified for ease of use on the classroom computer. Don't take the results too seriously.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/Profile_ABIAS-hr6.png"><img src="images/Profile_ABIAS-hr6.png" height="400"></a></td>
+                  </tr>
+                </table>
+              <p class="body"><br>You are now done with the Tools/Verification practice case. If you still have time, you can go  back and try some of the advanced exercises listed at the end of the <a href=4dvar.html#advanced>4dvar practice page</a>.<br></p>
+            </blockquote>
+            <p>&nbsp;</p>
+            <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

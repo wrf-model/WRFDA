@@ -147,7 +147,6 @@ body {
             </ul>
             <li><a href="#special">Special cases</a></li>
             <ul><li><a href="#gpspw">GPSPW and GPSZTD</a></li>
-               <li><a href="#data">Data record</a></li>
             </ul>
          </ul></blockquote></b>
       <blockquote>
@@ -411,7 +410,7 @@ body {
             </table></p>
 <div class=clear></div>
       <a name="FM"><p class="bodytext"><strong id="Font12">FM Codes</strong> </p>
-      <p class="bodytext">The World Meteorological Organization (WMO) specifies a list of 2-digit "FM" codes to distinguish between different observation types (described in <a href="https://www.wmo.int/pages/prog/gcos/documents/gruanmanuals/WWW_Data_Management/WMO_306_vol%20I.1_en.pdf">this presentation [WARNING: LARGE PDF]</a>. WRFDA assimilates a number of different observation types that do not have standard FM codes, so we use an extension of this system to identify different observation types. This code should appear in the "Platform" field as described above so that OBSPROC can properly identify the observation type. A list of valid FM codes for OBSPROC is listed below (codes in the same box are treated equivalently by OBSPROC and WRFDA):</p>
+      <p class="bodytext">The World Meteorological Organization (WMO) specifies a list of 2-digit "FM" codes to distinguish between different observation types (described in <a href="https://www.wmo.int/pages/prog/gcos/documents/gruanmanuals/WWW_Data_Management/WMO_306_vol%20I.1_en.pdf">this presentation [WARNING: LARGE PDF]</a>). WRFDA assimilates a number of different observation types that do not have standard FM codes, so we use an extension of this system to identify different observation types. This code should appear in the "Platform" field as described above so that OBSPROC can properly identify the observation type. A list of valid FM codes for OBSPROC is listed below (codes in the same box are treated equivalently by OBSPROC and WRFDA):</p>
             <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" border="1" class="bodytable">
               <tr>
                 <td><b>Code</b></td>
@@ -539,7 +538,7 @@ body {
             </table></p>
 <div class=clear></div>
 
-      <p class="bodytext"><strong id="Font14">Data record</strong> </p>
+      <a name=data><p class="bodytext"><strong id="Font14">Data record</strong> </p>
       <p class="bodytext">After the header record, there can be one or more data records. Multiple data records usually correspond to multiple vertical levels of data for a single observation site, and only certain observation types support more than one data record (for example, vertical soundings, FM-35). Unlike the header record, all fields here can be utilized (depending on the observation type), and all are optional, though some observations will be discarded if they are missing certain fields.</p>
             <p class=boxnw style="padding-left: 45px"><table style="background-color:#DDFFDD;" width="100%" border="1" class="bodytable">
               <tr>
@@ -685,12 +684,31 @@ body {
       </table></p>
 <div class=clear></div>
 
-      <p class="bodytext"><strong id="Font14">Observation formats</strong> </p>
+      <p class="bodytext"><strong id="Font14">Ending record</strong> </p>
+      <p class="bodytext">For all observation types, after the data record(s), there is a final, single-line, ending record. These fields have no meaning for OBSPROC, except the height and pressure fields should have the "end record" flag value of "-777777.00000".</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=20><kbd>
+               -777777.00000 &nbsp; &nbsp; &nbsp;0-777777.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0-888888.00000 &nbsp; &nbsp; &nbsp;0
+         </tr>
+      </table></p>
+<div class=clear></div>
+
+      <p class="bodytext"><strong id="Font14">Tail integers</strong> </p>
+      <p class="bodytext">Finally, after the ending record, there is another single line with three integer (I7) fields. The first is the number of valid fields for the observation, the second is the number of erros, and the third is the number of warnings. For the most part these are depreciated fields which were used by earlier MM5-era programs, but they are still used by OBSPROC to decide which observation to keep if two are identical observation types at identical places and times. The merge checks are in order of precedence, from left to right (most valid fields, least errors, or least warnings).</p>
+      <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
+         <tr>
+            <td colspan=3><kbd>
+               &nbsp; &nbsp; &nbsp;39&nbsp; &nbsp; &nbsp; 0&nbsp; &nbsp; &nbsp; 0
+         </tr>
+      </table></p>
+<div class=clear></div>
+
 
       <p class="bodytext"></p>
 
    <a name=special><h1>Special cases</h1>
-      <p class="bodytext">Because LITTLE_R is a legacy format that was developed several decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
+      <p class="bodytext">Because LITTLE_R is a legacy format that was developed decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
 
       <a name=gpspw><a name=gpsztd><p class="bodytext"><strong id="Font14">GPS PW and ZTD</strong> </p>
       <p class="bodytext">GPS Precipitable Water (GPSPW) and Zenith Total Delay (GPSZTD) observations are stored in similar formats. For these observation types, the observation of interest is actually in the header record, rather than the data record.</p>

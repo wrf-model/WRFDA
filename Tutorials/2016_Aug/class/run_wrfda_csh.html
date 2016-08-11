@@ -1,0 +1,404 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <p class="pagetitle">run_wrfda.csh</p>
+            <p class="stylecode"><pre>#!/bin/csh
+#
+set echo
+set DATE         = 2007010106
+set RUN_TYPE     = cycle   # cold or cycle
+set DOMAIN_ID    = 01
+set NPROC        =  4
+set DA_SRCDIR    = /kumquat/wrfhelp/SOURCE_CODE/WRFDA
+set BIN_DIR      = ${DA_SRCDIR}/var/build
+set OB_DATDIR    = /kumquat/wrfhelp/DATA/WRFDA/ASR180/ob
+set BE_DATDIR    = /kumquat/wrfhelp/DATA/WRFDA/ASR180/be
+set RC_DATDIR    = /kumquat/wrfhelp/DATA/WRFDA/ASR180/rc
+set RUN_BASEDIR  = /kumquat/users/$USER/DA/asr180/run
+set DA_RUNDIR    = ${RUN_BASEDIR}/${DATE}/da/d${DOMAIN_ID}
+set TIMEWINDOW1  =  -1h30m
+set TIMEWINDOW2  =  1h30m
+set CYCLE_PERIOD =  06
+
+set ccyy = `echo $DATE | cut -c1-4`
+set   mm = `echo $DATE | cut -c5-6`
+set   dd = `echo $DATE | cut -c7-8`
+set   hh = `echo $DATE | cut -c9-10`
+set DATE_MIN = `${BIN_DIR}/da_advance_time.exe ${DATE} ${TIMEWINDOW1} -w`
+set DATE_MAX = `${BIN_DIR}/da_advance_time.exe ${DATE} ${TIMEWINDOW2} -w`
+
+set PREV_DATE = `${BIN_DIR}/da_advance_time.exe ${DATE} -${CYCLE_PERIOD}`
+set VARBC_PREV_DATE = `${BIN_DIR}/da_advance_time.exe ${DATE} -24`
+
+if ( ! -d ${DA_RUNDIR} ) mkdir -p ${DA_RUNDIR}
+cd ${DA_RUNDIR}
+
+if ( ${DOMAIN_ID} == '01' ) then
+   set WEST_EAST_GRID_NUMBER   = 61
+   set SOUTH_NORTH_GRID_NUMBER = 61
+   set VERTICAL_GRID_NUMBER    = 41
+   set GRID_DISTANCE           = 180000
+   set BE_FILE = be_d01.dat
+else if ( ${DOMAIN_ID} == '02' ) then
+   set WEST_EAST_GRID_NUMBER   = 61
+   set SOUTH_NORTH_GRID_NUMBER = 61
+   set VERTICAL_GRID_NUMBER    = 41
+   set GRID_DISTANCE           = 90000
+    set BE_FILE = be_d02.dat
+endif
+
+rm -f ${DA_RUNDIR}/rsl.*
+#
+# link some constant files
+#
+ln -fs ${DA_SRCDIR}/run/LANDUSE.TBL  .
+#
+# link first-guess, observations, background-error
+#
+# link either ob.bufr (for ob_format=1) or ob.ascii (for ob_format=2)
+ln -fs ${OB_DATDIR}/${DATE}/gdas1.t${hh}z.prepbufr.nr.LINUX    ./ob.bufr
+ln -fs ${OB_DATDIR}/${DATE}/ob.ascii                           ./ob.ascii
+# BE file for cv_options=5
+ln -fs ${BE_DATDIR}/${BE_FILE}                                 ./be.dat
+# BE file for cv_options=3
+#ln -fs ${DA_SRCDIR}/var/run/be.dat.cv3                      ./be.dat
+#
+# link radiance-related files
+#
+ln -fs ${OB_DATDIR}/${DATE}/gdas1.t${hh}z.1bamua.tm00.bufr_d.LINUX   ./amsua.bufr
+ln -fs ${OB_DATDIR}/${DATE}/gdas1.t${hh}z.1bamub.tm00.bufr_d.LINUX   ./amsub.bufr
+ln -fs ${DA_SRCDIR}/var/run/radiance_info .
+# link crtm_coeffs if using CRTM
+ln -fs ${DA_SRCDIR}/var/run/crtm_coeffs   .
+# link rtcoef* if using RTTOV
+#ln -fs /kumquat/wrfhelp/WRFDA/external/rttov87/rtcoef_rttov7/rtcoef*.dat .
+#
+set VARBC_DIR = ${RUN_BASEDIR}/${VARBC_PREV_DATE}/da/d${DOMAIN_ID}
+if ( ! -e ${VARBC_DIR}/VARBC.out ) then
+   ln -fs ${DA_SRCDIR}/var/run/VARBC.in ./VARBC.in
+else
+   ln -fs ${VARBC_DIR}/VARBC.out  ./VARBC.in
+endif
+
+if ( ${RUN_TYPE} == 'cold' ) then
+   if ( ! -e ${RC_DATDIR}/${DATE}/wrfinput_d${DOMAIN_ID} ) then
+      echo "ERROR in run_wrfda.csh : first guess ${RC_DATDIR}/${DATE}/wrfinput_d${DOMAIN_ID} not found..."
+      exit 1
+   endif
+   ln -fs ${RC_DATDIR}/${DATE}/wrfinput_d${DOMAIN_ID} fg
+else  # cycling
+   if ( ! -e ${RUN_BASEDIR}/${PREV_DATE}/wrf/wrfvar_input_d${DOMAIN_ID}_${ccyy}-${mm}-${dd}_${hh}:00:00 ) then
+      echo "ERROR in run_wrfda.csh : first guess ${RUN_BASEDIR}/${PREV_DATE}/wrf/wrfvar_input_d${DOMAIN_ID}_${ccyy}-${mm}-${dd}_${hh}:00:00 not found..."
+      exit 1
+   else
+      ln -fs ${RUN_BASEDIR}/${PREV_DATE}/wrf/wrfvar_input_d${DOMAIN_ID}_${ccyy}-${mm}-${dd}_${hh}:00:00 fg_orig
+      cp -p ${RUN_BASEDIR}/${PREV_DATE}/wrf/wrfvar_input_d${DOMAIN_ID}_${ccyy}-${mm}-${dd}_${hh}:00:00 fg
+   endif
+endif
+
+if ( ${RUN_TYPE} == 'cycle' ) then
+   # when not cold-starting, update lower boundary first, before running wrfvar
+   # fields to be updated are TSK over water, TMN, SST, VEGFRA, ALBBCK, SEAICE, LANDMASK, IVGTYP, ISLTYP
+   cd ${DA_RUNDIR}
+   cat >! ${DA_RUNDIR}/parame.in << EOF
+&control_param
+ da_file            = '${DA_RUNDIR}/fg'
+ wrf_input          = '${RC_DATDIR}/${DATE}/wrfinput_d${DOMAIN_ID}'
+ domain_id          = ${DOMAIN_ID}
+ debug              = .false.
+ update_lateral_bdy = .false.
+ update_low_bdy     = .true.
+ update_lsm         = .false.
+ iswater            = 16 /
+EOF
+   ln -fs ${DA_SRCDIR}/var/build/da_update_bc.exe .
+   time ./da_update_bc.exe >&! update_low_bc_${DATE}.log
+   mv parame.in parame.in.lowbdy
+   # check status
+   grep "Update_bc completed successfully" update_low_bc_${DATE}.log
+   if ( $status != 0 ) then
+      echo "ERROR in run_wrfda.csh : update low bdy failed..."
+      exit 1
+   endif
+endif
+#
+# create namelist for WRFDA run
+#
+cat >! namelist.input << EOF
+ &wrfvar1
+ print_detail_grad=false
+ /
+ &wrfvar2
+ /
+ &wrfvar3
+ ob_format=1
+ /
+ &wrfvar4
+ thin_mesh_conv = 30*180.0
+ USE_SYNOPOBS =  T,
+ USE_SHIPSOBS =  T,
+ USE_METAROBS =  T,
+ USE_SOUNDOBS =  T,
+ USE_MTGIRSOBS =  F,
+ USE_TAMDAROBS =  F,
+ USE_PILOTOBS =  F,
+ USE_AIREPOBS =  T,
+ USE_GEOAMVOBS =  T,
+ USE_POLARAMVOBS =  T,
+ USE_BOGUSOBS =  F,
+ USE_BUOYOBS =  T,
+ USE_PROFILEROBS =  T,
+ USE_SATEMOBS =  F,
+ USE_GPSZTDOBS =  F,
+ USE_GPSPWOBS =  F,
+ USE_GPSREFOBS =  F,
+ USE_QSCATOBS =  T,
+ USE_AIRSRETOBS =  F,
+ use_ssmiretrievalobs=false
+ use_amsuaobs = T,
+ use_amsubobs = T,
+ use_mhsobs   = F,
+ use_airsobs  = F,
+ use_eos_amsuaobs = F,
+ USE_OBS_ERRFAC=F
+ /
+ &wrfvar5
+ MAX_ERROR_T =    5.0     ,
+ MAX_ERROR_UV =    5.0     ,
+ MAX_ERROR_PW =    5.0     ,
+ MAX_ERROR_REF =    5.0     ,
+ MAX_ERROR_Q =    5.0     ,
+ MAX_ERROR_P =    5.0   ,
+ /
+ &wrfvar6
+ max_ext_its=1,
+ ntmax=100,
+ eps=0.01,
+ orthonorm_gradient=.true.,
+ /
+ &wrfvar7
+ cv_options=5
+ var_scaling1 = 1.,
+ var_scaling2 = 1.,
+ var_scaling3 = 1.,
+ var_scaling4 = 1.,
+ var_scaling5 = 1.,
+ len_scaling1 = 1.,
+ len_scaling2 = 1.,
+ len_scaling3 = 1.,
+ len_scaling4 = 1.,
+ len_scaling5 = 1.,
+ /
+ &wrfvar8
+ /
+ &wrfvar9
+ /
+ &wrfvar10
+ /
+ &wrfvar11
+ check_rh=1
+ /
+ &wrfvar12
+ /
+ &wrfvar13
+ /
+ &wrfvar14
+ rtminit_nsensor=5,
+ rtminit_platform=1,1,10,1,1,
+ rtminit_satid=16,18,2,16,17,
+ rtminit_sensor=3,3,3,4,4,
+ thinning_mesh=30*200.0
+ thinning=true,
+ qc_rad=true,
+ write_iv_rad_ascii=false,
+ write_oa_rad_ascii=true,
+ rtm_option=2,
+ only_sea_rad=false,
+ use_varbc=.true.
+ use_crtm_kmatrix=.true.
+ crtm_atmosphere=5,
+ /
+ &wrfvar15
+ /
+ &wrfvar16
+ /
+ &wrfvar17
+ analysis_type="3D-VAR"
+ /
+ &wrfvar18
+ analysis_date="${ccyy}-${mm}-${dd}_${hh}:00:00",
+ /
+ &wrfvar19
+ /
+ &wrfvar20
+ /
+ &wrfvar21
+ time_window_min="${DATE_MIN}",
+ /
+ &wrfvar22
+ time_window_max="${DATE_MAX}",
+ /
+ &wrfvar23
+ /
+ &time_control
+ start_year                          = ${ccyy}
+ start_month                         = ${mm}
+ start_day                           = ${dd}
+ start_hour                          = ${hh}
+ start_minute                        = 00
+ start_second                        = 00
+ end_year                            = ${ccyy}
+ end_month                           = ${mm}
+ end_day                             = ${dd}
+ end_hour                            = ${hh}
+ end_minute                          = 00
+ end_second                          = 00
+ /
+ &dfi_control
+ /
+ &domains
+ s_we                                = 1
+ e_we                                = ${WEST_EAST_GRID_NUMBER}
+ s_sn                                = 1
+ e_sn                                = ${SOUTH_NORTH_GRID_NUMBER}
+ s_vert                              = 1
+ e_vert                              = ${VERTICAL_GRID_NUMBER}
+ dx                                  = ${GRID_DISTANCE}
+ dy                                  = ${GRID_DISTANCE}
+ hypsometric_opt                     = 1
+ i_parent_start                      = 0,
+ j_parent_start                      = 0,
+ /
+ &physics
+ mp_physics                          = 4,
+ sf_sfclay_physics                   = 1,
+ sf_surface_physics                  = 2,
+ bl_pbl_physics                      = 1,
+ cu_physics                          = 5,
+ num_soil_layers                     = 4,
+ num_land_cat                        = 24,
+ num_soil_cat                        = 16,
+ /
+ &fdda
+ /
+ &dynamics
+ /
+ &bdy_control
+ /
+ &grib2
+ /
+ &namelist_quilt
+ nio_tasks_per_group = 0,
+ nio_groups = 1,
+ /
+EOF
+
+ln -sf ${DA_SRCDIR}/var/build/da_wrfvar.exe .
+if ( $NPROC > 1 ) then
+   mpirun -np ${NPROC} ./da_wrfvar.exe  >&! wrfda_${DATE}_d${DOMAIN_ID}.log
+else
+   time ./da_wrfvar.exe  >&! wrfda_${DATE}_d${DOMAIN_ID}.log
+endif
+
+# check status
+if ( $NPROC > 1 ) then
+   grep "WRF-Var completed successfully" rsl.out.0000
+else
+   grep "WRF-Var completed successfully" wrfda_${DATE}_d${DOMAIN_ID}.log
+endif
+if ( $status != 0 ) then
+   echo "ERROR in run_wrfda.csh : da_wrfvar.exe failed..."
+   exit 1
+endif
+
+rm gts_omb_oma_01.* unpert_obs.*
+foreach file_rej ( `ls rej_obs_conv_01.*` )
+   cat ${file_rej} >> rej_obs_conv_01
+end
+rm rej_obs_conv_01.* filtered_obs.0*
+
+# update lateral bdy for coarse domain
+if ( ${DOMAIN_ID} == '01' ) then
+   cd ${DA_RUNDIR}
+   cp -p ${RC_DATDIR}/${DATE}/wrfbdy_d${DOMAIN_ID} ${DA_RUNDIR}/wrfbdy_d${DOMAIN_ID}
+   cat >! ${DA_RUNDIR}/parame.in << EOF
+&control_param
+ da_file            = '${DA_RUNDIR}/wrfvar_output'
+ wrf_bdy_file       = '${DA_RUNDIR}/wrfbdy_d${DOMAIN_ID}'
+ wrf_input          = '${RC_DATDIR}/${DATE}/wrfinput_d${DOMAIN_ID}'
+ domain_id          = ${DOMAIN_ID}
+ debug              = .false.
+ update_lateral_bdy = .true.
+ update_low_bdy     = .false
+ update_lsm         = .false.
+ iswater            = 16 /
+EOF
+   ln -sf ${DA_SRCDIR}/var/build/da_update_bc.exe .
+   time ./da_update_bc.exe >&! update_lat_bc_${DATE}.log
+   mv parame.in parame.in.latbdy
+   # check status
+   grep "Update_bc completed successfully" update_lat_bc_${DATE}.log
+   if ( $status != 0 ) then
+      echo "ERROR in run_wrfda.csh : update lateral bdy failed..."
+      exit 1
+   endif
+endif
+
+echo "Done run_wrfda.csh for domain ${DOMAIN_ID} `date`"</pre></p>
+          <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

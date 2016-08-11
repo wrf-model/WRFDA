@@ -1,0 +1,313 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="../assets/menu_array_class.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="../assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="../assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="../index.html"><img src="../images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+            <span class="pagetitle">Radiance data assimilation  </span>
+            <blockquote>
+              <p><span class="body">Reference: <a href="../docs/WRFDA_Radiance.pdf">Download the tutorial presentation</a></span></p>
+              <p><span class="bodyh1">Source code</span></p>
+              <blockquote>
+                <p>Get the <a href="wrfda_code.html">pre-compiled code</a>, if you have not done so. </p>
+                <p><em>WRFDA/var/build/da_wrfvar.exe</em> is the executable that will be used in this session.</p>
+              </blockquote>
+              <p><span class="bodyh1">Choice of your working directory </span> </p>
+              <blockquote>
+                <p>You should run each lesson in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
+                <p>We recommend you create <em>/kumquat/users/${USER}/DA/radiance</em> to be your working directory for this session.</p>
+                <blockquote>
+                  <p class="stylecode">mkdir /kumquat/users/${USER}/DA/radiance<br>
+                                       cd /kumquat/users/${USER}/DA/radiance</p>
+              </blockquote></blockquote>
+              <p><span class="bodyh1">Input files</span> </p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                    <blockquote>
+                      <p>For radiance assimilation practice, we will be using a different case than the day 1 exercises, which can be found in /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case. This is a case from late December, 2013, when a <a href="https://en.wikipedia.org/wiki/Cyclone_Dirk">major extratropical cyclone</a> impacted northwestern Europe. The domain for this case is plotted at right.</p>
+                      <p>Keep in mind that if you <a href="compile.html">compiled WRFDA yourself</a>, additional settings (specifically, environment variables for BUFR and one or both radiative transfer models) must be specified at compile time to utilize radiance data. This has been done for you in the pre-compiled code.</p>
+                      <p>Radiance assimilation for 3DVAR is much the same procedure as <a href="3dvar.html">Running WRFDA-3DVAR with conventional observations</a>. To begin this exercise, link/copy the basic input files above that you should have been familiar with by now:</p>
+                      <blockquote>
+                        <p class="stylecode">ln -sf /kumquat/users/${USER}/DA/WRFDA/run/LANDUSE.TBL ./LANDUSE.TBL<br>
+                                             ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/obs_gts_2013-12-23_00:00:00.3DVAR ./ob.ascii<br>
+                                             ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/be/be.dat ./be.dat<br>
+                                             cp -p /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/rc/2013122300/wrfinput_d01 ./fg</p>
+                      </blockquote>
+                      <p>In addition, the following extra files are required for radiance assimilation:</p>
+                    </td>
+                    <td class="bodytext"><a href="images/arctic.png"><img src="images/arctic.png" height="300"></a></td>
+                  </tr>
+                </table>
+              </blockquote>
+              <ul>
+                <li>Radiance data in NCEP BUFR format</li>
+              </ul>
+              <blockquote>
+                <blockquote>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/gdas.1bamua.t00z.20131223.bufr ./amsua.bufr<br>
+                    ln -fs /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/gdas.1bamub.t00z.20131223.bufr ./amsub.bufr</p>
+                </blockquote>
+              </blockquote>
+              <ul>
+                <li>radiance_info files (you must link the whole directory)</li>
+              </ul>
+              <blockquote>
+                <blockquote> 
+                  <p class="stylecode">ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/radiance_info ./radiance_info</p>
+                </blockquote>
+              </blockquote>
+              <ul>
+                <li>File for variational bias correction</li>
+              </ul>
+              <blockquote>
+                <blockquote>
+                  <p class="stylecode">cp /kumquat/users/${USER}/DA/WRFDA/var/run/VARBC.in ./VARBC.in</p>
+                </blockquote>
+              </blockquote>
+              <ul>
+                <li>Radiative Transfer Model (CRTM or RTTOV) coefficient files (you must link the whole directory)</li>
+              </ul>
+              <blockquote>
+                <blockquote>
+                  <p class="stylecode"> ln -fs /kumquat/users/${USER}/DA/WRFDA/var/run/crtm_coeffs ./crtm_coeffs</p>
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/external/rttov11/rtcoef_rttov11/rttov7pred54L ./rttov_coeffs</p>
+                </blockquote>
+              </blockquote>
+              <p><span class="bodyh1">Edit namelist.input</span> </p>
+              <blockquote>
+                <p>A sample namelist.input is provided here: <a href="namelist.input.radiance">namelist.input</a></p>
+                <p>If you'd like a challenge, try creating the namelist yourself from scratch. The important settings for this case are listed below. Otherwise you can copy it from /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/namelist.input.radiance</p>
+                <blockquote>
+                  <p><span class="stylecode">vi namelist.input </span>(pay special attention to the following radiance-related settings)</p>
+                  <p><span class="stylecode">&amp;wrfvar1<br>
+                    /<br>
+                    &amp;wrfvar2<br>
+                    /<br>
+                    &amp;wrfvar3<br>
+                    /<br>
+                    &amp;wrfvar4<br>
+                    use_amsuaobs = .true.<br>
+                    use_amsubobs = .true.<br>
+                    /<br>
+                    &amp;wrfvar5<br>
+                    /<br>
+                    &amp;wrfvar6<br>
+                    /<br>
+                    &amp;wrfvar7<br>
+                    /<br>
+                    &amp;wrfvar8<br>
+                    /<br>
+                    &amp;wrfvar9<br>
+                    /<br>
+                    &amp;wrfvar10<br>
+                    /<br>
+                    &amp;wrfvar11<br>
+                    /<br>
+                    &amp;wrfvar12<br>
+                    /<br>
+                    &amp;wrfvar13<br>
+                    /<br>
+                    &amp;wrfvar14<br>
+                    rtminit_nsensor = 3,<br>
+                    rtminit_platform = 1,1,1<br>
+                    rtminit_satid = 16,16,19<br>
+                    rtminit_sensor = 3,4,3<br>
+                    thinning_mesh = 120.0,120.0,120.0<br>
+                    thinning = .true.<br>
+                    qc_rad = .true.<br>
+                    write_iv_rad_ascii = .false.<br>
+                    write_oa_rad_ascii = .true.<br>
+                    rtm_option = 2</span> &nbsp; (set to "1" for RTTOV)<br>
+                    <span class="stylecode">only_sea_rad = .false.<br>
+                    use_varbc = .true.<br>
+                    use_crtm_kmatrix = .true.</span> &nbsp; (set "use_rttov_kmatrix" instead for RTTOV)<br>
+                    <span class="stylecode">varbc_nbgerr = 5000</span>
+                    <br>
+                    /<br>
+                    &amp;wrfvar15<br>
+                    /<br>
+                    &amp;wrfvar16<br>
+                    /<br>
+                    &amp;wrfvar17<br>
+                    /<br>
+                    &amp;wrfvar18<br>
+                     analysis_date="2013-12-23_00:00:00.0000",<br>
+                    /<br>
+                    &amp;wrfvar19<br>
+                    /<br>
+                    &amp;wrfvar20<br>
+                    /<br>
+                    &amp;wrfvar21<br>
+                    time_window_min = &quot;2013-12-22_23:00:00&quot;<br>
+                    /<br>
+                    &amp;wrfvar22<br>
+                    time_window_max = &quot;2013-12-23_01:00:00&quot;<br>
+                    /<br>
+                    &amp;wrfvar23<br>
+                    /<br>
+                    &amp;time_control<br>
+                    /<br>
+                    &amp;fdda<br>
+                    /<br>
+                    &amp;domains<br>
+                    e_we &nbsp; = 181,<br>
+                    e_sn &nbsp; = 181,<br>
+                    e_vert = 41,<br>
+                    dx &nbsp; &nbsp; = 60000,<br>
+                    dy &nbsp; &nbsp; = 60000,<br>
+                    /<br>
+                    &amp;dfi_control<br>
+                    /<br>
+                    &amp;tc<br>
+                    /<br>
+                    &amp;physics<br>
+                    sf_surface_physics = 2,<br>
+                    num_land_cat = 24,<br>
+                    /<br>
+                    &amp;scm<br>
+                    /<br>
+                    &amp;dynamics<br>
+                    /<br>
+                    &amp;bdy_control<br>
+                    /<br>
+                    &amp;grib2<br>
+                    /<br>
+                    &amp;fire<br>
+                    /<br>
+                    &amp;namelist_quilt<br>
+                    /<br>
+                    &amp;perturbation<br>
+                    /<br>
+                  </p>
+                </blockquote>
+              </blockquote>
+              <p><span class="bodyh1">Run WRFDA</span> </p>
+              <blockquote>
+                <blockquote>
+                  <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/WRFDA/var/build/da_wrfvar.exe</p>
+                </blockquote>
+                <p>The test should take about a minute to complete on classroom computers.</p>
+              </blockquote>
+              <p><span class="bodyh1">Check output</span> </p>
+              <blockquote>
+                <p>Check analysis increments.</p>
+                <p>Check <em><strong>statistics</strong></em>.</p>
+                <p>There are extra diagnostic files when assimilating radiance data:</p>
+                  <ul><li><b>01_oma_*amsu*</b>: Observation minus analysis statistics for each radiance instrument.</li>
+                    <li><b>01_qcstat_*amsu*</b>: Quality control statistics for each radiance instrument.</li>
+                    <li><b>VARBC.out</b>: Output file for Variational Bias Correction. This process is described in further detail in the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.7/WRFDA_Users_Guide.pdf#25">User's Guide</a></p>
+              </blockquote>
+              <span class="bodyh1">Graphics</span>
+              <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                <p>The script <em>/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh</em> can be used to generate a number of helpful plots and graphs for visualizing radiance assimilation statistics.</p>
+                <p class="stylecode">cp /kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh .</p>
+                <p class="stylecode">vi da_rad_diags.ksh<br>
+                  export START_DATE=2013122300<br>
+                  export END_DATE=2013122300<br>
+                  export CYCLE_PERIOD=12<br>
+                  #<br>
+                  export NUM_PROCS=6  # number of processors used in running WRFDA<br>
+                  export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                  export BUILD_DIR=${WRFVAR_DIR}/var/build<br>
+                  export TOOLS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS<br>
+                  export EXP_DIR=/kumquat/users/${USER}/DA/radiance<br>
+                  export VAR_RUN_DIR1=$EXP_DIR<br>
+                  export VAR_RUN_DIR2=none<br>
+                  <br>
+                  ...<br>
+                  export FGFILE=$VAR_RUN_DIR1/fg<br>
+                  ...<br>
+                  export FILE_PREFIX=01_oma<br>
+                  set -A INSTIDS noaa-19-amsua<br>
+                  ...<br>
+                  export $FULL_FILE_PREFIX=$VAR_RUN_DIR1/$FILE_PREFIX</p>
+
+                <p>After changing all the above settings, run the script. A number of plots with the file extention ".ncgm" will be created in the "diag" directory. Use the command "idt" to view these .ncgm files. The plot at right shows the observed values for AMSU-A Channel 5 on NOAA-16 (after thinning was applied); you should see many plots just like this for other channels and instruments.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/noaa-16-amsua_2013122300-0.png"><img src="images/noaa-16-amsua_2013122300-0.png" height="300"></a></td>
+                  </tr>
+                </table>
+                <p class="body"><br>You have now completed the basic radiance tutorial! If you still have time, you can try the additional practice below:</p>
+              </blockquote>
+              <p class="bodyh2"><a name="advanced">Additional practice</a></p>
+              <ul>
+                <li>Try assimilating more radiance data for this case. The radiance data for the HIRS3, HIRS4, and MHS instruments, respectively, can be found below:<br><br>
+                <span class="stylecode">ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/gdas.1bhrs3.t00z.20131223.bufr ./hirs3.bufr<br>
+                  ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/gdas.1bhrs4.t00z.20131223.bufr ./hirs4.bufr<br>
+                  ln -sf /kumquat/wrfhelp/DATA/WRFDA/arctic_tutorial_case/ob/2013122300/gdas.1bmhs.t00z.20131223.bufr ./mhs.bufr<br><br></span>
+                In the namelist, change the following settings to read the new files and assimilate the data:<br><br>
+                <span class="stylecode">&amp;wrfvar4<br>
+                    use_hirs3obs = .true.<br>
+                    use_hirs4obs = .true.<br>
+                    use_mhsobs = .true.<br>
+                    /<br>
+                    &amp;wrfvar14<br>
+                    rtminit_nsensor = 4,<br>
+                    rtminit_platform = 1,1,1,1,<br>
+                    rtminit_satid = 16,18,18,19,<br>
+                    rtminit_sensor = 0,0,15,15<br><br>
+                </span>
+</li>
+                <li>Try adding radiance assimilation to the <a href="3dvar.html">3dvar case</a> you tested in an earlier practice session. The radiance data for that case can be found in <em>/kumquat/wrfhelp/DATA/WRFDA/CONUS60/ob/2008020512</em><br><br></li>
+                <li>Try changing some of the namelist.input settings (for example, different thinning mesh, different Radiative Transfer Model) and compare the results. </li>
+              </ul>
+            </blockquote>
+            <p>&nbsp;</p>
+          <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../../../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>

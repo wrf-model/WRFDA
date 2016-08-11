@@ -180,10 +180,10 @@ PlainStyle,
 ,"<div style='margin-top:6px'>System</div>","show-menu=Analysis",,,1
 ,"<div style='margin-top:6px'>User Support</div>","show-menu=Support",,,1
 ,"<div style='margin-top:6px'>Download</div>","show-menu=Download",,,1
-,"Publications & Documentation","show-menu=Pub",,,1
+,"Publications &<br>Documentation","show-menu=Pub",,,1
 ,"<div style='margin-top:6px'>Links</div>","show-menu=Links",,,1
 ,"<div style='margin-top:6px'>Internal</div>","http://www2.mmm.ucar.edu/wrf/users/wrfda/internal.html",,,1
-,"WRFDA Testbeds","show-menu=Testbeds",,,1
+,"WRFDA<br>Testbeds","show-menu=Testbeds",,,1
 ])
 
 
@@ -346,6 +346,7 @@ PlainStyle2,
 ,
 ,"WRFDA Publications","http://www2.mmm.ucar.edu/wrf/users/wrfda/publications.html",,,1
 ,"Technical Notes","http://www2.mmm.ucar.edu/wrf/users/wrfda/technotes.html",,,1
+,"WRFDA Code Browser","http://www2.mmm.ucar.edu/wrf/users/wrfda/code_viewer/index.html",,,1
 ,"WRFDA User's Guide","show-menu=userguide",,,0
 ,"WRFDA Online Tutorial","http://www2.mmm.ucar.edu/wrf/users/wrfda/OnlineTutorial/index.html",,,1
 ,"How to compile WRFDA","http://www2.mmm.ucar.edu/wrf/users/wrfda/how_to_compile.html",,,1
