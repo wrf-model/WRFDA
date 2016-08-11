@@ -1,0 +1,178 @@
+<html>
+
+<head>
+
+<title>WRFDA Updates for Version 3.8.1</title>
+
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+
+<meta name="KEYWORDS" content="meteorology, mesoscale, microscale, weather modeling, forecasting weather, weather prediction, predictability, cloud systems, boundary layers, surface-atmosphere interactions, convective cloud systems, atmospheric chemistry, precipitating weather systems, wildfire research, National Center for Atmospheric Research">
+
+<meta name="DESCRIPTION" content="WRF Data Assimilation Users homepage">
+
+<meta name="ROBOTS" content="INDEX,FOLLOW">
+
+<meta name="resource-type" content="document">
+
+<meta http-equiv="expires" content="0">
+
+<meta name="author" content="MMM Webmaster">
+
+<meta name="copyright" content="Copyright (c) 2016 by UCAR">
+
+<meta name="revisit-after" content="1 days">
+
+<meta name="distribution" content="Global">
+
+<meta name="rating" content="General">
+
+
+
+
+
+<SCRIPT language=JavaScript src="./scripts/menu_array.js" type=text/javascript></SCRIPT>
+
+<SCRIPT language=JavaScript src="./scripts/mmenu.js" type=text/javascript></SCRIPT>
+
+
+
+
+
+<link href="./images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+
+
+<link href="./images/wrfstyle.css" rel="stylesheet" type="text/css">
+
+<link href="images/wrfstyle.css" rel="stylesheet" type="text/css">
+</head>
+
+
+
+<body bgcolor="#FFFFFF" background="./images/back2.jpg" link="#000099" vlink="#000099" alink="#FF3300" leftmargin="0" topmargin="0" marginwidth="0" marginheight="0">
+
+<table width="100%" border="0" cellspacing="0" cellpadding="0">
+
+  <tr bgcolor="#000000">
+
+    <td height="10" bgcolor="#000000"><div align="left"><img src="images/transgif.gif" width="1" height="1"></div>
+
+    </td>
+
+  </tr>
+
+  <tr valign="top">
+
+    <td height="10" bgcolor="#DDFFDD"><img src="images/header_new_cropped.png" height="56" border="0"></td>
+
+  </tr>
+
+  <tr bgcolor="#FFCC33">
+
+    <td height="6" background="./images/goldrule.jpg"><img src="images/goldrule.jpg" width="1" height="1"></td>
+
+  </tr>
+
+  <tr>
+
+    <td height="34" bgcolor="#009933">&nbsp;</td>
+
+  </tr>
+
+  <tr>
+
+    <td height="2" bgcolor="#ffcc66"><img src="images/transgif.gif" width="1" height="1"></td>
+
+  </tr>
+
+</table>
+
+<table width="100%" height="89%" border="0" cellpadding="0" cellspacing="0" class="background">
+
+  <tr>
+
+    <td width="100%" height="838" valign="top" bgcolor="#CBFFCD"><table width="780" border="0" cellpadding="0" cellspacing="0">
+
+      <tr valign="top">
+        <td height="842" bgcolor="#009933"><p align="right">&nbsp;</p>
+           <p align="center"><a href="system.html" class="leftnavlink">System Overview</a></p>
+           <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color: #CBFFCD;font-family: Arial; line-height: 10pt;font-weight: bold;">WRFDA V3.8.1</p>
+           <p align="center"><a href="updates-3.8.html" class="leftnavlink">WRFDA V3.8</a></p>
+           <p align="center"><a href="updates-3.7.1.html" class="leftnavlink">WRFDA V3.7.1</a></p>
+           <p align="center"><a href="updates-3.7.html" class="leftnavlink">WRFDA V3.7</a></p>
+           <p align="center"><a href="updates-3.6.1.html" class="leftnavlink">WRFDA V3.6.1</a></p>
+           <p align="center"><a href="updates-3.6.html" class="leftnavlink">WRFDA V3.6</a></p>
+           <p align="center"><a href="updates-3.5.1.html" class="leftnavlink">WRFDA V3.5.1</a></p>
+           <p align="center"><a href="updates-3.5.0.1.html" class="leftnavlink">WRFDA V3.5.0.1</a></p>
+           <p align="center"><a href="updates-3.5.html" class="leftnavlink">WRFDA V3.5</a></p>
+           <p align="center"><a href="updates-3.4.1.html" class="leftnavlink">WRFDA V3.4.1</a></p>
+           <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
+           <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
+           <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
+           <p align="center"><a href="updates-older.html" class="leftnavlink">Older versions</a></p>
+           <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
+           <p align="center"><a href="download/tools.html" class="leftnavlink">Tools</a></p>
+           <p align="center"><a href="known-problems.html" class="leftnavlink">Known Problems and Fixes</a></p></td>
+        <td width="663" bgcolor="#CBFFCD"><p>&nbsp;</p>
+            <p class="pagetitle">WRFDA Version 3.8.1: UPDATES</p>
+            <blockquote>
+              <h2>WRFDA Version 3.8.1 was released on August 11, 2016. </h2>
+            <p class="bodytext">This is primarily a bug-fix release.
+              <h3><big>Updated features:</big></h3>
+              <ul class="bodytext"><li>Bugs listed at the <a href="known-problems.html#V3_8">Known Problems page</a> have been fixed. These bugs include the following:</li>
+                <ul class="bodytext"><li>A fix for some BUFR compilation problems if user has certain environment variables set</li>
+                  <li>A fix for crashes with 4DVAR assimilation when using RRTMG radiation physics</li></ul>
+                <li>CRTM-specific code is now compiled automatically</li>
+                <li>Additional information about domain map parameters and minimization progress is now printed to log files</li>
+                <li>Other bug fixes and code improvements include:</li>
+                <ul class="bodytext"><li>Fixed compilation problems for Fujitsu compilers</li>
+                  <li>Avoiding alarming (but harmless) error messages from GEN_BE stage 0
+                  <li>Fixing CRTM compilation problems for some Cray platforms
+                  <li>Cleaning up various log file outputs and clarifying some error messages
+                  <li>Fixed some incorrect default variables for certain physics options</li></ul>
+
+                <li><a href="download/wrfplus.html">WRFPLUS</a> (WRF adjoint and tangent linear model) has also been updated to V3.8.1.</li>
+</ul>
+              <p class="bodytext">For instructions on compiling and running the latest version of WRFDA, please refer to the <a href="Docs/user_guide_V3.8.1/WRFDA_Users_Guide.pdf">User's Guide</a></p>
+</blockquote>
+            <p class="pagetitle">Helpful links</p>
+<blockquote>
+                    <li class="bodytext"><b><big><a href="./download/get_source.html">Download this version of WRFDA (V3.8.1) here</a></big></b><br><br></li>
+                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.8.1/users_guide_chap6.htm#_Installing_WRF-Var">Compiling WRFDA</a></big></li>
+                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.8.1/users_guide_chap6.htm#_Running_WRFDA">Running WRFDA</a></big></li>
+                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.8.1/users_guide_chap6.htm#_Description_of_Namelist_2">List and description of namelist variables</a></big></li>
+
+              <p align="center" class="detailtextRed">
+                <script language="JavaScript"><!--  ;;;;;;;;;;;-->
+
+<!--
+
+document.write("updated " + document.lastModified);
+
+// -->
+
+                        </script>
+              </p>
+              <p class="bodytext"><br>
+                <br>
+              </p>
+          </blockquote>            </td>
+        </tr>
+      <tr valign="top">
+        <td height="842" bgcolor="#009933">&nbsp;</td>
+        <td bgcolor="#CBFFCD">&nbsp;</td>
+      </tr>
+
+    </table></td>
+  </tr>
+
+  <tr>
+
+    <td height="50" bgcolor="#009933" class="detailtext">&nbsp;</td>
+  </tr>
+</table>
+
+</body>
+
+</html>
+
