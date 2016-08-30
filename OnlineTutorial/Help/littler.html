@@ -144,6 +144,8 @@ body {
          <blockquote><ul class="bodybullet"><b><li><a href="#format">What is the LITTLE_R format?</a></li>
             <ul><li><a href="#header">Header record</a></li>
                <li><a href="#data">Data record</a></li>
+               <li><a href="#end">Ending record</a></li>
+               <li><a href="#tail">Tail integers</a></li>
             </ul>
             <li><a href="#special">Special cases</a></li>
             <ul><li><a href="#gpspw">GPSPW and GPSZTD</a></li>
@@ -169,9 +171,9 @@ body {
                 <td style="background-color:#AAAADD;"><b>Platform (<a href="#FM">FM-Code</a>)</b></td>
                 <td style="background-color:#DDDD55;"><b>Source</b></td>
                 <td style="background-color:#AAAADD;"><b>Elevation</b></td>
-                <td style="background-color:#DDDD55;"><b>Valid fields</b></td>
-                <td style="background-color:#DDDD55;"><b>Num. errors</b></td>
-                <td style="background-color:#DDDD55;"><b>Num. warnings</b></td>
+                <td><b>Valid fields</b></td>
+                <td><b>Num. errors</b></td>
+                <td><b>Num. warnings</b></td>
                 <td style="background-color:#DDDD55;"><b>Sequence number</b></td>
                 <td><b>Num. duplicates</b></td>
                 <td><b>Is sounding?</b></td>
@@ -203,9 +205,9 @@ body {
                 <td style="background-color:#AAAADD;">A40</td>
                 <td style="background-color:#DDDD55;">A40</td>
                 <td style="background-color:#AAAADD;">F20.5</td>
-                <td style="background-color:#DDDD55;">I10</td>
-                <td style="background-color:#DDDD55;">I10</td>
-                <td style="background-color:#DDDD55;">I10</td>
+                <td>I10</td>
+                <td>I10</td>
+                <td>I10</td>
                 <td style="background-color:#DDDD55;">I10</td>
                 <td>I10</td>
                 <td>L</td>
@@ -239,9 +241,9 @@ body {
                 <td style="background-color:#AAAADD;">FM-35 TEMP</td>
                 <td style="background-color:#DDDD55;">GTS (ROHK) UKUS09 KWBC 051200 RRA</td>
                 <td style="background-color:#AAAADD;">1626.00000</td>
-                <td style="background-color:#DDDD55;">1</td>
-                <td style="background-color:#DDDD55;">-888888</td>
-                <td style="background-color:#DDDD55;">-888888</td>
+                <td>1</td>
+                <td>-888888</td>
+                <td>-888888</td>
                 <td style="background-color:#DDDD55;">890</td>
                 <td>-888888</td>
                 <td>T</td>
@@ -276,9 +278,9 @@ body {
                 <td style="background-color:#AAAADD;">FM-18 BUOY</td>
                 <td style="background-color:#DDDD55;">GTS (ROHK) SSVX07 LFVW 051100</td>
                 <td style="background-color:#AAAADD;">0.00000</td>
-                <td style="background-color:#DDDD55;">6</td>
-                <td style="background-color:#DDDD55;">-888888</td>
-                <td style="background-color:#DDDD55;">-888888</td>
+                <td>6</td>
+                <td>-888888</td>
+                <td>-888888</td>
                 <td style="background-color:#DDDD55;">564</td>
                 <td>-888888</td>
                 <td>F</td>
@@ -311,9 +313,9 @@ body {
                 <td style="background-color:#AAAADD;">FM-32 PROFILER</td>
                 <td style="background-color:#DDDD55;">MADIS NOAA Profiler Network NWS        N</td>
                 <td style="background-color:#AAAADD;">130.00000</td>
-                <td style="background-color:#DDDD55;">258</td>
-                <td style="background-color:#DDDD55;">0</td>
-                <td style="background-color:#DDDD55;">0</td>
+                <td>258</td>
+                <td>0</td>
+                <td>0</td>
                 <td style="background-color:#DDDD55;">1</td>
                 <td>0</td>
                 <td>F</td>
@@ -346,9 +348,9 @@ body {
                 <td style="background-color:#AAAADD;">FM-86 SATEM</td>
                 <td style="background-color:#DDDD55;">GTS (ROHK) THAA01 KWBC 051300</td>
                 <td style="background-color:#AAAADD;">-888888.00000</td>
-                <td style="background-color:#DDDD55;">3</td>
-                <td style="background-color:#DDDD55;">-888888</td>
-                <td style="background-color:#DDDD55;">-888888</td>
+                <td>3</td>
+                <td>-888888</td>
+                <td>-888888</td>
                 <td style="background-color:#DDDD55;">560</td>
                 <td>-888888</td>
                 <td>T</td>
@@ -381,9 +383,9 @@ body {
                 <td style="background-color:#AAAADD;">FM-111 GPSPW</td>
                 <td style="background-color:#DDDD55;">HOURLY_PWV.LLH</td>
                 <td style="background-color:#AAAADD;">20.91000</td>
-                <td style="background-color:#DDDD55;">0</td>
-                <td style="background-color:#DDDD55;">0</td>
-                <td style="background-color:#DDDD55;">0</td>
+                <td>0</td>
+                <td>0</td>
+                <td>0</td>
                 <td style="background-color:#DDDD55;">0</td>
                 <td>0</td>
                 <td>F</td>
@@ -684,7 +686,7 @@ body {
       </table></p>
 <div class=clear></div>
 
-      <p class="bodytext"><strong id="Font14">Ending record</strong> </p>
+      <a name=end><p class="bodytext"><strong id="Font14">Ending record</strong> </p>
       <p class="bodytext">For all observation types, after the data record(s), there is a final, single-line, ending record. These fields have no meaning for OBSPROC, except the height and pressure fields should have the "end record" flag value of "-777777.00000".</p>
       <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
          <tr>
@@ -694,8 +696,8 @@ body {
       </table></p>
 <div class=clear></div>
 
-      <p class="bodytext"><strong id="Font14">Tail integers</strong> </p>
-      <p class="bodytext">Finally, after the ending record, there is another single line with three integer (I7) fields. The first is the number of valid fields for the observation, the second is the number of erros, and the third is the number of warnings. For the most part these are depreciated fields which were used by earlier MM5-era programs, but they are still used by OBSPROC to decide which observation to keep if two are identical observation types at identical places and times. The merge checks are in order of precedence, from left to right (most valid fields, least errors, or least warnings).</p>
+      <a name=tail><p class="bodytext"><strong id="Font14">Tail integers</strong> </p>
+      <p class="bodytext">Finally, after the ending record, there is another single line with three integer (I7) fields. The first is the number of valid fields for the observation, the second is the number of errors, and the third is the number of warnings. For the most part these are depreciated fields which were used by earlier MM5-era programs, but they are still used by OBSPROC to decide which observation to keep if two are identical observation types at identical places and times. The merge checks are in order of precedence, from left to right (most valid fields, least errors, or least warnings).</p>
       <p class=bodytext><table style="background-color:#DDFFDD;" width="100%" class="bodytable">
          <tr>
             <td colspan=3><kbd>
@@ -982,37 +984,6 @@ THE FOLLOWING SEEMS TO BE INCORRECT, BUT I'D LIKE TO SAVE IT JUST IN CASE
      These tail integers only have meaning for when you have duplicate reports (two observations at the same location and time); there are three checks done by the "merge_obs" subroutine (in file var/obsproc/src/module_obs_merge.F90): first, if one report has more levels than the other, the one with fewer levels is discarded. Otherwise, if one has fewer write errors or fewer warnings, it is discarded. Otherwise, the first report (by order in the LITTLE_R file) is kept and the other discarded. As you can see, these are not really important for almost all cases (the number of errors should be zero if you have written your program correctly, unless there is a problem with your initial data), which is why we don't go into this much detail in the presentation I sent you.
 
 -->
-
-<!--
-      <table width="90%" border="0" cellpadding="3" cellspacing="7">
-        <tr>
-          <td width="5%" valign="top"><img src="../images/question.svg" alt="Tip" width="50" height="50"></td>
-          <td width="95%" bgcolor="#DDAA55" class="bodytext">
-            <span class="style5">Hold on... I think my computer might already have netCDF installed!</span><br>
-            Even if netCDF is already installed on your machine, we recommend that you compile your own version of the libraries, since the exact version and compilers used are so important. The process only takes about 30 minutes, and the libraries only take up around 11 Mb of space, so this should not be burdensome even for those on a tight computing and/or time budget.
-          </td>
-        </tr>
-      </table>
-
-      <p class="bodytext"><strong id="Font14">Step 1: Download and unzip the netCDF source code</strong> </p>
-      <p class="bodytext">NetCDF can be downloaded from the <a href="http://www.unidata.ucar.edu/downloads/netcdf/index.jsp">Unidata netCDF download page</a>. WRFDA is not yet compatible with the most recent version of netCDF, so you should scroll down to the bottom section titled "Old netCDF Bundled C/C++/Fortran Releases" and select the most recent link in that section. As of October 2012, this is version 4.1.3. From that page, click the link to download the most recent <em>stable</em> release of the netCDF source code, and save it to a convenient folder.</p>
-      <p class="bodytext">Now that you have downloaded the netCDF source code, it is time to configure the code to your environment and compile. In a terminal window, navigate to the directory in which you saved the netCDF tarball (netcdf-4.1.3.tar.gz) and un-tar it.</p>
-      <p class="code">tar -xvf netcdf-4.1.3.tar.gz</p>
-
-
-      <p class="bodytext"><strong id="Font14">Step 2: Configure and compile</strong> </p>
-      <p class="bodytext">Now, navigate to the folder you just un-tarred. Now it is time to select your compilers (again, if you are unsure of which compilers to use, see the <a href="configuration.html">Configuration Help Page</a>). Set the environment variable "FC" to the name of the Fortran compiler you will be using, and set "CC" to the name of the C compiler you will be using. We highly recommend using gfortran and gcc if possible.</p>
-MAKE A NOTE HERE: IF "SETENV" DOESN'T WORK, YOU ARE LIKELY USING A DIFFERENT TERMINAL SHELL. SEE OUR TERMINAL SHELL HELP PAGE.
-      <p class="code">setenv FC gfortran</p>
-      <p class="code">setenv CC gcc</p>
-      <p class="bodytext">Finally, you should configure netCDF so it will install in the correct folder. Typically netCDF will install in the /usr/local directory by default, but if you do not have administrative privileges on your machine, you will need to set your own directory. Any directory that you can write to will suffice; for demonstration purposes, we will use <span class="style6" id="Font12">/user/home/jdoe/netcdf_4.1.3</span> as our installation directory. Ensure that you are in the netcdf source directory that you just unpacked, and enter the following:</p>
-      <p class="bodytext">The <span class="style6" id="Font12">./configure</span> script will run a large number of checks, and if successful will end with no error messages. Once the script is finished, complete the installation by entering the following:
-      <p class="code">make check install</p>
-      <p class="bodytext">If everything works correctly, a long series of "make" commands will end with a message beginning with "Congratulations! You have successfully installed netCDF!". If you see this message, you are done, and can move on to the <a href="../Introduction/start.html">tutorial branch that best suits you</a>.</p>
-
-
--->
-
 
       </blockquote>
       <br>
