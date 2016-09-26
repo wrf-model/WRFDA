@@ -149,7 +149,14 @@
                 <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
             <a name="V3_8_1"></a><p class="pagetitle">WRFDA Version 3.8.1 : Known Problems and Fixes</p>
             <blockquote>
-              <p class=bodytext>No known problems at this time!
+            <h1> Precision errors using ifort on Cray machines (posted 2016-09-21) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               The WRFPLUS adjoint check fails on Cray machines:<br><br>
+               <code>ad_check: VAL_TL: 0.29626592914807E+12 <br>ad_check: VAL_AD: 0.29626592915255E+12<br></code><br>
+               This may result in precision problems, including bit-for-bit differences between runs, on affected machines</p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Replace the arch/configure_new.defaults file in your WRFPLUS and/or WRFDA builds with this version: <a href=fixes/v381/configure_new.defaults>configure_new.defaults</a></p>
+            <p class="bodytext">After replacing the file, run <code>./clean -a</code> and re-compile WRFPLUS and/or WRFDA.</p>
             </blockquote>
             <a name="V3_8"></a><p class="pagetitle">WRFDA Version 3.8 : Known Problems and Fixes</p>
             <blockquote>
