@@ -714,7 +714,7 @@ body {
 
       <a name=gpspw><a name=gpsztd><p class="bodytext"><strong id="Font14">GPS PW and ZTD</strong> </p>
       <p class="bodytext">GPS Precipitable Water (GPSPW) and Zenith Total Delay (GPSZTD) observations are stored in similar formats. For these observation types, the observation of interest is actually in the header record, rather than the data record.</p>
-      <p class="bodytext">For the GPSPW data, the "Precipitable Water" field contains the observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of tenths of millimeters. So an observation error of 1.5 mm should be stored as "15", an error of 3.0 mm should be "30", etc.</p>
+      <p class="bodytext">For the GPSPW and GPSZTD data, the "Precipitable Water" field contains the observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of tenths of millimeters. So an observation error of 1.5 mm should be stored as "15", an error of 3.0 mm should be "30", etc.</p>
             <p class=scrollbox width=100px style="padding-left: 45px">Scroll right to see the entire header.<table style="background-color:#DDFFDD;" border="1" class="bodytable">
               <tr><td colspan="41";>Here is an example GPSPW observation (the same shown earlier). Important fields are bolded, unused fields have a gray background. The observation is for 3.04 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
               <tr>
@@ -845,9 +845,8 @@ body {
       </table>
 <div class=clear></div>
 
-      <p class="bodytext">For the GPSZTD data, the "Precipitable Water" field contains the ZTD observed value in cm, and the "QC" field contains observation error information. Since the QC field must be an integer, it is stored as an integer number of millimeters. So an observation error of 15 mm should be stored as "15", an error of 30 mm should be "30", etc.</p>
             <p class=scrollbox width=100px style="padding-left: 45px">Scroll right to see the entire header.<table style="background-color:#DDFFDD;" border="1" class="bodytable">
-              <tr><td colspan="41";>Here is an example GPSPW observation (the same shown earlier). Important fields are bolded, unused fields have a gray background. The observation is for 3.04 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
+              <tr><td colspan="41";>Here is an example GPSZTD observation (a fake observation with fake values). Important fields are bolded, unused fields have a gray background. The observation is for 250.20 cm. Note that the QC field is 0, so OBSPROC will assign a default value of 2 (0.2 mm)</td><tr>
               <tr>
                 <td><b>Lat.</b></td>
                 <td><b>Lon.</b></td>
@@ -914,7 +913,7 @@ body {
                 <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
                 <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
                 <td style="background-color:#DDDDDD;">-888888.00000<br>0</td>
-                <td>250.20600<br>0</td>
+                <td>250.20000<br>0</td>
               </tr>
               <tr>
                 <td>Pressure&nbsp;(Pa)</td>
