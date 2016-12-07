@@ -244,12 +244,12 @@
             <p style="padding-left: 45px;"><table width="96%" border="1" align="center" bordercolor="#FF8A81" bgcolor="#FFFFFF" class="font11" style="background-color:#DDFFDD;">
               <tr>
                 <td width="5%"><strong>Q1</strong></td>
-                <td class="font11"><strong>When running GEN_BE, it fails with the message "Stage gen_be_diags failed with error 24". How can I fix this?</strong></td>
+                <td class="font11"><strong>When running GEN_BE, it fails with the message "Stage gen_be_diags failed with error". How can I fix this?</strong></td>
               </tr>
               <tr>
                 <td style="color:#900"><strong>A1</strong></td>
                 <td style="color:#900">While this error message states that the failure was in "Stage gen_be_diags", this is almost always due to an error at an earlier stage. Look in the log files for stages 0&ndash;4 for more information.<br>The most common errors are as follows:
-                  <ul><li><b>
+                  <ul><li>Incorrect specification of "NUM_LEVELS" (should be equal to e_vert - 1)</li>
                 </td>
               </tr>
             </table></p>

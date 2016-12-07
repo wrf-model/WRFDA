@@ -178,6 +178,12 @@
             </blockquote>
             <a name="V3_7_1"></a><p class="pagetitle">WRFDA Version 3.7.1 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> Error for large domains of certain sizes (posted 2016-12-07)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the error message:<br>
+               <code>Fatal error in file: &lt;A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk/da_setup_runconstants.html">da_setup_runconstants.inc&lt;/a>  LINE:      54<br>No factor found<br></code>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This error can seen when running WRFDA for large domains of certain sizes, due to the way WRFDA's FFT routines work. In the file <kbd>var/da/da_setup_structures/da_setup_runconstants.inc</kbd>, change "nrange" as defined in the beginning of the program from "60" to "1000", then recompile the code. This should allow WRFDA to work for very large domains, up to tens of thousands of grid points across.</p>
             <h1> Error using VARBC for IASI (posted 2016-04-06) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                Code crashes when using Variational Bias Correction for IASI instrument<br>
@@ -207,6 +213,12 @@
                    <li>PGI version 14+: 4DVAR compilation fails</li></ul></blockquote>
             <p class="bodytext"><strong>No solution available at this time; use another compiler if possible</strong></p>
             <a name="V3_7_run"><p class="pagetitle">Run-time Errors</p>
+            <h1> Error for large domains of certain sizes (posted 2016-12-07)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the error message:<br>
+               <code>Fatal error in file: &lt;A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk/da_setup_runconstants.html">da_setup_runconstants.inc&lt;/a>  LINE:      54<br>No factor found<br></code>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This error can seen when running WRFDA for large domains of certain sizes, due to the way WRFDA's FFT routines work. In the file <kbd>var/da/da_setup_structures/da_setup_runconstants.inc</kbd>, change "nrange" as defined in the beginning of the program from "60" to "1000", then recompile the code. This should allow WRFDA to work for very large domains, up to tens of thousands of grid points across.</p>
             <h1> Errors and bad results with the "rttov_emis_atlas_ir" option (posted 2015-08-12) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                For 4DVAR radiance assimilation with RTTOV, using the <kbd>rttov_emis_atlas_ir=1</kbd> option can cause WRFDA to crash, and even if it does not crash the results are likely bad.</p>
@@ -226,6 +238,12 @@
             </blockquote>
             <a name="V3_6_1"></a><p class="pagetitle">WRFDA Version 3.6.1 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> Error for large domains of certain sizes (posted 2016-12-07)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the error message:<br>
+               <code>Fatal error in file: &lt;A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk/da_setup_runconstants.html">da_setup_runconstants.inc&lt;/a>  LINE:      54<br>No factor found<br></code>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This error can seen when running WRFDA for large domains of certain sizes, due to the way WRFDA's FFT routines work. In the file <kbd>var/da/da_setup_structures/da_setup_runconstants.inc</kbd>, change "nrange" as defined in the beginning of the program from "60" to "1000", then recompile the code. This should allow WRFDA to work for very large domains, up to tens of thousands of grid points across.</p>
             <h1> Failure to compile with RTTOV 11.2 (posted 2014-10-17) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                When using RTTOV 11.2, WRFDA fails to compile with the following (or similar) error message:<br><br>
@@ -278,6 +296,12 @@
 
 
             <a name="V3_6_run"><p class="pagetitle">Run-time Errors</p>
+            <h1> Error for large domains of certain sizes (posted 2016-12-07)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the error message:<br>
+               <code>Fatal error in file: &lt;A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk/da_setup_runconstants.html">da_setup_runconstants.inc&lt;/a>  LINE:      54<br>No factor found<br></code>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This error can seen when running WRFDA for large domains of certain sizes, due to the way WRFDA's FFT routines work. In the file <kbd>var/da/da_setup_structures/da_setup_runconstants.inc</kbd>, change "nrange" as defined in the beginning of the program from "60" to "1000", then recompile the code. This should allow WRFDA to work for very large domains, up to tens of thousands of grid points across.</p>
             <h1> Error writing final output when assimilating PREPBUFR data (posted 2014-08-08) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
              WRFDA fails after the minimization step with the following error:<br><br>
@@ -316,6 +340,12 @@
 
             <a name="V3_5"></a><p class="pagetitle">WRFDA Version 3.5 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> Error for large domains of certain sizes (posted 2016-12-07)</h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the error message:<br>
+               <code>Fatal error in file: &lt;A HREF="http://www.mmm.ucar.edu/people/wrfhelp/wrfvar/code/trunk/da_setup_runconstants.html">da_setup_runconstants.inc&lt;/a>  LINE:      54<br>No factor found<br></code>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This error can seen when running WRFDA for large domains of certain sizes, due to the way WRFDA's FFT routines work. In the file <kbd>var/da/da_setup_structures/da_setup_runconstants.inc</kbd>, change "nrange" as defined in the beginning of the program from "60" to "1000", then recompile the code. This should allow WRFDA to work for very large domains, up to tens of thousands of grid points across.</p>
             <h1> Compilation failure on IBM AIX platforms (posted 2015-01-14) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                Compilation of BUFR libraries fail on IBM AIX platforms using the cc_r C compiler, with the following message:<br><br>
