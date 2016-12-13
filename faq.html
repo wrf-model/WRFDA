@@ -120,8 +120,8 @@
             <blockquote>
               <ul class="bodytext"><li><a href="#links">Quick links</a></li>
               <li><a href="#general">General questions</a></li>
-              <li><a href="#running">Running WRFDA</a></li></ul><br></blockquote>
-
+              <li><a href="#running">Running WRFDA</a></li>
+              <ul><li><a href="#running_GENBE">Running GEN_BE</a></li></ul></ul><br></blockquote>
 
             <blockquote>
               <h1><a name="links">Quick links</h1>
@@ -249,11 +249,46 @@
               <tr>
                 <td style="color:#900"><strong>A1</strong></td>
                 <td style="color:#900">While this error message states that the failure was in "Stage gen_be_diags", this is almost always due to an error at an earlier stage. Look in the log files for stages 0&ndash;4 for more information.<br>The most common errors are as follows:
-                  <ul><li>Incorrect specification of "NUM_LEVELS" (should be equal to e_vert - 1)</li>
+                  <ul><li><b>error 2</b> usually indicates incorrect specification of "NUM_LEVELS" (should be equal to e_vert - 1)</li>
+                  <li><b>error 24</b> usually indicates Incorrect setup of your WRF forecast directories. See the next entry below for help on setting up your GEN_BE forecasts properly.</li>
+                </td>
+              </tr>
+              <tr>
+                <td width="5%"><strong>Q2</strong></td>
+                <td class="font11"><strong>How do I set up my WRF forecasts as input for GEN_BE</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A2</strong></td>
+                <td style="color:#900">In the WRFDA package, there is a script <kbd>var/scripts/gen_be/gen_be_wrapper.ksh</kbd>, which is used to run the GEN_BE utility as described in the <a href=../../../usersguide.html>user's guide</a>. In that script, you are instructed to set a variable "FC_DIR", which is labelled as "where wrf forecasts are": an admittedly unhelpful label.<br><br> 
+                  GEN_BE uses the so-called "NMC method", where forecasts that are valid for the same date/time but initialized at different times are compared, to find an approximation of the background error (<a href=http://journals.ametsoc.org/doi/abs/10.1175/1520-0493%281992%29120%3C1747%3ATNMCSS%3E2.0.CO%3B2>Parrish and Derber, 1992</a>). GEN_BE compares a number of sequential forecasts using this method. The default setup in <kbd>gen_be_wrapper.ksh</kbd> is a "24-12" NMC comparison, which compares a 24-hour forecast with a 12-hour forecast (FCST_RANGE1=24, FCST_RANGE2=12).<br><br>
+                  Let's say that we use <kbd>/user/home/genbe/forecasts/</kbd> as our FC_DIR. If we are running from START_DATE=2012091200 to END_DATE=2012091900, we will need to have the following subdirectories within that directory:<br><br>
+                  <code>&nbsp; $ ls /user/home/genbe/forecasts/<br>
+                    &nbsp; 2012091100  2012091300  2012091500  2012091700  2012091900<br>
+                    &nbsp; 2012091112  2012091312  2012091512  2012091712  2012091912<br>
+                    &nbsp; 2012091200  2012091400  2012091600  2012091800<br>
+                    &nbsp; 2012091212  2012091412  2012091612  2012091812<br><br></code>
+                  Within each of those directories should be the WRF output files from a forecast initialized <b>at that time</b>. So the directory /user/home/genbe/forecasts/2012091200/ should have the 12-hour and 24-hour forecast files like this:<br><br>
+                  <code>$ ls /user/home/genbe/forecasts/2012091200<br>
+                    wrfout_d01_2012-09-12_12:00:00  wrfout_d01_2012-09-13_00:00:00<br><br></code>
+                  and the directory /user/home/genbe/forecasts/2012091212/should have the 12-hour and 24-hour forecast files like this:<br> 
+                  <code>$ ls /user/home/genbe/forecasts/2012091212<br><br>
+                    wrfout_d01_2012-09-13_00:00:00  wrfout_d01_2012-09-13_12:00:00<br><br></code>
+                  and so on. GEN_BE will be comparing 2012091200/wrfout_d01_2012-09-13_00:00:00 to 2012091212/wrfout_d01_2012-09-13_00:00:00, 2012091212/wrfout_d01_2012-09-13_12:00:00 to 2012091300/wrfout_d01_2012-09-13_12:00:00, 2012091200/wrfout_d01_2012-09-13_00:00:00 to 2012091212/wrfout_d01_2012-09-13_00:00:00, and so on.<br><br>
+                  The one-week period above is just an example: for guidance on how many forecasts you will need, see the next entry below.<br>
+                </td>
+              </tr>
+              <tr>
+                <td width="5%"><strong>Q3</strong></td>
+                <td class="font11"><strong>How many forecasts are necessary for getting good background error statistics from GEN_BE? Do I need to continuously update by background error?</strong></td>
+              </tr>
+              <tr>
+                <td style="color:#900"><strong>A3</strong></td>
+                <td style="color:#900">The number of forecasts necessary to "train" your background error properly will vary depending on your application, but a two-week period of forecasts at 12-hour intervals (25 forecasts in total) should be considered a bare minimum for scientific purposes. <br><br>
+                  Additionally, since the calculated background error can depend strongly on the exact weather regime found in those forecasts, you should use forecasts from a similar season that you plan on running WRFDA. For example, if you are running a data assimilation experiment on a July case using a be.dat background error file calculated from January forecasts, you may get poor results!<br><br>
+                  As a real-world example: The Antarctic Mesoscale Prediction System (<a href=http://www2.mmm.ucar.edu/rt/amps/>AMPS</a>), which uses WRFDA, recalculates their background error each month, using the previous month of forecasts from their system as the input to GEN_BE.<br>
                 </td>
               </tr>
             </table></p>
-
 
             <blockquote>
 
