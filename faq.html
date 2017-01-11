@@ -267,7 +267,7 @@
                     &nbsp; 2012091112  2012091312  2012091512  2012091712  2012091912<br>
                     &nbsp; 2012091200  2012091400  2012091600  2012091800<br>
                     &nbsp; 2012091212  2012091412  2012091612  2012091812<br><br></code>
-                  Within each of those directories should be the WRF output files from a forecast initialized <b>at that time</b>. So the directory /user/home/genbe/forecasts/2012091200/ should have the 12-hour and 24-hour forecast files like this:<br><br>
+                  Within each of those directories should be the WRF output files from a forecast initialized <b>at that time</b>. In other words, <em>each directory should have the output from a different forecast: you can not use one single, long forecast split into different directories</em>. So the directory /user/home/genbe/forecasts/2012091200/ should have the 12-hour and 24-hour forecast files like this:<br><br>
                   <code>$ ls /user/home/genbe/forecasts/2012091200<br>
                     wrfout_d01_2012-09-12_12:00:00  wrfout_d01_2012-09-13_00:00:00<br><br></code>
                   and the directory /user/home/genbe/forecasts/2012091212/should have the 12-hour and 24-hour forecast files like this:<br> 
