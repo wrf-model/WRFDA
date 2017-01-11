@@ -253,8 +253,6 @@ PlainStyle2,
 ,"WRFDA V3.4","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.4.html",,,0
 ,"WRFDA V3.3.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.3.1.html",,,0
 ,"WRFDA V3.3","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.3.html",,,0
-,"WRFDA V3.2.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.2.1.html",,,0
-,"WRFDA V3.2","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.2.html",,,0
 ,"Older versions","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-older.html",,,1
 ,"WRFDA Tutorials","http://www2.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,1
 ,"WRFDA Tools","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,0
@@ -391,10 +389,7 @@ PlainStyle2,
 ,"WRFDA V3.4.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.4.1/users_guide_chap6.htm",,,0
 ,"WRFDA V3.4","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.4/users_guide_chap6.htm",,,0
 ,"WRFDA V3.3","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.3/users_guide_chap6.htm",,,0
-,"WRFDA V3.2.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.2.1/users_guide_chap6.htm",,,0
-,"WRFDA V3.2","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.2/users_guide_chap6.htm",,,0
-,"WRFDA V3.1.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1.1/users_guide_chap6.htm",,,0
-,"WRFDA V3.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.1/users_guide_chap6.htm",,,0
+,"Older versions","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/older_usersguides.html",,,0
 ])
 
 
