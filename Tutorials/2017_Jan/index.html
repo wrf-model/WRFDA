@@ -1,0 +1,239 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html><!-- InstanceBegin template="/Templates/temp2.dwt" codeOutsideHTMLIsLocked="false" -->
+<head>
+<!-- InstanceBeginEditable name="doctitle" -->
+<title>WRFDA Practice</title>
+<!-- InstanceEndEditable -->
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<SCRIPT language=JavaScript src="assets/menu_array_class_index.js" type=text/javascript></SCRIPT>
+<SCRIPT language=JavaScript src="assets/mmenu.js" type=text/javascript></SCRIPT>
+<!-- InstanceBeginEditable name="head" -->
+<!-- InstanceEndEditable -->
+<link href="assets/wrfdastyle.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+<!--
+a:link {
+	text-decoration: none;
+}
+a:visited {
+	text-decoration: none;
+}
+a:hover {
+	text-decoration: underline;
+}
+a:active {
+	text-decoration: none;
+}
+-->
+</style></head>
+
+<body id="top" bgcolor="#FFFFFF">
+<table width="100%" border="2" cellpadding="0" cellspacing="0" bgcolor="cbffcd">
+  <tr> 
+    <td width="1485" colspan="3" bgcolor="#EEFFDD"><div align="center">
+      <a href="index.html"><img src="images/header.png" alt="page header" height="125" border="0" align="left"></a>
+    </div></td>
+  </tr>
+  <tr bgcolor="cbffcd" class="body"> 
+    <td height="33" colspan="4" bgcolor="#99BB66">&nbsp;</td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#EEFFDD"> <table width="90%" border="0" align="center" cellpadding="20" cellspacing="20">
+        <tr> 
+          <td valign="middle" bgcolor="#FFFFFF"><!-- InstanceBeginEditable name="maincontent" -->
+
+                <blockquote>
+                  <table border="2" cellspacing="5" cellpadding="5">
+                    <tr bgcolor="#DDD">
+                      <td> <p class="body"><u><big>Important note!</big></u><br> The instructions on this page are based on the <a href=http://www2.mmm.ucar.edu/wrf/users/wrfda/beta.html>Version 3.9 beta release</a>. Since this is a <a href="https://en.wiktionary.org/wiki/beta_version">beta release</a>, there may be some bugs hiding in the code, and the instructions and capabilities are subject to change prior to the full release if you have not done so. Therefore, we do not recommend using this version for scientific runs: the full Version 3.9 release is expected in early April, 2017.</p></td>
+                    </tr>
+                  </table>
+                </blockquote>
+
+            <span class="pagetitle">The WRF Data Assimilation System (WRFDA) </span>
+              <blockquote>
+<!--                <p>The instructions on this page are based on the <a href=http://www2.mmm.ucar.edu/wrf/users/wrfda/beta.html>Version 3.9 beta release</a>. Since this is a <a href="https://en.wiktionary.org/wiki/beta_version">beta release</a>, there may be some bugs hiding in the code, and the instructions and capabilities are subject to change prior to the full release if you have not done so. Therefore, we do not recommend using this version for scientific runs: the full Version 3.9 release is expected in early April, 2017.</p>
+-->
+              <p class="body">References: <ul><li><a href="docs/presentation.pdf">Download the tutorial presentation</a></li>
+                 <li><a href=http://www2.mmm.ucar.edu/wrf/users/workshops/WS2016/oral_presentations/5b.1.pdf>WRF Workshop presentation</a></li>
+                 <li>Read the paper: <a href=http://www.tellusa.net/index.php/tellusa/article/view/30917>Chun et al., 2016</a></li></ul></p>
+              <p><span class="bodyh1">A brief introduction to WRFDA</span></p>
+              <blockquote>
+                <p>The WRF Data Assimilation system (WRFDA, formerly known as WRF-VAR) is a unified model-space data assimilation system for use and development by NCAR staff, university collaborators, and the general community. WRFDA is an assimilation system which contains several different methods of data assimilation:
+                  <ul><li>3DVAR</li>
+                    <li>4DVAR</li>
+                    <li>FGAT</li>
+                    <li>3DENVAR</li>
+                    <li>4DENVAR</li></ul>
+                Using these assimilation methods, WRFDA is capable of ingesting a wide variety of observation types, which are detailed on the <a href=../../system.html>system description page</a>. Most data types can be assimilated in LITTLE_R (ASCII text) or PREPBUFR (binary) format, but satellite radiances are assimilated in a variety of different formats, including WMO BUFR and HDF5.</p>
+              </blockquote>
+              <p><span class="bodyh1">Downloading and installing WRFDA</span></p>
+              <blockquote>
+                <p>WRFDA is part of the WRF software framework, and like WRF it is designed to be installed and run on a wide variety of platforms. Typically, users should configure and compile the code on whichever machine it is to be run on, as described in the <a href=../../usersguide.html>Users Guide</a>. If you would like to attempt to build the code and follow along (building WRFDA takes between 5 and 25 minutes, depending on your settings and compiler), see <a href=compile.html>the compilation instructions on this page</a>. Note that there are prerequisite libraries which must be downloaded first: netCDF and HDF5.</p>
+<!--                  <ul><li><a href=./mac/da_wrfvar.exe>Mac OS Yosemite</a></li>
+                    <li><a href=./centos/da_wrfvar.exe>Linux Centos 7</a></li>
+                    <li><a href=./ubuntu/da_wrfvar.exe>Linux Ubuntu 14.04</a></li></ul>-->
+
+              </blockquote>
+              <p><span class="bodyh1">Running WRFDA</span></p>
+              <blockquote>
+                <p>WRFDA is run using a single executable "da_wrfvar.exe". This executable can be found in the compiled code under WRFDA/var/build/. The directory from which you execute da_wrfvar.exe will be your "working directory", and it is recommended that you create a new working directory for each experiment to avoid accidentally overwriting files.</p>
+                <p>A basic run of WRFDA requires at least 6 files:
+                  <ol><li>da_wrfvar.exe, the WRFDA executable</li>
+                    <li>namelist.input, a "namelist" file where you specify the settings for your specific experiment</li>
+                    <li>fg, the "first guess" file which will provide the initial atmospheric state for your analysis. This can be either a wrfinput file from real.exe or a wrfout file from a WRF forecast.</li>
+                    <li>be.dat, a background error data file. WRFDA provides several options for background error estimation; there is a generic option (CV3) provided in WRFDA/var/run/be.dat.cv3 which can be used for testing purposes, but probably should not be used for scientific experiments. For scientific experiments, you should generate your own background error data using the GEN_BE utility, <a href=http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.8.1/users_guide_chap6.htm#_Running_gen_be>as described in the Users Guide</a>
+                    <li>LANDUSE.TBL, a table of land-use data which is necessary especially for surface and satellite observations</li>
+                    <li>one or more observation files. Since WRFDA allows for a wide variety of data to be assimilated (in a wide variety of formats), the names of your observation files are going to depend on your experiment. In this tutorial, we will be using AMSR2 radiance data, which is available from the Japan Aerospace Exploration Agency (JAXA) in HDF5 format.</li><br>
+                  Since we will be assimilating AMSR2 radiance data in HDF5 format, we will need a few additional files and directories in our working directory:<br><br>
+                    <li>crtm_coeffs/, a directory containing coefficient files used by the Community Radiative Transfer Model (CRTM). This radiative transfer model is included in the WRFDA build, and will be used for converting radiance observations to model space, and vice versa.</li>
+                    <li>radiance_info/, a directory containing info files for each satellite instrument that WRFDA can assimilate. It includes information such as which channels to assimilate by default, and observation error coefficients.</li>
+                    <li>leapsec.dat, a text file containing <a href=https://en.wikipedia.org/wiki/Leap_second>leap second</a> information, which is necessary for AMSR2 data assimilation</li></ol>
+              <blockquote>
+<br><br>
+<br><br>
+<br><br>
+<br><br>
+<br><br>
+Done up to this point
+<br><br>
+<br><br>
+<br><br>
+
+
+                <p>All of these files are available for </p>
+              </blockquote>
+              <p><span class="bodyh1">Choice of your working directory </span> </p>
+              <blockquote>
+                <p>You should run each lesson in a separate directory, so that it will be easier to check for the necessary input files and look for what output files are created after a successful run.</p>
+                <p>We recommend you create <em>/kumquat/users/${USER}/DA/cloudy_radiance</em> to be your working directory for this session.</p>
+                <blockquote>
+                  <p class="stylecode">mkdir -p /kumquat/users/${USER}/DA/cloudy_radiance<br>
+                                       cd /kumquat/users/${USER}/DA/cloudy_radiance</p>
+              </blockquote></blockquote>
+              <p><span class="bodyh1">Input files</span> </p>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                    <blockquote>
+                      <p>This cloudy radiance exercise will be using its own test case, which can be found in /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case. This is a case from <a href="https://en.wikipedia.org/wiki/Hurricane_Sandy">Hurricane Sandy</a> which impacted the east coast of the United States in late October, 2012. The domain for this case is plotted at right.</p>
+                      <p>Cloudy radiance assimilation is much the same procedure as <a href="radiance.html">the basic radiance tutorial case</a>, but it requires some extra entries in the "radiance_info" files and some namelist changes.</p>
+                      <p>Currently, the all-sky radiance capability is only available for the JAXA GCOM-W1 AMSR2 instrument. These observations are available in HDF5 format. In addition, an extra file "leapsec.dat" is required for AMSR2 assimilation specifically: this contains information about <a href=https://en.wikipedia.org/wiki/Leap_second>leap seconds</a>.</p>
+                    </blockquote>
+                    </td>
+                    <td class="bodytext"><a href="images/sandy_domain_smaller.png"><img src="images/sandy_domain_smaller.png" height="300"></a></td>
+                  </tr>
+                </table>
+              <blockquote>
+                <p>To begin this exercise, link or copy the basic necessary files from the WRFDA package and the test directory:</p>
+                <blockquote>
+                  <p class=stylecode>ln -sf /kumquat/users/${USER}/DA/WRFDA_CR/run/LANDUSE.TBL .<br>
+                                     ln -sf /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/be.dat .<br>
+                                     ln -sf /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/fg .<br>
+                                     ln -sf /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/ob.ascii .<br>
+                                     cp -p /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/namelist.input .</p>
+                </blockquote>
+              <p>View the namelist file in the text editor of your choice: note the relevant options which are enabled (use_amsr2obs=true to read in AMSR2 observations, crtm_cloud=true to use cloudy radiance observations for CRTM).</p>
+                <blockquote>
+                  <p class=stylecode> &wrfvar14<br>
+                                      rtminit_nsensor=1,<br>
+                                      rtminit_platform=29,<br>
+                                      rtminit_satid=1,<br>
+                                      rtminit_sensor=63,<br>
+                                      thinning_mesh=30.0,<br>
+                                      thinning=true,<br>
+                                      qc_rad=true,<br>
+                                      write_iv_rad_ascii=true,<br>
+                                      write_oa_rad_ascii=true,<br>
+                                      rtm_option=2,<br>
+                                      crtm_cloud=true,<br>
+                                      only_sea_rad=.true,<br>
+                                      use_varbc=.true.<br>
+                                      varbc_factor=1.0,<br>
+                                      varbc_nbgerr=5000,<br>
+                                      varbc_nobsmin=500,</p>
+                </blockquote>
+              <p>Now get the data/coefficient files specific to radiance assimilation, including the above-mentioned "leapsec.dat". Note that currently the all-sky radiance capability is <em>only</em> available with CRTM, it is not yet available for RTTOV.</p>
+                <blockquote>
+                  <p class=stylecode>ln -sf /kumquat/users/${USER}/DA/<b>WRFDA_CR</b>/var/run/radiance_info ./radiance_info<br>
+                                     ln -sf /kumquat/users/${USER}/DA/<b>WRFDA_CR</b>/var/run/crtm_coeffs ./crtm_coeffs<br>
+                                     ln -sf /kumquat/users/${USER}/DA/<b>WRFDA_CR</b>/var/run/leapsec.dat .<br>
+                                     cp -p /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/VARBC.in .</p>
+                </blockquote>
+              <p>Finally, get the AMSR2 observation files. These files are in HDF5 format, and have a different naming scheme from BUFR radiance observation files. There are two types of AMSR2 observation files which are used by WRFDA: brightness temperature (L1SGRTBR*.h5) and cloud water (L2SGCLWLD*.h5). Brightness temperature observations are assimilated in WRFDA; cloud water information is used for quality control.</p>
+                <blockquote> 
+                  <p class="stylecode">ln -fs /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/L1SGRTBR*.h5 .<br>
+                                       ln -fs /kumquat/wrfhelp/DATA/WRFDA/allsky_radiance_case/L2SGCLWLD*.h5 .</p>
+                </blockquote>
+              <p>Note that the above linking commands get you multiple files through use of the wildcard (*). For more information on the naming scheme and why multiple files are used, see <a href=http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.8/WRFDA_Users_Guide.pdf#24>the relevant section of the user's guide</a>.</p>
+              </blockquote>
+              <p><span class="bodyh1">Run WRFDA</span> </p>
+              <blockquote>
+                <blockquote>
+                  <p class="stylecode">mpirun -np 6 /kumquat/users/${USER}/DA/<b>WRFDA_CR</b>/var/build/da_wrfvar.exe</p>
+                </blockquote>
+                <p>The execution of this test case should take 5-7 minutes to complete on classroom computers.</p>
+              </blockquote>
+              <p><span class="bodyh1">Check output</span> </p>
+              <blockquote>
+                <p>Check analysis increments.</p>
+                <p>Check <em><strong>statistics</strong></em>.</p>
+                <p>There are extra diagnostic files when assimilating radiance data:</p>
+                  <ul><li><b>*oma_gcom-w-1-amsr2*</b>: Observation minus analysis statistics for the AMSR2 instrument. Notice that there are two sets of files: starting "01_oma" and "02_oma". This is because we ran this case with two outer loops.</li>
+                    <li><b>*oma_gcom-w-1-amsr2*</b>: Observation minus background (innovation) statistics for the AMSR2 instrument</li>
+                    <li><b>01_qcstat_gcom-w-1-amsr2, 02_qcstat_gcom-w-1-amsr2</b>: Quality control statistics for AMSR2; one file for each outer loop</li>
+                    <li><b>VARBC.out</b>: Output file for Variational Bias Correction (see <a href="http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.8/WRFDA_Users_Guide.pdf#25">User's Guide</a> for more info). Note that the process was done for each outer loop: the VARBC.out statistics for the first outer loop is saved in the file "VARBC.out_01"</p>
+              </blockquote>
+              <span class="bodyh1">Graphics</span>
+              <blockquote>
+                <table border="0" cellpadding="0" cellspacing="0">
+                  <tr style="vertical-align: top;">
+                    <td>
+                <p>The script <em>/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh</em> can be used to generate a number of helpful plots and graphs for visualizing radiance assimilation statistics.</p>
+                <p class="stylecode">/kumquat/wrfhelp/DATA/WRFDA/TOOLS/scripts/da_rad_diags.ksh<br>
+                  export START_DATE=2012102718<br>
+                  export END_DATE=2012102718<br>
+                  #<br>
+                  export NUM_PROCS=6  # number of processors used in running WRFDA<br>
+                  export WRFVAR_DIR=/kumquat/users/${USER}/DA/WRFDA<br>
+                  export BUILD_DIR=${WRFVAR_DIR}/var/build<br>
+                  export TOOLS_DIR=/kumquat/wrfhelp/DATA/WRFDA/TOOLS<br>
+                  export EXP_DIR=/kumquat/users/${USER}/DA/cloudy_radiance<br>
+                  export VAR_RUN_DIR1=$EXP_DIR<br>
+                  export VAR_RUN_DIR2=none<br>
+                  <br>
+                  ...<br>
+                  export FGFILE=$VAR_RUN_DIR1/fg<br>
+                  ...<br>
+                  export FILE_PREFIX=01_oma<br>
+                  set -A INSTIDS gcom-w-1-amsr2<br>
+                  ...<br>
+                  export $FULL_FILE_PREFIX=$VAR_RUN_DIR1/$FILE_PREFIX</p>
+                <p>A number of plots with the file extention ".ncgm" will be created in the "diag" directory. Use the command "idt" to view these .ncgm files. The plot at right shows the observed values for AMSR2 Channel 5 on GCOM-W1 (after thinning was applied); you should see many plots like this for other channels, as well as plots related to bias correction.</p>
+                <p>If you would like to see the impact of cloudy radiance vs. clear-sky radiance only, you can run the case again with "crtm_cloud=false" under &amp;wrfvar14. The plots at right show one of the plots made with and without cloudy radiance observations.</p>
+                    </td>
+                    <td class="bodytext"><a href="images/no_cloudy_rad.png"><img src="images/no_cloudy_rad.png" height="300"></a><br>Plot of OMB with only clearsky radiance, Channel 5<br><hr><br>
+                                         <a href="images/cloudy_rad.png"><img src="images/cloudy_rad.png" height="300"></a><br>Same plot as above but with allsky (clear and cloudy) radiance<br></td>
+                  </tr>
+                </table>
+                <p class="body"><br>You have now completed the cloudy radiance tutorial! You can either <a href="wrfda_sessions.html#session_6">move on to the next exercise</a>.</p>
+              </blockquote>
+            </blockquote>
+            <p>&nbsp;</p>
+          <!-- InstanceEndEditable --><br>
+            
+          </td>
+        </tr>
+        <tr><td><a href="#top">back to top</a></td></tr>
+    </table></td>
+  </tr>
+  <tr> 
+    <td colspan="4" bgcolor="#99b86e">&nbsp;</td>
+  </tr>
+</table>
+
+<map name="Map">
+  <area shape="rect" coords="-189,-6,548,73" href="../index.html" alt="practice_page_header">
+</map>
+</body>
+<!-- InstanceEnd --></html>
