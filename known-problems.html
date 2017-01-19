@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2016 by UCAR">
+<meta name="copyright" content="Copyright (c) 2017 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -95,7 +95,7 @@
 
   <tr>
 
-    <td height="1739" valign="top" bgcolor="#CBFFCD"><table width="900" border="0" cellpadding="0" cellspacing="0">
+    <td height="1739" valign="top" bgcolor="#CBFFCD"><table width="1000" border="0" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
 
@@ -142,13 +142,21 @@
                   </ul></li>
                 <li><a href="#V3_5">Version 3.5</a></li>
                 <li><a href="#V3_4">Version 3.4</a></li>
-                <li><a href="#V3_3">Version 3.3</a></li>
-                <li><a href="#V3_2">Version 3.2</a></li>
-                <li><a href="#V3_1">Version 3.1</a></li>
-                <li><a href="#V3_0">Version 3.0</a></li>
+                <li><a href="#V3_3">Older versions</a></li>
                 <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
             <a name="V3_8_1"></a><p class="pagetitle">WRFDA Version 3.8.1 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following (or similar) error message:<br><br>
+               <code>Fatal error in file: da_eof_decomposition.inc  LINE:      40<br>
+                 Error in decomposition, info =    7</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to pixels not being rejected properly when CRTM has errors calculating the vertical pressure profile.<br>
+               In file <code>var/da/da_radiance/da_get_innov_vector_crtm.inc</code>, after line 434, add the following text on its own new line:</p>
+               <blockquote><code>iv%instid(inst)%info%proc_domain(:,n) = .false.</code></blockquote>
+            <p class="bodytext">This should be just before the line that says "cycle pixel_loop"<br>
+               Then re-compile the code. This should properly reject these bad pixels which cause this failure.</p>
             <h1> Precision errors using ifort on Cray machines (posted 2016-09-21) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                The WRFPLUS adjoint check fails on Cray machines:<br><br>
@@ -160,6 +168,17 @@
             </blockquote>
             <a name="V3_8"></a><p class="pagetitle">WRFDA Version 3.8 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following (or similar) error message:<br><br>
+               <code>Fatal error in file: da_eof_decomposition.inc  LINE:      40<br>
+                 Error in decomposition, info =    7</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to pixels not being rejected properly when CRTM has errors calculating the vertical pressure profile.<br>
+               In file <code>var/da/da_radiance/da_get_innov_vector_crtm.inc</code>, after line 434, add the following text on its own new line:</p>
+               <blockquote><code>iv%instid(inst)%info%proc_domain(:,n) = .false.</code></blockquote>
+            <p class="bodytext">This should be just before the line that says "cycle pixel_loop"<br>
+               Then re-compile the code. This should properly reject these bad pixels which cause this failure.</p>
             <h1> Compilation error in BUFR libraries (posted 2016-05-15) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                BUFR libraries (and therefore <code>da_wrfvar.exe</code>) fail to compile, potentially with the following (or similar) error message:<br><br>
@@ -178,6 +197,17 @@
             </blockquote>
             <a name="V3_7_1"></a><p class="pagetitle">WRFDA Version 3.7.1 : Known Problems and Fixes</p>
             <blockquote>
+            <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following (or similar) error message:<br><br>
+               <code>Fatal error in file: da_eof_decomposition.inc  LINE:      40<br>
+                 Error in decomposition, info =    7</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to pixels not being rejected properly when CRTM has errors calculating the vertical pressure profile.<br>
+               In file <code>var/da/da_radiance/da_get_innov_vector_crtm.inc</code>, after line 434, add the following text on its own new line:</p>
+               <blockquote><code>iv%instid(inst)%info%proc_domain(:,n) = .false.</code></blockquote>
+            <p class="bodytext">This should be just before the line that says "cycle pixel_loop"<br>
+               Then re-compile the code. This should properly reject these bad pixels which cause this failure.</p>
             <h1> Error for large domains of certain sizes (posted 2016-12-07)</h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFDA fails with the error message:<br>
@@ -205,6 +235,17 @@
             <blockquote>
             <p style="padding-right: 45px;padding-left: 60px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="text-align:center"><b>NOTE:</b> It is strongly recommended that you <b>not</b> use wrfinput files created with WRF version 3.7, which have problems with the initial wind field when generated from GFS or FNL input. Either upgrade to WRF version 3.7.1 or apply the fix mentioned on the <a href="http://www2.mmm.ucar.edu/wrf/users/wrfv3.7/known-prob-3.7.html">WRF Known Problems page</a> under "Input/Boundary Data".</td></tr></table></p>
             <a name="V3_7_compile"><p class="pagetitle">Compilation Errors</p>
+            <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following (or similar) error message:<br><br>
+               <code>Fatal error in file: da_eof_decomposition.inc  LINE:      40<br>
+                 Error in decomposition, info =    7</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to pixels not being rejected properly when CRTM has errors calculating the vertical pressure profile.<br>
+               In file <code>var/da/da_radiance/da_get_innov_vector_crtm.inc</code>, after line 434, add the following text on its own new line:</p>
+               <blockquote><code>iv%instid(inst)%info%proc_domain(:,n) = .false.</code></blockquote>
+            <p class="bodytext">This should be just before the line that says "cycle pixel_loop"<br>
+               Then re-compile the code. This should properly reject these bad pixels which cause this failure.</p>
             <h1> Problems with PGI compilers (posted 2015-04-21) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                There are several known issues with WRFDA compiled with PGI compilers:</p>
@@ -397,148 +438,10 @@
             <p class="bodytext"><strong>Solution:</strong><br>
                See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
             </blockquote>
-            <a name="V3_3"></a><p class="pagetitle">WRFDA Version 3.3 : Known Problems and Fixes</p>
+            <a name="V3_3"><a name="V3_2"><a name="V3_1"><a name="V3_0"></a><p class="pagetitle">Older versions</p>
+            <p style="padding-right: 45px;padding-left: 60px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="text-align:center"><b>NOTE:</b> It is strongly recommended that you use the most recent version of WRFDA. Versions older than 3.3 are very outdated, have many bugs (even those not listed), and are no longer supported.</td></tr></table></p>
             <blockquote>
-            <h1> gfortran "Graphite loop optimizations" error (posted 2015-05-18) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               WRFDA fails to compile: gfortran gives the message "sorry, unimplemented: Graphite loop optimizations can only be used if the libcloog-ppl0 package is installed"</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-                After running the configuration script (<code>./configure wrfda</code>) edit the "<code>configure.wrf</code>" file to remove the text "-ftree-loop-linear" at or near line 115 (where the variable "FCOPTIM" is defined). Then compile WRFDA.</p>
-            <h1> Problem with WRFPLUS, especially with PGI compiler (posted 2011-06-24) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               The adjoint model integration fails with either a segmentation fault or the error message: <code>0: ALLOCATE: 18446744072053605056 bytes requested; not enough memory</code>.</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               Download <a href="fixes/v33/module_em_tl.F">module_em_tl.F</a>, <a href="fixes/v33/module_em_ad.F">module_em_ad.F</a>, <a href="fixes/v33/module_advect_em_tl.F">module_advect_em_tl.F</a> and <a href="fixes/v33/module_advect_em_ad.F">module_advect_em_ad.F</a> and place them in the <kbd>WRFPLUS/dyn_em</kbd> directory.
-               Then download <a href="fixes/configure_new.defaults">configure_new.defaults</a> and place it in the <kbd>WRFPLUS/arch</kbd> directory.</p>
-            <h1> WRFPLUS compilation problem with g95 compiler for Mac OS (posted 2011-06-24) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               WRFPLUS fails to compile when using g95 compiler for Mac OS. </p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               Download <code><a href="fixes/v33/adStack.c">adStack.c</a></code> and place it in the <kbd>WRFPLUS/frame</kbd> directory.</p>
-            <h1> Problem with New Configure Script (posted 2011-04-08) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               There is a problem with the new configure script on Opensuse and Ubuntu Linux. It will fail on creating configure.wrf file, and may result in file removal in the top WRFV3/ directory. If configure.wrf is successfully created, then this fix doesn't affect you. </p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               If files are removed from WRFV3 directory, you will have to redownload the V3.3 tar file, or re-untar the file. Then download the <a href=http://www2.mmm.ucar.edu/wrf/src/fix/configure_fix.tar>configure_fix.tar</a> file in the WRFV3 directory. This file contains a new configure script, and a new arch/configure_new.default file.</p> 
-            <h1> Problem with New compile Script (posted 2011-04-08) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               There is a problem with the new compile script on IBM AIX OS. It will complain about invalid parameters for grep if compiled with CRTM lib. </p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               Download the <a href=fixes/v33/compile_fix.tar>compile_fix.tar</a> file in the WRFDA directory, untar it and overwrite the old file. <br></p>
-            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
-               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
-               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
-               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
-               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
-            </blockquote>
-            <a name="V3_2"></a><p class="pagetitle">WRF Var Version 3.2 : Known Problems and Fixes</p>
-            <blockquote>
-            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
-               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
-               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
-               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
-               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
-            </blockquote>
-            <a name="V3_1"></a><p class="pagetitle">WRF Var Version 3.1 : Known Problems and Fixes</p>
-<!--            <p style="padding-right: 45px;padding-left: 60px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="text-align:center;background-color:#DDAAAA;"><b>NOTE:</b> These older versions (3.1 and earlier) are no longer supported. If you are unable to solve your problem with the solutions listed here, upgrade to a newer version of WRFDA.</td></tr></table></p>
--->
-            <blockquote>
-            <h1> Problem reading BUFR or PREPBUFR files (posted 2009-04-09) </h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               WRFDA 3.5 or earlier compiled with gfortran or ifort returns the following error message when trying to read a BUFR or PREPBUFR file:<br><br>
-               **************BUFR ARCHIVE LIBRARY ABORT*****************<br>
-               BUFRLIB: OPENBF - ERROR READING INPUT FILE CONNECTED TO UNIT 26<br>
-               WHEN CHECKING FOR 'BUFR' IN FIRST 4 BYTES OF RECORD<br>
-               **************BUFR ARCHIVE LIBRARY ABORT*****************</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               See our page on <a href="readBUFR.html">Reading BUFR files</a></p>
-            <h1>Parallel WRF-Var run with PREPBUFR observational data (Posted 2009-04-09)</h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               Parallel running WRFDA with PREPBUFR observational data (ob_format=1) might get hung up with no error message being printed.</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               Click <a href="fixes/v31/V3_1_prepbufr_fix.tar">here</a> to download the patch</p>
-            <h1>Unblock and reblock radiance BUFR data with gfortran (Posted 2009-04-09)</h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               In some Linux operating systems using the gfortran compiler, the radiance BUFR data unblocked and reblocked by cwordsh might be unable to be read by WRFDA.</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               Upgrade to the latest version of WRFDA</p>
-            <h1>4D-Var (Posted 2009-04-09)</h1>
-            <p class="bodytext"><strong>Problem: </strong><br>
-               4D-Var results are unstable on some platforms.</p>
-            <p class="bodytext"><strong>Solution:</strong><br>
-               Upgrade to the latest version of WRFDA</p>
-            <p class="bodytext">&nbsp;<br><br></p>
-            </blockquote>
-            <a name="V3_0"></a><p class="pagetitle">WRFDA Version 3.0 : Known Problems and Fixes</p>
-<!--            <p style="padding-right: 45px;padding-left: 60px;"><table width="100%" border="1" class="bodytable" style="background-color:white;"><tr><td style="text-align:center;background-color:#DDAAAA;"><b>NOTE:</b> These older versions (3.1 and earlier) are no longer supported. If you are unable to solve your problem with the solutions listed here, upgrade to a newer version of WRFDA.</td></tr></table></p>
--->
-            <blockquote>
-              <h1>Minor bug fixes for version 3.0.1.1 (Posted 2009-01-09)</h1>
-              <p class="bodytext"><strong>Bug fix related to check_rh=2</strong><br>
-                To fix this problem a second RH check has been added after the moisture adjustment to 
-                ensure the RH is within a reasonable range.<br>
-                Affected files:<br>
-                var/da/da_physics/da_check_rh.inc<br>
-                var/da/da_physics/da_physics.f90</p>
-              <p class="bodytext"><strong>Bug fix related to sfc_assi_options=1</strong><br>
-                To keep original <em>(not WRF-Var &quot;corrected&quot; when sfc_assi_options=1)</em> surface pressure for writing out in gts_omb_oma and filtered_obs.<br>
-                Note: when qc_flag=2, O-B <em>(Observation minus Background)</em> values are calculated from surface-&quot;corrected&quot; O, while O values written out in gts_omb_oma are original values. That means B values are unknown when qc_flag=2.<br>
-                Affected files:<br>
-                var/da/da_buoy/da_get_innov_vector_buoy.inc<br>
-                var/da/da_metar/da_get_innov_vector_metar.inc<br>
-                var/da/da_ships/da_get_innov_vector_ships.inc<br>
-                var/da/da_sound/da_get_innov_vector_sonde_sfc.inc<br>
-                var/da/da_synop/da_get_innov_vector_synop.inc</p>
-              <p class="bodytext"><strong>Bug fix related to analysis_type = &quot;VERIFY&quot;</strong><br>
-                This fix will ensure the writing out of statistics.<br>
-                Affected files:<br>
-                var/da/da_main/da_solve.inc<br>
-                var/da/da_main/da_wrfvar_top.f90</p>
-              <p class="bodytext">Bug fix to initialize jo_radiance properly when radiance code is not included.<br>
-                Affected file: <br>
-                var/da/da_minimisation/da_jo_and_grady.inc</p>
-              <p class="bodytext"><strong>Solution:</strong>
-              <p class="bodytext">Upgrade to a newer version of WRFDA (fixed in version 3.1)</p>
-              <h1></h1>
-              <h1>Known Problems for version 3.0.1.1 (Posted 2009-01-09)</h1>
-              <p class="bodytext">WRF-Var does not work properly with NCEP PREPBUFR observations, because of the following known problems:</p>
-              <p class="bodytext"> (1) pressure fields are used twice and observation numbers are double-counted because mass and wind reports are separated in NCEP PREPBUFR files.</p>
-              <p class="bodytext"> (2) time-duplicate observations from fixed stations are over-used. For example, if there is more than one synop report from a surface station contained in a 6-hour time-windowed PREPBUFR file, only one report should be used. </p>
-              <p class="bodytext"><em>Fixes will be available in the next release.</em><br>
-              &nbsp;</p>
-              <h1>
-              <hr>Known Problems in Version 3.0.1 </h1>
-              <h1>Compile Error using PGI 7.1+  (posted 2008-06-10) </h1>
-              <p class="bodytext"><strong>Problem</strong>: Compile errors like this one occur when using PGI 7.1 or later: &quot;<kbd>PGF90-S-0000-Internal compiler error. string_expr_length: ast not string op</kbd>&quot;. </p>
-              <p class="bodytext"><strong>Solution</strong>: Changes have been made to the latest WRF Var tar file to fix the problem. The problem affects the following files:<br>
-                WRFDA/var/da/da_main/da_med_initialdata_input.inc<br>
-                WRFDA/var/da/da_obs_io/da_read_obs_radar.inc<br>
-                WRFDA/var/da/da_obs_io/da_read_omb_tmp.inc<br>
-                WRFDA/var/da/da_obs_io/da_read_rand_unit.inc<br>
-                WRFDA/var/da/da_obs_io/da_read_y_unit.inc<br>
-                WRFDA/var/da/da_obs_io/da_scan_obs_radar.inc<br>
-                WRFDA/var/da/da_ssmi/da_read_obs_ssmi.inc<br>
-                WRFDA/var/da/da_ssmi/da_scan_obs_ssmi.inc<br>
-                WRFDA/var/da/da_tools/da_openfile.inc<br>
-                WRFDA/var/da/da_tracing/da_trace.inc<br>
-                WRFDA/var/da/da_tracing/da_trace_entry.inc<br>
-                WRFDA/var/da/da_tracing/da_trace_exit.inc<br>
-              WRFDA/var/da/da_vtox_transforms/da_vertical_transform.inc </p>
-            <h1>Compile Problem for Program obsproc (Posted 2008-06-10) </h1>
-              <p class="bodytext"><strong>Problem</strong>: Compile fails on program obsproc. </p>
-              <p class="bodytext"><strong>Solution</strong>: Upgrade to a newer version of WRFDA (fixed in Version 3.0.1.1 and later)</p>
-            <h1>Compile Problem On IBMs (Posted 2008-06-10) </h1>
-              <p class="bodytext"><strong>Problem</strong>: Compile time very long on IBMs using xlf. </p>
-              <p class="bodytext"><strong>Solution</strong>: Check your configure.var file and reduce optimization level from O3 to O2. This has also been included in the updated tar file. </p>
-              <p class="bodytext">&nbsp;</p>
+            <p class="bodytext">For posterity and reference, known problems with older versions can be found at <a href=known-problems-old.html>this page</a>.</p>
             </blockquote>
             <a name="compilers"></a><p class="pagetitle">Bad compilers</p>
             <blockquote>
