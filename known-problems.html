@@ -128,7 +128,13 @@
             <p class="bodytext">If your issue is not found on this page, please contact <a href="wrfhelp.html">wrfhelp</a> for assistance.<br><br></p>
             <blockquote>
               <blockquote><ul class="bodytext"><li><a href="#V3_8_1">Version 3.8.1</a></li>
+                  <ul><li><a href="#V3_8_1_compile">Compilation errors</a></li>
+                  <li><a href="#V3_8_1_run">Run-time errors</a></li>
+                  </ul></li>
                 <li><a href="#V3_8">Version 3.8</a>
+                  <ul><li><a href="#V3_8_compile">Compilation errors</a></li>
+                  <li><a href="#V3_8_run">Run-time errors</a></li>
+                  </ul></li>
                 <li><a href="#V3_7_1">Version 3.7.1</a>
                 <li><a href="#V3_7">Version 3.7</a>
                   <ul><li><a href="#V3_7_compile">Compilation errors</a></li>
@@ -146,6 +152,35 @@
                 <li><a href="#compilers">Bad compilers</a></li></ul><br></blockquote></blockquote>
             <a name="V3_8_1"></a><p class="pagetitle">WRFDA Version 3.8.1 : Known Problems and Fixes</p>
             <blockquote>
+            <a name="V3_8_1_compile"><p class="pagetitle">Compilation Errors</p>
+            <h1> PGI 4DVAR compilation failure (posted 2017-04-13) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails to compile for 4DVAR with PGI compilers, giving the following error message:<br><br>
+               <code>PGF90-S-0155-Ambiguous interfaces for generic procedure set_tiles (da_wrfvar_top.f: 3921)</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Add a new line containing the text "set_tiles" just before the "##########" line at the end of the file <code>var/build/da_name_space.pl</code>. Then run `clean -a` and re-compile.</p>
+            <a name="V3_8_1_run"><p class="pagetitle">Run-Time Errors</p>
+            <h1> "The microphysics option does not exist" during adjoint integrate step for 4DVAR (posted 2017-04-13) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following error message (the exact number may vary):<br><br>
+               <code>FATAL CALLED FROM FILE:  &lt;stdin&gt;  LINE:    1837<br>
+                      The microphysics option does not exist: mp_physics =    1075052544</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Copy the following two files into the <code>WRFDA/var/da/da_4dvar</code> directory:<br>
+               <blockquote><ul class=bodytext><li><a href="fixes/v381/da_4dvar.f90">da_4dvar.f90</a></li>
+               <li><a href="fixes/v381/da_4dvar_io.inc">da_4dvar_io.inc</a></li></ul></blockquote>
+               <p class="bodytext">overwriting the existing files in that directory. Then re-compile the code.</p>
+            <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following (or similar) error message:<br><br>
+               <code>Fatal error in file: da_eof_decomposition.inc  LINE:      40<br>
+                 Error in decomposition, info =    7</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               This problem is due to pixels not being rejected properly when CRTM has errors calculating the vertical pressure profile.<br>
+               In file <code>var/da/da_radiance/da_get_innov_vector_crtm.inc</code>, after line 434, add the following text on its own new line:</p>
+               <blockquote><code>iv%instid(inst)%info%proc_domain(:,n) = .false.</code></blockquote>
+            <p class="bodytext">This should be just before the line that says "cycle pixel_loop"<br>
+               Then re-compile the code. This should properly reject these bad pixels which cause this failure.</p>
             <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFDA fails with the following (or similar) error message:<br><br>
@@ -168,6 +203,24 @@
             </blockquote>
             <a name="V3_8"></a><p class="pagetitle">WRFDA Version 3.8 : Known Problems and Fixes</p>
             <blockquote>
+            <a name="V3_8_compile"><p class="pagetitle">Compilation Errors</p>
+            <h1> PGI 4DVAR compilation failure (posted 2017-04-13) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails to compile for 4DVAR with PGI compilers, giving the following error message:<br><br>
+               <code>PGF90-S-0155-Ambiguous interfaces for generic procedure set_tiles (da_wrfvar_top.f: 3921)</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Add a new line containing the text "set_tiles" just before the "##########" line at the end of the file <code>var/build/da_name_space.pl</code>. Then run `clean -a` and re-compile.</p>
+            <a name="V3_8_run"><p class="pagetitle">Run-Time Errors</p>
+            <h1> "The microphysics option does not exist" during adjoint integrate step for 4DVAR (posted 2017-04-13) </h1>
+            <p class="bodytext"><strong>Problem: </strong><br>
+               WRFDA fails with the following error message (the exact number may vary):<br><br>
+               <code>FATAL CALLED FROM FILE:  &lt;stdin&gt;  LINE:    1837<br>
+                      The microphysics option does not exist: mp_physics =    1075052544</code><br></p>
+            <p class="bodytext"><strong>Solution:</strong><br>
+               Copy the following two files into the <code>WRFDA/var/da/da_4dvar</code> directory:<br>
+               <blockquote><ul class=bodytext><li><a href="fixes/v381/da_4dvar.f90">da_4dvar.f90</a></li>
+               <li><a href="fixes/v381/da_4dvar_io.inc">da_4dvar_io.inc</a></li></ul></blockquote>
+               <p class="bodytext">overwriting the existing files in that directory. Then re-compile the code.</p>
             <h1> "Error in decomposition" when assimilating radiances with CRTM (posted 2017-01-19) </h1>
             <p class="bodytext"><strong>Problem: </strong><br>
                WRFDA fails with the following (or similar) error message:<br><br>
