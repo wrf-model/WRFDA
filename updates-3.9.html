@@ -111,18 +111,6 @@
             <p class="pagetitle">WRFDA Version 3.9 update summary</p>
             <blockquote>
               <h2>WRFDA Version 3.9 was released on April 17, 2017. </h2>
-
-After Friendly Release 1:
- 
-Updates:
- 
-mp_physics under &physics in the namelist now must be specified for 4DVAR runs, or WRFDA will fail. Previously this defaulted to mp_physics=0 (no physics)
-In radiance diagnostic files, "scanpos" is now printed as I6 rather than I3
-Bug fixes:
-Fixed discontinuities when using dual-resolution hybrid with 5:1 ratio
-Fixed problem with single-level GPSREF observations above 30km
-
-
               <h3><big>New features:</big></h3>
               <ul class="bodytext"><li>WRFDA now supports <a href="#4denvar">a 4DEnVar assimilation option</a>.</li>
                 <li><a href="#cloudyrad">Cloudy radiances</a> can now be assimilated for the AMSR2 instrument.</li>
