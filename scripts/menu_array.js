@@ -241,6 +241,7 @@ PlainStyle2,
 0,
 , 
 ,"System Overview","http://www2.mmm.ucar.edu/wrf/users/wrfda/system.html",,,1
+,"WRFDA V3.9","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.9.html",,,0
 ,"WRFDA V3.8.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.8.1.html",,,0
 ,"WRFDA V3.8","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.8.html",,,0
 ,"WRFDA V3.7.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.7.1.html",,,0
@@ -251,8 +252,6 @@ PlainStyle2,
 ,"WRFDA V3.5","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.5.html",,,0
 ,"WRFDA V3.4.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.4.1.html",,,0
 ,"WRFDA V3.4","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.4.html",,,0
-,"WRFDA V3.3.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.3.1.html",,,0
-,"WRFDA V3.3","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-3.3.html",,,0
 ,"Older versions","http://www2.mmm.ucar.edu/wrf/users/wrfda/updates-older.html",,,1
 ,"WRFDA Tutorials","http://www2.mmm.ucar.edu/wrf/users/wrfda/tutorial.html",,,1
 ,"WRFDA Tools","http://www2.mmm.ucar.edu/wrf/users/wrfda/download/tools.html",,,0
@@ -378,6 +377,7 @@ PlainStyle2,
 ,
 0,
 ,
+,"WRFDA V3.9","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.9/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.8.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.8.1/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.8","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.8/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.7.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.7.1/WRFDA_Users_Guide.html",,,0
@@ -388,7 +388,6 @@ PlainStyle2,
 ,"WRFDA V3.5","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.5/WRFDA_Users_Guide.html",,,0
 ,"WRFDA V3.4.1","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.4.1/users_guide_chap6.htm",,,0
 ,"WRFDA V3.4","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.4/users_guide_chap6.htm",,,0
-,"WRFDA V3.3","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/user_guide_V3.3/users_guide_chap6.htm",,,0
 ,"Older versions","http://www2.mmm.ucar.edu/wrf/users/wrfda/Docs/older_usersguides.html",,,0
 ])
 

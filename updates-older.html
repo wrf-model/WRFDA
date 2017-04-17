@@ -2,7 +2,7 @@
 
 <head>
 
-<title>WRFDA Updates prior to version 3.3</title>
+<title>WRFDA Updates prior to version 3.4</title>
 
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
 
@@ -18,7 +18,7 @@
 
 <meta name="author" content="MMM Webmaster">
 
-<meta name="copyright" content="Copyright (c) 2016 by UCAR">
+<meta name="copyright" content="Copyright (c) 2017 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -96,6 +96,7 @@
       <tr valign="top">
         <td height="900" bgcolor="#009933"><p align="right">&nbsp;</p>
            <p align="center"><a href="system.html" class="leftnavlink">System Overview</a></p>
+           <p align="center"><a href="updates-3.9.html" class="leftnavlink">WRFDA V3.9</a></p>
            <p align="center"><a href="updates-3.8.1.html" class="leftnavlink">WRFDA V3.8.1</a></p>
            <p align="center"><a href="updates-3.8.html" class="leftnavlink">WRFDA V3.8</a></p>
            <p align="center"><a href="updates-3.7.1.html" class="leftnavlink">WRFDA V3.7.1</a></p>
@@ -107,8 +108,6 @@
            <p align="center"><a href="updates-3.5.html" class="leftnavlink">WRFDA V3.5</a></p>
            <p align="center"><a href="updates-3.4.1.html" class="leftnavlink">WRFDA V3.4.1</a></p>
            <p align="center"><a href="updates-3.4.html" class="leftnavlink">WRFDA V3.4</a></p>
-           <p align="center"><a href="updates-3.3.1.html" class="leftnavlink">WRFDA V3.3.1</a></p>
-           <p align="center"><a href="updates-3.3.html" class="leftnavlink">WRFDA V3.3</a></p>
            <p align="center" style="border-width: 5px;border-style: solid;border-color: #CBFFCD;background-color:
 #CBFFCD;font-family: Arial; line-height: 10pt;font-size:15.5;font-weight: bold;">Older versions</p>
            <p align="center"><a href="tutorial.html" class="leftnavlink">Tutorials</a></p>
@@ -119,6 +118,8 @@
             <p class="pagetitle">Older WRFDA version details</p>
             <p class="bodytext">This page contains information on older versions of WRFDA. Limited support is available for these releases: we strongly recommend using the most recent version if possible.</p>
             <ul class="toc">
+              <li><a href="#V3.2.1">Version 3.3.1</a></li>
+              <li><a href="#V3.2">Version 3.3</a></li>
               <li><a href="#V3.2.1">Version 3.2.1</a></li>
               <li><a href="#V3.2">Version 3.2</a></li>
               <li><a href="#V3.1.1">Version 3.1.1</a></li>
@@ -127,6 +128,30 @@
               <li><a href="#V3.0.1">Version 3.0.1</a></li>
               <li><a href="#V3.0">Version 3.0</a></li>
 
+            <a name="V3.3.1"><p class="pagetitle">WRFDA Version 3.3.1: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">The WRFDA tar file has been updated to Version 3.3.1 on September 27, 2011.</p>
+              <p class="bodytext">- WRF 4D-Var<br>
+                The <a href="download/wrfplus.html">WRFPLUS</a> (WRF adjoint and tangent linear model) has been upgraded to V3.3.1 and is consistent with the released WRF version 3.3.1. Three simplified physics packages were added into WRFPLUS: surface drag (pbl_bl_physics=98), large-scale condensation (mp_physics=98) and a cumulus scheme (cu_physics=98), but use these with caution.</p>
+              <p class="bodytext">WRF 4D-Var lateral boundary condition (LBC) control has been improved to consider the perturbation of LBCs at the start of the assimilation window when LBC control is turning off.</p>
+              <p class="bodytext">The calculation of innovation of surface observations has been improved to compare the observation with the surface fields in firstguess.</p>
+              <p class="bodytext">For 4D-var minimization, P and PH are keep unchanged after analysis. Our preliminary experiments show that this has a postive impact.</p>
+              <p class="bodytext">Lots of bug fixes. </p>
+            </blockquote>
+            <a name="V3.3"><p class="pagetitle">WRFDA Version 3.3: UPDATES</p>
+            <blockquote>
+              <p class="bodytext">The WRFDA tar file was updated to Version 3.3 on April 6, 2011. </p>
+              <p class="bodytext">- The RTTOV interface has been upgraded to version 10.0<br>
+                Please download RTTOV v10.0 and install it in appropriate location<br>
+                if you want to use RTTOV to assimilate radiance observations in BUFR format</p>
+              <p class="bodytext">- crtm_atmosphere has been removed from the namelist<br>
+                Now the CRTM reference climatology is determined inside WRFDA based on<br>
+                latitude and month.</p>
+              <p class="bodytext">- New WRF 4D-Var<br>
+                The WRFPLUS (WRF adjoint and tangent linear model) has been upgraded to V3.3 and it is consistent with the released WRF version 3.3. However, only dry dynamic processes are included in WRFPLUS version 3.3, and only serial run is supported.<br>
+                WRFDA is also upgraded with WRFPLUS version 3.3 and the new 4D-Var system as a single executable application. Please refer to <a href="Docs/user_guide_V3.3/users_guide_chap6.htm">Users' guide</a> for the details.</p>
+              <p class="bodytext">- Lots of bug fixes.              </p>
+            </blockquote>
             <a name="V3.2.1"><p class="pagetitle">WRFDA Version 3.2.1: UPDATES</p>
             <blockquote>
               <p class="bodytext">The WRFDA tar file was been updated to Version 3.2.1 on August 18, 2010.</p>
@@ -216,15 +241,6 @@
               <p align="left" class="bodytext"><strong>Note</strong>, the released Var code is re-tarred to avoid some confusion at the compile stage. The top directory is now named WRFDA. </p>
 
             </blockquote>
-            <p class="pagetitle">Helpful links</p>
-            <blockquote>
-              <p class="bodytext"><em>NOTE: These links point to the User Guide for WRFDA version 3.1.1; if you are using an older version you may need to follow a slightly different procedure.</em></p>
-                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Installing_
-WRF-Var">Compiling WRFDA</a></big></li>
-                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Running_WRF
--Var_1">Running WRFDA</a></big></li>
-                    <li class="bodytext"><big><a href="./Docs/user_guide_V3.1.1/users_guide_chap6.htm#_Description
-_of_Namelist_1">List and description of namelist variables</a></big></li>
 
               <p align="center" class="detailtextRed">
 
