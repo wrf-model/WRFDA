@@ -41,6 +41,19 @@
 
 //  #########  popup text 
 descarray = new Array(
+//Instrument - 0
+"Information about the instrument in question",
+//File name - 1
+"The file name that WRFDA will look for within your working directory",
+//Read obs - 2
+"The namelist variable in &wrfvar4 which (when set to 'true') tells WRFDA to look for the .bufr file",
+//rtminit_platform - 3
+"The value to set for this namelist variable in &wrfvar14",
+//rtminit_satid - 4
+"The value to set for this namelist variable in &wrfvar14",
+//rtminit_sensor - 5
+"The value to set for this namelist variable in &wrfvar14",
+//Last
 "Example of mouse-overs used in these pages. If they stop working, try refreshing the page."
 );
 </script>
@@ -146,7 +159,9 @@ body {
                <li><a href="#data">Data record</a></li>
                <li><a href="#end">Ending record</a></li>
                <li><a href="#tail">Tail integers</a></li>
-            </ul>
+               <li><a href="#missing">Missing values</a></li>
+    </ul>
+            <li><a href="#mandatory">Mandatory fields by observation type</a></li>
             <li><a href="#special">Special cases</a></li>
             <ul><li><a href="#gpspw">GPSPW and GPSZTD</a></li>
             </ul>
@@ -231,7 +246,7 @@ body {
                 <td>F13.5, I7</td>
                 <td style="background-color:#DDDD55;">F13.5, I7</td>
               </tr>
-              <tr><td colspan="32";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional/unused fields should still be filled with blanks (for text) or "missing" values.</td><tr>
+              <tr><td colspan="32";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional/unused fields should still be filled with blanks (for text) or "missing" values (as described in <a href="#missing">this section</a>).</td><tr>
               <tr><td colspan="32";>Below are some examples of this header format in action. The first is a sounding from the Denver Airport location</td><tr>
               <tr>
                 <td style="background-color:#AAAADD;">39.78000</td>
@@ -709,6 +724,14 @@ body {
 
       <p class="bodytext"></p>
 
+      <a name=missing><p class="bodytext"><strong id="Font14">Missing values</strong> </p>
+      <p class="bodytext">As mentioned above, there are standard "flag" values which are used to indicate to OBSPROC/WRFDA that a value is missing rather than a real observation. For most observation fields (those which should be a floating-point number), this flag value is "-888888.00000". These observations can be given a QC flag of -88 as well.</p>
+
+      <p class="bodytext"></p>
+
+<!--      <a name=mandatory><h1>Mandatory fields by observation type</h1>
+      <p class="bodytext">Which fields in the data records are mandatory, optional, or unused depends on the observation type. A partial list is compiled below:</p>
+-->
    <a name=special><h1>Special cases</h1>
       <p class="bodytext">Because LITTLE_R is a legacy format that was developed decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
 
