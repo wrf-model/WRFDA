@@ -18,7 +18,7 @@
 
 <meta http-equiv="expires" content="0">
 
-<meta name="copyright" content="Copyright (c) 2016 by UCAR">
+<meta name="copyright" content="Copyright (c) 2017 by UCAR">
 
 <meta name="revisit-after" content="1 days">
 
@@ -98,6 +98,15 @@ body {
 .clear  {
 	clear:both;
 }
+.mandatory {
+  background-color: rgba(170,170,220,.75);
+}
+.optional {
+  background-color: rgba(220,220,85,.75);
+}
+.unused {
+  text-color: rgba(220,220,220,.75);
+}
 -->
 </style>
 
@@ -155,15 +164,26 @@ body {
       <p class="headingtext" id="Font20">LITTLE_R Help</p>
       <p class="bodytext"><strong id="Font14">Index</strong> </p>
          <blockquote><ul class="bodybullet"><b><li><a href="#format">What is the LITTLE_R format?</a></li>
-            <ul><li><a href="#header">Header record</a></li>
+            <ul>
+               <li><a href="#header">Header record</a></li>
                <li><a href="#data">Data record</a></li>
                <li><a href="#end">Ending record</a></li>
                <li><a href="#tail">Tail integers</a></li>
                <li><a href="#missing">Missing values</a></li>
-    </ul>
+            </ul>
             <li><a href="#mandatory">Mandatory fields by observation type</a></li>
+            <ul>
+               <li><a href="#mandatory_header">Header record</a></li>
+               <li><a href="#mandatory_data">Data record</a></li>
+            </ul>
             <li><a href="#special">Special cases</a></li>
-            <ul><li><a href="#gpspw">GPSPW and GPSZTD</a></li>
+            <ul>
+               <li><a href="#gpspw">GPSPW and GPSZTD</a></li>
+            </ul>
+            </li><a href="#notes">Notes</a></li>
+            <ul>
+               <li><a href="#FM">FM codes</a></li>
+               <li><a href="#fortran_format">Fortran format notation</a></li>
             </ul>
          </ul></blockquote></b>
       <blockquote>
@@ -174,7 +194,7 @@ body {
         <p class="style5" id="Font16">What is the LITTLE_R format?</p>
         <p class="bodytext">A LITTLE_R file is composed of <em>reports</em>. These reports are composed of <em>records</em>: a header (detailing the specific data reported by this type of observation), the data itself (organized in a way specified by the header values), and three tail integers. These records are composed of <em>fields</em>: these fields contain the definitions for the data indicated by this observation type (in the header record) and the individual pieces of data for each observation (in the data record).</p>
 
-      <p class="bodytext"><strong id="Font14">Header record</strong> </p>
+      <a name=header><p class="bodytext"><strong id="Font14">Header record</strong> </p>
       <p class="bodytext">The header record is a single line: the first line of each observation record which stores information about the observation type and location. Below is a table showing the description of each field, its format, and a few examples.</p>
       <p class="bodytext">LITTLE_R was designed for applications other than WRFDA, so many fields are not used. See <a href="../../wrf/users/docs/user_guide_V3/users_guide_chap7.htm#format">Chapter 7 of the WRF User's Guide</a> for more detail about each field.</p>
             <p class="box" style="padding-left: 45px;"><table style="background-color:#DDFFDD;overflow:scroll" width="100%" border="1" class="bodytable">
@@ -183,7 +203,7 @@ body {
                 <td style="background-color:#AAAADD;"><b>Longitude</b></td>
                 <td style="background-color:#DDDD55;"><b>ID</b></td>
                 <td style="background-color:#DDDD55;"><b>Name</b></td>
-                <td style="background-color:#AAAADD;"><b>Platform (<a href="#FM">FM-Code</a>)</b></td>
+                <td style="background-color:#AAAADD;"><b>Platform (FM-Code)<sup><a href="#FM">note</a></sup></b></td>
                 <td style="background-color:#DDDD55;"><b>Source</b></td>
                 <td style="background-color:#AAAADD;"><b>Elevation</b></td>
                 <td><b>Valid fields</b></td>
@@ -246,7 +266,7 @@ body {
                 <td>F13.5, I7</td>
                 <td style="background-color:#DDDD55;">F13.5, I7</td>
               </tr>
-              <tr><td colspan="32";>Only the colored fields above are used by WRFDA. Fields in blue are mandatory, fields in yellow are optional. Optional/unused fields should still be filled with blanks (for text) or "missing" values (as described in <a href="#missing">this section</a>).</td><tr>
+              <tr><td colspan="32";>Only the colored fields above are used by WRFDA. Fields in <span style="background-color:#AAAADD;">blue</span> are read and used by OBSPROC/WRFDA, other fields are unused (<a href="#mandatory_header">see this section for more details on mandatory/optional/unused fields</a>). Optional/unused fields should still be filled with blanks (for text) or "missing" values (as described in <a href="#missing">this section</a>).</td><tr>
               <tr><td colspan="32";>Below are some examples of this header format in action. The first is a sounding from the Denver Airport location</td><tr>
               <tr>
                 <td style="background-color:#AAAADD;">39.78000</td>
@@ -426,134 +446,14 @@ body {
               </tr>
             </table></p>
 <div class=clear></div>
-      <a name="FM"><p class="bodytext"><strong id="Font12">FM Codes</strong> </p>
-      <p class="bodytext">The World Meteorological Organization (WMO) specifies a list of 2-digit "FM" codes to distinguish between different observation types (described in <a href="https://www.wmo.int/pages/prog/gcos/documents/gruanmanuals/WWW_Data_Management/WMO_306_vol%20I.1_en.pdf">this presentation [WARNING: LARGE PDF]</a>). WRFDA assimilates a number of different observation types that do not have standard FM codes, so we use an extension of this system to identify different observation types. This code should appear in the "Platform" field as described above so that OBSPROC can properly identify the observation type. A list of valid FM codes for OBSPROC is listed below (codes in the same box are treated equivalently by OBSPROC and WRFDA):</p>
-            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" border="1" class="bodytable">
-              <tr>
-                <td><b>Code</b></td>
-                <td><b>Obs Type</b></td>
-                <td><b>Description</b></td>
-              </tr>
-              <tr>
-                <td>FM-12<br>FM-14</td>
-                <td>SYNOP<br>SYNOP MOBIL</td>
-                <td>Surface observation from a fixed land station<br>Surface observation from a mobile land station</td>
-              </tr>
-              <tr>
-                <td>FM-13</td>
-                <td>SHIP</td>
-                <td>Surface observation from a sea station</td>
-              </tr>
-              <tr>
-                <td>FM-15<br>FM-16</td>
-                <td>METAR<br>SPECI</td>
-                <td>Aerodrome routine meteorological report<br>Aerodrome special meteorological report</td>
-              </tr>
-              <tr>
-                <td>FM-18<br>FM-19</td>
-                <td>BUOY</td>
-                <td>Buoy observation</td>
-              </tr>
-              <tr>
-                <td>FM-32<br>FM-33<br>FM-34</td>
-                <td>PILOT<br>PILOT SHIP<br>PILOT MOBIL</td>
-                <td>Upper-wind report from a fixed land station<br>Upper-wind report from a sea station<br> Upper-wind report from a mobile land station</td>
-              </tr>
-              <tr>
-                <td>FM-35<br>FM-36<br>FM-37<br>FM-38</td>
-                <td>TEMP<br>TEMP SHIP<br>TEMP DROP<br>TEMP MOBIL</td>
-                <td>Upper-level pressure, temperature, humidity and wind report from a fixed land station<br>
-                    Upper-level pressure, temperature, humidity and wind report from a sea station<br>
-                    Upper-level pressure, temperature, humidity and wind report from a sonde released by carrier balloons or aircraft<br> 
-                    Upper-level pressure, temperature, humidity and wind report from a mobile land station</td>
-              </tr>
-              <tr>
-                <td>FM-42</td>
-                <td>AMDAR</td>
-                <td>Automated aircraft report</td>
-              </tr>
-              <tr>
-                <td>FM-86</td>
-                <td>SATEM</td>
-                <td> Report of satellite remote upper-air soundings of pressure, temperature, humidity, and thickness</td>
-              </tr>
-              <tr>
-                <td>FM-88</td>
-                <td>SATOB</td>
-                <td> Report of satellite observations of wind, surface temperature, cloud, humidity and radiation</td>
-              </tr>
-              <tr>
-                <td>FM-96<br>FM-97</td>
-                <td>AIREP</td>
-                <td>Aircraft report</td>
-              </tr>
-              <tr>
-                <td>FM-101</td>
-                <td>TAMDAR</td>
-                <td>Automated aircraft report from <a href="https://en.wikipedia.org/wiki/TAMDAR">TAMDAR</a> system</td>
-              </tr>
-              <tr>
-                <td>FM-111</td>
-                <td>GPSPW</td>
-                <td>Ground-based GPS Precipitable Water observation</td>
-              </tr>
-              <tr>
-                <td>FM-114</td>
-                <td>GPSZD</td>
-                <td>Ground-based GPS Zenith Total Delay (GPSZTD) observation</td>
-              </tr>
-              <tr>
-                <td>FM-116</td>
-                <td>GPSRF</td>
-                <td>Space-based GPS Refractivity observation </td>
-              </tr>
-<!--              <tr>
-                <td>FM-118</td>
-                <td>GPSEP</td>
-                <td>Space-based GPS Excess Phase observation (GPSEPH) </td>
-              </tr>-->
-              <tr>
-                <td>FM-121</td>
-                <td>SSMT1</td>
-                <td>SSM/T- Atmospheric Temperature Profiler (<a href=https://web.archive.org/web/20051210073501/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt.html>description page</a>)</td>
-              </tr>
-              <tr>
-                <td>FM-122</td>
-                <td>SSMT2</td>
-                <td>SSMT/2 Atmospheric Water Vapor Profiler (<a href=https://web.archive.org/web/20051210082729/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt2.html>description page</a>)</td>
-              </tr>
-              <tr>
-                <td>FM-125<br>FM-126</td>
-                <td>SSMI</td>
-                <td>Special Sensor Microwave Imager (SSM/I) (<a href=https://nsidc.org/data/docs/daac/ssmi_instrument.gd.html>description page</a>)</td>
-              </tr>
-              <tr>
-                <td>FM-131</td>
-                <td>TOVS</td>
-                <td>TIROS Observational Vertical Sounder (TOVS) observations (<a href=http://www.ozonelayer.noaa.gov/action/tovs.htm>description page</a>)</td>
-              </tr>
-              <tr>
-                <td>FM-132</td>
-                <td>PROFILER</td>
-                <td>Profiler observation</td>
-              </tr>
-              <tr>
-                <td>FM-133</td>
-                <td>AIRSRET</td>
-                <td>Atmospheric Infrared Sounder (AIRS) temperature retrievals (<a href=http://airs.jpl.nasa.gov/data/physical_retrievals>description page</a>) </td>
-              </tr>
-              <tr>
-                <td>FM-135</td>
-                <td>BOGUS</td>
-                <td>Bogus observations for TC relocation (Paper: <a href=http://nldr.library.ucar.edu/repository/assets/osgc/OSGC-000-000-002-702.pdf>Xiao et al., 2008</a>)</td>
-              </tr>
-              <tr>
-                <td>FM-281</td>
-                <td>QSCAT</td>
-                <td>Scatterometer observation (originally Quickscat, but new scatterometers such as Oceansat can use this code as well)</td>
-              </tr>
-            </table></p>
-<div class=clear></div>
+
+
+
+
+
+
+
+
 
       <a name=data><p class="bodytext"><strong id="Font14">Data record</strong> </p>
       <p class="bodytext">After the header record, there can be one or more data records. Multiple data records usually correspond to multiple vertical levels of data for a single observation site, and only certain observation types support more than one data record (for example, vertical soundings, FM-35). Unlike the header record, all fields here can be utilized (depending on the observation type), and all are optional, though some observations will be discarded if they are missing certain fields.</p>
@@ -725,13 +625,295 @@ body {
       <p class="bodytext"></p>
 
       <a name=missing><p class="bodytext"><strong id="Font14">Missing values</strong> </p>
-      <p class="bodytext">As mentioned above, there are standard "flag" values which are used to indicate to OBSPROC/WRFDA that a value is missing rather than a real observation. For most observation fields (those which should be a floating-point number), this flag value is "-888888.00000". These observations can be given a QC flag of -88 as well.</p>
+      <p class="bodytext">Even if there is no information available for a field, because LITTLE_R is a text-based format with no separator characters, even missing fields and those not used by OBSPROC/WRFDA must be filled with <em>something</em> so that subsequent fields can be read in correctly. There are standard "flag" values which are used to indicate to OBSPROC/WRFDA that a value is missing rather than a real observation. For most observation fields (those which should be a floating-point number), this flag value is "-888888.00000". These observations can be given a QC flag of -88 as well.</p>
 
       <p class="bodytext"></p>
 
-<!--      <a name=mandatory><h1>Mandatory fields by observation type</h1>
-      <p class="bodytext">Which fields in the data records are mandatory, optional, or unused depends on the observation type. A partial list is compiled below:</p>
--->
+      <a name=mandatory><h1>Mandatory, optional, and unused fields</h1>
+      <a name=mandatory_header><p class="bodytext"><strong id="Font14">Header record</strong> </p>
+      <p class="bodytext">In the header record, there are some mandatory and optional fields, most of which are noted by color-code in the. However, there is a note about the final column which contains precipitable water data and QC info: these fields are only used for <a href="#gpspw">GPSPW and GPSZTD observations</a>, and are the only truly "optional" data in the LITTLE_R format as read by OBSPROC: this data can be left out entirely rather than filled with missing values.</p>
+      <p class="bodytext">More details about the necessity of different header fields can be found in the table below:</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr>
+                <td><b>Field name</b></td>
+                <td><b>Field type/width<sup><a href=#fortran_format>1</a></sup></b></td>
+                <td><b>Field description</b></td>
+                <td><b>Mandatory, optional, or unused</b></td>
+                <td><b>Example</b></td>
+                <td><b>Other notes</b></td>
+              </tr>
+              <tr style="background-color:#AAAADD;">
+                <td><b>Latitude</b></td>
+                <td>F20.5</td>
+                <td>The decimal latitude of the observation location, relative to the equator.</td>
+                <td>Mandatory</td>
+                <td>31.12000</td>
+                <td>Positive values are north of the equator, negative values to the south. Must be in the range [-90.00000, 90.00000].</td>
+              </tr>
+              <tr style="background-color:#AAAADD;">
+                <td><b>Longitude</b></td>
+                <td>F20.5</td>
+                <td>The decimal longitude of the observation location, relative to the prime meridian.</td>
+                <td>Mandatory</td>
+                <td>31.12000</td>
+                <td>Negative values are west of the prime meridian, positive values to the east. Must be in the range [-180.00000, 360.00000] (values between 180 and 360 will be subtracted by 360 prior to being re-encoded for ob.ascii).</td>
+              </tr>
+              <tr style="background-color:#FFFF99;">
+                <td><b>ID</b></td>
+                <td>A40</td>
+                <td>The ID of the observation.</td>
+                <td>Optional</td>
+                <td>3009S 13625E</td>
+                <td>This field is only included for human readability. Can be any text: for example, the type of instrument used.</td>
+              </tr>
+              <tr style="background-color:#FFFF99;">
+                <td><b>Name</b></td>
+                <td>A40</td>
+                <td>The name of the observation.</td>
+                <td>Optional</td>
+                <td>LINZ/HOERSCHINGFLUGHAFEN / AUSTRIA</td>
+                <td>This field is only included for human readability. Can be any text: often used to describe the observation location</td>
+              </tr>
+              <tr style="background-color:#AAAADD;">
+                <td><b>Platform (FM-Code)</b></td>
+                <td>A40</td>
+                <td>The FM-code of the observation, followed by an optional text description of the observation.</td>
+                <td>Mandatory</td>
+                <td>FM-97 AIREP</td>
+                <td>The first 3 characters must be exactly "FM-". Characters 4&ndash;6 should be <a href="#FM">a valid FM Code</a>, either a 3-digit number or a 2-digit number followed by a space. The remaining 34 characters are typically a text description of the platform (e.g. "SYNOP", "SHIP", "AIREP", etc.), but theoretically can be any text.</td>
+              </tr>
+              <tr style="background-color:#FFFF99;">
+                <td><b>Source</b></td>
+                <td>A40</td>
+                <td>The source of the observation.</td>
+                <td>Optional</td>
+                <td>MADIS NOAA Profiler Network NWS N</td>
+                <td>This field is only included for human readability. Can be any text: often used to describe the source or data stream from which the observation was obtained.</td>
+              </tr>
+              <tr style="color:rgba(0, 0, 0, 0.5);">
+                <td><b>Valid fields</b></td>
+                <td>I10</td>
+                <td>Number of valid fields in the observation</td>
+                <td>Unused</td>
+                <td>5</td>
+                <td></td>
+              </tr>
+              <tr style="background-color:#AADDCC;">
+                <td><b>Elevation</b></td>
+                <td>F20.5</td>
+                <td>The elevation of the observation above sea level in meters.</td>
+                <td>Mandatory for some observations</td>
+                <td>1626.00000</td>
+                <td></td>
+              </tr>
+           </table></p>
+
+
+
+      <a name=mandatory_data><p class="bodytext"><strong id="Font14">Data record</strong> </p>
+      <p class="bodytext">In the data record for each observation, each level is considered separately for rejection within OBSPROC and/or WRFDA. If it is a single-level observation type (SYNOP, METAR, BUOY, etc.), then the entire observation will be rejected.</p>
+      <p class="bodytext">Before looking at the individual observation types, there are two basic rules that must be followed, otherwise that level will be rejected:</p>
+      <blockquote><blockquote><ul class="bodybullet">
+         <li>At least one of pressure or height must be included</li>
+         <li>If only one of pressure or height is included, at least one other field must be included</li>
+      </ul></blockquote></blockquote>
+      <p class="bodytext">To put it another way: at least two fields of information must be filled in for a level to be used by WRFDA, and at least one of those must be pressure or height. However, </p>
+      <p class="bodytext">Aside from the above rules, the variables in the data records that are mandatory, optional, or unused depends on the observation type. A partial list of these criteria is compiled below. Unless otherwise noted, observations which are missing mandatory information will be discarded. For multi-level observations, if some levels are missing mandatory information only those levels will be discarded.</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" border="1" class="bodytable">
+               <colgroup>
+                  <col span="2"/>
+                  <col class="mandatory" />
+                  <col class="optional"/>
+                  <col class="unused" />
+              </colgroup>
+              <tr>
+                <td><b>Code</b></td>
+                <td><b>Obs Type</b></td>
+                <td><b>Mandatory variables</b></td>
+                <td><b>Optional variables</b></td>
+                <td><b>Unused variables</b></td>
+                <td><b>Notes</b></td>
+              </tr>
+              <tr>
+                <td>FM-12<br>FM-14</td>
+                <td>SYNOP<br>SYNOP MOBIL</td>
+                <td>Height and/or pressure</td>
+                <td>U,V,T,Q</td>
+                <td><em>(none)</em></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>FM-13</td>
+                <td>SHIP</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Surface observation from a sea station</td>
+              </tr>
+              <tr>
+                <td>FM-15<br>FM-16</td>
+                <td>METAR<br>SPECI</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Aerodrome routine meteorological report<br>Aerodrome special meteorological report</td>
+              </tr>
+              <tr>
+                <td>FM-18<br>FM-19</td>
+                <td>BUOY</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Buoy observation</td>
+              </tr>
+              <tr>
+                <td>FM-32<br>FM-33<br>FM-34</td>
+                <td>PILOT<br>PILOT SHIP<br>PILOT MOBIL</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Upper-wind report from a fixed land station<br>Upper-wind report from a sea station<br> Upper-wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-35<br>FM-36<br>FM-37<br>FM-38</td>
+                <td>TEMP<br>TEMP SHIP<br>TEMP DROP<br>TEMP MOBIL</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Upper-level pressure, temperature, humidity and wind report from a fixed land station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-42</td>
+                <td>AMDAR</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Automated aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-86</td>
+                <td>SATEM</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td> Report of satellite remote upper-air soundings of pressure, temperature, humidity, and thickness</td>
+              </tr>
+              <tr>
+                <td>FM-88</td>
+                <td>SATOB</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td> Report of satellite observations of wind, surface temperature, cloud, humidity and radiation</td>
+              </tr>
+              <tr>
+                <td>FM-96<br>FM-97</td>
+                <td>AIREP</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-101</td>
+                <td>TAMDAR</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Automated aircraft report from <a href="https://en.wikipedia.org/wiki/TAMDAR">TAMDAR</a> system</td>
+              </tr>
+              <tr>
+                <td>FM-111</td>
+                <td>GPSPW</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Ground-based GPS Precipitable Water observation</td>
+              </tr>
+              <tr>
+                <td>FM-114</td>
+                <td>GPSZD</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Ground-based GPS Zenith Total Delay (GPSZTD) observation</td>
+              </tr>
+              <tr>
+                <td>FM-116</td>
+                <td>GPSRF</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Space-based GPS Refractivity observation </td>
+              </tr>
+              <tr>
+                <td>FM-121</td>
+                <td>SSMT1</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>SSM/T- Atmospheric Temperature Profiler (<a href=https://web.archive.org/web/20051210073501/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-122</td>
+                <td>SSMT2</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>SSMT/2 Atmospheric Water Vapor Profiler (<a href=https://web.archive.org/web/20051210082729/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt2.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-125<br>FM-126</td>
+                <td>SSMI</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Special Sensor Microwave Imager (SSM/I) (<a href=https://nsidc.org/data/docs/daac/ssmi_instrument.gd.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-131</td>
+                <td>TOVS</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>TIROS Observational Vertical Sounder (TOVS) observations (<a href=http://www.ozonelayer.noaa.gov/action/tovs.htm>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-132</td>
+                <td>PROFILER</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Profiler observation</td>
+              </tr>
+              <tr>
+                <td>FM-133</td>
+                <td>AIRSRET</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Atmospheric Infrared Sounder (AIRS) temperature retrievals (<a href=http://airs.jpl.nasa.gov/data/physical_retrievals>description page</a>) </td>
+              </tr>
+              <tr>
+                <td>FM-135</td>
+                <td>BOGUS</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Bogus observations for TC relocation (Paper: <a href=http://nldr.library.ucar.edu/repository/assets/osgc/OSGC-000-000-002-702.pdf>Xiao et al., 2008</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-281</td>
+                <td>QSCAT</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td>Scatterometer observation (originally Quickscat, but new scatterometers such as Oceansat can use this code as well)</td>
+              </tr>
+           </table></p>
+
+
    <a name=special><h1>Special cases</h1>
       <p class="bodytext">Because LITTLE_R is a legacy format that was developed decades ago, it was developed before many observation types became available. As a work-around for this, several observation types deviate from the formats described above. The exceptions are listed below:</p>
 
@@ -997,6 +1179,167 @@ body {
          </tr>
       </table>
 <div class=clear></div>
+
+   <a name=notes><h1>Notes</h1>
+      <a name="FM"><p class="bodytext"><strong id="Font12">FM Codes</strong> </p>
+      <p class="bodytext">The World Meteorological Organization (WMO) specifies a list of 2-digit "FM" codes to distinguish between different observation types (described in <a href="https://www.wmo.int/pages/prog/gcos/documents/gruanmanuals/WWW_Data_Management/WMO_306_vol%20I.1_en.pdf">this presentation [WARNING: LARGE PDF]</a>). WRFDA assimilates a number of different observation types that do not have standard FM codes, so we use an extension of this system to identify different observation types. This code should appear in the "Platform" field as described above so that OBSPROC can properly identify the observation type. A list of valid FM codes for OBSPROC is listed below (codes in the same box are treated equivalently by OBSPROC and WRFDA):</p>
+            <p style="padding-left: 45px"><table style="background-color:#DDFFDD;" border="1" class="bodytable">
+              <tr>
+                <td><b>Code</b></td>
+                <td><b>Obs Type</b></td>
+                <td><b>Description</b></td>
+              </tr>
+              <tr>
+                <td>FM-12<br>FM-14</td>
+                <td>SYNOP<br>SYNOP MOBIL</td>
+                <td>Surface observation from a fixed land station<br>Surface observation from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-13</td>
+                <td>SHIP</td>
+                <td>Surface observation from a sea station</td>
+              </tr>
+              <tr>
+                <td>FM-15<br>FM-16</td>
+                <td>METAR<br>SPECI</td>
+                <td>Aerodrome routine meteorological report<br>Aerodrome special meteorological report</td>
+              </tr>
+              <tr>
+                <td>FM-18<br>FM-19</td>
+                <td>BUOY</td>
+                <td>Buoy observation</td>
+              </tr>
+              <tr>
+                <td>FM-32<br>FM-33<br>FM-34</td>
+                <td>PILOT<br>PILOT SHIP<br>PILOT MOBIL</td>
+                <td>Upper-wind report from a fixed land station<br>Upper-wind report from a sea station<br> Upper-wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-35<br>FM-36<br>FM-37<br>FM-38</td>
+                <td>TEMP<br>TEMP SHIP<br>TEMP DROP<br>TEMP MOBIL</td>
+                <td>Upper-level pressure, temperature, humidity and wind report from a fixed land station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a sea station<br>
+                    Upper-level pressure, temperature, humidity and wind report from a sonde released by carrier balloons or aircraft<br> 
+                    Upper-level pressure, temperature, humidity and wind report from a mobile land station</td>
+              </tr>
+              <tr>
+                <td>FM-42</td>
+                <td>AMDAR</td>
+                <td>Automated aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-86</td>
+                <td>SATEM</td>
+                <td> Report of satellite remote upper-air soundings of pressure, temperature, humidity, and thickness</td>
+              </tr>
+              <tr>
+                <td>FM-88</td>
+                <td>SATOB</td>
+                <td> Report of satellite observations of wind, surface temperature, cloud, humidity and radiation</td>
+              </tr>
+              <tr>
+                <td>FM-96<br>FM-97</td>
+                <td>AIREP</td>
+                <td>Aircraft report</td>
+              </tr>
+              <tr>
+                <td>FM-101</td>
+                <td>TAMDAR</td>
+                <td>Automated aircraft report from <a href="https://en.wikipedia.org/wiki/TAMDAR">TAMDAR</a> system</td>
+              </tr>
+              <tr>
+                <td>FM-111</td>
+                <td>GPSPW</td>
+                <td>Ground-based GPS Precipitable Water observation</td>
+              </tr>
+              <tr>
+                <td>FM-114</td>
+                <td>GPSZD</td>
+                <td>Ground-based GPS Zenith Total Delay (GPSZTD) observation</td>
+              </tr>
+              <tr>
+                <td>FM-116</td>
+                <td>GPSRF</td>
+                <td>Space-based GPS Refractivity observation </td>
+              </tr>
+<!--              <tr>
+                <td>FM-118</td>
+                <td>GPSEP</td>
+                <td>Space-based GPS Excess Phase observation (GPSEPH) </td>
+              </tr>-->
+              <tr>
+                <td>FM-121</td>
+                <td>SSMT1</td>
+                <td>SSM/T- Atmospheric Temperature Profiler (<a href=https://web.archive.org/web/20051210073501/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-122</td>
+                <td>SSMT2</td>
+                <td>SSMT/2 Atmospheric Water Vapor Profiler (<a href=https://web.archive.org/web/20051210082729/http://dmsp.ngdc.noaa.gov/html/sensors/doc_ssmt2.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-125<br>FM-126</td>
+                <td>SSMI</td>
+                <td>Special Sensor Microwave Imager (SSM/I) (<a href=https://nsidc.org/data/docs/daac/ssmi_instrument.gd.html>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-131</td>
+                <td>TOVS</td>
+                <td>TIROS Observational Vertical Sounder (TOVS) observations (<a href=http://www.ozonelayer.noaa.gov/action/tovs.htm>description page</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-132</td>
+                <td>PROFILER</td>
+                <td>Profiler observation</td>
+              </tr>
+              <tr>
+                <td>FM-133</td>
+                <td>AIRSRET</td>
+                <td>Atmospheric Infrared Sounder (AIRS) temperature retrievals (<a href=http://airs.jpl.nasa.gov/data/physical_retrievals>description page</a>) </td>
+              </tr>
+              <tr>
+                <td>FM-135</td>
+                <td>BOGUS</td>
+                <td>Bogus observations for TC relocation (Paper: <a href=http://nldr.library.ucar.edu/repository/assets/osgc/OSGC-000-000-002-702.pdf>Xiao et al., 2008</a>)</td>
+              </tr>
+              <tr>
+                <td>FM-281</td>
+                <td>QSCAT</td>
+                <td>Scatterometer observation (originally Quickscat, but new scatterometers such as Oceansat can use this code as well)</td>
+              </tr>
+            </table></p>
+
+
+      <a name=fortran_format><p class="bodytext"><strong id="Font14">Fortran format notation</strong> </p>
+      <p class=bodytext>This is standard fortran format notation, or "format edit descriptors". They are described in depth <a href=https://www.obliquity.com/computer/fortran/format.html>on this page</a>. To introduce them briefly, they are in the format "<em>nXn.n</em>", where i"<em>n</em>" is a number, "<em>X</em>" is a letter, and "<em>.</em>" is a literal decimal point.</p>
+      <p class=bodytext> The first number simply multiplies the content that comes after it. For example, "10I5" indicates there are 10 I5 fields, 3F10.2 indicates there are 3 F10.2 fields, and 1L15 indicates there is just one L15 field (in which case, the 1 is optional and can be omitted).</p>
+      <p class=bodytext> The character indicates what the data type is. "F" for floating point number , "I" for integer, "A" for text/characters, and "L" for logical (true/false).</p>
+      <p class=bodytext> The rest of the content indicates how wide the field will be, and how the decimal point will be placed (if applicable). Floating point numbers are a little bit more complicated: F10.2 indicates the whole field will be 10 characters wide (<b>including</b> the decimal point), and there will be 2 characters <em>after</em> the decimal point. If the input data is less than that number of characters across, it should be padded at the beginning with the appropriate number of spaces.</p>
+      <p class=bodytext> Here are several examples to put this all in practice:</p>
+      <blockquote><blockquote><ul class="bodybullet">
+         <li>I8: An integer 8 characters across. Only numerical characters (0-9) or spaces can be included, otherwise there will be a read error. Valid possibilites include:
+            <ul><li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;0423</kbd>"</li>
+            <li>"<kbd>00010000</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;42</kbd>"</li>
+            <li>"<kbd>12345678</kbd>"</li></ul>
+         <li>L5: A logical 5 characters across. Can be "T" or "F", padded with 4 spaces. Valid possibilities include:</li>
+            <ul><li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;T</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;f</kbd>"</li></ul>
+         <li>A10: A character string 10 characters across. Can be any valid <em><a href=https://en.wikipedia.org/wiki/ASCII#Printable_characters>printable</a></em> ASCII characters:</li>
+            <ul><li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;8</kbd>"</li>
+            <li>"<kbd>&nbsp;puppyface</kbd>"</li>
+            <li>"<kbd>?*Skjs-3`#</kbd>"</li>
+            <li>"<kbd>forty-two&nbsp;</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</kbd>"</li>
+            <li>"<kbd>&nbsp;!Q~w&nbsp;1=2&nbsp;</kbd>"</li></ul>
+         <li>F20.5: A floating point number 20 characters across. There should be 5 digits after the decimal point, and any extra space to the right of the decimal should be padded with zeros or spaces</li>
+            <ul><li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;0.00008</kbd>"</li>
+            <li>"<kbd>00000123456789.00000</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;3.14159</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;000001729.00000</kbd>"</li>
+            <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;48.23000</kbd>"</li></ul>
+         </ul></blockquote></blockquote>
 
 
 <!-- 
