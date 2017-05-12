@@ -664,7 +664,7 @@ body {
                 <td>The ID of the observation.</td>
                 <td>Optional</td>
                 <td>3009S 13625E</td>
-                <td>This field is only included for human readability. Can be any text: for example, the type of instrument used.</td>
+                <td>For buoy observations, this field can be used as an alternate way to include elevation information (<a href=#elevation>see the section on elevation</a>) <br> For all other observations this field is only included for human readability. Can be any text: for example, the type of instrument used.</td>
               </tr>
               <tr style="background-color:#FFFF99;">
                 <td><b>Name</b></td>
@@ -704,7 +704,7 @@ body {
                 <td>The elevation of the observation above sea level in meters.</td>
                 <td>Mandatory for some observations</td>
                 <td>1626.00000</td>
-                <td></td>
+                <td><a href=#elevation>See note about elevation for different observations</a></td>
               </tr>
            </table></p>
 
@@ -1340,6 +1340,29 @@ body {
             <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;000001729.00000</kbd>"</li>
             <li>"<kbd>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;48.23000</kbd>"</li></ul>
          </ul></blockquote></blockquote>
+
+      <a name=elevation><p class="bodytext"><strong id="Font14">Elevation</strong> </p>
+      <p class=bodytext>Elevation has a complicated set of criteria for determining its necessity. They are listed below:</p>
+      <blockquote><blockquote><ul class="bodybullet">
+         <li><b>Mandatory:</b>
+            <ul><li>Surface observations: FM-15,16</li>
+               <li></li>
+            </ul>
+         <li><b>Optional:</b>
+            <ul><li>Marine observations: FM-13,18,19,33,36 (see below for more details)</li>
+               <li>Scatterometer: FM-281 (If elevation is missing, it is set to 10 meters)</li>
+               </ul>
+         <li><b>Unused:</b>
+            <ul><li></li>
+               <li></li>
+               <li></li></ul>
+      </ul></blockquote></blockquote>
+      <p class=bodytext>For marine observations, if the user has elevation information, that can be included. Otherwise OBSPROC will attempt to assign an observation based on the body of water the observation is from. In most cases, the elevation will automatically be assigned "0", unless it is from the <a href=https://en.wikipedia.org/wiki/Great_Lakes>Great Lakes</a>, in which case it will be assigned the appropriate elevation depending on which lake it is in:</p>
+      <blockquote><blockquote><ul class="bodybullet">
+         <li>For ship observations, the elevation for Great Lakes observations will be assigned from a set value for each lake based on the lake's standard elevation</li>
+         <li>For buoy observations, the elevation for these observations will be assigned from the table contained in the text file <kbd>msfc.tbl</kbd> (provided in the <kbd>WRFDA/var/obsproc/</kbd> directory). For these observations, the first 5 digits of the "ID" field must correspond to one of the codes contained in that table.</li>
+       </ul></blockquote></blockquote>
+
 
 
 <!-- 
