@@ -690,14 +690,6 @@ body {
                 <td>MADIS NOAA Profiler Network NWS N</td>
                 <td>This field is only included for human readability. Can be any text: often used to describe the source or data stream from which the observation was obtained.</td>
               </tr>
-              <tr style="color:rgba(0, 0, 0, 0.5);">
-                <td><b>Valid fields</b></td>
-                <td>I10</td>
-                <td>Number of valid fields in the observation</td>
-                <td>Unused</td>
-                <td>5</td>
-                <td></td>
-              </tr>
               <tr style="background-color:#AADDCC;">
                 <td><b>Elevation</b></td>
                 <td>F20.5</td>
@@ -706,6 +698,62 @@ body {
                 <td>1626.00000</td>
                 <td><a href=#elevation>See note about elevation for different observations</a></td>
               </tr>
+              <tr style="color:rgba(0, 0, 0, 0.5);">
+                <td><b>Valid fields</b></td>
+                <td>I10</td>
+                <td>Number of valid fields in the observation</td>
+                <td>Unused</td>
+                <td>5</td>
+                <td></td>
+              </tr>
+              <tr style="color:rgba(0, 0, 0, 0.5);">
+                <td><b>Errors</b></td>
+                <td>I10</td>
+                <td>Number of errors reported in writing the observation</td>
+                <td>Unused</td>
+                <td>0</td>
+                <td></td>
+              </tr>
+              <tr style="color:rgba(0, 0, 0, 0.5);">
+                <td><b>Warnings</b></td>
+                <td>I10</td>
+                <td>Number of warnings reported in writing the observation</td>
+                <td>Unused</td>
+                <td>0</td>
+                <td></td>
+              </tr>
+              <tr style="background-color:#FFFF99;">
+                <td><b>Sequence number</b></td>
+                <td>I10</td>
+                <td>The sequential order of this observation type/set</td>
+                <td>Optional</td>
+                <td>523</td>
+                <td>This field is only used as one of the "tiebreakers" for deciding which observation header will be kept when merging duplicate obs. It is assumed that lower numbers are more recent observations.</td>
+              </tr>
+              <tr style="color:rgba(0, 0, 0, 0.5);">
+                <td><b>Duplicates</b></td>
+                <td>I10</td>
+                <td>Number of duplicate observations</td>
+                <td>Unused</td>
+                <td>0</td>
+                <td></td>
+              </tr>
+              <tr style="color:rgba(0, 0, 0, 0.5);">
+                <td><b>Is sounding</b></td>
+                <td>L10</td>
+                <td>Logical flag: true if observation has multiple levels</td>
+                <td>Unused</td>
+                <td>F</td>
+                <td></td>
+              </tr>
+              <tr style="background-color:#FFFF99;">
+                <td><b>Bogus</b></td>
+                <td>L10</td>
+                <td>Logical flag: true if observation is a "bogus" observation</td>
+                <td>Optional</td>
+                <td>T</td>
+                <td>This field is only used for some internal quality control checks that should not apply to "bogus" type observations.</td>
+              </tr> 
            </table></p>
 
 
